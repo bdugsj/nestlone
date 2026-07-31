@@ -1,0 +1,89 @@
+# syntax=docker/dockerfile:1
+# Nestlone + CodeWhale — Kali-based security analysis & pentest container.
+#
+# Build:  docker compose build
+# Run:    docker compose up -d
+# Shell:  docker exec -it nestlone bash
+#
+# Multi-stage: Rust build (Debian) + Kali runtime with pentest tools.
+
+ARG RUST_VERSION=1.88
+
+# ── Stage 1: Build CodeWhale ───────────────────────────────────────────
+FROM rust:${RUST_VERSION}-slim-bookworm AS builder
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    pkg-config libssl-dev libdbus-1-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /build
+COPY . .
+
+RUN cargo build --release \
+    -p codewhale-cli -p codewhale-tui \
+    && mkdir -p /out \
+    && cp target/release/codewhale /out/ \
+    && cp target/release/codew /out/ \
+    && cp target/release/codewhale-tui /out/
+
+# ── Stage 2: Kali Runtime ─────────────────────────────────────────────
+FROM kalilinux/kali-rolling
+
+# Avoid interactive prompts during package install
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Switch to a nearby mirror for faster downloads.
+# Override with --build-arg KALI_MIRROR=mirrors.tuna.tsinghua.edu.cn
+ARG KALI_MIRROR=mirrors.ustc.edu.cn
+RUN echo "deb http://${KALI_MIRROR}/kali kali-rolling main contrib non-free non-free-firmware" > /etc/apt/sources.list
+
+# Kali tools + runtime deps
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    # ── Runtime deps ──
+    ca-certificates libdbus-1-3 libssl3 python3 python3-pip git \
+    curl wget xxd \
+    # ── Pentest: recon ──
+    nmap dnsrecon dnsutils enum4linux smbclient whatweb \
+    # ── Pentest: web ──
+    nikto dirb gobuster ffuf \
+    # ── Pentest: exploitation ──
+    sqlmap hydra metasploit-framework \
+    # ── Pentest: password ──
+    john hashcat \
+    # ── Pentest: exploit search ──
+    exploitdb \
+    # ── Python MCP deps ──
+    python3-httpx \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install mcp SDK
+RUN pip3 install --break-system-packages mcp
+
+# Non-root user
+RUN groupadd --gid 1000 nestlone \
+    && useradd --create-home --shell /bin/bash --uid 1000 --gid 1000 nestlone \
+    && install -d -m 0700 -o nestlone -g nestlone /home/nestlone/.codewhale \
+    && install -d -m 0755 -o nestlone -g nestlone /opt/nestlone/mcp \
+    && install -d -m 0755 -o nestlone -g nestlone /workspace
+
+# Copy CodeWhale binaries
+COPY --from=builder --chown=nestlone:nestlone /out/codewhale /usr/local/bin/codewhale
+COPY --from=builder --chown=nestlone:nestlone /out/codew /usr/local/bin/codew
+COPY --from=builder --chown=nestlone:nestlone /out/codewhale-tui /usr/local/bin/codewhale-tui
+
+# Copy MCP servers
+COPY --chown=nestlone:nestlone mcp/ /opt/nestlone/mcp/
+
+# Copy MCP config for CodeWhale
+COPY --chown=nestlone:nestlone .codewhale/mcp.json /home/nestlone/.codewhale/mcp.json
+
+# Copy entrypoint
+COPY --chown=nestlone:nestlone entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+USER nestlone
+WORKDIR /workspace
+
+EXPOSE 7878
+
+ENTRYPOINT ["/entrypoint.sh"]

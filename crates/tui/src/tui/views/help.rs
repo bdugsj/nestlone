@@ -1,0 +1,1289 @@
+//! Searchable help overlay for `Alt+?`, `F1`, and `Ctrl+/`.
+//!
+//! Renders two stacked sections — *Slash commands* and *Keybindings* — with
+//! a live substring filter applied as the user types in the search box. The
+//! entry point decides which section comes first: `/help` and context-menu
+//! Help lead with commands, while keyboard shortcuts lead with the key
+//! reference that the footer promises. The command list is sourced from
+//! [`crate::commands::command_infos()`] and the keybinding list from
+//! [`crate::tui::keybindings::KEYBINDINGS`] so neither can drift from the
+//! wired-up handlers.
+//!
+//! Keys: any printable character extends the filter, `Backspace` (or `Ctrl+H`)
+//! shrinks it,
+//! `↑`/`↓` (or `Ctrl+P`/`Ctrl+N`) move the selection, `PgUp`/`PgDn` jump by
+//! ten rows, `Home`/`End` jump to ends, and `Esc` closes. Pressing `?` again
+//! at the call-site (`tui::ui`) also toggles the overlay closed.
+
+use std::borrow::Cow;
+use std::cell::RefCell;
+use std::path::Path;
+
+use crossterm::event::{KeyCode, KeyEvent, KeyModifiers, MouseButton, MouseEvent, MouseEventKind};
+use ratatui::{
+    buffer::Buffer,
+    layout::Rect,
+    style::{Modifier, Style},
+    text::{Line, Span},
+    widgets::{Paragraph, Widget},
+};
+use unicode_width::UnicodeWidthStr;
+
+use crate::commands;
+use crate::localization::{Locale, MessageId, tr};
+use crate::palette;
+use crate::tui::keybindings::KEYBINDINGS;
+use crate::tui::menu_style;
+use crate::tui::views::{
+    ActionHint, ModalKind, ModalView, ViewAction, render_modal_footer, render_panel_scroll_rail,
+    render_underwater_surface,
+};
+
+/// Two top-level sections rendered in the overlay.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum HelpSection {
+    Command,
+    UserCommand,
+    Skill,
+    Keybinding,
+}
+
+impl HelpSection {
+    fn label(self, locale: Locale) -> Cow<'static, str> {
+        match self {
+            Self::Command => tr(locale, MessageId::HelpSlashCommands),
+            Self::UserCommand => tr(locale, MessageId::HelpUserCommands),
+            Self::Skill => tr(locale, MessageId::HelpSkills),
+            Self::Keybinding => tr(locale, MessageId::HelpKeybindings),
+        }
+    }
+}
+
+/// Which reference surface owns the first visible section when Help opens.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum HelpOrdering {
+    /// `/help` and context-menu Help are command discovery surfaces.
+    CommandsFirst,
+    /// F1 and its Ctrl+/ and Alt+? fallbacks open the keyboard reference.
+    KeybindingsFirst,
+}
+
+impl HelpOrdering {
+    fn section_rank(self, section: HelpSection) -> u8 {
+        // User commands and skills sit with the built-in commands: they are
+        // the same kind of thing to the user (#3912), so a keyboard-reference
+        // open still sorts every command surface below the chords.
+        match (self, section) {
+            (Self::CommandsFirst, HelpSection::Command) => 0,
+            (Self::CommandsFirst, HelpSection::UserCommand) => 1,
+            (Self::CommandsFirst, HelpSection::Skill) => 2,
+            (Self::CommandsFirst, HelpSection::Keybinding) => 3,
+            (Self::KeybindingsFirst, HelpSection::Keybinding) => 0,
+            (Self::KeybindingsFirst, HelpSection::Command) => 1,
+            (Self::KeybindingsFirst, HelpSection::UserCommand) => 2,
+            (Self::KeybindingsFirst, HelpSection::Skill) => 3,
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+struct HelpEntry {
+    section: HelpSection,
+    /// Sort-within-section key — keybinding entries reuse their declared
+    /// section's rank so the help overlay groups Navigation, Editing, … in
+    /// the same order as `tui::keybindings`.
+    sub_rank: u8,
+    label: String,
+    description: String,
+    /// Lowercased haystack used for substring matching; pre-built so each
+    /// keystroke does not re-allocate per entry.
+    haystack: String,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum HelpRenderRow {
+    Section(HelpSection),
+    Entry { slot: usize, entry_idx: usize },
+}
+
+pub struct HelpView {
+    locale: Locale,
+    ordering: HelpOrdering,
+    entries: Vec<HelpEntry>,
+    /// Indices into `entries`, in display order, after filtering.
+    filtered: Vec<usize>,
+    query: String,
+    selected: usize,
+    row_hitboxes: RefCell<Vec<(Rect, usize)>>,
+}
+
+impl Default for HelpView {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl HelpView {
+    pub fn new() -> Self {
+        Self::new_for_locale(Locale::En)
+    }
+
+    pub fn new_for_locale(locale: Locale) -> Self {
+        Self::new_with_ordering(locale, HelpOrdering::CommandsFirst)
+    }
+
+    /// Discoverability index over every user-invocable surface (#3912):
+    /// built-ins, workspace commands, and discovered skills. `skills` comes
+    /// from `App::cached_skills`; pass `&[]` only where none are discovered.
+    pub fn new_for_workspace(
+        locale: Locale,
+        workspace: &Path,
+        skills: &[(String, String)],
+    ) -> Self {
+        commands::user_registry::with_registry_for_workspace(Some(workspace), |registry| {
+            Self::new_with_registry(locale, HelpOrdering::CommandsFirst, registry, skills)
+        })
+    }
+
+    /// Open Help as the keyboard reference promised by shell shortcut hints.
+    pub fn new_for_shortcuts(
+        locale: Locale,
+        workspace: &Path,
+        skills: &[(String, String)],
+    ) -> Self {
+        commands::user_registry::with_registry_for_workspace(Some(workspace), |registry| {
+            Self::new_with_registry(locale, HelpOrdering::KeybindingsFirst, registry, skills)
+        })
+    }
+
+    fn new_with_ordering(locale: Locale, ordering: HelpOrdering) -> Self {
+        let registry = commands::user_registry::UserCommandRegistry::new();
+        Self::new_with_registry(locale, ordering, &registry, &[])
+    }
+
+    fn new_with_registry(
+        locale: Locale,
+        ordering: HelpOrdering,
+        registry: &commands::user_registry::UserCommandRegistry,
+        skills: &[(String, String)],
+    ) -> Self {
+        let entries = build_entries(locale, registry, skills);
+        let mut view = Self {
+            locale,
+            ordering,
+            entries,
+            filtered: Vec::new(),
+            query: String::new(),
+            selected: 0,
+            row_hitboxes: RefCell::new(Vec::new()),
+        };
+        view.refilter();
+        view
+    }
+
+    fn tr(&self, id: MessageId) -> Cow<'static, str> {
+        tr(self.locale, id)
+    }
+
+    fn refilter(&mut self) {
+        // Substring matching is intentional — fuzzy matchers can hide the
+        // exact-prefix hit a user is typing toward, which is the wrong
+        // failure mode for a *help* surface. We split on whitespace so
+        // multi-term queries (`apply mode`) act as an AND.
+        let query = self.query.trim().to_ascii_lowercase();
+        let terms: Vec<&str> = query
+            .split_whitespace()
+            .filter(|term| !term.is_empty())
+            .collect();
+
+        let mut filtered: Vec<usize> = self
+            .entries
+            .iter()
+            .enumerate()
+            .filter(|(_, entry)| terms.iter().all(|term| entry.haystack.contains(term)))
+            .map(|(idx, _)| idx)
+            .collect();
+
+        filtered.sort_by_key(|idx| {
+            let entry = &self.entries[*idx];
+            (
+                self.ordering.section_rank(entry.section),
+                entry.sub_rank,
+                entry.label.clone(),
+            )
+        });
+        self.filtered = filtered;
+        if self.selected >= self.filtered.len() {
+            self.selected = self.filtered.len().saturating_sub(1);
+        }
+    }
+
+    fn move_selection(&mut self, delta: isize) {
+        // #4755: help list wraps at both ends (same as other modal lists).
+        self.selected = crate::tui::list_nav::wrap_index(self.selected, self.filtered.len(), delta);
+    }
+
+    fn move_selection_wrapping(&mut self, delta: isize) {
+        self.move_selection(delta);
+    }
+
+    fn render_rows(&self) -> Vec<HelpRenderRow> {
+        let mut rows = Vec::new();
+        let mut active_section: Option<HelpSection> = None;
+
+        for (slot, entry_idx) in self.filtered.iter().copied().enumerate() {
+            let entry = &self.entries[entry_idx];
+            if active_section != Some(entry.section) {
+                rows.push(HelpRenderRow::Section(entry.section));
+                active_section = Some(entry.section);
+            }
+            rows.push(HelpRenderRow::Entry { slot, entry_idx });
+        }
+
+        rows
+    }
+
+    fn selected_render_row(rows: &[HelpRenderRow], selected: usize) -> usize {
+        rows.iter()
+            .position(|row| matches!(row, HelpRenderRow::Entry { slot, .. } if *slot == selected))
+            .unwrap_or(0)
+    }
+
+    fn visible_row_start(rows: &[HelpRenderRow], selected: usize, visible_budget: usize) -> usize {
+        if rows.len() <= visible_budget {
+            return 0;
+        }
+
+        let selected_row = Self::selected_render_row(rows, selected);
+        let half = visible_budget / 2;
+        if selected_row <= half {
+            0
+        } else if selected_row + half >= rows.len() {
+            rows.len().saturating_sub(visible_budget)
+        } else {
+            selected_row.saturating_sub(half)
+        }
+    }
+}
+
+fn build_entries(
+    locale: Locale,
+    registry: &commands::user_registry::UserCommandRegistry,
+    skills: &[(String, String)],
+) -> Vec<HelpEntry> {
+    let mut entries = Vec::new();
+
+    for command in commands::command_infos() {
+        if registry.get(command.name).is_some() {
+            continue;
+        }
+        let label = format!("/{}", command.name);
+        let localized = command.description_for(locale);
+        let visible_aliases = command
+            .aliases
+            .iter()
+            .copied()
+            .filter(|alias| registry.get(alias).is_none())
+            .collect::<Vec<_>>();
+        let description = if visible_aliases.is_empty() {
+            localized.to_string()
+        } else {
+            format!(
+                "{}  (aliases: {})",
+                localized,
+                visible_aliases
+                    .iter()
+                    .map(|a| format!("/{a}"))
+                    .collect::<Vec<_>>()
+                    .join(", ")
+            )
+        };
+        let haystack = format!(
+            "{} {} {}",
+            label.to_ascii_lowercase(),
+            description.to_ascii_lowercase(),
+            command.usage.to_ascii_lowercase()
+        );
+        entries.push(HelpEntry {
+            section: HelpSection::Command,
+            // Commands have no inherent ordering — fall back to alphabetical
+            // by leaning on `label.clone()` in the final sort_by_key tuple.
+            sub_rank: 0,
+            label,
+            description,
+            haystack,
+        });
+    }
+
+    // Workspace commands (#3912). The registry was already consulted above to
+    // suppress shadowed built-ins; until now it never contributed a row of its
+    // own, so `.codewhale/commands/*.md` authors could not find their own work
+    // in the surface that teaches the product. `hidden` entries stay out.
+    for command in registry.iter().filter(|command| !command.hidden) {
+        let label = format!("/{}", command.name);
+        let description = command
+            .description
+            .as_deref()
+            .map(str::trim)
+            .filter(|description| !description.is_empty())
+            .unwrap_or_default()
+            .to_string();
+        let usage = command
+            .display_usage()
+            .map(str::to_owned)
+            .unwrap_or_else(|| label.clone());
+        let haystack = format!(
+            "{} {} {}",
+            label.to_ascii_lowercase(),
+            description.to_ascii_lowercase(),
+            usage.to_ascii_lowercase()
+        );
+        entries.push(HelpEntry {
+            section: HelpSection::UserCommand,
+            sub_rank: 0,
+            label,
+            description,
+            haystack,
+        });
+    }
+
+    // Skills dispatch as `$name` or `/skill name`; advertise the shape the
+    // user actually types.
+    for (name, description) in skills {
+        let label = format!("${name}");
+        let description = description.trim().to_string();
+        let haystack = format!(
+            "{} {} /skill {}",
+            label.to_ascii_lowercase(),
+            description.to_ascii_lowercase(),
+            name.to_ascii_lowercase()
+        );
+        entries.push(HelpEntry {
+            section: HelpSection::Skill,
+            sub_rank: 0,
+            label,
+            description,
+            haystack,
+        });
+    }
+
+    for binding in KEYBINDINGS {
+        // macOS renders Alt chords with the Option glyph (`⌥V`), never
+        // `Alt`/`Cmd` (TUI-DOG-002 acceptance).
+        let label = crate::tui::shell_key_routing::display_chord(binding.chord).into_owned();
+        let description = format!(
+            "[{}] {}",
+            binding.section.label(locale),
+            tr(locale, binding.description_id)
+        );
+        let haystack = format!(
+            "{} {}",
+            label.to_ascii_lowercase(),
+            description.to_ascii_lowercase()
+        );
+        entries.push(HelpEntry {
+            section: HelpSection::Keybinding,
+            sub_rank: binding.section.rank(),
+            label,
+            description,
+            haystack,
+        });
+    }
+
+    entries
+}
+
+fn truncate_to_width(text: &str, max_width: usize) -> String {
+    if max_width == 0 {
+        return String::new();
+    }
+    if text.width() <= max_width {
+        return text.to_string();
+    }
+    let mut out = String::new();
+    let limit = max_width.saturating_sub(1);
+    for ch in text.chars() {
+        let next_width = out.width() + ch.to_string().width();
+        if next_width > limit {
+            break;
+        }
+        out.push(ch);
+    }
+    out.push('…');
+    out
+}
+
+impl ModalView for HelpView {
+    fn kind(&self) -> ModalKind {
+        ModalKind::Help
+    }
+
+    fn as_any_mut(&mut self) -> &mut dyn std::any::Any {
+        self
+    }
+
+    fn handle_mouse(&mut self, mouse: MouseEvent) -> ViewAction {
+        // Scroll clamps at the ends (keyboard Up/Down wrap); wheel-wrapping
+        // reads as disorienting.
+        match mouse.kind {
+            MouseEventKind::ScrollUp => self.move_selection(-1),
+            MouseEventKind::ScrollDown => self.move_selection(1),
+            MouseEventKind::Down(MouseButton::Left) => {
+                if let Some(slot) = self.row_hitboxes.borrow().iter().find_map(|(rect, slot)| {
+                    rect.contains(ratatui::layout::Position::new(mouse.column, mouse.row))
+                        .then_some(*slot)
+                }) {
+                    self.selected = slot;
+                }
+            }
+            _ => {}
+        }
+        ViewAction::None
+    }
+
+    fn handle_key(&mut self, key: KeyEvent) -> ViewAction {
+        match key.code {
+            KeyCode::Esc => ViewAction::Close,
+            KeyCode::Char('c') if key.modifiers.contains(KeyModifiers::CONTROL) => {
+                ViewAction::Close
+            }
+            KeyCode::Char('q') | KeyCode::Char('Q') if self.query.is_empty() => ViewAction::Close,
+            KeyCode::Up => {
+                self.move_selection_wrapping(-1);
+                ViewAction::None
+            }
+            KeyCode::Down => {
+                self.move_selection_wrapping(1);
+                ViewAction::None
+            }
+            KeyCode::Char('p') if key.modifiers.contains(KeyModifiers::CONTROL) => {
+                self.move_selection_wrapping(-1);
+                ViewAction::None
+            }
+            KeyCode::Char('n') if key.modifiers.contains(KeyModifiers::CONTROL) => {
+                self.move_selection_wrapping(1);
+                ViewAction::None
+            }
+            KeyCode::PageUp => {
+                self.move_selection(-10);
+                ViewAction::None
+            }
+            KeyCode::PageDown => {
+                self.move_selection(10);
+                ViewAction::None
+            }
+            KeyCode::Home => {
+                self.selected = 0;
+                ViewAction::None
+            }
+            KeyCode::End => {
+                if !self.filtered.is_empty() {
+                    self.selected = self.filtered.len() - 1;
+                }
+                ViewAction::None
+            }
+            KeyCode::Backspace => {
+                self.query.pop();
+                self.refilter();
+                ViewAction::None
+            }
+            // Terminals where stty erase == ^H send Ctrl+H instead of
+            // Backspace (DEL). Treat it identically so the filter input
+            // works across all platforms (#958).
+            KeyCode::Char('h') if key.modifiers.contains(KeyModifiers::CONTROL) => {
+                self.query.pop();
+                self.refilter();
+                ViewAction::None
+            }
+            KeyCode::Char(c)
+                if !c.is_control()
+                    && (key.modifiers.is_empty() || key.modifiers == KeyModifiers::SHIFT) =>
+            {
+                self.query.push(c);
+                self.refilter();
+                ViewAction::None
+            }
+            _ => ViewAction::None,
+        }
+    }
+
+    fn render(&self, area: Rect, buf: &mut Buffer) {
+        self.row_hitboxes.borrow_mut().clear();
+        let inner = render_underwater_surface(
+            area,
+            buf,
+            format!(
+                "{} — {}",
+                self.tr(MessageId::HelpTitle),
+                self.tr(MessageId::HelpSubtitle)
+            ),
+        );
+
+        // The action footer wraps inside the modal body (#3732) rather than the
+        // single-line border title that silently clipped hints at narrow
+        // widths; the list renders into the content area above it. Empty hint
+        // keys keep the existing localized footer phrases as plain labels.
+        let content = render_modal_footer(
+            inner,
+            buf,
+            &[
+                ActionHint::new("", self.tr(MessageId::HelpFooterTypeFilter)),
+                ActionHint::new("", self.tr(MessageId::HelpFooterMove)),
+                ActionHint::new("", self.tr(MessageId::HelpFooterJump)),
+                ActionHint::new("", self.tr(MessageId::HelpFooterClose)),
+            ],
+        );
+
+        let mut lines: Vec<Line<'static>> = Vec::new();
+
+        let query_label = if self.query.is_empty() {
+            self.tr(MessageId::HelpFilterPlaceholder).to_string()
+        } else {
+            format!("{}{}", self.tr(MessageId::HelpFilterPrefix), self.query)
+        };
+        lines.push(Line::from(Span::styled(
+            query_label,
+            Style::default()
+                .fg(palette::WHALE_INFO)
+                .add_modifier(Modifier::BOLD),
+        )));
+
+        let match_count = if self.query.is_empty() {
+            format!("{} entries", self.entries.len())
+        } else {
+            format!("{} / {} matches", self.filtered.len(), self.entries.len())
+        };
+        lines.push(Line::from(Span::styled(
+            match_count,
+            Style::default()
+                .fg(palette::TEXT_DIM)
+                .add_modifier(Modifier::ITALIC),
+        )));
+        lines.push(Line::from(""));
+
+        let rows = self.render_rows();
+        let visible_rows = content.height.saturating_sub(lines.len() as u16) as usize;
+        let row_start = Self::visible_row_start(&rows, self.selected, visible_rows.max(1));
+        // Reserve the rail before calculating column widths. Otherwise the
+        // description column writes beneath the rail on compact terminals.
+        let content = render_panel_scroll_rail(
+            content,
+            buf,
+            rows.len(),
+            row_start,
+            visible_rows.max(1),
+            true,
+        );
+
+        if self.filtered.is_empty() {
+            lines.push(Line::from(Span::styled(
+                self.tr(MessageId::HelpNoMatches),
+                Style::default()
+                    .fg(palette::TEXT_MUTED)
+                    .add_modifier(Modifier::ITALIC),
+            )));
+        } else {
+            // The chord/label column takes up to 28 cols on wide screens;
+            // descriptions fill the remainder. Borders and padding eat 4
+            // cells from each side (border 1 + padding 1) × 2.
+            let inner_width = content.width as usize;
+            let label_width = 28.min(inner_width.saturating_sub(8));
+            let desc_capacity = inner_width.saturating_sub(label_width + 4);
+
+            // `content` is the body area above the wrapping footer (the block's
+            // border, padding, and footer rows already removed), so budgeting
+            // against its height keeps selected rows clear of the footer.
+            let header_lines = lines.len();
+            let visible_budget = (content.height as usize)
+                .saturating_sub(header_lines)
+                .max(1);
+
+            for row in rows.iter().skip(row_start).take(visible_budget) {
+                match *row {
+                    HelpRenderRow::Section(section) => {
+                        let count = self
+                            .filtered
+                            .iter()
+                            .filter(|idx| self.entries[**idx].section == section)
+                            .count();
+                        lines.push(Line::from(Span::styled(
+                            format!("  {} ({})", section.label(self.locale), count),
+                            Style::default()
+                                .fg(palette::WHALE_ACTION)
+                                .add_modifier(Modifier::BOLD),
+                        )));
+                    }
+                    HelpRenderRow::Entry { slot, entry_idx } => {
+                        let row_y = content.y.saturating_add(lines.len() as u16);
+                        self.row_hitboxes
+                            .borrow_mut()
+                            .push((Rect::new(content.x, row_y, content.width, 1), slot));
+                        let entry = &self.entries[entry_idx];
+                        let is_selected = slot == self.selected;
+                        let style = if is_selected {
+                            menu_style::selected_row_style()
+                        } else {
+                            Style::default().fg(palette::TEXT_PRIMARY)
+                        };
+                        let cursor =
+                            format!("{} ", crate::tui::glyphs::selection_marker(is_selected));
+                        let label = truncate_to_width(&entry.label, label_width);
+                        let desc = truncate_to_width(&entry.description, desc_capacity);
+                        let line_text = format!("{cursor}{label:<label_width$}  {desc}",);
+                        lines.push(Line::from(Span::styled(line_text, style)));
+                    }
+                }
+            }
+        }
+
+        Paragraph::new(lines).render(content, buf);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
+
+    fn key(code: KeyCode) -> KeyEvent {
+        KeyEvent::new(code, KeyModifiers::NONE)
+    }
+
+    fn type_filter(view: &mut HelpView, text: &str) {
+        for ch in text.chars() {
+            view.handle_key(KeyEvent::new(KeyCode::Char(ch), KeyModifiers::NONE));
+        }
+    }
+
+    fn first_filtered_section(view: &HelpView) -> HelpSection {
+        view.entries[*view
+            .filtered
+            .first()
+            .expect("help should contain at least one entry")]
+        .section
+    }
+
+    #[test]
+    fn empty_filter_lists_all_entries() {
+        let view = HelpView::new();
+        // Total = registered slash commands + catalogued keybindings.
+        let expected = commands::command_infos().len() + KEYBINDINGS.len();
+        assert_eq!(view.filtered.len(), expected);
+        assert_eq!(view.entries.len(), expected);
+    }
+
+    #[test]
+    fn entry_points_choose_the_section_they_promise() {
+        let commands = HelpView::new_for_locale(Locale::En);
+        assert_eq!(commands.ordering, HelpOrdering::CommandsFirst);
+        assert_eq!(first_filtered_section(&commands), HelpSection::Command);
+
+        let shortcuts = HelpView::new_with_ordering(Locale::En, HelpOrdering::KeybindingsFirst);
+        assert_eq!(shortcuts.ordering, HelpOrdering::KeybindingsFirst);
+        assert_eq!(first_filtered_section(&shortcuts), HelpSection::Keybinding);
+    }
+
+    #[test]
+    fn workspace_help_hides_user_shadowed_debt_aliases_from_copy_and_search() {
+        let tmp = tempfile::TempDir::new().unwrap();
+        let commands_dir = tmp.path().join(".codewhale").join("commands");
+        std::fs::create_dir_all(&commands_dir).unwrap();
+        std::fs::write(
+            commands_dir.join("slop.md"),
+            "---\ndescription: Internal cleanup\nhidden: true\n---\ninternal cleanup",
+        )
+        .unwrap();
+        std::fs::write(
+            commands_dir.join("custom-debt.md"),
+            "---\ndescription: Custom debt flow\nalias: canzha\n---\ncustom debt",
+        )
+        .unwrap();
+
+        for (term, mut view) in [
+            (
+                "slop",
+                HelpView::new_for_workspace(Locale::En, tmp.path(), &[]),
+            ),
+            (
+                "canzha",
+                HelpView::new_for_shortcuts(Locale::En, tmp.path(), &[]),
+            ),
+        ] {
+            let debt = view
+                .entries
+                .iter()
+                .find(|entry| entry.label == "/debt")
+                .expect("canonical /debt help should remain visible");
+            assert!(debt.description.contains("/cleanup"));
+            assert!(!debt.description.contains("/slop"));
+            assert!(!debt.description.contains("/canzha"));
+
+            type_filter(&mut view, term);
+            assert!(
+                view.filtered
+                    .iter()
+                    .all(|idx| view.entries[*idx].label != "/debt")
+            );
+        }
+    }
+
+    #[test]
+    fn workspace_commands_and_skills_are_findable_with_provenance() {
+        // #3912: both surfaces executed and autocompleted but were absent
+        // from the surface that teaches the product.
+        let tmp = tempfile::TempDir::new().unwrap();
+        let commands_dir = tmp.path().join(".codewhale").join("commands");
+        std::fs::create_dir_all(&commands_dir).unwrap();
+        std::fs::write(
+            commands_dir.join("shipit.md"),
+            "---\ndescription: Cut a release candidate\n---\nbody",
+        )
+        .unwrap();
+        std::fs::write(
+            commands_dir.join("secret.md"),
+            "---\ndescription: Internal only\nhidden: true\n---\nbody",
+        )
+        .unwrap();
+
+        let skills = vec![(
+            "codereview".to_string(),
+            "Review a diff for defects".to_string(),
+        )];
+        let mut view = HelpView::new_for_workspace(Locale::En, tmp.path(), &skills);
+
+        let user = view
+            .entries
+            .iter()
+            .find(|entry| entry.label == "/shipit")
+            .expect("workspace command should be listed");
+        assert_eq!(user.section, HelpSection::UserCommand);
+        assert!(user.description.contains("Cut a release candidate"));
+
+        let skill = view
+            .entries
+            .iter()
+            .find(|entry| entry.label == "$codereview")
+            .expect("discovered skill should be listed");
+        assert_eq!(skill.section, HelpSection::Skill);
+
+        assert!(
+            !view.entries.iter().any(|entry| entry.label == "/secret"),
+            "hidden workspace commands stay out of the overlay"
+        );
+
+        // Both are reachable through the existing substring filter.
+        type_filter(&mut view, "shipit");
+        assert!(
+            view.filtered
+                .iter()
+                .any(|idx| view.entries[*idx].label == "/shipit")
+        );
+
+        let mut view = HelpView::new_for_workspace(Locale::En, tmp.path(), &skills);
+        type_filter(&mut view, "review a diff");
+        assert!(
+            view.filtered
+                .iter()
+                .any(|idx| view.entries[*idx].label == "$codereview"),
+            "skills are findable by their description"
+        );
+    }
+
+    #[test]
+    fn skill_rows_advertise_the_slash_skill_shape_too() {
+        let tmp = tempfile::TempDir::new().unwrap();
+        let skills = vec![("audit".to_string(), "Audit the tree".to_string())];
+        let mut view = HelpView::new_for_workspace(Locale::En, tmp.path(), &skills);
+        type_filter(&mut view, "/skill audit");
+        assert!(
+            view.filtered
+                .iter()
+                .any(|idx| view.entries[*idx].label == "$audit"),
+            "searching the /skill form finds the skill"
+        );
+    }
+
+    #[test]
+    fn help_hides_builtins_with_shadowed_canonical_names() {
+        let registry = commands::user_registry::UserCommandRegistry::from_loaded(vec![(
+            "debt".to_string(),
+            "---\ndescription: Custom debt\n---\ncustom debt".to_string(),
+        )]);
+        let entries = build_entries(Locale::En, &registry, &[]);
+
+        // The built-in row is suppressed so the name is not advertised twice.
+        assert!(
+            !entries
+                .iter()
+                .any(|entry| entry.label == "/debt" && entry.section == HelpSection::Command),
+            "the shadowed built-in must not keep its own row"
+        );
+        // Since #3912 the shadowing workspace command supplies the row instead
+        // of the name vanishing from help entirely.
+        let user = entries
+            .iter()
+            .find(|entry| entry.label == "/debt")
+            .expect("the user command that shadows /debt should be listed");
+        assert_eq!(user.section, HelpSection::UserCommand);
+        assert!(user.description.contains("Custom debt"));
+    }
+
+    #[test]
+    fn substring_filter_narrows_to_command() {
+        let mut view = HelpView::new();
+        type_filter(&mut view, "mode [act");
+        assert!(!view.filtered.is_empty());
+        // Every filtered entry should genuinely contain the query in its
+        // searchable haystack — no false positives slipped past.
+        for idx in &view.filtered {
+            assert!(
+                view.entries[*idx].haystack.contains("mode [act"),
+                "entry {:?} leaked through `mode [act` filter",
+                view.entries[*idx]
+            );
+        }
+        // The unified `/mode` command must surface when filtering for a
+        // concrete mode value from the visible vocabulary.
+        assert!(
+            view.filtered
+                .iter()
+                .any(|idx| view.entries[*idx].label == "/mode"),
+            "/mode should match the `mode [act` filter"
+        );
+    }
+
+    #[test]
+    fn substring_filter_finds_keybinding_by_chord() {
+        let mut view = HelpView::new();
+        type_filter(&mut view, "ctrl+r");
+        assert!(!view.filtered.is_empty(), "Ctrl+R should match");
+        assert!(
+            view.filtered
+                .iter()
+                .any(|idx| view.entries[*idx].label.eq_ignore_ascii_case("ctrl+r")),
+            "Ctrl+R chord must surface in the filtered set"
+        );
+    }
+
+    #[test]
+    fn multiple_terms_act_as_and() {
+        let mut view = HelpView::new();
+        type_filter(&mut view, "session picker");
+        assert!(
+            !view.filtered.is_empty(),
+            "expected at least one entry mentioning both `session` and `picker`"
+        );
+        for idx in &view.filtered {
+            let haystack = &view.entries[*idx].haystack;
+            assert!(
+                haystack.contains("session") && haystack.contains("picker"),
+                "entry {:?} leaked through `session picker` AND filter",
+                view.entries[*idx]
+            );
+        }
+    }
+
+    #[test]
+    fn unknown_filter_yields_empty_set() {
+        let mut view = HelpView::new();
+        type_filter(&mut view, "zzzqqxxnope");
+        assert!(view.filtered.is_empty());
+        assert_eq!(view.selected, 0);
+    }
+
+    #[test]
+    fn backspace_widens_match_set() {
+        let mut view = HelpView::new();
+        // Near-miss against the still-visible mode vocabulary so the last
+        // character removes a unique miss and broadens the match set.
+        type_filter(&mut view, "modez");
+        let narrow = view.filtered.len();
+        view.handle_key(key(KeyCode::Backspace));
+        let wider = view.filtered.len();
+        assert!(
+            wider > narrow,
+            "backspace must broaden the matching set (was {narrow}, now {wider})"
+        );
+    }
+
+    #[test]
+    fn ctrl_h_widens_match_set() {
+        let mut view = HelpView::new();
+        type_filter(&mut view, "modez");
+        let narrow = view.filtered.len();
+        view.handle_key(KeyEvent::new(KeyCode::Char('h'), KeyModifiers::CONTROL));
+        let wider = view.filtered.len();
+        assert!(
+            wider > narrow,
+            "Ctrl+H must behave as Backspace, broadening the matching set (was {narrow}, now {wider})"
+        );
+    }
+
+    #[test]
+    fn esc_closes_overlay() {
+        let mut view = HelpView::new();
+        let action = view.handle_key(key(KeyCode::Esc));
+        assert!(matches!(action, ViewAction::Close));
+    }
+
+    #[test]
+    fn ctrl_c_closes_overlay() {
+        let mut view = HelpView::new();
+        let action = view.handle_key(KeyEvent::new(KeyCode::Char('c'), KeyModifiers::CONTROL));
+        assert!(matches!(action, ViewAction::Close));
+    }
+
+    #[test]
+    fn q_closes_empty_filter_but_types_when_filtering() {
+        let mut view = HelpView::new();
+        let action = view.handle_key(key(KeyCode::Char('q')));
+        assert!(matches!(action, ViewAction::Close));
+
+        let mut view = HelpView::new();
+        type_filter(&mut view, "mod");
+        let action = view.handle_key(key(KeyCode::Char('q')));
+        assert!(matches!(action, ViewAction::None));
+        assert_eq!(view.query, "modq");
+    }
+
+    #[test]
+    fn arrow_keys_move_selection_and_wrap_edges() {
+        let mut view = HelpView::new();
+        // Down once → row 1; Up twice wraps from the first row to the last.
+        view.handle_key(key(KeyCode::Down));
+        assert_eq!(view.selected, 1);
+        view.handle_key(key(KeyCode::Up));
+        view.handle_key(key(KeyCode::Up));
+        assert_eq!(view.selected, view.filtered.len() - 1);
+        // Down from last wraps to first; End still jumps to the last row.
+        view.handle_key(key(KeyCode::Down));
+        assert_eq!(view.selected, 0);
+        view.handle_key(key(KeyCode::End));
+        assert_eq!(view.selected, view.filtered.len() - 1);
+    }
+
+    #[test]
+    fn mouse_click_selects_visible_help_row() {
+        let mut view = HelpView::new();
+        let area = Rect::new(0, 0, 100, 30);
+        let mut buf = Buffer::empty(area);
+        view.render(area, &mut buf);
+        let (rect, slot) = view.row_hitboxes.borrow()[1];
+
+        view.handle_mouse(MouseEvent {
+            kind: MouseEventKind::Down(MouseButton::Left),
+            column: rect.x,
+            row: rect.y,
+            modifiers: KeyModifiers::NONE,
+        });
+
+        assert_eq!(view.selected, slot);
+    }
+
+    #[test]
+    fn visible_window_keeps_selected_entry_visible_after_scroll() {
+        let mut view = HelpView::new();
+        let selected = view
+            .filtered
+            .iter()
+            .position(|idx| view.entries[*idx].label == "/home")
+            .expect("/home command should be present");
+        view.selected = selected;
+
+        let rows = view.render_rows();
+        let row_start = HelpView::visible_row_start(&rows, view.selected, 12);
+        let visible = &rows[row_start..(row_start + 12).min(rows.len())];
+
+        assert!(
+            visible
+                .iter()
+                .any(|row| matches!(row, HelpRenderRow::Entry { slot, .. } if *slot == selected)),
+            "selected help entry should stay in the visible render window"
+        );
+    }
+
+    #[test]
+    fn render_keeps_next_row_after_help_visible() {
+        let mut view = HelpView::new();
+        let help_slot = view
+            .filtered
+            .iter()
+            .position(|idx| view.entries[*idx].label == "/help")
+            .expect("/help command should be present");
+        view.selected = help_slot;
+        view.handle_key(key(KeyCode::Down));
+        let selected_idx = view.filtered[view.selected];
+        let selected_label = view.entries[selected_idx].label.clone();
+
+        let area = Rect::new(0, 0, 96, 32);
+        let mut buf = Buffer::empty(area);
+        view.render(area, &mut buf);
+
+        let mut highlighted_label = false;
+        for y in area.top()..area.bottom() {
+            let mut row = String::new();
+            let mut row_has_highlight = false;
+            for x in area.left()..area.right() {
+                let cell = &buf[(x, y)];
+                row.push_str(cell.symbol());
+                row_has_highlight |=
+                    cell.bg == palette::SELECTION_BG && cell.fg == palette::SELECTION_TEXT;
+            }
+            if row_has_highlight && row.contains(&selected_label) {
+                highlighted_label = true;
+                break;
+            }
+        }
+
+        assert!(
+            highlighted_label,
+            "selected row after /help should stay visibly highlighted"
+        );
+    }
+
+    #[test]
+    fn selected_help_row_uses_selection_highlight() {
+        let view = HelpView::new();
+        let area = Rect::new(0, 0, 96, 32);
+        let mut buf = Buffer::empty(area);
+        view.render(area, &mut buf);
+
+        let mut found_highlight = false;
+        for y in area.top()..area.bottom() {
+            for x in area.left()..area.right() {
+                let cell = &buf[(x, y)];
+                if cell.bg == palette::SELECTION_BG && cell.fg == palette::SELECTION_TEXT {
+                    found_highlight = true;
+                    break;
+                }
+            }
+        }
+
+        assert!(
+            found_highlight,
+            "selected row should use the semantic selection highlight"
+        );
+    }
+
+    #[test]
+    fn render_includes_help_chrome_for_empty_filter() {
+        let view = HelpView::new();
+        let area = Rect::new(0, 0, 96, 32);
+        let mut buf = Buffer::empty(area);
+        view.render(area, &mut buf);
+
+        let dump = buffer_text(&buf, area);
+        // Title border + section headings should always render.
+        assert!(dump.contains("Help"), "missing help title:\n{dump}");
+        assert!(
+            dump.contains("Type to filter"),
+            "missing filter prompt:\n{dump}"
+        );
+        assert!(
+            dump.contains("Slash commands"),
+            "missing slash-command section heading:\n{dump}"
+        );
+        // Footer hint should advertise close key on the bottom border.
+        assert!(
+            dump.contains("Esc close"),
+            "missing Esc close footer hint:\n{dump}"
+        );
+    }
+
+    #[test]
+    fn render_with_filter_shows_only_matching_section_and_status() {
+        let mut view = HelpView::new();
+        type_filter(&mut view, "mode [act");
+        let area = Rect::new(0, 0, 96, 24);
+        let mut buf = Buffer::empty(area);
+        view.render(area, &mut buf);
+
+        let dump = buffer_text(&buf, area);
+        assert!(
+            dump.contains("Filter: mode [act"),
+            "filter echo missing:\n{dump}"
+        );
+        assert!(
+            dump.contains("matches"),
+            "match counter missing in dump:\n{dump}"
+        );
+        assert!(
+            dump.contains("/mode"),
+            "expected /mode command in filtered render:\n{dump}"
+        );
+        assert!(
+            !dump.contains("/model"),
+            "non-matching commands should not render under a `mode [act` filter:\n{dump}"
+        );
+    }
+
+    #[test]
+    fn localized_help_chrome_renders_without_missing_markers() {
+        let view = HelpView::new_for_locale(Locale::ZhHans);
+        let area = Rect::new(0, 0, 48, 18);
+        let mut buf = Buffer::empty(area);
+        view.render(area, &mut buf);
+
+        let dump = buffer_text(&buf, area);
+        assert!(
+            dump.contains('帮') && dump.contains('助'),
+            "missing localized title:\n{dump}"
+        );
+        assert!(
+            !dump.contains("MISSING"),
+            "missing-key marker leaked:\n{dump}"
+        );
+    }
+
+    #[test]
+    fn localized_help_keybinding_descriptions_use_zh_hans() {
+        let registry = commands::user_registry::UserCommandRegistry::new();
+        let entries = build_entries(Locale::ZhHans, &registry, &[]);
+        let kb_entries: Vec<_> = entries
+            .iter()
+            .filter(|e| e.section == HelpSection::Keybinding)
+            .collect();
+        assert!(!kb_entries.is_empty(), "no keybinding entries found");
+
+        for entry in &kb_entries {
+            assert!(
+                entry
+                    .description
+                    .chars()
+                    .any(|c| { ('\u{4e00}'..='\u{9fff}').contains(&c) }),
+                "keybinding description not localized: {}",
+                entry.description
+            );
+        }
+    }
+
+    /// The four terminal sizes the v0.8.66 modal blocker (#3732) requires
+    /// every overlay to remain readable and fully operable at.
+    const BLOCKER_SIZES: [(u16, u16); 4] = [(80, 24), (100, 30), (120, 32), (160, 40)];
+
+    const SHORTCUT_HELP_SIZES: [(u16, u16); 5] =
+        [(40, 12), (60, 16), (80, 24), (100, 32), (140, 40)];
+
+    #[test]
+    fn shortcut_help_leads_with_keys_at_responsive_sizes() {
+        use crate::tui::views::ViewStack;
+
+        let keybindings_heading = tr(Locale::En, MessageId::HelpKeybindings);
+        let commands_heading = tr(Locale::En, MessageId::HelpSlashCommands);
+
+        for (w, h) in SHORTCUT_HELP_SIZES {
+            let area = Rect::new(0, 0, w, h);
+            let mut buf = Buffer::empty(area);
+            for y in 0..h {
+                for x in 0..w {
+                    buf[(x, y)].set_symbol("§");
+                }
+            }
+
+            let mut stack = ViewStack::new();
+            stack.push(HelpView::new_with_ordering(
+                Locale::En,
+                HelpOrdering::KeybindingsFirst,
+            ));
+            stack.render(area, &mut buf);
+
+            let rows: Vec<String> = (0..h)
+                .map(|y| {
+                    (0..w)
+                        .map(|x| buf[(x, y)].symbol().to_string())
+                        .collect::<String>()
+                })
+                .collect();
+            let text = rows.join("\n");
+            let keys_at = text.find(keybindings_heading.as_ref()).unwrap_or_else(|| {
+                panic!("{w}x{h}: shortcut Help hid the keybindings heading:\n{text}")
+            });
+            if let Some(commands_at) = text.find(commands_heading.as_ref()) {
+                assert!(
+                    keys_at < commands_at,
+                    "{w}x{h}: shortcut Help rendered commands before keybindings:\n{text}"
+                );
+            }
+            assert!(
+                !text.contains('§'),
+                "{w}x{h}: background bleed-through into shortcut Help"
+            );
+            assert!(
+                (0..h).any(|y| {
+                    (0..w).any(|x| {
+                        let cell = &buf[(x, y)];
+                        cell.bg == palette::SELECTION_BG && cell.fg == palette::SELECTION_TEXT
+                    })
+                }),
+                "{w}x{h}: first keybinding row lost its selection highlight"
+            );
+            for (y, row) in rows.iter().enumerate() {
+                assert!(
+                    UnicodeWidthStr::width(row.trim_end()) <= w as usize,
+                    "{w}x{h}: row {y} overflows width: {row:?}"
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn help_is_usable_and_opaque_at_blocker_sizes() {
+        use crate::tui::views::ViewStack;
+        for (w, h) in BLOCKER_SIZES {
+            let area = Rect::new(0, 0, w, h);
+            let mut buf = Buffer::empty(area);
+            for y in 0..h {
+                for x in 0..w {
+                    buf[(x, y)].set_symbol("X");
+                }
+            }
+            let mut stack = ViewStack::new();
+            stack.push(HelpView::new_for_locale(Locale::En));
+            stack.render(area, &mut buf);
+
+            let rows: Vec<String> = (0..h)
+                .map(|y| {
+                    (0..w)
+                        .map(|x| buf[(x, y)].symbol().to_string())
+                        .collect::<String>()
+                })
+                .collect();
+            let text = rows.join("\n");
+
+            for label in [
+                "type to filter",
+                "Up/Down move",
+                "PgUp/PgDn jump",
+                "Esc close",
+            ] {
+                assert!(text.contains(label), "{w}x{h}: missing footer '{label}'");
+            }
+            assert!(
+                !text.contains('X'),
+                "{w}x{h}: background bleed-through into modal surface"
+            );
+            assert_eq!(
+                buf[(w / 2, h / 2)].bg,
+                palette::WHALE_BG,
+                "{w}x{h}: modal interior must be opaque"
+            );
+            for (y, row) in rows.iter().enumerate() {
+                assert!(
+                    UnicodeWidthStr::width(row.trim_end()) <= w as usize,
+                    "{w}x{h}: row {y} overflows width: {row:?}"
+                );
+            }
+        }
+    }
+
+    fn buffer_text(buf: &Buffer, area: Rect) -> String {
+        let mut out = String::new();
+        for y in area.top()..area.bottom() {
+            for x in area.left()..area.right() {
+                out.push_str(buf[(x, y)].symbol());
+            }
+            out.push('\n');
+        }
+        out
+    }
+}
