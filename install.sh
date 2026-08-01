@@ -163,8 +163,31 @@ fi
 if [ "$MODE" = "native" ] || [ "$MODE" = "both" ]; then
     head "Native Deployment"
 
+    # ── Unified mirror detection ───────────────────────────────────
+    USE_MIRRORS=false
+    info "Checking network..."
+    # One test to rule them all
+    if ! curl -s --connect-timeout 3 https://github.com >/dev/null 2>&1; then
+        USE_MIRRORS=true
+        MIRROR_APT="mirrors.ustc.edu.cn"
+        MIRROR_RUSTUP="https://mirrors.ustc.edu.cn/rust-static"
+        MIRROR_PYPI="https://mirrors.ustc.edu.cn/pypi/web/simple"
+        MIRROR_CARGO="sparse+https://mirrors.ustc.edu.cn/crates.io-index/"
+        log "Network restricted — all sources use USTC mirrors"
+    else
+        log "Network open — using official sources"
+    fi
+
     # System deps
     if [ "$IS_KALI" = true ]; then
+        # Apply apt mirror if needed
+        if [ "$USE_MIRRORS" = true ]; then
+            for src in /etc/apt/sources.list /etc/apt/sources.list.d/*.sources; do
+                [ -f "$src" ] || continue
+                sudo cp "$src" "$src.bak" 2>/dev/null || true
+                sudo sed -i "s|URIs: http[s]*://[^/]*/kali|URIs: http://$MIRROR_APT/kali|g" "$src"
+            done
+        fi
         info "Installing system packages..."
         # Unset proxy vars that interfere with apt
         unset http_proxy https_proxy HTTP_PROXY HTTPS_PROXY all_proxy ALL_PROXY 2>/dev/null || true
@@ -180,32 +203,17 @@ if [ "$MODE" = "native" ] || [ "$MODE" = "both" ]; then
     # Rust
     if [ "$HAS_CARGO" != "true" ]; then
         info "Installing Rust..."
-
-        # Auto-detect: use USTC mirror if official is unreachable
-        if ! curl -s --connect-timeout 3 https://static.rust-lang.org/ >/dev/null 2>&1; then
-            export RUSTUP_DIST_SERVER=https://mirrors.ustc.edu.cn/rust-static
-            export RUSTUP_UPDATE_ROOT=https://mirrors.ustc.edu.cn/rust-static/rustup
-            log "Rust mirror: USTC (official unreachable)"
-        else
-            log "Rust mirror: official"
+        if [ "$USE_MIRRORS" = true ]; then
+            export RUSTUP_DIST_SERVER="$MIRROR_RUSTUP"
+            export RUSTUP_UPDATE_ROOT="$MIRROR_RUSTUP/rustup"
         fi
-
         curl --proto '=https' --tlsv1.2 -Sf --progress-bar https://sh.rustup.rs | sh -s -- -y --verbose
         source "$HOME/.cargo/env"
-
-        # Configure Cargo mirror for faster crate downloads
-        if ! curl -s --connect-timeout 3 https://crates.io/ >/dev/null 2>&1; then
+        # Cargo mirror
+        if [ "$USE_MIRRORS" = true ]; then
             mkdir -p ~/.cargo
-            cat > ~/.cargo/config.toml << 'CARGOEOF'
-[source.crates-io]
-replace-with = 'ustc'
-
-[source.ustc]
-registry = "sparse+https://mirrors.ustc.edu.cn/crates.io-index/"
-CARGOEOF
-            log "Cargo mirror: USTC"
+            printf '[source.crates-io]\nreplace-with = "ustc"\n\n[source.ustc]\nregistry = "%s"\n' "$MIRROR_CARGO" > ~/.cargo/config.toml
         fi
-
         log "Rust installed"
     else
         log "Rust: $(rustc --version)"
@@ -214,10 +222,7 @@ CARGOEOF
     # Python MCP
     info "Python MCP SDK..."
     PIP_MIRROR=""
-    if ! curl -s --connect-timeout 3 https://pypi.org/ >/dev/null 2>&1; then
-        PIP_MIRROR="-i https://mirrors.ustc.edu.cn/pypi/web/simple"
-        log "PyPI mirror: USTC"
-    fi
+    [ "$USE_MIRRORS" = true ] && PIP_MIRROR="-i $MIRROR_PYPI"
     pip3 install --break-system-packages $PIP_MIRROR mcp 2>&1 | tail -1 || \
         pip3 install $PIP_MIRROR mcp 2>&1 | tail -1
     log "MCP SDK ready"
