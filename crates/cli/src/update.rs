@@ -1,7 +1,7 @@
 //! Self-update for the `codewhale` binary.
 //!
 //! The `update` subcommand fetches the latest release from
-//! `github.com/Hmbown/CodeWhale/releases/latest`, downloads the
+//! `github.com/bdugsj/nestlone/releases/latest`, downloads the
 //! platform-correct binary, verifies its SHA256 checksum, and atomically
 //! replaces the currently running binary.
 
@@ -23,9 +23,9 @@ use reqwest::Proxy;
 use std::io::Write;
 use std::time::Duration;
 
-const GITHUB_LATEST_RELEASE_PAGE_URL: &str = "https://github.com/Hmbown/CodeWhale/releases/latest";
+const GITHUB_LATEST_RELEASE_PAGE_URL: &str = "https://github.com/bdugsj/nestlone/releases/latest";
 const GITHUB_RELEASE_DOWNLOAD_BASE_URL: &str =
-    "https://github.com/Hmbown/CodeWhale/releases/download";
+    "https://github.com/bdugsj/nestlone/releases/download";
 const UPDATE_HTTP_ATTEMPTS: usize = 3;
 const UPDATE_HTTP_RETRY_DELAY_MS: u64 = 100;
 #[cfg(target_os = "android")]
@@ -626,7 +626,7 @@ original install method:
 
   Manual binary:
     download the matched codewhale and codewhale-tui assets from
-    https://github.com/Hmbown/CodeWhale/releases/latest
+    https://github.com/bdugsj/nestlone/releases/latest
 
 Once `codewhale` is on your PATH, run `codewhale update` for future updates.",
         exe = current_exe.display(),
@@ -1074,7 +1074,7 @@ fn release_tag_from_github_release_url(url: &reqwest::Url) -> Option<String> {
 
 fn release_tag_from_github_release_html(body: &str) -> Option<String> {
     const MARKERS: &[&str] = &[
-        "/Hmbown/CodeWhale/releases/tag/",
+        "/bdugsj/nestlone/releases/tag/",
         "/hmbown/CodeWhale/releases/tag/",
         "/releases/tag/",
     ];
@@ -2006,7 +2006,7 @@ mod tests {
         assert!(message.contains("cargo install codewhale-cli --locked"));
         assert!(message.contains("cargo install codewhale-tui --locked"));
         assert!(message.contains("brew upgrade deepseek-tui"));
-        assert!(message.contains("https://github.com/Hmbown/CodeWhale/releases/latest"));
+        assert!(message.contains("https://github.com/bdugsj/nestlone/releases/latest"));
     }
 
     #[test]
@@ -2484,7 +2484,7 @@ E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855  *codewhale-win
 
     #[test]
     fn github_release_url_parser_extracts_tag() {
-        let url = reqwest::Url::parse("https://github.com/Hmbown/CodeWhale/releases/tag/v0.8.61")
+        let url = reqwest::Url::parse("https://github.com/bdugsj/nestlone/releases/tag/v0.8.61")
             .unwrap();
 
         assert_eq!(
@@ -2500,25 +2500,25 @@ E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855  *codewhale-win
         assert_eq!(release.tag_name, "v0.8.61");
         assert_eq!(
             release.assets[0].browser_download_url,
-            "https://github.com/Hmbown/CodeWhale/releases/download/v0.8.61/codewhale-artifacts-sha256.txt"
+            "https://github.com/bdugsj/nestlone/releases/download/v0.8.61/codewhale-artifacts-sha256.txt"
         );
         let dispatcher =
             select_platform_asset(&release, "codewhale-macos-arm64").expect("dispatcher asset");
         assert_eq!(
             dispatcher.browser_download_url,
-            "https://github.com/Hmbown/CodeWhale/releases/download/v0.8.61/codewhale-macos-arm64"
+            "https://github.com/bdugsj/nestlone/releases/download/v0.8.61/codewhale-macos-arm64"
         );
         let tui = select_platform_asset(&release, "codewhale-tui-macos-arm64").expect("tui asset");
         assert_eq!(
             tui.browser_download_url,
-            "https://github.com/Hmbown/CodeWhale/releases/download/v0.8.61/codewhale-tui-macos-arm64"
+            "https://github.com/bdugsj/nestlone/releases/download/v0.8.61/codewhale-tui-macos-arm64"
         );
     }
 
     #[test]
     fn latest_stable_redirect_fallback_reads_tag_url() {
         let (url, request_rx, handle) = serve_http_once("200 OK", "text/html", b"<html></html>");
-        let tag_url = url.replace("/release", "/Hmbown/CodeWhale/releases/tag/v9.9.9");
+        let tag_url = url.replace("/release", "/bdugsj/nestlone/releases/tag/v9.9.9");
 
         let tag = fetch_latest_stable_tag_from_redirect_url(&tag_url, None)
             .expect("tag should parse from final URL");
@@ -2526,7 +2526,7 @@ E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855  *codewhale-win
         assert_eq!(tag, "v9.9.9");
         let request = request_rx.recv().expect("captured request");
         assert!(
-            request.starts_with("GET /Hmbown/CodeWhale/releases/tag/v9.9.9 "),
+            request.starts_with("GET /bdugsj/nestlone/releases/tag/v9.9.9 "),
             "got {request:?}"
         );
         handle.join().expect("test server thread");
@@ -2535,8 +2535,8 @@ E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855  *codewhale-win
     #[test]
     fn github_release_html_parser_skips_empty_first_marker() {
         let body = r#"
-            <a href="/Hmbown/CodeWhale/releases/tag/?expanded=true">generic</a>
-            <a href="/Hmbown/CodeWhale/releases/tag/v9.9.9">latest</a>
+            <a href="/bdugsj/nestlone/releases/tag/?expanded=true">generic</a>
+            <a href="/bdugsj/nestlone/releases/tag/v9.9.9">latest</a>
         "#;
 
         assert_eq!(
@@ -2549,11 +2549,11 @@ E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855  *codewhale-win
     fn cnb_release_base_url_includes_tag_directory() {
         assert_eq!(
             codewhale_release::cnb_release_base_url("0.8.47"),
-            "https://cnb.cool/Hmbown/CodeWhale/-/releases/v0.8.47"
+            "https://cnb.cool/bdugsj/nestlone/-/releases/v0.8.47"
         );
         assert_eq!(
             codewhale_release::cnb_release_base_url("v0.8.47"),
-            "https://cnb.cool/Hmbown/CodeWhale/-/releases/v0.8.47"
+            "https://cnb.cool/bdugsj/nestlone/-/releases/v0.8.47"
         );
     }
 
