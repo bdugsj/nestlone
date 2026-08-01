@@ -18213,8 +18213,7 @@ impl UpdateNotice {
     fn notice_block(&self) -> String {
         format!(
             "Update available: v{current} -> v{latest}\n\
-             Release notes: https://github.com/Hmbown/CodeWhale/releases/tag/v{latest}\n\
-             Run `codewhale update` (preview with `codewhale update --check`), then restart CodeWhale.",
+             Run `codewhale update` to upgrade, then restart.",
             current = self.current,
             latest = self.latest
         )

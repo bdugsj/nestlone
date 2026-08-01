@@ -482,17 +482,17 @@ pub fn codewhale_links(app: &mut App) -> CommandResult {
 
     let _ = writeln!(
         message,
-        "{} `https://codewhale.net/{site_locale}/docs`",
+        "{} `https://nestlone.local/docs",
         tr(locale, MessageId::LinksDocumentation)
     );
     let _ = writeln!(
         message,
-        "{} `https://codewhale.net/{site_locale}/community`",
+        "{} `https://nestlone.local/docs",
         tr(locale, MessageId::LinksCommunity)
     );
     let _ = writeln!(
         message,
-        "{} `https://github.com/Hmbown/CodeWhale`",
+        "{} (see project docs)",
         tr(locale, MessageId::LinksGitHub)
     );
     let _ = writeln!(
@@ -1515,8 +1515,8 @@ mod tests {
         assert!(result.message.is_some());
         let msg = result.message.unwrap();
         assert!(msg.contains("Codewhale & community"));
-        assert!(msg.contains("https://codewhale.net/en/docs"));
-        assert!(msg.contains("https://codewhale.net/en/community"));
+        assert!(msg.contains("https://nestlone.local/docs"));
+        assert!(msg.contains("https://nestlone.local/docs"));
         assert!(msg.contains("https://github.com/Hmbown/CodeWhale"));
         assert!(msg.contains("https://app.codewhale.net"));
         assert!(msg.contains("separate sign-in"));
@@ -1594,8 +1594,8 @@ mod tests {
             .message
             .expect("links should return a message");
 
-        assert!(msg.contains("`https://codewhale.net/zh/docs`"));
-        assert!(msg.contains("`https://codewhale.net/zh/community`"));
+        assert!(msg.contains("`https://nestlone.local/docs"));
+        assert!(msg.contains("`https://nestlone.local/docs"));
         assert!(msg.contains("`https://app.codewhale.net`"));
     }
 

@@ -54,7 +54,7 @@ mod legacy_deepseek_compat {
     use std::path::PathBuf;
 
     /// Service name advertised by the HTTP and stdio health probes.
-    pub(crate) const SERVICE_NAME: &str = "deepseek-app-server";
+    pub(crate) const SERVICE_NAME: &str = "nestlone-app-server";
 
     /// Fallback hook-event log location used when no config path is
     /// provided (legacy `.deepseek/` dot-directory layout).

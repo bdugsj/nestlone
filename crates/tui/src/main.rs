@@ -183,8 +183,8 @@ fn install_rustls_crypto_provider() {
     bin_name = "codewhale-tui",
     author,
     version = env!("DEEPSEEK_BUILD_VERSION"),
-    about = "Codewhale terminal coding agent",
-    long_about = "Terminal-native TUI and CLI for open-source and open-weight coding models.\n\nRun 'codewhale' to start.\n\nProvider routes include DeepSeek, Arcee, Hugging Face, OpenRouter, Xiaomi MiMo, local vLLM/SGLang/Ollama, and more."
+    about = "Nestlone — security agent platform (Kali + pentest + RE)",
+    long_about = "Terminal-native TUI and CLI for security analysis and penetration testing.\n\nRun 'nestlone' to start.\n\nProvider routes include DeepSeek, Arcee, Hugging Face, OpenRouter, Xiaomi MiMo, local vLLM/SGLang/Ollama, and more."
 )]
 struct Cli {
     /// Subcommand to run
@@ -266,7 +266,7 @@ enum Commands {
     SessionDiagnostics(SessionDiagnosticsArgs),
     /// Bootstrap MCP config and/or skills directories
     Setup(SetupArgs),
-    /// Generate a remote Codewhale agent deploy bundle (cloud + chat bridge)
+    /// Generate a remote Nestlone agent deploy bundle (cloud + chat bridge)
     RemoteSetup(remote_setup::RemoteSetupArgs),
     /// Generate shell completions
     Completions {
@@ -1243,13 +1243,13 @@ enum McpCommand {
     },
     /// Validate MCP config and required servers
     Validate,
-    /// Register this Codewhale binary as a local MCP stdio server.
+    /// Register this Nestlone binary as a local MCP stdio server.
     ///
     /// This adds a config entry that runs `codewhale serve --mcp` (stdio protocol).
     /// For the HTTP/SSE runtime API, use `codewhale serve --http` directly instead.
     #[command(
         name = "add-self",
-        long_about = "Register this Codewhale binary as a local MCP stdio server.\n\nAdds a config entry to ~/.codewhale/mcp.json that launches `codewhale serve --mcp`\nvia the stdio transport. Other Codewhale sessions (or any MCP client) can then\ndiscover and call tools exposed by this server.\n\nUse `codewhale serve --http` instead if you need the HTTP/SSE runtime API."
+        long_about = "Register this Nestlone binary as a local MCP stdio server.\n\nAdds a config entry to ~/.codewhale/mcp.json that launches `codewhale serve --mcp`\nvia the stdio transport. Other Codewhale sessions (or any MCP client) can then\ndiscover and call tools exposed by this server.\n\nUse `codewhale serve --http` instead if you need the HTTP/SSE runtime API."
     )]
     AddSelf {
         /// Server name in mcp.json (default: "codewhale")
@@ -1417,7 +1417,7 @@ fn main() -> Result<()> {
         .name("codewhale-main".to_string())
         .stack_size(CODEWHALE_MAIN_STACK_BYTES)
         .spawn(move || run_async_main(cli, command, plugin_discovery, plugin_registry))
-        .context("Failed to start the Codewhale runtime thread")?;
+        .context("Failed to start the Nestlone runtime thread")?;
     match runtime_thread.join() {
         Ok(result) => result,
         Err(payload) => {
@@ -1426,7 +1426,7 @@ fn main() -> Result<()> {
                 .map(|value| (*value).to_string())
                 .or_else(|| payload.downcast_ref::<String>().cloned())
                 .unwrap_or_else(|| "unknown panic payload".to_string());
-            Err(anyhow!("Codewhale runtime thread panicked: {message}"))
+            Err(anyhow!("Nestlone runtime thread panicked: {message}"))
         }
     }
 }
@@ -1737,7 +1737,7 @@ async fn run_async_main(
                     let cors_origins = resolve_cors_origins(&config, &args.cors_origin);
                     let bind_host = resolve_serve_bind_host(args.mobile, args.host);
                     if args.web && bind_host.host != "127.0.0.1" {
-                        bail!("Codewhale web is loopback-only and must bind to 127.0.0.1");
+                        bail!("Nestlone web is loopback-only and must bind to 127.0.0.1");
                     }
                     if bind_host.mobile_rebound_to_lan {
                         println!(
@@ -1908,7 +1908,7 @@ fn warn_on_workspace_dotenv_result() {
     match load_workspace_dotenv_credentials() {
         Ok(Some(report)) if !report.ignored.is_empty() => {
             eprintln!(
-                "Codewhale ignored non-credential settings in {}: {}. Use config.toml, CLI flags, or the launching shell for control settings.",
+                "Nestlone ignored non-credential settings in {}: {}. Use config.toml, CLI flags, or the launching shell for control settings.",
                 report.path.display(),
                 display_env_key_set(&report.ignored)
             );
@@ -1918,7 +1918,7 @@ fn warn_on_workspace_dotenv_result() {
             // The error intentionally contains no file contents or parsed
             // values. A malformed or unsafe workspace file fails closed while
             // shell/config credentials remain available.
-            eprintln!("Codewhale did not load workspace .env: {error}");
+            eprintln!("Nestlone did not load workspace .env: {error}");
         }
     }
 }
@@ -3034,7 +3034,7 @@ fn run_setup(
 
     println!(
         "{}",
-        "Codewhale Setup".truecolor(aqua_r, aqua_g, aqua_b).bold()
+        "Nestlone Setup".truecolor(aqua_r, aqua_g, aqua_b).bold()
     );
     println!("{}", "==============".truecolor(sky_r, sky_g, sky_b));
     println!("Workspace: {}", crate::utils::display_path(workspace));
@@ -3300,7 +3300,7 @@ fn run_setup_status(
 
     println!(
         "{}",
-        "Codewhale Status".truecolor(aqua_r, aqua_g, aqua_b).bold()
+        "Nestlone Status".truecolor(aqua_r, aqua_g, aqua_b).bold()
     );
     println!("{}", "===============".truecolor(sky_r, sky_g, sky_b));
     println!("workspace: {}", workspace.display());

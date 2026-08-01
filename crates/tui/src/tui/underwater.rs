@@ -655,7 +655,7 @@ pub fn render_launch_screen(area: Rect, buf: &mut Buffer, app: &App) {
     );
     let mut header = vec![
         Span::styled(
-            "cw",
+            "ns",
             Style::default()
                 .fg(app.ui_theme.accent_primary)
                 .add_modifier(Modifier::BOLD),
@@ -905,7 +905,7 @@ pub fn render_header(area: Rect, buf: &mut Buffer, app: &App) {
     .filter(|indicator| *indicator != "cw");
     let mut left = vec![
         Span::styled(
-            "cw",
+            "ns",
             Style::default()
                 .fg(app.ui_theme.accent_primary)
                 .add_modifier(Modifier::BOLD),
@@ -1096,7 +1096,7 @@ pub fn render_header(area: Rect, buf: &mut Buffer, app: &App) {
             .saturating_add(span_width(&suffix));
         let route_budget = left_budget.saturating_sub(fixed_width);
         left = vec![Span::styled(
-            "cw",
+            "ns",
             Style::default()
                 .fg(app.ui_theme.accent_primary)
                 .add_modifier(Modifier::BOLD),

@@ -1,4 +1,3 @@
-# syntax=docker/dockerfile:1
 # Nestlone + CodeWhale — Kali-based security analysis & pentest container.
 #
 # Build:  docker compose build
@@ -19,6 +18,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 WORKDIR /build
 COPY . .
 
+# Limit build parallelism to avoid OOM in Docker Desktop (default uses all cores)
+ENV CARGO_BUILD_JOBS=2
 RUN cargo build --release \
     -p codewhale-cli -p codewhale-tui \
     && mkdir -p /out \

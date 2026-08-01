@@ -1366,3 +1366,4 @@ default_text_model = "deepseek-ai/deepseek-v4-pro"
 # ─────────────────────────────────────────────────────────────────────────────────
 # allowed_approval_policies = ["on-request", "untrusted", "never"]
 # allowed_sandbox_modes = ["read-only", "workspace-write"]
+test

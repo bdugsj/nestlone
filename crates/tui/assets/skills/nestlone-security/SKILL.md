@@ -85,14 +85,53 @@ All destructive MCP tools enforce target scope. Create `.nestlone/scope.json`:
 
 Without this file, all destructive tools return an error.
 
+## Workspace Layout
+
+All files live under `/workspace/` (bind-mounted to host `./workspace/`).
+Follow this structure — the agent creates directories on demand.
+
+```
+workspace/
+├── targets/                          ← per-target, slugified
+│   └── <target-slug>/                ← e.g. 192.168.1.0_24, example.com
+│       ├── notes.md                  ← running notes, hypotheses, timeline
+│       └── scans/                    ← raw tool output, dated
+│           ├── 2026-08-01/
+│           │   ├── nmap_initial.txt
+│           │   ├── nikto.txt
+│           │   └── ffuf_api.json
+│           └── 2026-08-02/
+├── binaries/                         ← samples and dumps for RE
+│   └── <target-slug>/
+├── hashes/                           ← password hashes for john/hashcat
+├── wordlists/                        ← custom wordlists
+├── reports/                          ← final deliverables
+│   └── 2026-08-01_<engagement>.md
+└── .nestlone/
+    ├── scope.json
+    └── experience/                   ← self-evolution journal (see below)
+```
+
+**Rules**:
+- Raw tool output goes under `targets/<slug>/scans/YYYY-MM-DD/` — never in root.
+- Binaries get their own target subdirectory under `binaries/`.
+- Reports are dated markdown files in `reports/`.
+- Create directories on first use. Don't pre-create empty trees.
+- Target slug: replace `/` `:` with `_`, strip `http://`, lowercase.
+
 ## Workflow
 
 ### Phase 1: Reconnaissance
-1. `nmap_scan` — discover open ports, services, OS
-2. `nikto_scan` + `whatweb` — web fingerprinting
-3. `dnsrecon`, `dig` — DNS enumeration
-4. `ffuf_fuzz` — discover hidden directories/files
-5. `search_advisory` — check known vulns for discovered services
+1. **Read `.nestlone/NETWORK.md` first** — identifies Docker bridge vs host LAN. NEVER scan Docker internal subnets (172.x, 10.x).
+2. `nmap_scan` — discover open ports, services, OS on the host-facing network
+2. For every service+version discovered, run the exploit chain:
+   - `search_exploit <service> <version>` → find PoCs
+   - `lookup_cve <CVE-ID>` → CVSS score and details
+   - `msf_search <service> <version>` → Metasploit modules
+3. `nikto_scan` + `whatweb` — web fingerprinting
+4. `dnsrecon`, `dig` — DNS enumeration
+5. `ffuf_fuzz` — discover hidden directories/files
+6. `search_advisory` — check known vulns for discovered services
 
 ### Phase 2: Vulnerability Assessment
 1. For each service version found, use `lookup_cve` to check for known issues
@@ -128,13 +167,16 @@ over time instead of repeating the same discoveries.
 
 ### First thing on every session
 
-Check whether this is a fresh environment:
+Read environment context (only the files relevant to your task):
 ```bash
-cat .nestlone/BOOTSTRAP.md 2>/dev/null
+cat .nestlone/env/active/network.md     # network setup — ALWAYS before scanning
+cat .nestlone/env/active/container.md   # container limits
+cat .nestlone/env/active/capabilities.md # tool quick reference
 ```
-If it exists: this is a new or reset environment. Read it — it tells you what
-survived, what needs re-initialization, and what might be missing. Act on its
-instructions, then delete it: `rm .nestlone/BOOTSTRAP.md`.
+The `active/` link points to the detected platform (windows/docker/linux).
+Read only what's needed — saves context.
+
+If `.nestlone/BOOTSTRAP.md` exists (fresh environment): read it, act on it, delete it.
 
 ### Before any task
 

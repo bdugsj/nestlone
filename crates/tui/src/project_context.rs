@@ -50,7 +50,7 @@ const RULES_DIRS: &[&str] = &[".codewhale/rules", ".claude/rules"];
 const DEPRECATED_WHALE_FILENAME: &str = "WHALE.md";
 
 /// Warning surfaced when an ignored `WHALE.md` is present.
-const WHALE_IGNORED_WARNING: &str = "WHALE.md is ignored; move project instructions to AGENTS.md, or Codewhale-specific authority policy to .codewhale/constitution.json.";
+const WHALE_IGNORED_WARNING: &str = "WHALE.md is ignored; move project instructions to AGENTS.md, or security authority policy to .codewhale/constitution.json.";
 
 /// Relative path (within a workspace or one of its parents) to the
 /// Codewhale-specific repo authority/prioritization policy.

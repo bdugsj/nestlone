@@ -12,7 +12,9 @@ use std::path::Path;
 /// requested by @JayBeest (#4227).
 /// Generation 9 adds the `nestlone-security` skill for binary analysis,
 /// reverse engineering, and crypto tools.
-const BUNDLED_SKILL_VERSION: &str = "9";
+/// Generation 10 adds `red-team`, `blue-team`, and `malware-analyst`
+/// persona skills for role-specific security workflows.
+const BUNDLED_SKILL_VERSION: &str = "10";
 
 // ── system & extension (meta) ───────────────────────────────────────────────
 const SKILL_CREATOR_BODY: &str = include_str!("../../assets/skills/skill-creator/SKILL.md");
@@ -57,6 +59,12 @@ const CONTRIBUTOR_ONBOARDING_BODY: &str =
 // ── security ───────────────────────────────────────────────────────────
 const NESTLONE_SECURITY_BODY: &str =
     include_str!("../../assets/skills/nestlone-security/SKILL.md");
+
+// ── security personas ──────────────────────────────────────────────────
+const RED_TEAM_BODY: &str = include_str!("../../assets/skills/red-team/SKILL.md");
+const BLUE_TEAM_BODY: &str = include_str!("../../assets/skills/blue-team/SKILL.md");
+const MALWARE_ANALYST_BODY: &str =
+    include_str!("../../assets/skills/malware-analyst/SKILL.md");
 
 // Optional integration (not auto-installed for every user): Feishu body kept for
 // digest/migration helpers only.
@@ -246,6 +254,21 @@ const BUNDLED_SKILLS: &[BundledSkill] = &[
         name: "nestlone-security",
         body: NESTLONE_SECURITY_BODY,
         introduced_in: 9,
+    },
+    BundledSkill {
+        name: "red-team",
+        body: RED_TEAM_BODY,
+        introduced_in: 10,
+    },
+    BundledSkill {
+        name: "blue-team",
+        body: BLUE_TEAM_BODY,
+        introduced_in: 10,
+    },
+    BundledSkill {
+        name: "malware-analyst",
+        body: MALWARE_ANALYST_BODY,
+        introduced_in: 10,
     },
 ];
 

@@ -39,12 +39,12 @@ from pathlib import Path
 from typing import Any
 
 try:
-    from mcp.server.fastmcp import FastMCP
+    from mcp.server import MCPServer
 except ImportError:
     print("mcp SDK not installed. Run: pip install mcp", file=sys.stderr)
     sys.exit(1)
 
-mcp = FastMCP("nestlone-vuln")
+mcp = MCPServer("nestlone-vuln")
 
 NVD_API_KEY = os.environ.get("NVD_API_KEY", "")
 NVD_BASE = "https://services.nvd.nist.gov/rest/json/cves/2.0"
@@ -457,6 +457,153 @@ def search_exploit(query: str, max_results: int = 15) -> str:
         )
 
     return "\n".join(lines)
+
+
+# ---- scan_project_deps ----
+
+@mcp.tool()
+def scan_project_deps(project_dir: str = "/workspace") -> str:
+    """Auto-detect and scan all dependencies in a project directory.
+
+    Reads package.json, Cargo.toml, requirements.txt, go.mod, Gemfile,
+    pom.xml, and composer.json from the given directory, extracts
+    package@version pairs, and scans them all against OSV.dev.
+
+    Args:
+        project_dir: Path to project root (default /workspace).
+    """
+    import glob as glob_mod
+
+    base = Path(project_dir)
+    if not base.exists():
+        return f"Error: directory not found: {project_dir}"
+
+    deps: list[dict[str, str]] = []
+    found_files: list[str] = []
+
+    # -- Node.js: package.json --
+    pkg_json = base / "package.json"
+    if pkg_json.exists():
+        found_files.append("package.json")
+        try:
+            data = json.loads(pkg_json.read_text(encoding="utf-8"))
+            for section in ["dependencies", "devDependencies"]:
+                for name, ver in data.get(section, {}).items():
+                    clean = str(ver).lstrip("^~>=<")
+                    deps.append({"ecosystem": "npm", "name": name, "version": clean})
+        except Exception:
+            pass
+
+    # -- Rust: Cargo.toml --
+    cargo_toml = base / "Cargo.toml"
+    if cargo_toml.exists():
+        found_files.append("Cargo.toml")
+        try:
+            text = cargo_toml.read_text(encoding="utf-8")
+            in_deps = False
+            for line in text.split("\n"):
+                line = line.strip()
+                if line.startswith("[dependencies") or line.startswith("[build-dependencies"):
+                    in_deps = True
+                    continue
+                if line.startswith("["):
+                    in_deps = False
+                    continue
+                if in_deps and "=" in line and not line.startswith("#"):
+                    name = line.split("=")[0].strip().strip('"')
+                    ver_match = line.split("=")[1].strip().strip('"')
+                    ver = ver_match.split()[0] if ver_match else "0"
+                    deps.append({"ecosystem": "cargo", "name": name, "version": ver})
+        except Exception:
+            pass
+
+    # -- Python: requirements.txt --
+    req_txt = base / "requirements.txt"
+    if req_txt.exists():
+        found_files.append("requirements.txt")
+        try:
+            for line in req_txt.read_text(encoding="utf-8").split("\n"):
+                line = line.strip()
+                if line and not line.startswith("#") and not line.startswith("-"):
+                    for sep in ["==", ">=", "<=", "~=", "!="]:
+                        if sep in line:
+                            name, ver = line.split(sep, 1)
+                            deps.append({"ecosystem": "pypi", "name": name.strip(), "version": ver.strip()})
+                            break
+                    else:
+                        deps.append({"ecosystem": "pypi", "name": line.strip(), "version": ""})
+        except Exception:
+            pass
+
+    # -- Go: go.mod --
+    go_mod = base / "go.mod"
+    if go_mod.exists():
+        found_files.append("go.mod")
+        try:
+            for line in go_mod.read_text(encoding="utf-8").split("\n"):
+                line = line.strip()
+                if line.startswith("require ") or line.startswith("\t"):
+                    parts = line.lstrip("require ").split()
+                    if len(parts) >= 2 and not parts[0].startswith("//"):
+                        deps.append({"ecosystem": "go", "name": parts[0], "version": parts[1]})
+        except Exception:
+            pass
+
+    # -- Ruby: Gemfile --
+    gemfile = base / "Gemfile"
+    if gemfile.exists():
+        found_files.append("Gemfile")
+        try:
+            for line in gemfile.read_text(encoding="utf-8").split("\n"):
+                line = line.strip()
+                if line.startswith("gem "):
+                    parts = line[4:].strip().strip("'").strip('"').split(",")
+                    name = parts[0].strip().strip("'").strip('"')
+                    ver = ""
+                    for p in parts[1:]:
+                        p = p.strip().strip("'").strip('"')
+                        for v in p.split():
+                            if v[0].isdigit():
+                                ver = v
+                    deps.append({"ecosystem": "gem", "name": name, "version": ver})
+        except Exception:
+            pass
+
+    # -- PHP: composer.json --
+    composer_json = base / "composer.json"
+    if composer_json.exists():
+        found_files.append("composer.json")
+        try:
+            data = json.loads(composer_json.read_text(encoding="utf-8"))
+            for section in ["require", "require-dev"]:
+                for name, ver in data.get(section, {}).items():
+                    if name != "php":
+                        clean = str(ver).lstrip("^~>=<")
+                        deps.append({"ecosystem": "composer", "name": name, "version": clean})
+        except Exception:
+            pass
+
+    if not deps:
+        return f"No dependency files found in {project_dir}. Looked for: package.json, Cargo.toml, requirements.txt, go.mod, Gemfile, composer.json"
+
+    # Deduplicate
+    seen: set[tuple[str, str, str]] = set()
+    unique: list[dict[str, str]] = []
+    for d in deps:
+        key = (d["ecosystem"], d["name"], d["version"])
+        if key not in seen:
+            seen.add(key)
+            unique.append(d)
+
+    # Run the batch scan
+    result = scan_deps(json.dumps(unique[:100]))  # cap at 100 deps
+
+    return (
+        f"=== Dependency Scan: {project_dir} ===\n"
+        f"Found: {', '.join(found_files)}\n"
+        f"Dependencies extracted: {len(unique)}\n\n"
+        f"{result}"
+    )
 
 
 # ---- Entry point ----

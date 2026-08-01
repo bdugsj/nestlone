@@ -1046,7 +1046,7 @@ The user-global constitution is personal standing preference law. It is structur
 
 AGENTS.md and project instructions are project law / implementation guidance. They can describe build commands, repository norms, and local workflows. Under “Whose word wins,” they sit below the current user request and bundled Constitution, and above user-global standing preferences, memory, and handoff.
 
-WHALE.md is ignored. Move ordinary project instructions to AGENTS.md and Codewhale-specific authority policy to .codewhale/constitution.json.
+WHALE.md is ignored. Move ordinary project instructions to AGENTS.md and security authority policy to .codewhale/constitution.json.
 
 Runtime posture is separate. A constitution can recommend autonomy, but it does not change approval policy, sandbox, shell, network, trust, MCP permissions, or default mode. Use /constitution posture to review those controls."
         }

@@ -233,9 +233,9 @@ fn client_user_agent(api_provider: ApiProvider) -> &'static str {
         )
     } else {
         concat!(
-            "Mozilla/5.0 (compatible; codewhale/",
+            "Mozilla/5.0 (compatible; nestlone/",
             env!("CARGO_PKG_VERSION"),
-            "; +https://github.com/Hmbown/CodeWhale)"
+            "; )"
         )
     }
 }
@@ -1486,9 +1486,9 @@ pub async fn verify_provider_api_key(
     let client = crate::tls::reqwest_client_builder()
         .default_headers(headers)
         .user_agent(concat!(
-            "Mozilla/5.0 (compatible; codewhale/",
+            "Mozilla/5.0 (compatible; nestlone/",
             env!("CARGO_PKG_VERSION"),
-            "; +https://github.com/Hmbown/CodeWhale)"
+            "; )"
         ))
         .connect_timeout(Duration::from_secs(10))
         .timeout(Duration::from_secs(15))
