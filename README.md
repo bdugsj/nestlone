@@ -20,7 +20,7 @@ git clone https://github.com/bdugsj/nestlone.git
 cd nestlone
 cp .env.example .env        # edit API key
 docker compose up -d
-docker exec -it nestlone codewhale-tui
+docker exec -it nestlone nestlone
 ```
 
 ### Kali Linux (native)

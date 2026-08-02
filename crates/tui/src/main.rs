@@ -3584,7 +3584,7 @@ async fn run_doctor(
 
     println!(
         "{}",
-        "codewhale Doctor"
+        "Nestlone Doctor"
             .truecolor(accent_r, accent_g, accent_b)
             .bold()
     );
@@ -3593,7 +3593,7 @@ async fn run_doctor(
 
     // Version info
     println!("{}", "Version Information:".bold());
-    println!("  codewhale-tui: {}", env!("DEEPSEEK_BUILD_VERSION"));
+    println!("  nestlone: {}", env!("DEEPSEEK_BUILD_VERSION"));
     println!("  rust: {}", rustc_version());
     println!();
 

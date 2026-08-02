@@ -122,6 +122,36 @@ if [ ! -f "workspace/.nestlone/scope.json" ]; then
 fi
 log "Workspace ready: $SCRIPT_DIR/workspace/"
 
+# ── Binary PATH installation ────────────────────────────────────────────
+install_to_path() {
+    info "Installing binaries to PATH..."
+    BIN_TARGET=""
+    if [ -w /usr/local/bin ]; then
+        BIN_TARGET="/usr/local/bin"
+    else
+        BIN_TARGET="$HOME/.local/bin"
+        mkdir -p "$BIN_TARGET"
+    fi
+    # nestlone is the real TUI binary; nestlone-cli aliases the CLI facade
+    ln -sf "$SCRIPT_DIR/CodeWhale/target/release/nestlone" "$BIN_TARGET/nestlone"
+    ln -sf "$SCRIPT_DIR/CodeWhale/target/release/codewhale" "$BIN_TARGET/nestlone-cli"
+    ln -sf "$SCRIPT_DIR/CodeWhale/target/release/codewhale" "$BIN_TARGET/codewhale"
+    ln -sf "$SCRIPT_DIR/CodeWhale/target/release/nestlone"  "$BIN_TARGET/codewhale-tui"
+    # Ensure the target dir is on PATH for future shells (bash + zsh)
+    case ":$PATH:" in
+        *":$BIN_TARGET:"*) ;;
+        *)
+            export PATH="$PATH:$BIN_TARGET"
+            for rc in "$HOME/.bashrc" "$HOME/.zshrc"; do
+                if [ -f "$rc" ] && ! grep -q "export PATH=.*$BIN_TARGET" "$rc" 2>/dev/null; then
+                    echo "export PATH=\"\$PATH:$BIN_TARGET\"" >> "$rc"
+                fi
+            done
+            ;;
+    esac
+    log "Installed: nestlone, nestlone-cli, codewhale → $BIN_TARGET"
+}
+
 # ═══════════════════════════════════════════════════════════════════════════
 # Docker Install
 # ═══════════════════════════════════════════════════════════════════════════
@@ -153,7 +183,7 @@ if [ "$MODE" = "docker" ] || [ "$MODE" = "both" ]; then
     info "Starting container..."
     docker compose up -d 2>&1 | tail -3
     log "Container running — access at:"
-    echo "       TUI:    docker exec -it nestlone codewhale-tui"
+    echo "       TUI:    docker exec -it nestlone nestlone"
     echo "       Web UI: http://localhost:7878"
 fi
 
@@ -233,8 +263,10 @@ if [ "$MODE" = "native" ] || [ "$MODE" = "both" ]; then
     cargo build --release -p codewhale-cli -p codewhale-tui
     cd "$SCRIPT_DIR"
     log "Native build complete"
-    echo "       Binary:  CodeWhale/target/release/codewhale"
-    echo "       TUI:     CodeWhale/target/release/codewhale-tui"
+
+    # Install binaries to PATH
+    install_to_path
+    log "Install complete — you can now run: nestlone"
 
     # MCP config
     mkdir -p "$HOME/.codewhale"
@@ -271,6 +303,8 @@ if [ "$MODE" = "dev" ]; then
     cargo build --release -p codewhale-cli -p codewhale-tui
     cd "$SCRIPT_DIR"
     log "Dev build complete"
+    install_to_path
+    log "Install complete — you can now run: nestlone"
 fi
 
 # ── Done ─────────────────────────────────────────────────────────────────
@@ -285,13 +319,13 @@ echo "  Scope:     workspace/.nestlone/scope.json"
 echo ""
 if [ "$MODE" = "docker" ] || [ "$MODE" = "both" ]; then
     echo "  Docker:"
-    echo "    TUI:    docker exec -it nestlone codewhale-tui"
+    echo "    TUI:    docker exec -it nestlone nestlone"
     echo "    Web:    http://localhost:7878"
     echo "    Stop:   docker compose down"
 fi
 if [ "$MODE" = "native" ] || [ "$MODE" = "both" ] || [ "$MODE" = "dev" ]; then
     echo "  Native:"
-    echo "    TUI:    CodeWhale/target/release/codewhale-tui"
+    echo "    TUI:    CodeWhale/target/release/nestlone"
     echo "    Web:    CodeWhale/target/release/codewhale app-server --http --host 0.0.0.0 --port 7878"
 fi
 echo ""

@@ -25,7 +25,7 @@ RUN cargo build --release \
     && mkdir -p /out \
     && cp target/release/codewhale /out/ \
     && cp target/release/codew /out/ \
-    && cp target/release/codewhale-tui /out/
+    && cp target/release/nestlone /out/
 
 # ── Stage 2: Kali Runtime ─────────────────────────────────────────────
 FROM kalilinux/kali-rolling
@@ -70,7 +70,7 @@ RUN groupadd --gid 1000 nestlone \
 # Copy CodeWhale binaries
 COPY --from=builder --chown=nestlone:nestlone /out/codewhale /usr/local/bin/codewhale
 COPY --from=builder --chown=nestlone:nestlone /out/codew /usr/local/bin/codew
-COPY --from=builder --chown=nestlone:nestlone /out/codewhale-tui /usr/local/bin/codewhale-tui
+COPY --from=builder --chown=nestlone:nestlone /out/nestlone /usr/local/bin/nestlone
 
 # Copy MCP servers
 COPY --chown=nestlone:nestlone mcp/ /opt/nestlone/mcp/
