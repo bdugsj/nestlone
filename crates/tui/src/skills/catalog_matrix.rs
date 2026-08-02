@@ -294,7 +294,7 @@ fn aliases_resolve_to_their_canonical_skill_and_add_no_catalogue_entries() {
 }
 
 #[test]
-fn grok_compatibility_aliases_map_to_shipped_codewhale_workflows() {
+fn grok_compatibility_aliases_map_to_shipped_nestlone_workflows() {
     let (_tmp, registry) = installed_registry();
     for (alias, canonical) in [
         ("check-work", "verify"),

@@ -20,7 +20,7 @@ use std::path::{Path, PathBuf};
 
 use serde::{Deserialize, Serialize};
 
-use codewhale_config::{
+use nestlone_config::{
     FleetConfigToml, FleetDelegationHints, FleetLoadout, FleetProfile, FleetProfilePermissions,
     FleetRole, FleetSlot,
 };
@@ -522,7 +522,7 @@ mod tests {
     fn personal_setup_target_round_trips_through_the_runtime_roster() {
         let _env_lock = crate::test_support::lock_test_env();
         let home = TempDir::new().unwrap();
-        let _codewhale_home = crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", home.path());
+        let _nestlone_home = crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", home.path());
         let workspace = TempDir::new().unwrap();
         let personal_dir = super::super::profile::agent_profile_dir_for_scope(
             super::super::profile::FleetProfileScope::Personal,
@@ -532,7 +532,7 @@ mod tests {
         assert_eq!(personal_dir, home.path().join("agents"));
 
         let target = personal_dir.join("reviewer.toml");
-        let mut transaction = codewhale_config::persistence::SetupTransaction::new();
+        let mut transaction = nestlone_config::persistence::SetupTransaction::new();
         transaction.stage(
             target.clone(),
             b"id = \"reviewer\"\nrole_hint = \"reviewer\"\nprovider = \"deepseek\"\nmodel = \"deepseek-v4-flash\"\n"
@@ -608,7 +608,7 @@ mod tests {
     fn model_overrides_use_lowercased_ids_and_only_explicit_models() {
         let _env_lock = crate::test_support::lock_test_env();
         let home = TempDir::new().unwrap();
-        let _codewhale_home = crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", home.path());
+        let _nestlone_home = crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", home.path());
         // Isolate personal `$CODEWHALE_HOME/agents` so ambient developer
         // profiles cannot pin built-ins like manager during unit tests.
         let tmp = TempDir::new().unwrap();

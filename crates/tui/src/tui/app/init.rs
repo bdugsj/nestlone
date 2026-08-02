@@ -499,12 +499,12 @@ impl App {
         let work_runtime =
             crate::work_graph::new_shared_work_runtime(todos.clone(), plan_state.clone());
 
-        let skills_scan_codewhale_only = config.skills_config().scan_codewhale_only();
+        let skills_scan_nestlone_only = config.skills_config().scan_nestlone_only();
         let skills_dir = resolve_skills_dir(&workspace, &global_skills_dir, config);
         let cached_skills = Self::discover_cached_skills(
             &workspace,
             &skills_dir,
-            skills_scan_codewhale_only,
+            skills_scan_nestlone_only,
             plugin_registry.as_ref(),
         );
 
@@ -654,7 +654,7 @@ impl App {
                 .map(PathBuf::from),
             mcp_config_path: mcp_config_path.clone(),
             skills_dir,
-            skills_scan_codewhale_only,
+            skills_scan_nestlone_only,
             memory_path,
             use_memory,
             moraine_fallback: config.moraine_fallback(),

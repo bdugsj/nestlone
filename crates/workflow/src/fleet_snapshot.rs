@@ -33,7 +33,7 @@ use crate::reasoning_router::CapturedReasoningRouter;
 pub struct QualifiedFleetId {
     /// Fleet name as declared in the file.
     pub name: String,
-    /// Non-secret origin label, e.g. `workspace` or `codewhale_home`.
+    /// Non-secret origin label, e.g. `workspace` or `nestlone_home`.
     pub origin: String,
 }
 

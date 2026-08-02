@@ -4,7 +4,7 @@ use std::collections::HashSet;
 
 use anyhow::Result;
 use bash_arity::BashArityDict;
-use codewhale_protocol::NetworkPolicyAmendment;
+use nestlone_protocol::NetworkPolicyAmendment;
 use serde::{Deserialize, Serialize};
 
 /// Priority layer for a permission ruleset. Higher ordinal = higher priority.

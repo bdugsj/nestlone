@@ -28,7 +28,7 @@ pub(crate) fn default_config_path() -> Option<PathBuf> {
             } else {
                 Some(
                     crate::test_support::isolated_test_state_root()
-                        .join(codewhale_config::CONFIG_FILE_NAME),
+                        .join(nestlone_config::CONFIG_FILE_NAME),
                 )
             }
         })
@@ -42,7 +42,7 @@ fn default_config_path_from_environment() -> Option<PathBuf> {
     env_config_path_unlocked().or_else(home_config_path)
 }
 
-pub(crate) fn codewhale_home_dir() -> Option<PathBuf> {
+pub(crate) fn nestlone_home_dir() -> Option<PathBuf> {
     std::env::var_os("CODEWHALE_HOME").and_then(|path| {
         let path = PathBuf::from(path);
         (!path.as_os_str().is_empty()).then_some(path)
@@ -50,7 +50,7 @@ pub(crate) fn codewhale_home_dir() -> Option<PathBuf> {
 }
 
 pub(crate) fn home_config_path() -> Option<PathBuf> {
-    if let Some(home) = codewhale_home_dir() {
+    if let Some(home) = nestlone_home_dir() {
         return Some(home.join("config.toml"));
     }
 

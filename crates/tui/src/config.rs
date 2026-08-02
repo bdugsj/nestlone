@@ -5,7 +5,7 @@ use std::fs;
 use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result};
-use codewhale_execpolicy::ExecPolicyEngine;
+use nestlone_execpolicy::ExecPolicyEngine;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 #[cfg(unix)]
@@ -82,7 +82,7 @@ pub enum ApiProvider {
     ///
     /// Selected when `provider = "<name>"` names a `[providers.<name>]
     /// kind="openai-compatible"` table. A single dynamic identity that maps to
-    /// [`codewhale_config::ProviderKind::Custom`] and routes via the OpenAI Chat
+    /// [`nestlone_config::ProviderKind::Custom`] and routes via the OpenAI Chat
     /// Completions wire protocol; the concrete endpoint/model/auth come from the
     /// named config table, not from this variant.
     Custom,
@@ -138,7 +138,7 @@ impl ApiProvider {
         {
             return Some(Self::DeepseekCN);
         }
-        codewhale_config::ProviderKind::parse(value).map(Self::from_kind)
+        nestlone_config::ProviderKind::parse(value).map(Self::from_kind)
     }
 
     #[must_use]
@@ -163,7 +163,7 @@ impl ApiProvider {
     /// Returns `None` only for the TUI-only legacy `DeepseekCN` variant, which
     /// intentionally keeps its own config table while sharing DeepSeek auth envs.
     #[must_use]
-    pub fn metadata(self) -> Option<&'static dyn codewhale_config::provider::Provider> {
+    pub fn metadata(self) -> Option<&'static dyn nestlone_config::provider::Provider> {
         self.kind().map(|kind| kind.provider())
     }
 
@@ -171,7 +171,7 @@ impl ApiProvider {
     #[must_use]
     pub fn env_vars(self) -> &'static [&'static str] {
         self.metadata().map_or(
-            codewhale_config::ProviderKind::Deepseek
+            nestlone_config::ProviderKind::Deepseek
                 .provider()
                 .env_vars(),
             |provider| provider.env_vars(),
@@ -187,7 +187,7 @@ impl ApiProvider {
     /// Providers ordered for picker/browsing surfaces.
     #[must_use]
     pub fn sorted_for_display() -> Vec<Self> {
-        codewhale_config::provider::providers_sorted_for_display()
+        nestlone_config::provider::providers_sorted_for_display()
             .iter()
             .map(|provider| Self::from_kind(provider.kind()))
             .collect()
@@ -207,15 +207,15 @@ impl ApiProvider {
 
     /// Canonical credential acquisition metadata shared by provider surfaces.
     #[must_use]
-    pub fn credential_help(self) -> codewhale_config::provider::CredentialHelp {
+    pub fn credential_help(self) -> nestlone_config::provider::CredentialHelp {
         self.metadata().map_or_else(
             || {
-                codewhale_config::provider::provider_for_kind(
-                    codewhale_config::ProviderKind::Deepseek,
+                nestlone_config::provider::provider_for_kind(
+                    nestlone_config::ProviderKind::Deepseek,
                 )
                 .credential_help()
             },
-            codewhale_config::provider::Provider::credential_help,
+            nestlone_config::provider::Provider::credential_help,
         )
     }
 
@@ -233,45 +233,45 @@ impl ApiProvider {
 
     /// `ApiProvider` discriminant → `ProviderKind` lookup.
     /// Index 1 is `None` for the legacy `DeepseekCN` variant.
-    const KIND_LOOKUP: [Option<codewhale_config::ProviderKind>; 38] = [
-        Some(codewhale_config::ProviderKind::Deepseek),
+    const KIND_LOOKUP: [Option<nestlone_config::ProviderKind>; 38] = [
+        Some(nestlone_config::ProviderKind::Deepseek),
         None, // DeepseekCN
-        Some(codewhale_config::ProviderKind::DeepseekAnthropic),
-        Some(codewhale_config::ProviderKind::NvidiaNim),
-        Some(codewhale_config::ProviderKind::Openai),
-        Some(codewhale_config::ProviderKind::Atlascloud),
-        Some(codewhale_config::ProviderKind::WanjieArk),
-        Some(codewhale_config::ProviderKind::Volcengine),
-        Some(codewhale_config::ProviderKind::Openrouter),
-        Some(codewhale_config::ProviderKind::XiaomiMimo),
-        Some(codewhale_config::ProviderKind::Novita),
-        Some(codewhale_config::ProviderKind::Fireworks),
-        Some(codewhale_config::ProviderKind::Siliconflow),
-        Some(codewhale_config::ProviderKind::SiliconflowCN),
-        Some(codewhale_config::ProviderKind::Arcee),
-        Some(codewhale_config::ProviderKind::Moonshot),
-        Some(codewhale_config::ProviderKind::Sglang),
-        Some(codewhale_config::ProviderKind::Vllm),
-        Some(codewhale_config::ProviderKind::Ollama),
-        Some(codewhale_config::ProviderKind::Huggingface),
-        Some(codewhale_config::ProviderKind::Together),
-        Some(codewhale_config::ProviderKind::Qianfan),
-        Some(codewhale_config::ProviderKind::OpenaiCodex),
-        Some(codewhale_config::ProviderKind::Anthropic),
-        Some(codewhale_config::ProviderKind::Openmodel),
-        Some(codewhale_config::ProviderKind::Zai),
-        Some(codewhale_config::ProviderKind::Stepfun),
-        Some(codewhale_config::ProviderKind::Minimax),
-        Some(codewhale_config::ProviderKind::MinimaxAnthropic),
-        Some(codewhale_config::ProviderKind::Deepinfra),
-        Some(codewhale_config::ProviderKind::Sakana),
-        Some(codewhale_config::ProviderKind::LongCat),
-        Some(codewhale_config::ProviderKind::OpencodeGo),
-        Some(codewhale_config::ProviderKind::OpencodeZen),
-        Some(codewhale_config::ProviderKind::Meta),
-        Some(codewhale_config::ProviderKind::Xai),
-        Some(codewhale_config::ProviderKind::Telecomjs),
-        Some(codewhale_config::ProviderKind::Custom),
+        Some(nestlone_config::ProviderKind::DeepseekAnthropic),
+        Some(nestlone_config::ProviderKind::NvidiaNim),
+        Some(nestlone_config::ProviderKind::Openai),
+        Some(nestlone_config::ProviderKind::Atlascloud),
+        Some(nestlone_config::ProviderKind::WanjieArk),
+        Some(nestlone_config::ProviderKind::Volcengine),
+        Some(nestlone_config::ProviderKind::Openrouter),
+        Some(nestlone_config::ProviderKind::XiaomiMimo),
+        Some(nestlone_config::ProviderKind::Novita),
+        Some(nestlone_config::ProviderKind::Fireworks),
+        Some(nestlone_config::ProviderKind::Siliconflow),
+        Some(nestlone_config::ProviderKind::SiliconflowCN),
+        Some(nestlone_config::ProviderKind::Arcee),
+        Some(nestlone_config::ProviderKind::Moonshot),
+        Some(nestlone_config::ProviderKind::Sglang),
+        Some(nestlone_config::ProviderKind::Vllm),
+        Some(nestlone_config::ProviderKind::Ollama),
+        Some(nestlone_config::ProviderKind::Huggingface),
+        Some(nestlone_config::ProviderKind::Together),
+        Some(nestlone_config::ProviderKind::Qianfan),
+        Some(nestlone_config::ProviderKind::OpenaiCodex),
+        Some(nestlone_config::ProviderKind::Anthropic),
+        Some(nestlone_config::ProviderKind::Openmodel),
+        Some(nestlone_config::ProviderKind::Zai),
+        Some(nestlone_config::ProviderKind::Stepfun),
+        Some(nestlone_config::ProviderKind::Minimax),
+        Some(nestlone_config::ProviderKind::MinimaxAnthropic),
+        Some(nestlone_config::ProviderKind::Deepinfra),
+        Some(nestlone_config::ProviderKind::Sakana),
+        Some(nestlone_config::ProviderKind::LongCat),
+        Some(nestlone_config::ProviderKind::OpencodeGo),
+        Some(nestlone_config::ProviderKind::OpencodeZen),
+        Some(nestlone_config::ProviderKind::Meta),
+        Some(nestlone_config::ProviderKind::Xai),
+        Some(nestlone_config::ProviderKind::Telecomjs),
+        Some(nestlone_config::ProviderKind::Custom),
     ];
 
     /// `ProviderKind` discriminant → `ApiProvider` lookup.
@@ -318,13 +318,13 @@ impl ApiProvider {
     /// Map to the config-level `ProviderKind`.
     /// Returns `None` for the legacy `DeepseekCN` variant.
     #[must_use]
-    pub fn kind(self) -> Option<codewhale_config::ProviderKind> {
+    pub fn kind(self) -> Option<nestlone_config::ProviderKind> {
         Self::KIND_LOOKUP[self as usize]
     }
 
     /// Construct from a config-level `ProviderKind`.
     #[must_use]
-    pub fn from_kind(kind: codewhale_config::ProviderKind) -> Self {
+    pub fn from_kind(kind: nestlone_config::ProviderKind) -> Self {
         Self::FROM_KIND_LOOKUP[kind as usize]
     }
 
@@ -960,7 +960,7 @@ fn canonical_openrouter_recent_model_id(model: &str) -> Option<&'static str> {
 }
 
 pub(crate) fn opencode_go_chat_model_id(model: &str) -> Option<&'static str> {
-    codewhale_config::opencode_go_chat_model_id(model)
+    nestlone_config::opencode_go_chat_model_id(model)
 }
 
 fn canonical_xiaomi_mimo_model_id(model: &str) -> Option<&'static str> {
@@ -2080,8 +2080,8 @@ pub struct SubagentsConfig {
     /// spawn. `0` blocks the model-facing `agent` tool at this runtime depth;
     /// use `[subagents] enabled = false` for the clearer durable off switch.
     /// `1` allows one level, `2` two, and so on. When unset, defaults to
-    /// [`codewhale_config::DEFAULT_SPAWN_DEPTH`]; any value is clamped to
-    /// [`codewhale_config::MAX_SPAWN_DEPTH_CEILING`]. Fleet workers are
+    /// [`nestlone_config::DEFAULT_SPAWN_DEPTH`]; any value is clamped to
+    /// [`nestlone_config::MAX_SPAWN_DEPTH_CEILING`]. Fleet workers are
     /// governed separately by `[fleet.exec] max_spawn_depth`; both share the
     /// same default and ceiling so the limit cannot drift.
     #[serde(default)]
@@ -2292,7 +2292,7 @@ pub struct Config {
     #[serde(alias = "sandboxMode")]
     pub sandbox_mode: Option<String>,
     #[serde(default, alias = "fallbackProviders")]
-    pub fallback_providers: Vec<codewhale_config::ProviderKind>,
+    pub fallback_providers: Vec<nestlone_config::ProviderKind>,
     pub yolo: Option<bool>,
     pub verbosity: Option<String>,
     /// External sandbox backend: `"none"` or `"opensandbox"`.
@@ -2350,7 +2350,7 @@ pub struct Config {
     /// Verifier-preview behavior (#2093). When absent, automatic verifier
     /// preview stays off and verifier verdicts use the hunt policy.
     #[serde(default)]
-    pub verifier: Option<codewhale_config::VerifierConfigToml>,
+    pub verifier: Option<nestlone_config::VerifierConfigToml>,
 
     /// Community skill installer settings (#140). When absent, installer
     /// commands fall back to the bundled defaults
@@ -2392,9 +2392,9 @@ pub struct Config {
     pub auto: Option<AutoConfig>,
 
     /// Optional 1-8 hotbar slot bindings (#2064). When absent, hotbar UI and
-    /// dispatch layers use the built-in defaults from `codewhale_config`.
+    /// dispatch layers use the built-in defaults from `nestlone_config`.
     #[serde(default)]
-    pub hotbar: Option<Vec<codewhale_config::HotbarBindingToml>>,
+    pub hotbar: Option<Vec<nestlone_config::HotbarBindingToml>>,
 
     /// Startup update-check behavior. When absent, the TUI keeps the default
     /// fire-and-forget latest-release check.
@@ -2413,14 +2413,14 @@ pub struct Config {
 
     /// Agent Fleet trust/security/role/exec config.
     #[serde(default)]
-    pub fleet: Option<codewhale_config::FleetConfigToml>,
+    pub fleet: Option<nestlone_config::FleetConfigToml>,
 
     /// Workflow automatic-launch, approval, isolation, and activity
     /// persistence knobs (#4128). When absent, consumers use
-    /// [`codewhale_config::WorkflowConfigToml::default`] via
+    /// [`nestlone_config::WorkflowConfigToml::default`] via
     /// [`Self::workflow_config`].
     #[serde(default)]
-    pub workflow: Option<codewhale_config::WorkflowConfigToml>,
+    pub workflow: Option<nestlone_config::WorkflowConfigToml>,
 
     /// Sub-agent model overrides.
     #[serde(default)]
@@ -2757,19 +2757,19 @@ pub struct SkillsConfig {
     /// (plus any explicit `skills_dir`) instead of importing compatible
     /// directories from other AI tools such as Claude, OpenCode, or Cursor.
     #[serde(default, alias = "scanCodewhaleOnly")]
-    pub scan_codewhale_only: Option<bool>,
+    pub scan_nestlone_only: Option<bool>,
 }
 
 impl SkillsConfig {
     /// Resolve whether session-time discovery should ignore cross-tool skill
     /// directories. Defaults to the compatibility-preserving broad scan.
     #[must_use]
-    pub fn scan_codewhale_only(&self) -> bool {
-        self.scan_codewhale_only.unwrap_or(false)
+    pub fn scan_nestlone_only(&self) -> bool {
+        self.scan_nestlone_only.unwrap_or(false)
     }
 }
 
-/// `[network]` table — mirrors `codewhale_config::NetworkPolicyToml` so the live
+/// `[network]` table — mirrors `nestlone_config::NetworkPolicyToml` so the live
 /// TUI runtime can construct a [`crate::network_policy::NetworkPolicy`]
 /// without reaching into the workspace config crate. See `config.example.toml`
 /// for documentation.
@@ -2923,11 +2923,11 @@ pub struct ProviderConfig {
         alias = "concurrency"
     )]
     pub max_concurrency: Option<usize>,
-    pub auth: Option<codewhale_config::ProviderAuthSourceToml>,
+    pub auth: Option<nestlone_config::ProviderAuthSourceToml>,
     /// Explicit, provider-scoped consent for one credential file owned by
     /// another CLI. Absence is the disabled default.
     #[serde(default, alias = "externalCredentials")]
-    pub external_credentials: Option<codewhale_config::ExternalCredentialConsentToml>,
+    pub external_credentials: Option<nestlone_config::ExternalCredentialConsentToml>,
     /// Wire-protocol selector for a custom `[providers.<name>]` entry (#1519).
     ///
     /// Only `"openai-compatible"` is accepted for now; any other value is
@@ -3293,10 +3293,10 @@ fn allow_shell_env_is_set() -> bool {
 fn project_config_root_bool(workspace: &Path, key: &str) -> Option<bool> {
     [
         workspace
-            .join(codewhale_config::CODEWHALE_APP_DIR)
+            .join(nestlone_config::CODEWHALE_APP_DIR)
             .join("config.toml"),
         workspace
-            .join(codewhale_config::LEGACY_APP_DIR)
+            .join(nestlone_config::LEGACY_APP_DIR)
             .join("config.toml"),
     ]
     .into_iter()
@@ -3332,16 +3332,16 @@ impl Config {
     pub(crate) fn external_credential_consent_status(
         &self,
         provider: ApiProvider,
-    ) -> Option<codewhale_config::ExternalCredentialConsentStatus> {
+    ) -> Option<nestlone_config::ExternalCredentialConsentStatus> {
         let (kind, source, path) = match provider {
             ApiProvider::OpenaiCodex => (
-                codewhale_config::ProviderKind::OpenaiCodex,
-                codewhale_config::ExternalCredentialSource::CodexCli,
+                nestlone_config::ProviderKind::OpenaiCodex,
+                nestlone_config::ExternalCredentialSource::CodexCli,
                 crate::oauth::auth_file_path(),
             ),
             ApiProvider::Xai => (
-                codewhale_config::ProviderKind::Xai,
-                codewhale_config::ExternalCredentialSource::GrokCli,
+                nestlone_config::ProviderKind::Xai,
+                nestlone_config::ExternalCredentialSource::GrokCli,
                 crate::xai_oauth::auth_file_path(),
             ),
             _ => return None,
@@ -3349,11 +3349,11 @@ impl Config {
         let active_kind = self
             .api_provider()
             .kind()
-            .unwrap_or(codewhale_config::ProviderKind::Deepseek);
+            .unwrap_or(nestlone_config::ProviderKind::Deepseek);
         let consent = self
             .provider_config_for(provider)
             .and_then(|entry| entry.external_credentials.as_ref());
-        Some(codewhale_config::external_credential_consent_status(
+        Some(nestlone_config::external_credential_consent_status(
             consent,
             kind,
             source,
@@ -3409,14 +3409,14 @@ impl Config {
                 });
             let approval_baseline = self.approval_policy.as_deref().or(saved_approval_baseline);
             let parsed_controls =
-                codewhale_config::load_project_config(workspace).is_some_and(|project| {
+                nestlone_config::load_project_config(workspace).is_some_and(|project| {
                     project.approval_policy.as_deref().is_some_and(|policy| {
-                        codewhale_config::project_approval_policy_is_allowed(
+                        nestlone_config::project_approval_policy_is_allowed(
                             approval_baseline,
                             policy,
                         )
                     }) || project.sandbox_mode.as_deref().is_some_and(|sandbox| {
-                        codewhale_config::project_sandbox_mode_is_allowed(
+                        nestlone_config::project_sandbox_mode_is_allowed(
                             self.sandbox_mode.as_deref(),
                             sandbox,
                         )
@@ -3517,10 +3517,10 @@ impl Config {
                     approval_policy_baseline_from_permission_posture(Some(&posture))
                 });
             let approval_baseline = self.approval_policy.as_deref().or(saved_approval_baseline);
-            if codewhale_config::load_project_config(workspace)
+            if nestlone_config::load_project_config(workspace)
                 .and_then(|project| project.approval_policy)
                 .is_some_and(|policy| {
-                    codewhale_config::project_approval_policy_is_allowed(approval_baseline, &policy)
+                    nestlone_config::project_approval_policy_is_allowed(approval_baseline, &policy)
                 })
             {
                 return ApprovalPolicyControl::ProjectConfig;
@@ -3792,7 +3792,7 @@ impl Config {
                 let parsed: ConfigFile = toml::from_str(&contents).map_err(|_| {
                     anyhow::anyhow!(
                         "Failed to parse config file {}; file contents were omitted",
-                        codewhale_config::quote_os_path(path)
+                        nestlone_config::quote_os_path(path)
                     )
                 })?;
                 if let Some(msg) = warn_on_misplaced_top_level_keys(&contents) {
@@ -4595,7 +4595,7 @@ impl Config {
 
     /// Mirror a successful native xAI login into the live route config.
     /// Codewhale-owned OAuth storage supersedes any dormant Grok CLI consent.
-    pub(crate) fn mark_codewhale_owned_xai_oauth(&mut self, generation: String) {
+    pub(crate) fn mark_nestlone_owned_xai_oauth(&mut self, generation: String) {
         let entry = self.provider_config_for_mut(ApiProvider::Xai);
         entry.auth_mode = Some("oauth".to_string());
         entry.oauth_credential_generation = Some(generation);
@@ -4711,7 +4711,7 @@ impl Config {
         }
         headers.retain(|name, value| !name.trim().is_empty() && !value.trim().is_empty());
         if auth_mode_disables_api_key(self.auth_mode_for_provider(provider).as_deref()) {
-            headers.retain(|name, _| !codewhale_config::is_upstream_auth_header(name));
+            headers.retain(|name, _| !nestlone_config::is_upstream_auth_header(name));
         }
         headers
     }
@@ -4885,7 +4885,7 @@ impl Config {
             ApiProvider::Telecomjs => DEFAULT_TELECOMJS_MODEL,
             // Custom endpoints have no built-in default model; pass through the
             // descriptor placeholder when nothing is configured (#1519).
-            ApiProvider::Custom => codewhale_config::ProviderKind::Custom
+            ApiProvider::Custom => nestlone_config::ProviderKind::Custom
                 .provider()
                 .default_model(),
         }
@@ -5074,7 +5074,7 @@ impl Config {
                         // No built-in endpoint; descriptor placeholder keeps the
                         // fallback total. A real custom route configures
                         // `[providers.<name>] base_url` which wins above (#1519).
-                        ApiProvider::Custom => codewhale_config::ProviderKind::Custom
+                        ApiProvider::Custom => nestlone_config::ProviderKind::Custom
                             .provider()
                             .default_base_url(),
                     }
@@ -5267,9 +5267,9 @@ impl Config {
     pub(crate) fn external_credential_read_grant(
         &self,
         provider: ApiProvider,
-        source: codewhale_config::ExternalCredentialSource,
+        source: nestlone_config::ExternalCredentialSource,
         suggested_path: &Path,
-    ) -> Result<codewhale_config::ExternalCredentialReadGrant> {
+    ) -> Result<nestlone_config::ExternalCredentialReadGrant> {
         if provider != self.api_provider() {
             anyhow::bail!(
                 "external credential access for {} is dormant until that provider is explicitly selected",
@@ -5278,7 +5278,7 @@ impl Config {
         }
         let kind = provider
             .metadata()
-            .map(codewhale_config::provider::Provider::kind)
+            .map(nestlone_config::provider::Provider::kind)
             .context("external credentials are unsupported for this provider")?;
         let consent = self
             .provider_config_for(provider)
@@ -5289,7 +5289,7 @@ impl Config {
                     source.as_str(),
                     provider.display_name(),
                     kind.as_str(),
-                    codewhale_config::quote_os_path(suggested_path)
+                    nestlone_config::quote_os_path(suggested_path)
                 )
             })?;
         consent
@@ -5308,11 +5308,11 @@ impl Config {
     pub(crate) fn external_credential_read_consent_configured(
         &self,
         provider: ApiProvider,
-        source: codewhale_config::ExternalCredentialSource,
+        source: nestlone_config::ExternalCredentialSource,
     ) -> bool {
         let Some(kind) = provider
             .metadata()
-            .map(codewhale_config::provider::Provider::kind)
+            .map(nestlone_config::provider::Provider::kind)
         else {
             return false;
         };
@@ -5482,7 +5482,7 @@ impl Config {
             let path = crate::oauth::auth_file_path();
             let grant = self.external_credential_read_grant(
                 provider,
-                codewhale_config::ExternalCredentialSource::CodexCli,
+                nestlone_config::ExternalCredentialSource::CodexCli,
                 &path,
             )?;
             return Ok(crate::oauth::get_credentials(&grant)?.access_token);
@@ -5931,17 +5931,17 @@ impl Config {
 
     /// How many levels of nested sub-agents the interactive `agent` tool may
     /// spawn. Reads `[subagents] max_depth`; when unset it defaults to
-    /// [`codewhale_config::DEFAULT_SPAWN_DEPTH`]. `0` is a valid value that
+    /// [`nestlone_config::DEFAULT_SPAWN_DEPTH`]. `0` is a valid value that
     /// blocks the `agent` tool at this runtime depth. Any value is clamped to
-    /// [`codewhale_config::MAX_SPAWN_DEPTH_CEILING`] so the operator's choice
+    /// [`nestlone_config::MAX_SPAWN_DEPTH_CEILING`] so the operator's choice
     /// can never exceed the hard recursion ceiling.
     #[must_use]
     pub fn subagent_max_spawn_depth(&self) -> u32 {
         self.subagents
             .as_ref()
             .and_then(|cfg| cfg.max_depth)
-            .unwrap_or(codewhale_config::DEFAULT_SPAWN_DEPTH)
-            .min(codewhale_config::MAX_SPAWN_DEPTH_CEILING)
+            .unwrap_or(nestlone_config::DEFAULT_SPAWN_DEPTH)
+            .min(nestlone_config::MAX_SPAWN_DEPTH_CEILING)
     }
 
     /// Return the provider-specific maximum sub-agent recursion depth.
@@ -5950,7 +5950,7 @@ impl Config {
         self.subagent_provider_config(provider)
             .and_then(|cfg| cfg.max_depth)
             .unwrap_or_else(|| self.subagent_max_spawn_depth())
-            .min(codewhale_config::MAX_SPAWN_DEPTH_CEILING)
+            .min(nestlone_config::MAX_SPAWN_DEPTH_CEILING)
     }
 
     /// Number of direct (depth-1) sub-agents that may execute concurrently
@@ -6161,7 +6161,7 @@ impl Config {
     /// Parsed `[fleet]` table, or defaults when the table is absent
     /// (#fleet-roster cutover (v0.8.67)).
     #[must_use]
-    pub fn fleet_config(&self) -> codewhale_config::FleetConfigToml {
+    pub fn fleet_config(&self) -> nestlone_config::FleetConfigToml {
         self.fleet.clone().unwrap_or_default()
     }
 
@@ -6170,7 +6170,7 @@ impl Config {
     /// activity-persistence consumers should read through this accessor so
     /// omitted keys share one model.
     #[must_use]
-    pub fn workflow_config(&self) -> codewhale_config::WorkflowConfigToml {
+    pub fn workflow_config(&self) -> nestlone_config::WorkflowConfigToml {
         self.workflow.clone().unwrap_or_default()
     }
 
@@ -6218,8 +6218,8 @@ impl Config {
     pub fn resolve_hotbar_bindings(
         &self,
         known_action_ids: &[&str],
-    ) -> codewhale_config::HotbarConfigResolution {
-        codewhale_config::resolve_hotbar_bindings(self.hotbar.as_deref(), known_action_ids)
+    ) -> nestlone_config::HotbarConfigResolution {
+        nestlone_config::resolve_hotbar_bindings(self.hotbar.as_deref(), known_action_ids)
     }
 
     /// Resolve enabled features from defaults and config entries.
@@ -6306,7 +6306,7 @@ fn root_deepseek_model_is_foreign_to_direct_provider(provider: ApiProvider, mode
 mod home;
 mod paths;
 use paths::{
-    canonicalize_or_keep, codewhale_home_dir, default_config_path, default_managed_config_path,
+    canonicalize_or_keep, nestlone_home_dir, default_config_path, default_managed_config_path,
     default_mcp_config_path, default_memory_path, default_notes_path, default_requirements_path,
     default_skills_dir, env_config_path, expand_pathbuf, home_config_path, workspace_config_key,
 };
@@ -6317,8 +6317,8 @@ pub(crate) fn workspace_trust_config_candidate_paths() -> Vec<PathBuf> {
         return vec![path];
     }
 
-    if let Some(codewhale_home) = codewhale_home_dir() {
-        return vec![codewhale_home.join("config.toml")];
+    if let Some(nestlone_home) = nestlone_home_dir() {
+        return vec![nestlone_home.join("config.toml")];
     }
 
     let Some(home) = effective_home_dir() else {
@@ -6400,7 +6400,7 @@ pub(crate) fn resolve_load_config_path(path: Option<PathBuf>) -> Option<PathBuf>
             } else {
                 Some(
                     crate::test_support::isolated_test_state_root()
-                        .join(codewhale_config::CONFIG_FILE_NAME),
+                        .join(nestlone_config::CONFIG_FILE_NAME),
                 )
             }
         })
@@ -6476,7 +6476,7 @@ check_for_updates = true
 /// dispatcher forwards from `--base-url`.  Returns `None` when the var is
 /// absent or empty so that provider-specific defaults still apply.
 fn env_base_url_override() -> Option<String> {
-    codewhale_env_var("CODEWHALE_BASE_URL", "DEEPSEEK_BASE_URL")
+    nestlone_env_var("CODEWHALE_BASE_URL", "DEEPSEEK_BASE_URL")
         .ok()
         .filter(|v| !v.trim().is_empty())
 }
@@ -6558,12 +6558,12 @@ fn provider_env_base_url_override(provider: ApiProvider) -> Option<String> {
 /// Resolve an env var, preferring the `CODEWHALE_*` form over the
 /// legacy `DEEPSEEK_*` form. Empty values are ignored so a blank shell export
 /// does not erase configured provider settings.
-fn codewhale_env_var(
-    codewhale_name: &str,
+fn nestlone_env_var(
+    nestlone_name: &str,
     legacy_name: &str,
 ) -> Result<String, std::env::VarError> {
     let read = || {
-        std::env::var(codewhale_name)
+        std::env::var(nestlone_name)
             .ok()
             .filter(|value| !value.trim().is_empty())
             .or_else(|| {
@@ -6597,12 +6597,12 @@ fn apply_env_overrides(config: &mut Config) {
 }
 
 fn apply_env_overrides_unlocked(config: &mut Config) {
-    if let Ok(value) = codewhale_env_var("CODEWHALE_PROVIDER", "DEEPSEEK_PROVIDER") {
+    if let Ok(value) = nestlone_env_var("CODEWHALE_PROVIDER", "DEEPSEEK_PROVIDER") {
         config.provider = Some(value);
     }
     let active_base_url_from_env = env_base_url_override().is_some()
         || provider_env_base_url_override(config.api_provider()).is_some();
-    if let Ok(value) = codewhale_env_var("CODEWHALE_BASE_URL", "DEEPSEEK_BASE_URL") {
+    if let Ok(value) = nestlone_env_var("CODEWHALE_BASE_URL", "DEEPSEEK_BASE_URL") {
         match config.api_provider() {
             ApiProvider::Deepseek | ApiProvider::DeepseekCN => {
                 // DeepSeek and DeepSeek-CN share this one legacy root field.
@@ -7339,7 +7339,7 @@ fn apply_env_overrides_unlocked(config: &mut Config) {
             .opencode_zen
             .model = Some(value);
     }
-    if let Some(value) = codewhale_env_var("CODEWHALE_MODEL", "DEEPSEEK_MODEL")
+    if let Some(value) = nestlone_env_var("CODEWHALE_MODEL", "DEEPSEEK_MODEL")
         .ok()
         .or_else(|| {
             std::env::var("DEEPSEEK_DEFAULT_TEXT_MODEL")
@@ -7511,7 +7511,7 @@ fn apply_env_overrides_unlocked(config: &mut Config) {
             .get_or_insert_with(SearchConfig::default)
             .api_key = Some(value);
     }
-    if let Ok(value) = codewhale_env_var("CODEWHALE_SEARCH_BASE_URL", "DEEPSEEK_SEARCH_BASE_URL") {
+    if let Ok(value) = nestlone_env_var("CODEWHALE_SEARCH_BASE_URL", "DEEPSEEK_SEARCH_BASE_URL") {
         config
             .search
             .get_or_insert_with(SearchConfig::default)
@@ -7862,8 +7862,8 @@ fn xiaomi_mimo_base_url_is_pay_as_you_go(base_url: &str) -> bool {
 fn base_url_is_custom_for_provider(provider: ApiProvider, base_url: &str) -> bool {
     let kind = provider
         .kind()
-        .unwrap_or(codewhale_config::ProviderKind::Deepseek);
-    codewhale_config::provider_preserves_custom_base_url_model(kind, base_url)
+        .unwrap_or(nestlone_config::ProviderKind::Deepseek);
+    nestlone_config::provider_preserves_custom_base_url_model(kind, base_url)
 }
 
 fn provider_preserves_custom_base_url_model(provider: ApiProvider, base_url: &str) -> bool {
@@ -7882,8 +7882,8 @@ fn moonshot_base_url_uses_kimi_code(base_url: &str) -> bool {
 /// route-specific K3 capability and request shaping are not safe for arbitrary
 /// Kimi-hosted paths.
 pub(crate) fn moonshot_base_url_is_exact_kimi_code(base_url: &str) -> bool {
-    codewhale_config::provider::is_exact_kimi_code_route(
-        codewhale_config::ProviderKind::Moonshot,
+    nestlone_config::provider::is_exact_kimi_code_route(
+        nestlone_config::ProviderKind::Moonshot,
         base_url,
     )
 }
@@ -7892,8 +7892,8 @@ pub(crate) fn moonshot_base_url_is_exact_kimi_code(base_url: &str) -> bool {
 /// insignificant trailing slash. Custom gateways must retain their own wire
 /// contract even when they expose a `kimi-k3` model id.
 pub(crate) fn moonshot_base_url_is_exact_direct_platform(base_url: &str) -> bool {
-    codewhale_config::provider::is_exact_moonshot_platform_route(
-        codewhale_config::ProviderKind::Moonshot,
+    nestlone_config::provider::is_exact_moonshot_platform_route(
+        nestlone_config::ProviderKind::Moonshot,
         base_url,
     )
 }
@@ -7928,8 +7928,8 @@ pub(crate) fn is_exact_kimi_code_k3_route(
 #[must_use]
 pub(crate) fn is_exact_zai_chat_route(provider: ApiProvider, base_url: &str) -> bool {
     provider == ApiProvider::Zai
-        && codewhale_config::provider::is_exact_zai_chat_route(
-            codewhale_config::ProviderKind::Zai,
+        && nestlone_config::provider::is_exact_zai_chat_route(
+            nestlone_config::ProviderKind::Zai,
             base_url,
         )
 }
@@ -7979,11 +7979,11 @@ pub(crate) fn is_exact_known_zai_reasoning_route(
 /// `.io` and `.com` hosts are first-party; anything else is a gateway.
 #[must_use]
 pub(crate) fn minimax_base_url_is_supported_direct(base_url: &str) -> bool {
-    codewhale_config::provider::is_exact_minimax_chat_route(
-        codewhale_config::ProviderKind::Minimax,
+    nestlone_config::provider::is_exact_minimax_chat_route(
+        nestlone_config::ProviderKind::Minimax,
         base_url,
-    ) || codewhale_config::provider::is_exact_minimax_anthropic_route(
-        codewhale_config::ProviderKind::MinimaxAnthropic,
+    ) || nestlone_config::provider::is_exact_minimax_anthropic_route(
+        nestlone_config::ProviderKind::MinimaxAnthropic,
         base_url,
     )
 }
@@ -7998,8 +7998,8 @@ pub(crate) fn is_exact_minimax_m3_route(
     model: &str,
 ) -> bool {
     provider == ApiProvider::Minimax
-        && codewhale_config::provider::is_exact_minimax_chat_route(
-            codewhale_config::ProviderKind::Minimax,
+        && nestlone_config::provider::is_exact_minimax_chat_route(
+            nestlone_config::ProviderKind::Minimax,
             base_url,
         )
         && model.trim().eq_ignore_ascii_case(DEFAULT_MINIMAX_MODEL)
@@ -8015,8 +8015,8 @@ pub(crate) fn is_exact_minimax_anthropic_m3_route(
     model: &str,
 ) -> bool {
     provider == ApiProvider::MinimaxAnthropic
-        && codewhale_config::provider::is_exact_minimax_anthropic_route(
-            codewhale_config::ProviderKind::MinimaxAnthropic,
+        && nestlone_config::provider::is_exact_minimax_anthropic_route(
+            nestlone_config::ProviderKind::MinimaxAnthropic,
             base_url,
         )
         && model.trim().eq_ignore_ascii_case(DEFAULT_MINIMAX_MODEL)
@@ -8257,10 +8257,10 @@ pub(crate) fn moonshot_k3_route_display_name(base_url: &str, model: &str) -> Opt
 pub(crate) fn credential_help_for_provider_route(
     provider: ApiProvider,
     base_url: &str,
-) -> codewhale_config::provider::CredentialHelp {
+) -> nestlone_config::provider::CredentialHelp {
     provider.kind().map_or_else(
         || provider.credential_help(),
-        |kind| codewhale_config::provider::credential_help_for_route(kind, base_url),
+        |kind| nestlone_config::provider::credential_help_for_route(kind, base_url),
     )
 }
 
@@ -8585,7 +8585,7 @@ fn load_sibling_exec_policy_engine(config_path: Option<&Path>) -> Result<ExecPol
     let Some(config_path) = config_path else {
         return Ok(ExecPolicyEngine::new(Vec::new(), Vec::new()));
     };
-    let permissions_path = codewhale_config::permissions_path_for_config_path(config_path);
+    let permissions_path = nestlone_config::permissions_path_for_config_path(config_path);
     if !permissions_path.exists() {
         return Ok(ExecPolicyEngine::new(Vec::new(), Vec::new()));
     }
@@ -8596,10 +8596,10 @@ fn load_sibling_exec_policy_engine(config_path: Option<&Path>) -> Result<ExecPol
             permissions_path.display()
         )
     })?;
-    let permissions: codewhale_config::PermissionsToml = toml::from_str(&raw).map_err(|_| {
+    let permissions: nestlone_config::PermissionsToml = toml::from_str(&raw).map_err(|_| {
         anyhow::anyhow!(
             "Failed to parse permissions file {}; file contents were omitted",
-            codewhale_config::quote_os_path(&permissions_path)
+            nestlone_config::quote_os_path(&permissions_path)
         )
     })?;
     if permissions.is_empty() {
@@ -8622,9 +8622,9 @@ fn merge_skills_config(
             max_install_size_bytes: override_cfg
                 .max_install_size_bytes
                 .or(base.max_install_size_bytes),
-            scan_codewhale_only: override_cfg
-                .scan_codewhale_only
-                .or(base.scan_codewhale_only),
+            scan_nestlone_only: override_cfg
+                .scan_nestlone_only
+                .or(base.scan_nestlone_only),
         }),
     }
 }
@@ -8738,7 +8738,7 @@ fn load_single_config_file(path: &Path) -> Result<Config> {
     let parsed: ConfigFile = toml::from_str(&contents).map_err(|_| {
         anyhow::anyhow!(
             "Failed to parse config file {}; file contents were omitted",
-            codewhale_config::quote_os_path(path)
+            nestlone_config::quote_os_path(path)
         )
     })?;
     Ok(parsed.base)
@@ -8854,7 +8854,7 @@ fn strip_external_credential_consent(config: &mut Config) {
             .provider_config_for_mut(provider)
             .external_credentials;
         if external.as_ref().is_some_and(|consent| {
-            consent.access != codewhale_config::ExternalCredentialAccess::Disabled
+            consent.access != nestlone_config::ExternalCredentialAccess::Disabled
         }) {
             *external = None;
         }
@@ -8865,7 +8865,7 @@ fn strip_external_credential_consent(config: &mut Config) {
                 .external_credentials
                 .as_ref()
                 .is_some_and(|consent| {
-                    consent.access != codewhale_config::ExternalCredentialAccess::Disabled
+                    consent.access != nestlone_config::ExternalCredentialAccess::Disabled
                 })
             {
                 provider.external_credentials = None;
@@ -8910,7 +8910,7 @@ fn apply_requirements(config: &mut Config) -> Result<()> {
     let requirements: RequirementsFile = toml::from_str(&contents).map_err(|_| {
         anyhow::anyhow!(
             "Failed to parse requirements file {}; file contents were omitted",
-            codewhale_config::quote_os_path(&path)
+            nestlone_config::quote_os_path(&path)
         )
     })?;
 
@@ -9006,7 +9006,7 @@ pub fn ensure_parent_dir(path: &Path) -> Result<()> {
 /// Write content to a config file with restrictive permissions (owner-only read/write).
 /// On Unix this sets mode 0o600 before writing.
 fn write_config_file_secure(path: &Path, content: &str) -> Result<()> {
-    codewhale_config::create_config_document(path, content)
+    nestlone_config::create_config_document(path, content)
 }
 
 /// Where a saved credential ended up. Returned by [`save_api_key`] so
@@ -9016,7 +9016,7 @@ pub enum SavedCredential {
     /// Stored in the durable secret store. The config file contains only
     /// non-secret provider metadata and has any matching plaintext `api_key`
     /// entry removed. The `backend` label is the value of
-    /// [`codewhale_secrets::Secrets::backend_name`] at write time so the toast
+    /// [`nestlone_secrets::Secrets::backend_name`] at write time so the toast
     /// text can name the actual backend (`"system keyring"`,
     /// `"file-based (~/.codewhale/secrets/)"`).
     KeyringAndConfigFile {
@@ -9103,7 +9103,7 @@ fn save_root_api_key_for_secret_slot(
                         }
                         return Err(error);
                     }
-                    codewhale_config::scrub_plaintext_api_keys_from_config_backup(&path)?;
+                    nestlone_config::scrub_plaintext_api_keys_from_config_backup(&path)?;
                     let backend = secrets.backend_name().to_string();
                     log_sensitive_event(
                         "credential.save",
@@ -9131,22 +9131,22 @@ fn save_root_api_key_for_secret_slot(
     }
 
     let path = save_api_key_to_config_file(trimmed)?;
-    codewhale_config::scrub_plaintext_api_keys_from_config_backup(&path)?;
+    nestlone_config::scrub_plaintext_api_keys_from_config_backup(&path)?;
     Ok(SavedCredential::ConfigFile(path))
 }
 
 #[cfg(not(test))]
-fn credential_secret_store_for_save() -> Option<codewhale_secrets::Secrets> {
-    Some(codewhale_secrets::Secrets::auto_detect())
+fn credential_secret_store_for_save() -> Option<nestlone_secrets::Secrets> {
+    Some(nestlone_secrets::Secrets::auto_detect())
 }
 
 #[cfg(test)]
-fn credential_secret_store_for_save() -> Option<codewhale_secrets::Secrets> {
+fn credential_secret_store_for_save() -> Option<nestlone_secrets::Secrets> {
     let isolated_home = std::env::var_os("CODEWHALE_HOME").is_some_and(|value| !value.is_empty());
     let explicit_backend = std::env::var_os("CODEWHALE_SECRET_BACKEND")
         .or_else(|| std::env::var_os("DEEPSEEK_SECRET_BACKEND"))
         .is_some_and(|value| !value.is_empty());
-    (isolated_home && explicit_backend).then(codewhale_secrets::Secrets::auto_detect)
+    (isolated_home && explicit_backend).then(nestlone_secrets::Secrets::auto_detect)
 }
 
 fn save_root_api_key_metadata_without_plaintext(
@@ -9303,7 +9303,7 @@ pub fn active_provider_has_config_api_key(config: &Config) -> bool {
         return config
             .external_credential_read_grant(
                 provider,
-                codewhale_config::ExternalCredentialSource::CodexCli,
+                nestlone_config::ExternalCredentialSource::CodexCli,
                 &path,
             )
             .is_ok_and(|grant| crate::oauth::stored_credentials_present(&grant));
@@ -9395,7 +9395,7 @@ pub fn has_api_key_for(config: &Config, provider: ApiProvider) -> bool {
         return config
             .external_credential_read_grant(
                 provider,
-                codewhale_config::ExternalCredentialSource::CodexCli,
+                nestlone_config::ExternalCredentialSource::CodexCli,
                 &path,
             )
             .is_ok_and(|grant| crate::oauth::stored_credentials_present(&grant));
@@ -9466,7 +9466,7 @@ impl Config {
         let path = crate::oauth::auth_file_path();
         let grant = self.external_credential_read_grant(
             ApiProvider::OpenaiCodex,
-            codewhale_config::ExternalCredentialSource::CodexCli,
+            nestlone_config::ExternalCredentialSource::CodexCli,
             &path,
         )?;
         crate::oauth::get_credentials(&grant)
@@ -9597,7 +9597,7 @@ pub(crate) fn save_api_key_for_identity(
     api_key: &str,
 ) -> Result<PathBuf> {
     if identity.provider == ApiProvider::Xai {
-        return codewhale_config::with_xai_oauth_revocation_transaction(|| {
+        return nestlone_config::with_xai_oauth_revocation_transaction(|| {
             save_api_key_for_identity_unlocked(identity, route_config, api_key)
         });
     }
@@ -9721,7 +9721,7 @@ fn save_api_key_for_identity_unlocked(
                         }
                         return Err(error);
                     }
-                    codewhale_config::scrub_plaintext_api_keys_from_config_backup(&config_path)?;
+                    nestlone_config::scrub_plaintext_api_keys_from_config_backup(&config_path)?;
                     log_sensitive_event(
                         "credential.save",
                         json!({
@@ -9789,7 +9789,7 @@ fn save_api_key_for_identity_unlocked(
             "config_path": config_path.display().to_string(),
         }),
     );
-    codewhale_config::scrub_plaintext_api_keys_from_config_backup(&config_path)?;
+    nestlone_config::scrub_plaintext_api_keys_from_config_backup(&config_path)?;
 
     Ok(config_path)
 }
@@ -9911,18 +9911,18 @@ pub(crate) fn persist_external_credential_consent_for_at(
     config_path: Option<&Path>,
     live_config: &mut Config,
     provider: ApiProvider,
-    consent_provider: codewhale_config::ProviderKind,
-    source: codewhale_config::ExternalCredentialSource,
+    consent_provider: nestlone_config::ProviderKind,
+    source: nestlone_config::ExternalCredentialSource,
     path: &Path,
 ) -> Result<PathBuf> {
     let expected = match provider {
         ApiProvider::OpenaiCodex => (
-            codewhale_config::ProviderKind::OpenaiCodex,
-            codewhale_config::ExternalCredentialSource::CodexCli,
+            nestlone_config::ProviderKind::OpenaiCodex,
+            nestlone_config::ExternalCredentialSource::CodexCli,
         ),
         ApiProvider::Xai => (
-            codewhale_config::ProviderKind::Xai,
-            codewhale_config::ExternalCredentialSource::GrokCli,
+            nestlone_config::ProviderKind::Xai,
+            nestlone_config::ExternalCredentialSource::GrokCli,
         ),
         _ => anyhow::bail!(
             "{} has no supported external credential owner",
@@ -9934,7 +9934,7 @@ pub(crate) fn persist_external_credential_consent_for_at(
         "external credential owner does not match provider {}",
         provider.as_str()
     );
-    let path = codewhale_config::resolve_external_credential_path(path)?;
+    let path = nestlone_config::resolve_external_credential_path(path)?;
     let path_value = path.to_str().context(
         "external credential path cannot be persisted losslessly because it is not valid UTF-8",
     )?;
@@ -9975,13 +9975,13 @@ pub(crate) fn persist_external_credential_consent_for_at(
         crate::config_persistence::set_document_value(
             doc,
             &[prefix[0], prefix[1], prefix[2], "consent_version"],
-            i64::from(codewhale_config::EXTERNAL_CREDENTIAL_CONSENT_VERSION),
+            i64::from(nestlone_config::EXTERNAL_CREDENTIAL_CONSENT_VERSION),
         )
     })
     .with_context(|| {
         format!(
             "Failed to write config to {}",
-            codewhale_config::quote_os_path(&config_path)
+            nestlone_config::quote_os_path(&config_path)
         )
     })?;
     live_config
@@ -9989,7 +9989,7 @@ pub(crate) fn persist_external_credential_consent_for_at(
         .get_or_insert_with(ProvidersConfig::default);
     let entry = live_config.provider_config_for_mut(provider);
     entry.auth_mode = Some("oauth".to_string());
-    entry.external_credentials = Some(codewhale_config::ExternalCredentialConsentToml::read_only(
+    entry.external_credentials = Some(nestlone_config::ExternalCredentialConsentToml::read_only(
         consent_provider,
         source,
         path,
@@ -10025,7 +10025,7 @@ pub(crate) fn revoke_external_credential_consent_for_at(
     .with_context(|| {
         format!(
             "Failed to write config to {}",
-            codewhale_config::quote_os_path(&config_path)
+            nestlone_config::quote_os_path(&config_path)
         )
     })?;
     live_config
@@ -10126,9 +10126,9 @@ fn provider_secret_store_api_key_with_mode(
     }
 
     let secrets = if read_only {
-        codewhale_secrets::Secrets::auto_detect_read_only()
+        nestlone_secrets::Secrets::auto_detect_read_only()
     } else {
-        codewhale_secrets::Secrets::auto_detect()
+        nestlone_secrets::Secrets::auto_detect()
     };
     secrets
         .get(provider_secret_store_slot(provider))
@@ -10147,7 +10147,7 @@ fn provider_secret_store_api_key_with_mode(
 /// `/model` pick — never a reason to run something the user did not ask for
 /// (v0.9.1 kimi-k3 dogfood report).
 pub(crate) fn explicit_launch_model_override() -> Option<String> {
-    codewhale_env_var("CODEWHALE_MODEL", "DEEPSEEK_MODEL")
+    nestlone_env_var("CODEWHALE_MODEL", "DEEPSEEK_MODEL")
         .ok()
         .map(|value| value.trim().to_string())
         .filter(|value| !value.is_empty())
@@ -10192,7 +10192,7 @@ fn missing_provider_api_key_message(provider: ApiProvider) -> Result<String> {
 /// (Path 0) ensures a freshly-entered key still wins over a stale env
 /// var that lingers from a previous session.
 pub fn clear_api_key() -> Result<()> {
-    codewhale_config::with_xai_oauth_revocation_transaction(clear_api_key_unlocked)
+    nestlone_config::with_xai_oauth_revocation_transaction(clear_api_key_unlocked)
 }
 
 fn clear_api_key_unlocked() -> Result<()> {
@@ -10238,7 +10238,7 @@ fn clear_api_key_unlocked() -> Result<()> {
 /// legacy root `api_key` when the provider is DeepSeek).
 pub fn clear_active_provider_api_key(provider: &str) -> Result<()> {
     if provider == ApiProvider::Xai.as_str() {
-        return codewhale_config::with_xai_oauth_revocation_transaction(|| {
+        return nestlone_config::with_xai_oauth_revocation_transaction(|| {
             clear_active_provider_api_key_unlocked(provider)
         });
     }
@@ -10261,7 +10261,7 @@ fn clear_active_provider_api_key_unlocked(provider: &str) -> Result<()> {
     let persisted_config: Config = toml::from_str(&persisted).map_err(|_| {
         anyhow::anyhow!(
             "Failed to parse config from {}; file contents were omitted",
-            codewhale_config::quote_os_path(&config_path)
+            nestlone_config::quote_os_path(&config_path)
         )
     })?;
     let exact_literal_custom_table = provider == ApiProvider::Custom.as_str()

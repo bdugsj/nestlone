@@ -884,10 +884,10 @@ mod tests {
         let tmp = tempfile::TempDir::new().expect("tempdir");
         let _home = crate::test_support::EnvVarGuard::set("HOME", tmp.path());
         let _user_profile = crate::test_support::EnvVarGuard::set("USERPROFILE", tmp.path());
-        let _codewhale_home =
+        let _nestlone_home =
             crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", tmp.path().join(".codewhale"));
         let _deepseek_config = crate::test_support::EnvVarGuard::remove("DEEPSEEK_CONFIG_PATH");
-        let _codewhale_config = crate::test_support::EnvVarGuard::remove("CODEWHALE_CONFIG_PATH");
+        let _nestlone_config = crate::test_support::EnvVarGuard::remove("CODEWHALE_CONFIG_PATH");
         let _writes = allow_writes_in_tests();
 
         let writer = StartupDefaultsWriter::default();

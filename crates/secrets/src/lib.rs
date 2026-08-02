@@ -397,10 +397,10 @@ impl FileKeyringStore {
     /// copied into the CodeWhale store — unless `CODEWHALE_HOME` is explicit,
     /// in which case ambient `$HOME/.deepseek` credentials are never imported.
     pub fn default_path() -> Result<PathBuf, SecretsError> {
-        let primary = default_codewhale_secrets_path()?;
+        let primary = default_nestlone_secrets_path()?;
         // Match the diagnostic isolation boundary: an explicit Codewhale home
         // must not silently pull ambient legacy DeepSeek credentials.
-        if !codewhale_home_is_explicit() {
+        if !nestlone_home_is_explicit() {
             match legacy_deepseek_secrets_path() {
                 Ok(legacy) => {
                     if let Err(err) = Self::migrate_legacy_file_if_needed(&primary, &legacy) {
@@ -426,8 +426,8 @@ impl FileKeyringStore {
     /// flows must keep using [`Self::default_path`] so their existing additive
     /// migration behavior remains unchanged.
     pub fn default_paths_read_only() -> Result<(PathBuf, Option<PathBuf>), SecretsError> {
-        let primary = default_codewhale_secrets_path()?;
-        let legacy = (!codewhale_home_is_explicit())
+        let primary = default_nestlone_secrets_path()?;
+        let legacy = (!nestlone_home_is_explicit())
             .then(legacy_deepseek_secrets_path)
             .transpose()?;
         Ok((primary, legacy))
@@ -670,7 +670,7 @@ impl KeyringStore for FileKeyringStore {
     }
 }
 
-fn default_codewhale_secrets_path() -> Result<PathBuf, SecretsError> {
+fn default_nestlone_secrets_path() -> Result<PathBuf, SecretsError> {
     if let Ok(value) = std::env::var("CODEWHALE_HOME") {
         let trimmed = value.trim();
         if !trimmed.is_empty() {
@@ -692,7 +692,7 @@ fn legacy_deepseek_secrets_path() -> Result<PathBuf, SecretsError> {
 
 /// Match the state/config isolation boundary: an explicit Codewhale home must
 /// not fall back to ambient legacy data under `$HOME/.deepseek`.
-fn codewhale_home_is_explicit() -> bool {
+fn nestlone_home_is_explicit() -> bool {
     std::env::var("CODEWHALE_HOME").is_ok_and(|value| !value.trim().is_empty())
 }
 
@@ -730,7 +730,7 @@ fn configured_secret_backend() -> Option<String> {
 /// # Examples
 ///
 /// ```no_run
-/// use codewhale_secrets::Secrets;
+/// use nestlone_secrets::Secrets;
 ///
 /// let secrets = Secrets::auto_detect();
 /// if let Some(key) = secrets.resolve("deepseek") {
@@ -1289,21 +1289,21 @@ mod tests {
     }
 
     #[test]
-    fn read_only_auto_detect_respects_explicit_codewhale_home_isolation() {
+    fn read_only_auto_detect_respects_explicit_nestlone_home_isolation() {
         let _lock = env_lock();
         clear_known_envs();
         let tmp = tempfile::tempdir().unwrap();
-        let codewhale_home = tmp.path().join("isolated-codewhale-home");
+        let nestlone_home = tmp.path().join("isolated-codewhale-home");
         let _home = EnvVarGuard::set("HOME", tmp.path());
         let _userprofile = EnvVarGuard::set("USERPROFILE", tmp.path());
-        let _codewhale_home = EnvVarGuard::set("CODEWHALE_HOME", &codewhale_home);
+        let _nestlone_home = EnvVarGuard::set("CODEWHALE_HOME", &nestlone_home);
         let _backend = EnvVarGuard::set(SECRET_BACKEND_ENV, "file");
         let legacy = tmp
             .path()
             .join(".deepseek")
             .join("secrets")
             .join("secrets.json");
-        let primary = codewhale_home.join("secrets").join("secrets.json");
+        let primary = nestlone_home.join("secrets").join("secrets.json");
         FileKeyringStore::new(&legacy)
             .set("deepseek", "synthetic-ambient-legacy-value")
             .unwrap();
@@ -1337,12 +1337,12 @@ mod tests {
         let _lock = env_lock();
         clear_known_envs();
         let tmp = tempfile::tempdir().unwrap();
-        let codewhale_home = tmp.path().join("isolated-codewhale-home");
+        let nestlone_home = tmp.path().join("isolated-codewhale-home");
         let _home = EnvVarGuard::set("HOME", tmp.path());
         let _userprofile = EnvVarGuard::set("USERPROFILE", tmp.path());
-        let _codewhale_home = EnvVarGuard::set("CODEWHALE_HOME", &codewhale_home);
+        let _nestlone_home = EnvVarGuard::set("CODEWHALE_HOME", &nestlone_home);
         let _backend = EnvVarGuard::set(SECRET_BACKEND_ENV, "file");
-        let primary = codewhale_home.join("secrets").join("secrets.json");
+        let primary = nestlone_home.join("secrets").join("secrets.json");
         FileKeyringStore::new(&primary)
             .set("deepseek", "synthetic-isolated-primary-value")
             .unwrap();
@@ -1371,7 +1371,7 @@ mod tests {
     }
 
     #[test]
-    fn file_default_path_uses_codewhale_home() {
+    fn file_default_path_uses_nestlone_home() {
         let _lock = env_lock();
         clear_known_envs();
         let tmp = tempfile::tempdir().unwrap();
@@ -1390,14 +1390,14 @@ mod tests {
     }
 
     #[test]
-    fn file_default_path_honors_codewhale_home() {
+    fn file_default_path_honors_nestlone_home() {
         let _lock = env_lock();
         clear_known_envs();
         let tmp = tempfile::tempdir().unwrap();
         let custom = tmp.path().join("custom-codewhale");
         let _home = EnvVarGuard::set("HOME", tmp.path());
         let _userprofile = EnvVarGuard::set("USERPROFILE", tmp.path());
-        let _codewhale_home = EnvVarGuard::set("CODEWHALE_HOME", &custom);
+        let _nestlone_home = EnvVarGuard::set("CODEWHALE_HOME", &custom);
 
         let path = FileKeyringStore::default_path().unwrap();
 
@@ -2023,16 +2023,16 @@ mod tests {
     }
 
     #[test]
-    fn default_path_with_explicit_codewhale_home_does_not_migrate_ambient_legacy() {
+    fn default_path_with_explicit_nestlone_home_does_not_migrate_ambient_legacy() {
         // FR003-C001: explicit CODEWHALE_HOME must not silently import ambient
         // `$HOME/.deepseek/secrets` credentials into the isolated home.
         let _lock = env_lock();
         clear_known_envs();
         let tmp = tempfile::tempdir().unwrap();
-        let codewhale_home = tmp.path().join("isolated-codewhale-home");
+        let nestlone_home = tmp.path().join("isolated-codewhale-home");
         let _home = EnvVarGuard::set("HOME", tmp.path());
         let _userprofile = EnvVarGuard::set("USERPROFILE", tmp.path());
-        let _codewhale_home = EnvVarGuard::set("CODEWHALE_HOME", &codewhale_home);
+        let _nestlone_home = EnvVarGuard::set("CODEWHALE_HOME", &nestlone_home);
         let legacy = tmp
             .path()
             .join(".deepseek")
@@ -2043,7 +2043,7 @@ mod tests {
             .unwrap();
 
         let path = FileKeyringStore::default_path().unwrap();
-        assert_eq!(path, codewhale_home.join("secrets").join("secrets.json"));
+        assert_eq!(path, nestlone_home.join("secrets").join("secrets.json"));
         assert!(
             !path.exists(),
             "explicit CODEWHALE_HOME must not create/migrate a primary store from ambient legacy"

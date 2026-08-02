@@ -1,4 +1,4 @@
-//! Shared build-script helpers for the `codewhale-cli` and `codewhale-tui`
+//! Shared build-script helpers for the `nestlone-cli` and `nestlone-tui`
 //! build scripts: rerun-condition declarations and the embedded
 //! `DEEPSEEK_BUILD_VERSION` metadata. Only call these functions from a build
 //! script — they emit `cargo:` directives on stdout.
@@ -33,7 +33,7 @@ pub fn emit_build_version(manifest_dir: &Path, package_version: &str) {
 
     println!("cargo:rustc-env=DEEPSEEK_BUILD_VERSION={build_version}");
     if let Some(commit) = commit {
-        println!("cargo:rustc-env=CODEWHALE_BUILD_COMMIT={commit}");
+        println!("cargo:rustc-env=NESTLONE_BUILD_COMMIT={commit}");
     }
 }
 
@@ -239,7 +239,7 @@ mod tests {
             .expect("clock before epoch")
             .as_nanos();
         let root = std::env::temp_dir().join(format!(
-            "codewhale-build-support-{}-{unique}",
+            "nestlone-build-support-{}-{unique}",
             std::process::id()
         ));
         let common = root.join(".git");

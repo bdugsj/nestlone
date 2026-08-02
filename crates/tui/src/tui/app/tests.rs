@@ -2194,7 +2194,7 @@ fn cached_skills_merges_across_candidate_directories() {
 }
 
 #[test]
-fn cached_skills_respect_codewhale_only_scan_config() {
+fn cached_skills_respect_nestlone_only_scan_config() {
     let tmp = tempfile::TempDir::new().expect("tempdir");
     let workspace = tmp.path().join("workspace");
 
@@ -2209,13 +2209,13 @@ fn cached_skills_respect_codewhale_only_scan_config() {
     )
     .expect("write claude skill");
 
-    let codewhale_dir = workspace
+    let nestlone_dir = workspace
         .join(".codewhale")
         .join("skills")
         .join("codewhale-skill");
-    std::fs::create_dir_all(&codewhale_dir).expect("codewhale skill dir");
+    std::fs::create_dir_all(&nestlone_dir).expect("codewhale skill dir");
     std::fs::write(
-        codewhale_dir.join("SKILL.md"),
+        nestlone_dir.join("SKILL.md"),
         "---\nname: codewhale-skill\ndescription: CodeWhale skill\n---\nbody\n",
     )
     .expect("write codewhale skill");
@@ -2227,7 +2227,7 @@ fn cached_skills_respect_codewhale_only_scan_config() {
         options,
         &Config {
             skills: Some(crate::config::SkillsConfig {
-                scan_codewhale_only: Some(true),
+                scan_nestlone_only: Some(true),
                 ..Default::default()
             }),
             ..Default::default()
@@ -2252,7 +2252,7 @@ fn cached_skills_respect_codewhale_only_scan_config() {
 }
 
 #[test]
-fn resolve_skills_dir_requires_codewhale_skills_to_be_directory() {
+fn resolve_skills_dir_requires_nestlone_skills_to_be_directory() {
     let tmp = tempfile::TempDir::new().expect("tempdir");
     let workspace = tmp.path().join("workspace");
     std::fs::create_dir_all(workspace.join(".codewhale")).expect("codewhale dir");
@@ -2265,7 +2265,7 @@ fn resolve_skills_dir_requires_codewhale_skills_to_be_directory() {
     let global_skills_dir = tmp.path().join("global-skills");
     let config = Config {
         skills: Some(crate::config::SkillsConfig {
-            scan_codewhale_only: Some(true),
+            scan_nestlone_only: Some(true),
             ..Default::default()
         }),
         ..Default::default()
@@ -2310,17 +2310,17 @@ fn cached_skills_include_configured_directory() {
 }
 
 #[test]
-fn cached_skills_preserve_configured_directory_in_codewhale_only_scan() {
+fn cached_skills_preserve_configured_directory_in_nestlone_only_scan() {
     let tmp = tempfile::TempDir::new().expect("tempdir");
     let workspace = tmp.path().join("workspace");
 
-    let codewhale_skill_dir = workspace
+    let nestlone_skill_dir = workspace
         .join(".codewhale")
         .join("skills")
         .join("workspace-codewhale");
-    std::fs::create_dir_all(&codewhale_skill_dir).expect("workspace codewhale skill dir");
+    std::fs::create_dir_all(&nestlone_skill_dir).expect("workspace codewhale skill dir");
     std::fs::write(
-        codewhale_skill_dir.join("SKILL.md"),
+        nestlone_skill_dir.join("SKILL.md"),
         "---\nname: workspace-codewhale\ndescription: Workspace CodeWhale skill\n---\nbody\n",
     )
     .expect("write workspace codewhale skill");
@@ -2340,7 +2340,7 @@ fn cached_skills_preserve_configured_directory_in_codewhale_only_scan() {
     let config = Config {
         skills_dir: Some(configured_dir.to_string_lossy().into_owned()),
         skills: Some(crate::config::SkillsConfig {
-            scan_codewhale_only: Some(true),
+            scan_nestlone_only: Some(true),
             ..Default::default()
         }),
         ..Default::default()
@@ -2365,7 +2365,7 @@ fn cached_skills_preserve_configured_directory_in_codewhale_only_scan() {
 }
 
 #[test]
-fn cached_skills_reject_codewhale_only_workspace_symlink_escape() {
+fn cached_skills_reject_nestlone_only_workspace_symlink_escape() {
     let tmp = tempfile::TempDir::new().expect("tempdir");
     let workspace = tmp.path().join("workspace");
     let escape_target = tmp.path().join("escape-target");
@@ -2389,7 +2389,7 @@ fn cached_skills_reject_codewhale_only_workspace_symlink_escape() {
     options.skills_dir = global_skills_dir.clone();
     let config = Config {
         skills: Some(crate::config::SkillsConfig {
-            scan_codewhale_only: Some(true),
+            scan_nestlone_only: Some(true),
             ..Default::default()
         }),
         ..Default::default()
@@ -2672,8 +2672,8 @@ fn work_restore_reconciles_fleet_from_the_restored_workspace() {
     let ledger = crate::fleet::ledger::FleetLedger::open(restored_workspace.path())
         .expect("open restored Fleet ledger");
     ledger
-        .enqueue(codewhale_protocol::fleet::FleetInboxEntry {
-            run_id: codewhale_protocol::fleet::FleetRunId::from("run-restore"),
+        .enqueue(nestlone_protocol::fleet::FleetInboxEntry {
+            run_id: nestlone_protocol::fleet::FleetRunId::from("run-restore"),
             task_id: "task-restore".to_string(),
             priority: 0,
             enqueued_at: "2026-07-18T00:00:00Z".to_string(),
@@ -2743,8 +2743,8 @@ fn failed_workspace_owner_reconcile_leaves_previous_work_state_intact() {
     let ledger = crate::fleet::ledger::FleetLedger::open(restored_workspace.path())
         .expect("open restored Fleet ledger");
     ledger
-        .enqueue(codewhale_protocol::fleet::FleetInboxEntry {
-            run_id: codewhale_protocol::fleet::FleetRunId::from("run-regress"),
+        .enqueue(nestlone_protocol::fleet::FleetInboxEntry {
+            run_id: nestlone_protocol::fleet::FleetRunId::from("run-regress"),
             task_id: "task-regress".to_string(),
             priority: 0,
             enqueued_at: "2026-07-18T00:00:00Z".to_string(),
@@ -3391,7 +3391,7 @@ fn legacy_yolo_migrates_the_actual_fallback_config_not_a_missing_env_path() {
     let _env_lock = lock_test_env();
     let tmp = tempfile::tempdir().expect("tempdir");
     let home = tmp.path().join("home");
-    let home_config_dir = home.join(codewhale_config::CODEWHALE_APP_DIR);
+    let home_config_dir = home.join(nestlone_config::CODEWHALE_APP_DIR);
     let override_dir = tmp.path().join("missing-override");
     let missing_override = override_dir.join("config.toml");
     let workspace = tmp.path().join("workspace");
@@ -3409,8 +3409,8 @@ fn legacy_yolo_migrates_the_actual_fallback_config_not_a_missing_env_path() {
 
     let _home = EnvVarGuard::set("HOME", &home);
     let _user_profile = EnvVarGuard::set("USERPROFILE", &home);
-    let _codewhale_home = EnvVarGuard::remove("CODEWHALE_HOME");
-    let _codewhale_config = EnvVarGuard::remove("CODEWHALE_CONFIG_PATH");
+    let _nestlone_home = EnvVarGuard::remove("CODEWHALE_HOME");
+    let _nestlone_config = EnvVarGuard::remove("CODEWHALE_CONFIG_PATH");
     let _deepseek_config = EnvVarGuard::set("DEEPSEEK_CONFIG_PATH", &missing_override);
     let _approval_env = EnvVarGuard::remove("DEEPSEEK_APPROVAL_POLICY");
 
@@ -5304,7 +5304,7 @@ fn word_selection_extends_by_word_and_replaces_on_type() {
 /// providers under test are cleared so readiness is driven solely by config.
 fn app_with_fallback_chain(
     active: ApiProvider,
-    fallbacks: &[codewhale_config::ProviderKind],
+    fallbacks: &[nestlone_config::ProviderKind],
     keyed: &[ApiProvider],
 ) -> App {
     let mut providers = ProvidersConfig::default();
@@ -5347,8 +5347,8 @@ fn advance_fallback_skips_unauthed_middle_provider_and_lands_on_next_ready() {
     let mut app = app_with_fallback_chain(
         ApiProvider::Openai,
         &[
-            codewhale_config::ProviderKind::Openrouter,
-            codewhale_config::ProviderKind::Together,
+            nestlone_config::ProviderKind::Openrouter,
+            nestlone_config::ProviderKind::Together,
         ],
         &[ApiProvider::Openai, ApiProvider::Together],
     );
@@ -5379,7 +5379,7 @@ fn advance_fallback_local_provider_is_eligible_without_a_key() {
     // Chain: Openai (active, keyed) -> Ollama (local, no key needed).
     let mut app = app_with_fallback_chain(
         ApiProvider::Openai,
-        &[codewhale_config::ProviderKind::Ollama],
+        &[nestlone_config::ProviderKind::Ollama],
         &[ApiProvider::Openai],
     );
 
@@ -5410,8 +5410,8 @@ fn advance_fallback_all_unready_exhausts_with_clear_reason() {
     let mut app = app_with_fallback_chain(
         ApiProvider::Openai,
         &[
-            codewhale_config::ProviderKind::Openrouter,
-            codewhale_config::ProviderKind::Together,
+            nestlone_config::ProviderKind::Openrouter,
+            nestlone_config::ProviderKind::Together,
         ],
         &[ApiProvider::Openai],
     );
@@ -5456,16 +5456,16 @@ fn startup_and_fallback_skip_inactive_external_only_routes_without_io() {
         provider: Some(ApiProvider::Deepseek.as_str().to_string()),
         api_key: Some("active-deepseek-key".to_string()),
         fallback_providers: vec![
-            codewhale_config::ProviderKind::OpenaiCodex,
-            codewhale_config::ProviderKind::Xai,
+            nestlone_config::ProviderKind::OpenaiCodex,
+            nestlone_config::ProviderKind::Xai,
         ],
         providers: Some(ProvidersConfig {
             openai_codex: ProviderConfig {
                 auth_mode: Some("oauth".to_string()),
                 external_credentials: Some(
-                    codewhale_config::ExternalCredentialConsentToml::read_only(
-                        codewhale_config::ProviderKind::OpenaiCodex,
-                        codewhale_config::ExternalCredentialSource::CodexCli,
+                    nestlone_config::ExternalCredentialConsentToml::read_only(
+                        nestlone_config::ProviderKind::OpenaiCodex,
+                        nestlone_config::ExternalCredentialSource::CodexCli,
                         codex_path.clone(),
                     ),
                 ),
@@ -5474,9 +5474,9 @@ fn startup_and_fallback_skip_inactive_external_only_routes_without_io() {
             xai: ProviderConfig {
                 auth_mode: Some("oauth".to_string()),
                 external_credentials: Some(
-                    codewhale_config::ExternalCredentialConsentToml::read_only(
-                        codewhale_config::ProviderKind::Xai,
-                        codewhale_config::ExternalCredentialSource::GrokCli,
+                    nestlone_config::ExternalCredentialConsentToml::read_only(
+                        nestlone_config::ProviderKind::Xai,
+                        nestlone_config::ExternalCredentialSource::GrokCli,
                         grok_path.clone(),
                     ),
                 ),
@@ -5529,7 +5529,7 @@ fn advance_fallback_local_primary_does_not_fall_back_to_cloud() {
     // chain exhausts rather than leaking a local/private route out to cloud.
     let mut app = app_with_fallback_chain(
         ApiProvider::Ollama,
-        &[codewhale_config::ProviderKind::Deepseek],
+        &[nestlone_config::ProviderKind::Deepseek],
         &[ApiProvider::Deepseek],
     );
 
@@ -5556,7 +5556,7 @@ fn advance_fallback_local_primary_may_fall_back_to_local_sibling() {
     // the local/private posture is preserved and the fallback is allowed.
     let mut app = app_with_fallback_chain(
         ApiProvider::Ollama,
-        &[codewhale_config::ProviderKind::Vllm],
+        &[nestlone_config::ProviderKind::Vllm],
         &[],
     );
 
@@ -5584,8 +5584,8 @@ fn advance_fallback_cloud_primary_can_hop_cloud_to_local_to_cloud() {
     let mut app = app_with_fallback_chain(
         ApiProvider::Openai,
         &[
-            codewhale_config::ProviderKind::Ollama,
-            codewhale_config::ProviderKind::Deepseek,
+            nestlone_config::ProviderKind::Ollama,
+            nestlone_config::ProviderKind::Deepseek,
         ],
         &[ApiProvider::Openai, ApiProvider::Deepseek],
     );
@@ -5928,9 +5928,9 @@ fn failed_startup_default_write_is_reported_not_swallowed() {
     std::fs::write(&blocked_home, "not a directory").expect("blocking file");
     let _home = EnvVarGuard::set("HOME", tmp.path());
     let _user_profile = EnvVarGuard::set("USERPROFILE", tmp.path());
-    let _codewhale_home = EnvVarGuard::set("CODEWHALE_HOME", &blocked_home);
+    let _nestlone_home = EnvVarGuard::set("CODEWHALE_HOME", &blocked_home);
     let _deepseek_config = EnvVarGuard::remove("DEEPSEEK_CONFIG_PATH");
-    let _codewhale_config = EnvVarGuard::remove("CODEWHALE_CONFIG_PATH");
+    let _nestlone_config = EnvVarGuard::remove("CODEWHALE_CONFIG_PATH");
     let _writes = crate::tui::startup_defaults::allow_writes_in_tests();
 
     let mut app = App::new(test_options(false), &Config::default());
@@ -6462,7 +6462,7 @@ fn slash_config_and_set_refuse_every_live_route_key_while_a_turn_runs() {
         "nothing may land after the queue is drained either"
     );
     assert!(
-        !codewhale_config::SetupState::path()
+        !nestlone_config::SetupState::path()
             .expect("setup state path")
             .exists(),
         "a refused route change must not record provider/model setup progress"
@@ -6543,9 +6543,9 @@ async fn a_late_startup_default_failure_is_returned_not_only_logged() {
     std::fs::write(&blocked_home, "not a directory").expect("blocking file");
     let _home = EnvVarGuard::set("HOME", tmp.path());
     let _user_profile = EnvVarGuard::set("USERPROFILE", tmp.path());
-    let _codewhale_home = EnvVarGuard::set("CODEWHALE_HOME", &blocked_home);
+    let _nestlone_home = EnvVarGuard::set("CODEWHALE_HOME", &blocked_home);
     let _deepseek_config = EnvVarGuard::remove("DEEPSEEK_CONFIG_PATH");
-    let _codewhale_config = EnvVarGuard::remove("CODEWHALE_CONFIG_PATH");
+    let _nestlone_config = EnvVarGuard::remove("CODEWHALE_CONFIG_PATH");
     let _writes = crate::tui::startup_defaults::allow_writes_in_tests();
 
     let mut app = App::new(test_options(false), &Config::default());
@@ -6704,7 +6704,7 @@ fn an_explicit_launch_model_outranks_the_remembered_provider_model() {
     )
     .expect("seed settings");
     let _config_path_guard = EnvVarGuard::set("DEEPSEEK_CONFIG_PATH", &config_path);
-    let _codewhale_config_path = EnvVarGuard::remove("CODEWHALE_CONFIG_PATH");
+    let _nestlone_config_path = EnvVarGuard::remove("CODEWHALE_CONFIG_PATH");
 
     let config = Config::load(Some(config_path.clone()), None).expect("load sealed config");
 

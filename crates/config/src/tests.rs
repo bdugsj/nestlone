@@ -123,15 +123,15 @@ fn permissions_toml_deserializes_action_deny_and_allow() {
     assert_eq!(permissions.rules.len(), 3);
     assert_eq!(
         permissions.rules[0].action,
-        codewhale_execpolicy::PermissionAction::Deny
+        nestlone_execpolicy::PermissionAction::Deny
     );
     assert_eq!(
         permissions.rules[1].action,
-        codewhale_execpolicy::PermissionAction::Allow
+        nestlone_execpolicy::PermissionAction::Allow
     );
     assert_eq!(
         permissions.rules[2].action,
-        codewhale_execpolicy::PermissionAction::Ask
+        nestlone_execpolicy::PermissionAction::Ask
     ); // default
 }
 
@@ -209,7 +209,7 @@ fn permissions_ruleset_deny_without_command_stays_in_ask_rules() {
     assert_eq!(ruleset.ask_rules.len(), 1);
     assert_eq!(
         ruleset.ask_rules[0].action,
-        codewhale_execpolicy::PermissionAction::Deny
+        nestlone_execpolicy::PermissionAction::Deny
     );
     // No command → nothing to promote to denied_prefixes
     assert!(ruleset.denied_prefixes.is_empty());
@@ -277,7 +277,7 @@ fn permissions_ruleset_mixed_actions_all_coexist() {
         .unwrap();
     assert_eq!(
         path_deny.action,
-        codewhale_execpolicy::PermissionAction::Deny
+        nestlone_execpolicy::PermissionAction::Deny
     );
 
     let path_allow = ruleset
@@ -287,7 +287,7 @@ fn permissions_ruleset_mixed_actions_all_coexist() {
         .unwrap();
     assert_eq!(
         path_allow.action,
-        codewhale_execpolicy::PermissionAction::Allow
+        nestlone_execpolicy::PermissionAction::Allow
     );
 }
 
@@ -611,12 +611,12 @@ fn config_store_exec_policy_engine_uses_sibling_permissions() {
     let store = ConfigStore::load(Some(config_path)).expect("load config store");
     let decision = store
         .exec_policy_engine()
-        .check(codewhale_execpolicy::ExecPolicyContext {
+        .check(nestlone_execpolicy::ExecPolicyContext {
             command: "cargo test --workspace",
             cwd: "/workspace",
             tool: Some("exec_shell"),
             path: None,
-            ask_for_approval: codewhale_execpolicy::AskForApproval::UnlessTrusted,
+            ask_for_approval: nestlone_execpolicy::AskForApproval::UnlessTrusted,
             sandbox_mode: Some("workspace-write"),
         })
         .expect("policy check");
@@ -743,29 +743,29 @@ fn config_store_appends_exact_workspace_allow_rules() {
 
     let exact = store
         .exec_policy_engine()
-        .check(codewhale_execpolicy::ExecPolicyContext {
+        .check(nestlone_execpolicy::ExecPolicyContext {
             command: "cargo test",
             cwd: dir.path().to_string_lossy().as_ref(),
             tool: Some("exec_shell"),
             path: None,
-            ask_for_approval: codewhale_execpolicy::AskForApproval::OnRequest,
+            ask_for_approval: nestlone_execpolicy::AskForApproval::OnRequest,
             sandbox_mode: Some("workspace-write"),
         })
         .expect("check exact grant");
     assert_eq!(
         exact.matched_action,
-        Some(codewhale_execpolicy::PermissionAction::Allow)
+        Some(nestlone_execpolicy::PermissionAction::Allow)
     );
     assert!(!exact.requires_approval);
 
     let extra_args = store
         .exec_policy_engine()
-        .check(codewhale_execpolicy::ExecPolicyContext {
+        .check(nestlone_execpolicy::ExecPolicyContext {
             command: "cargo test --workspace",
             cwd: dir.path().to_string_lossy().as_ref(),
             tool: Some("exec_shell"),
             path: None,
-            ask_for_approval: codewhale_execpolicy::AskForApproval::OnRequest,
+            ask_for_approval: nestlone_execpolicy::AskForApproval::OnRequest,
             sandbox_mode: Some("workspace-write"),
         })
         .expect("check extra args");
@@ -782,7 +782,7 @@ fn config_store_rejects_broad_or_unscoped_allow_rules() {
     let mut store = ConfigStore::load(Some(config_path)).expect("load config store");
 
     let mut unscoped = ToolAskRule::exec_shell("cargo test");
-    unscoped.action = codewhale_execpolicy::PermissionAction::Allow;
+    unscoped.action = nestlone_execpolicy::PermissionAction::Allow;
     assert!(
         store
             .append_allow_rules(&[unscoped])
@@ -792,7 +792,7 @@ fn config_store_rejects_broad_or_unscoped_allow_rules() {
     );
 
     let mut prefix = ToolAskRule::exec_shell("cargo test");
-    prefix.action = codewhale_execpolicy::PermissionAction::Allow;
+    prefix.action = nestlone_execpolicy::PermissionAction::Allow;
     prefix.workspace = Some(dir.path().to_string_lossy().into_owned());
     assert!(
         store
@@ -1151,9 +1151,9 @@ struct EnvGuard {
     hf_base_url: Option<OsString>,
     huggingface_model: Option<OsString>,
     hf_model: Option<OsString>,
-    codewhale_provider: Option<OsString>,
-    codewhale_model: Option<OsString>,
-    codewhale_base_url: Option<OsString>,
+    nestlone_provider: Option<OsString>,
+    nestlone_model: Option<OsString>,
+    nestlone_base_url: Option<OsString>,
     xai_api_key: Option<OsString>,
     xai_base_url: Option<OsString>,
     xai_model: Option<OsString>,
@@ -1187,9 +1187,9 @@ impl EnvGuard {
             deepseek_default_text_model: env::var_os("DEEPSEEK_DEFAULT_TEXT_MODEL"),
             deepseek_provider: env::var_os("DEEPSEEK_PROVIDER"),
             deepseek_auth_mode: env::var_os("DEEPSEEK_AUTH_MODE"),
-            codewhale_provider: env::var_os("CODEWHALE_PROVIDER"),
-            codewhale_model: env::var_os("CODEWHALE_MODEL"),
-            codewhale_base_url: env::var_os("CODEWHALE_BASE_URL"),
+            nestlone_provider: env::var_os("CODEWHALE_PROVIDER"),
+            nestlone_model: env::var_os("CODEWHALE_MODEL"),
+            nestlone_base_url: env::var_os("CODEWHALE_BASE_URL"),
             xai_api_key: env::var_os("XAI_API_KEY"),
             xai_base_url: env::var_os("XAI_BASE_URL"),
             xai_model: env::var_os("XAI_MODEL"),
@@ -1468,9 +1468,9 @@ impl Drop for EnvGuard {
             );
             Self::restore_var("DEEPSEEK_PROVIDER", self.deepseek_provider.take());
             Self::restore_var("DEEPSEEK_AUTH_MODE", self.deepseek_auth_mode.take());
-            Self::restore_var("CODEWHALE_PROVIDER", self.codewhale_provider.take());
-            Self::restore_var("CODEWHALE_MODEL", self.codewhale_model.take());
-            Self::restore_var("CODEWHALE_BASE_URL", self.codewhale_base_url.take());
+            Self::restore_var("CODEWHALE_PROVIDER", self.nestlone_provider.take());
+            Self::restore_var("CODEWHALE_MODEL", self.nestlone_model.take());
+            Self::restore_var("CODEWHALE_BASE_URL", self.nestlone_base_url.take());
             Self::restore_var("XAI_API_KEY", self.xai_api_key.take());
             Self::restore_var("XAI_BASE_URL", self.xai_base_url.take());
             Self::restore_var("XAI_MODEL", self.xai_model.take());
@@ -1618,17 +1618,17 @@ impl RecordingSecretsStore {
     }
 }
 
-impl codewhale_secrets::KeyringStore for RecordingSecretsStore {
-    fn get(&self, key: &str) -> Result<Option<String>, codewhale_secrets::SecretsError> {
+impl nestlone_secrets::KeyringStore for RecordingSecretsStore {
+    fn get(&self, key: &str) -> Result<Option<String>, nestlone_secrets::SecretsError> {
         self.gets.lock().unwrap().push(key.to_string());
         Ok(self.value.clone())
     }
 
-    fn set(&self, _key: &str, _value: &str) -> Result<(), codewhale_secrets::SecretsError> {
+    fn set(&self, _key: &str, _value: &str) -> Result<(), nestlone_secrets::SecretsError> {
         Ok(())
     }
 
-    fn delete(&self, _key: &str) -> Result<(), codewhale_secrets::SecretsError> {
+    fn delete(&self, _key: &str) -> Result<(), nestlone_secrets::SecretsError> {
         Ok(())
     }
 
@@ -2680,7 +2680,7 @@ fn app_homes_prefer_home_env_before_platform_home_fallback() {
     let _env = StateEnvRestore {
         home: env::var_os("HOME"),
         userprofile: env::var_os("USERPROFILE"),
-        codewhale_home: env::var_os("CODEWHALE_HOME"),
+        nestlone_home: env::var_os("CODEWHALE_HOME"),
     };
     // Safety: test-only environment mutation is serialized by env_lock().
     unsafe {
@@ -2690,7 +2690,7 @@ fn app_homes_prefer_home_env_before_platform_home_fallback() {
     }
 
     assert_eq!(
-        codewhale_home().expect("codewhale home"),
+        nestlone_home().expect("codewhale home"),
         home.join(CODEWHALE_APP_DIR)
     );
     assert_eq!(
@@ -2706,7 +2706,7 @@ fn app_homes_prefer_home_env_before_platform_home_fallback() {
     unsafe {
         env::set_var("CODEWHALE_HOME", &explicit);
     }
-    assert_eq!(codewhale_home().expect("explicit home"), explicit);
+    assert_eq!(nestlone_home().expect("explicit home"), explicit);
 }
 
 #[test]
@@ -2755,7 +2755,7 @@ fn migrate_config_reports_copied_legacy_path() {
     let _env = StateEnvRestore {
         home: env::var_os("HOME"),
         userprofile: env::var_os("USERPROFILE"),
-        codewhale_home: env::var_os("CODEWHALE_HOME"),
+        nestlone_home: env::var_os("CODEWHALE_HOME"),
     };
     // Safety: test-only environment mutation is serialized by env_lock().
     unsafe {
@@ -2784,7 +2784,7 @@ fn migrate_config_reports_copied_legacy_path() {
 }
 
 #[test]
-fn explicit_codewhale_home_bypasses_legacy_config_fallback_and_migration() {
+fn explicit_nestlone_home_bypasses_legacy_config_fallback_and_migration() {
     let _lock = env_lock();
     let unique = std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
@@ -2802,7 +2802,7 @@ fn explicit_codewhale_home_bypasses_legacy_config_fallback_and_migration() {
     let _env = StateEnvRestore {
         home: env::var_os("HOME"),
         userprofile: env::var_os("USERPROFILE"),
-        codewhale_home: env::var_os("CODEWHALE_HOME"),
+        nestlone_home: env::var_os("CODEWHALE_HOME"),
     };
     // Safety: test-only environment mutation is serialized by env_lock().
     unsafe {
@@ -2836,7 +2836,7 @@ fn explicit_codewhale_home_bypasses_legacy_config_fallback_and_migration() {
 struct StateEnvRestore {
     home: Option<OsString>,
     userprofile: Option<OsString>,
-    codewhale_home: Option<OsString>,
+    nestlone_home: Option<OsString>,
 }
 
 impl Drop for StateEnvRestore {
@@ -2851,7 +2851,7 @@ impl Drop for StateEnvRestore {
                 Some(value) => env::set_var("USERPROFILE", value),
                 None => env::remove_var("USERPROFILE"),
             }
-            match self.codewhale_home.take() {
+            match self.nestlone_home.take() {
                 Some(value) => env::set_var("CODEWHALE_HOME", value),
                 None => env::remove_var("CODEWHALE_HOME"),
             }
@@ -2860,7 +2860,7 @@ impl Drop for StateEnvRestore {
 }
 
 /// Points `HOME`/`USERPROFILE` at a fresh temp tree and clears
-/// `CODEWHALE_HOME` so `codewhale_home()` -> `<home>/.codewhale` and
+/// `CODEWHALE_HOME` so `nestlone_home()` -> `<home>/.codewhale` and
 /// `legacy_deepseek_home()` -> `<home>/.deepseek`. Env is restored on drop.
 struct StateDirEnv {
     home: PathBuf,
@@ -2876,7 +2876,7 @@ impl StateDirEnv {
         let restore = StateEnvRestore {
             home: env::var_os("HOME"),
             userprofile: env::var_os("USERPROFILE"),
-            codewhale_home: env::var_os("CODEWHALE_HOME"),
+            nestlone_home: env::var_os("CODEWHALE_HOME"),
         };
         // Safety: test-only environment mutation is serialized by env_lock().
         unsafe {
@@ -3031,7 +3031,7 @@ fn resolve_state_dir_still_finds_legacy_for_backfill() {
 }
 
 #[test]
-fn explicit_codewhale_home_bypasses_legacy_state_fallback_and_migration() {
+fn explicit_nestlone_home_bypasses_legacy_state_fallback_and_migration() {
     let _lock = env_lock();
     let unique = std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
@@ -4067,11 +4067,11 @@ fn fireworks_and_together_base_url_and_auth_metadata() {
         std::env::set_var("TOGETHER_API_KEY", "tg-test-key");
     }
     assert_eq!(
-        codewhale_secrets::env_for("fireworks").as_deref(),
+        nestlone_secrets::env_for("fireworks").as_deref(),
         Some("fw-test-key")
     );
     assert_eq!(
-        codewhale_secrets::env_for("together").as_deref(),
+        nestlone_secrets::env_for("together").as_deref(),
         Some("tg-test-key")
     );
     unsafe {
@@ -4376,7 +4376,7 @@ model = "opencode-go/glm-5.2"
         std::env::set_var("OPENCODE_GO_MODEL", "opencode-go/mimo-v2.5-pro");
     }
     assert_eq!(
-        codewhale_secrets::env_for("opencode-go").as_deref(),
+        nestlone_secrets::env_for("opencode-go").as_deref(),
         Some("go-env-key")
     );
     let resolved = config.resolve_runtime_options(&CliRuntimeOverrides::default());
@@ -4462,7 +4462,7 @@ model = "glm-5.2"
         std::env::set_var("TELECOMJS_MODEL", "kimi-k2.5");
     }
     assert_eq!(
-        codewhale_secrets::env_for("tokenhub").as_deref(),
+        nestlone_secrets::env_for("tokenhub").as_deref(),
         Some("telecom-env-key")
     );
 
@@ -5217,7 +5217,7 @@ fn moonshot_kimi_code_api_key_endpoint_defaults_to_kimi_for_coding() {
 /// active provider. It must be honored by the runtime resolver and win
 /// over a root `provider = "deepseek"` config entry.
 #[test]
-fn codewhale_provider_env_switches_active_provider() {
+fn nestlone_provider_env_switches_active_provider() {
     let _lock = env_lock();
     let _env = EnvGuard::without_deepseek_runtime_overrides();
     // Safety: test-only env mutation guarded by env_lock().
@@ -5248,7 +5248,7 @@ fn codewhale_provider_env_switches_active_provider() {
 /// fresh shell config is not tripped up by a stale legacy export still
 /// living in their dotfiles.
 #[test]
-fn codewhale_provider_env_wins_over_deepseek_provider_env() {
+fn nestlone_provider_env_wins_over_deepseek_provider_env() {
     let _lock = env_lock();
     let _env = EnvGuard::without_deepseek_runtime_overrides();
     // Safety: test-only env mutation guarded by env_lock().
@@ -5334,7 +5334,7 @@ fn config_provider_records_provider_source() {
 /// against the active provider. It must be honored by the runtime
 /// resolver in place of `DEEPSEEK_MODEL`.
 #[test]
-fn codewhale_model_env_alias_overrides_default_for_active_provider() {
+fn nestlone_model_env_alias_overrides_default_for_active_provider() {
     let _lock = env_lock();
     let _env = EnvGuard::without_deepseek_runtime_overrides();
     // Safety: test-only env mutation guarded by env_lock().
@@ -5351,7 +5351,7 @@ fn codewhale_model_env_alias_overrides_default_for_active_provider() {
 }
 
 #[test]
-fn blank_codewhale_model_env_alias_does_not_override_default_for_active_provider() {
+fn blank_nestlone_model_env_alias_does_not_override_default_for_active_provider() {
     let _lock = env_lock();
     let _env = EnvGuard::without_deepseek_runtime_overrides();
     // Safety: test-only env mutation guarded by env_lock().
@@ -6417,13 +6417,13 @@ fn siliconflow_custom_base_url_preserves_provider_model() {
 
 #[test]
 fn config_file_resolves_above_env_and_keyring() {
-    use codewhale_secrets::KeyringStore;
+    use nestlone_secrets::KeyringStore;
     let _lock = env_lock();
     let _env = EnvGuard::without_deepseek_runtime_overrides();
     // Safety: env mutation guarded by env_lock().
     unsafe { std::env::set_var("DEEPSEEK_API_KEY", "env-key") };
 
-    let store = std::sync::Arc::new(codewhale_secrets::InMemoryKeyringStore::new());
+    let store = std::sync::Arc::new(nestlone_secrets::InMemoryKeyringStore::new());
     store.set("deepseek", "ring-key").unwrap();
     let secrets = Secrets::new(store);
 
@@ -6450,7 +6450,7 @@ fn env_resolves_when_config_file_and_keyring_empty() {
     unsafe { std::env::set_var("DEEPSEEK_API_KEY", "env-key") };
 
     let secrets = Secrets::new(std::sync::Arc::new(
-        codewhale_secrets::InMemoryKeyringStore::new(),
+        nestlone_secrets::InMemoryKeyringStore::new(),
     ));
     let config = ConfigToml::default();
 
@@ -6469,7 +6469,7 @@ fn config_file_resolves_when_keyring_and_env_empty() {
     let _env = EnvGuard::without_deepseek_runtime_overrides();
 
     let secrets = Secrets::new(std::sync::Arc::new(
-        codewhale_secrets::InMemoryKeyringStore::new(),
+        nestlone_secrets::InMemoryKeyringStore::new(),
     ));
     let mut config = ConfigToml::default();
     config.providers.deepseek.api_key = Some("file-key".to_string());
@@ -6485,13 +6485,13 @@ fn config_file_resolves_when_keyring_and_env_empty() {
 
 #[test]
 fn keyring_resolves_when_config_file_empty_even_if_env_is_set() {
-    use codewhale_secrets::KeyringStore;
+    use nestlone_secrets::KeyringStore;
     let _lock = env_lock();
     let _env = EnvGuard::without_deepseek_runtime_overrides();
     // Safety: env mutation guarded by env_lock().
     unsafe { std::env::set_var("DEEPSEEK_API_KEY", "stale-env-key") };
 
-    let store = std::sync::Arc::new(codewhale_secrets::InMemoryKeyringStore::new());
+    let store = std::sync::Arc::new(nestlone_secrets::InMemoryKeyringStore::new());
     store.set("deepseek", "ring-key").unwrap();
     let secrets = Secrets::new(store);
 
@@ -6506,11 +6506,11 @@ fn keyring_resolves_when_config_file_empty_even_if_env_is_set() {
 
 #[test]
 fn cli_flag_still_overrides_keyring() {
-    use codewhale_secrets::KeyringStore;
+    use nestlone_secrets::KeyringStore;
     let _lock = env_lock();
     let _env = EnvGuard::without_deepseek_runtime_overrides();
 
-    let store = std::sync::Arc::new(codewhale_secrets::InMemoryKeyringStore::new());
+    let store = std::sync::Arc::new(nestlone_secrets::InMemoryKeyringStore::new());
     store.set("deepseek", "ring-key").unwrap();
     let secrets = Secrets::new(store);
 

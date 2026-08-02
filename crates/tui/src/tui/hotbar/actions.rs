@@ -181,7 +181,7 @@ impl HotbarRecommendationOptions {
 impl Default for HotbarRecommendationOptions {
     fn default() -> Self {
         Self {
-            max_total: usize::from(codewhale_config::HOTBAR_SLOT_COUNT),
+            max_total: usize::from(nestlone_config::HOTBAR_SLOT_COUNT),
             max_eligible_per_category: usize::MAX,
             include_required_args: false,
         }
@@ -392,12 +392,12 @@ pub fn recommend_hotbar_actions(
 pub fn recommended_hotbar_bindings(
     app: &App,
     options: HotbarRecommendationOptions,
-) -> Vec<codewhale_config::HotbarBindingToml> {
+) -> Vec<nestlone_config::HotbarBindingToml> {
     recommend_hotbar_actions(app, options)
         .into_iter()
-        .take(usize::from(codewhale_config::HOTBAR_SLOT_COUNT))
+        .take(usize::from(nestlone_config::HOTBAR_SLOT_COUNT))
         .enumerate()
-        .map(|(idx, entry)| codewhale_config::HotbarBindingToml {
+        .map(|(idx, entry)| nestlone_config::HotbarBindingToml {
             slot: u8::try_from(idx + 1).expect("recommended hotbar slot fits in u8"),
             action: entry.metadata.id,
             label: Some(entry.metadata.compact_label),
@@ -406,7 +406,7 @@ pub fn recommended_hotbar_bindings(
 }
 
 fn default_hotbar_position(action_id: &str) -> Option<usize> {
-    codewhale_config::DEFAULT_HOTBAR_ACTIONS
+    nestlone_config::DEFAULT_HOTBAR_ACTIONS
         .iter()
         .position(|default_id| *default_id == action_id)
 }
@@ -890,7 +890,7 @@ impl AppHotbarAction {
     }
 
     fn recommendation(&self) -> HotbarRecommendation {
-        if codewhale_config::DEFAULT_HOTBAR_ACTIONS.contains(&self.id) {
+        if nestlone_config::DEFAULT_HOTBAR_ACTIONS.contains(&self.id) {
             HotbarRecommendation::Default
         } else {
             HotbarRecommendation::Eligible
@@ -1057,7 +1057,7 @@ impl HotbarAction for AppHotbarAction {
                     build_command_palette_entries(
                         app.ui_locale,
                         &app.skills_dir,
-                        app.skills_scan_codewhale_only,
+                        app.skills_scan_nestlone_only,
                         &app.workspace,
                         &app.mcp_config_path,
                         app.mcp_snapshot.as_ref(),
@@ -1805,7 +1805,7 @@ mod tests {
     fn default_hotbar_actions_have_registered_default_metadata() {
         let registry = HotbarActionRegistry::with_builtins();
 
-        for id in codewhale_config::DEFAULT_HOTBAR_ACTIONS {
+        for id in nestlone_config::DEFAULT_HOTBAR_ACTIONS {
             let action = registry
                 .get(id)
                 .unwrap_or_else(|| panic!("missing default hotbar action {id}"));
@@ -1880,7 +1880,7 @@ mod tests {
                 .iter()
                 .map(|entry| entry.metadata.id.as_str())
                 .collect::<Vec<_>>(),
-            codewhale_config::DEFAULT_HOTBAR_ACTIONS
+            nestlone_config::DEFAULT_HOTBAR_ACTIONS
         );
         assert!(recommendations.iter().all(|entry| {
             entry.metadata.recommendation == HotbarRecommendation::Default
@@ -1929,7 +1929,7 @@ mod tests {
             },
         );
 
-        for default_id in codewhale_config::DEFAULT_HOTBAR_ACTIONS {
+        for default_id in nestlone_config::DEFAULT_HOTBAR_ACTIONS {
             assert!(
                 recommendations
                     .iter()
@@ -1955,7 +1955,7 @@ mod tests {
                 .iter()
                 .map(|binding| binding.action.as_str())
                 .collect::<Vec<_>>(),
-            codewhale_config::DEFAULT_HOTBAR_ACTIONS
+            nestlone_config::DEFAULT_HOTBAR_ACTIONS
         );
         assert_eq!(
             bindings
@@ -1974,12 +1974,12 @@ mod tests {
             ]
         );
 
-        let config = codewhale_config::ConfigToml {
+        let config = nestlone_config::ConfigToml {
             hotbar: Some(bindings.clone()),
             ..Default::default()
         };
         let serialized = toml::to_string_pretty(&config).expect("serialize hotbar recommendations");
-        let round_tripped: codewhale_config::ConfigToml =
+        let round_tripped: nestlone_config::ConfigToml =
             toml::from_str(&serialized).expect("deserialize hotbar recommendations");
         assert_eq!(round_tripped.hotbar, Some(bindings));
     }
@@ -2106,8 +2106,8 @@ mod tests {
     /// read-only, because a keypress supplies no id.
     #[test]
     fn control_plane_commands_are_bound_and_bare_dispatch_is_read_only() {
-        use codewhale_lane::control::OPERATIONS;
-        use codewhale_lane::{ControlAuthority, ControlSurface, TargetKind};
+        use nestlone_lane::control::OPERATIONS;
+        use nestlone_lane::{ControlAuthority, ControlSurface, TargetKind};
 
         let registry = HotbarActionRegistry::with_builtins();
         for descriptor in OPERATIONS {
@@ -2478,10 +2478,10 @@ mod tests {
         let tmp = tempfile::TempDir::new().expect("tempdir");
         let _home = crate::test_support::EnvVarGuard::set("HOME", tmp.path());
         let _user_profile = crate::test_support::EnvVarGuard::set("USERPROFILE", tmp.path());
-        let _codewhale_home =
+        let _nestlone_home =
             crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", tmp.path().join(".codewhale"));
         let _deepseek_config = crate::test_support::EnvVarGuard::remove("DEEPSEEK_CONFIG_PATH");
-        let _codewhale_config = crate::test_support::EnvVarGuard::remove("CODEWHALE_CONFIG_PATH");
+        let _nestlone_config = crate::test_support::EnvVarGuard::remove("CODEWHALE_CONFIG_PATH");
         let _writes = crate::tui::startup_defaults::allow_writes_in_tests();
 
         crate::settings::Settings::transact(|settings| {

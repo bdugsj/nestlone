@@ -19,7 +19,7 @@
 //! - **Drafting is not ratifying.** The caller shows the rendered preview and
 //!   still requires the explicit ratify keypress before anything persists.
 
-use codewhale_config::{UntrustedDraftParse, UserConstitution, user_constitution::MAX_NOTES_LEN};
+use nestlone_config::{UntrustedDraftParse, UserConstitution, user_constitution::MAX_NOTES_LEN};
 
 use crate::llm_client::LlmClient;
 use crate::localization::Locale;
@@ -192,8 +192,8 @@ mod tests {
     use super::*;
     use crate::llm_client::mock::MockLlmClient;
     use crate::models::{MessageResponse, Usage};
-    use codewhale_config::AutonomyPreference;
-    use codewhale_config::user_constitution::MAX_NOTES_LEN;
+    use nestlone_config::AutonomyPreference;
+    use nestlone_config::user_constitution::MAX_NOTES_LEN;
 
     fn text_response(text: &str) -> MessageResponse {
         MessageResponse {

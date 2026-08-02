@@ -2017,7 +2017,7 @@ fn load_workspace_dotenv_credentials_from_path(path: &Path) -> Result<WorkspaceD
 }
 
 fn is_workspace_dotenv_credential_key(key: &str) -> bool {
-    codewhale_config::provider::providers_sorted_for_display()
+    nestlone_config::provider::providers_sorted_for_display()
         .into_iter()
         .any(|provider| provider.env_vars().contains(&key))
         || matches!(
@@ -2348,8 +2348,8 @@ async fn run_fleet_command(workspace: &Path, config: &Config, args: FleetArgs) -
     use crate::fleet::control as fleet_control;
     use crate::fleet::executor::FleetExecutor;
     use crate::fleet::manager::{FleetManager, FleetStatusSnapshot, FleetWorkerInspection};
-    use codewhale_lane::{ControlOperation, ControlSurface};
-    use codewhale_protocol::fleet::{FleetAlertEventClass, FleetArtifactKind, FleetRunId};
+    use nestlone_lane::{ControlOperation, ControlSurface};
+    use nestlone_protocol::fleet::{FleetAlertEventClass, FleetArtifactKind, FleetRunId};
 
     // Every label and every row below comes from the shared Fleet control
     // surface, so `codewhale fleet …` and `/fleet …` cannot drift in how they
@@ -2367,7 +2367,7 @@ async fn run_fleet_command(workspace: &Path, config: &Config, args: FleetArgs) -
     }
 
     /// Print one shared control receipt on the CLI surface.
-    fn emit_fleet_receipt(receipt: &codewhale_lane::ControlReceipt) -> Result<()> {
+    fn emit_fleet_receipt(receipt: &nestlone_lane::ControlReceipt) -> Result<()> {
         if receipt.is_error() {
             eprintln!("{}", receipt.render());
             let detail = receipt
@@ -2486,7 +2486,7 @@ async fn run_fleet_command(workspace: &Path, config: &Config, args: FleetArgs) -
         let descriptor = operation.descriptor();
         let availability = descriptor.availability(ControlSurface::Cli, fleet_context);
         if !availability.is_available() {
-            return emit_fleet_receipt(&codewhale_lane::ControlReceipt::unavailable(
+            return emit_fleet_receipt(&nestlone_lane::ControlReceipt::unavailable(
                 descriptor,
                 ControlSurface::Cli,
                 availability,
@@ -2531,13 +2531,13 @@ async fn run_fleet_command(workspace: &Path, config: &Config, args: FleetArgs) -
                 "manager loop running; use `codewhale fleet status`, `inspect`, `interrupt`, or `stop --all` from another terminal."
             );
             let mut executor = FleetExecutor::new(workspace);
-            let codewhale_binary = fleet::executor::configured_codewhale_binary();
+            let nestlone_binary = fleet::executor::configured_nestlone_binary();
             let status = manager
                 .run_to_completion(
                     &report.run_id,
                     max_workers,
                     &mut executor,
-                    &codewhale_binary,
+                    &nestlone_binary,
                     None,
                     Duration::from_secs(2),
                 )
@@ -2592,13 +2592,13 @@ async fn run_fleet_command(workspace: &Path, config: &Config, args: FleetArgs) -
                 report.run_id.0
             );
             let mut executor = FleetExecutor::new(workspace);
-            let codewhale_binary = fleet::executor::configured_codewhale_binary();
+            let nestlone_binary = fleet::executor::configured_nestlone_binary();
             let status = manager
                 .run_to_completion(
                     &report.run_id,
                     report.max_workers,
                     &mut executor,
-                    &codewhale_binary,
+                    &nestlone_binary,
                     None,
                     Duration::from_secs(2),
                 )
@@ -2953,7 +2953,7 @@ fn resolve_cors_origins(config: &Config, flag_origins: &[String]) -> Vec<String>
 }
 
 fn deepseek_home_dir() -> PathBuf {
-    codewhale_config::codewhale_home().unwrap_or_else(|_| {
+    nestlone_config::nestlone_home().unwrap_or_else(|_| {
         crate::config::effective_home_dir()
             .map_or_else(|| PathBuf::from(".codewhale"), |h| h.join(".codewhale"))
     })
@@ -3600,11 +3600,11 @@ async fn run_doctor(
     println!("{}", "Updates:".bold());
     let current_version = env!("CARGO_PKG_VERSION");
     println!("  · current: v{current_version}");
-    match codewhale_release::latest_release_tag_async(codewhale_release::ReleaseChannel::Stable)
+    match nestlone_release::latest_release_tag_async(nestlone_release::ReleaseChannel::Stable)
         .await
     {
         Ok(latest_tag) => {
-            match codewhale_release::compare_release_versions(current_version, &latest_tag) {
+            match nestlone_release::compare_release_versions(current_version, &latest_tag) {
                 Ok(std::cmp::Ordering::Less) => {
                     println!(
                         "  {} latest: {latest_tag}",
@@ -3646,9 +3646,9 @@ async fn run_doctor(
     println!("{}", "Configuration:".bold());
     let config_path = config_path_override
         .map(PathBuf::from)
-        .or_else(|| codewhale_config::resolve_config_path(None).ok())
+        .or_else(|| nestlone_config::resolve_config_path(None).ok())
         .unwrap_or_else(|| {
-            codewhale_config::codewhale_home()
+            nestlone_config::nestlone_home()
                 .unwrap_or_else(|_| PathBuf::from(".codewhale"))
                 .join("config.toml")
         });
@@ -3698,7 +3698,7 @@ async fn run_doctor(
     let session_recovery = doctor_session_recovery_report(
         &code_home,
         &legacy_home,
-        codewhale_config::codewhale_home_is_explicit(),
+        nestlone_config::nestlone_home_is_explicit(),
     );
     print_doctor_legacy_state_report(
         &legacy_state_report,
@@ -4648,7 +4648,7 @@ struct DoctorSessionRecoveryReport {
     status: DoctorSessionRecoveryStatus,
     primary_sessions_path: PathBuf,
     legacy_sessions_path: PathBuf,
-    codewhale_home_is_explicit: bool,
+    nestlone_home_is_explicit: bool,
     legacy_session_file_count: usize,
     already_present_file_count: usize,
     recoverable_file_count: usize,
@@ -4682,11 +4682,11 @@ fn doctor_legacy_state_status(
 
 fn doctor_state_roots() -> (PathBuf, PathBuf) {
     let code_home =
-        codewhale_config::codewhale_home().unwrap_or_else(|_| PathBuf::from("~/.codewhale"));
-    let legacy_home = if codewhale_config::codewhale_home_is_explicit() {
-        code_home.join(codewhale_config::LEGACY_APP_DIR)
+        nestlone_config::nestlone_home().unwrap_or_else(|_| PathBuf::from("~/.codewhale"));
+    let legacy_home = if nestlone_config::nestlone_home_is_explicit() {
+        code_home.join(nestlone_config::LEGACY_APP_DIR)
     } else {
-        codewhale_config::legacy_deepseek_home().unwrap_or_else(|_| PathBuf::from("~/.deepseek"))
+        nestlone_config::legacy_deepseek_home().unwrap_or_else(|_| PathBuf::from("~/.deepseek"))
     };
     (code_home, legacy_home)
 }
@@ -4730,7 +4730,7 @@ fn doctor_legacy_state_report(
 fn doctor_session_recovery_report(
     primary_root: &Path,
     legacy_root: &Path,
-    codewhale_home_is_explicit: bool,
+    nestlone_home_is_explicit: bool,
 ) -> DoctorSessionRecoveryReport {
     let primary_sessions_path = primary_root.join("sessions");
     let legacy_sessions_path = legacy_root.join("sessions");
@@ -4738,7 +4738,7 @@ fn doctor_session_recovery_report(
         status: DoctorSessionRecoveryStatus::NoLegacySessions,
         primary_sessions_path,
         legacy_sessions_path,
-        codewhale_home_is_explicit,
+        nestlone_home_is_explicit,
         legacy_session_file_count: 0,
         already_present_file_count: 0,
         recoverable_file_count: 0,
@@ -4746,7 +4746,7 @@ fn doctor_session_recovery_report(
         error: None,
     };
 
-    if codewhale_home_is_explicit {
+    if nestlone_home_is_explicit {
         report.status = DoctorSessionRecoveryStatus::Isolated;
         return report;
     }
@@ -5123,7 +5123,7 @@ fn doctor_session_recovery_json(report: &DoctorSessionRecoveryReport) -> serde_j
         "checkpoint_internals_scanned": false,
         "session_descriptors_compared": false,
         "counterpart_check": "top_level_filename_and_regular_file_only",
-        "codewhale_home_is_explicit": report.codewhale_home_is_explicit,
+        "nestlone_home_is_explicit": report.nestlone_home_is_explicit,
         "legacy_sessions_path": report.legacy_sessions_path.display().to_string(),
         "primary_sessions_path": report.primary_sessions_path.display().to_string(),
         "legacy_session_file_count": report.legacy_session_file_count,
@@ -5184,13 +5184,13 @@ fn doctor_legacy_state_json(
 fn doctor_setup_state(
     config: &Config,
     workspace: &Path,
-) -> (codewhale_config::SetupState, &'static str) {
-    if let Ok(Some(state)) = codewhale_config::SetupState::load() {
+) -> (nestlone_config::SetupState, &'static str) {
+    if let Ok(Some(state)) = nestlone_config::SetupState::load() {
         return (state, "persisted");
     }
 
     (
-        codewhale_config::SetupState::derive_inherited(&doctor_inherited_setup_facts(
+        nestlone_config::SetupState::derive_inherited(&doctor_inherited_setup_facts(
             config, workspace,
         )),
         "derived",
@@ -5200,21 +5200,21 @@ fn doctor_setup_state(
 fn doctor_inherited_setup_facts(
     config: &Config,
     workspace: &Path,
-) -> codewhale_config::InheritedConfigFacts {
-    let user_constitution = codewhale_config::UserConstitution::load().ok();
+) -> nestlone_config::InheritedConfigFacts {
+    let user_constitution = nestlone_config::UserConstitution::load().ok();
     let user_constitution_validity = user_constitution.as_ref().map_or(
-        codewhale_config::ConstitutionValidity::Unknown,
-        codewhale_config::UserConstitutionLoad::validity,
+        nestlone_config::ConstitutionValidity::Unknown,
+        nestlone_config::UserConstitutionLoad::validity,
     );
     let has_user_constitution = user_constitution
         .as_ref()
-        .is_some_and(|loaded| !matches!(loaded, codewhale_config::UserConstitutionLoad::Missing));
-    let has_expert_override = codewhale_config::codewhale_home()
+        .is_some_and(|loaded| !matches!(loaded, nestlone_config::UserConstitutionLoad::Missing));
+    let has_expert_override = nestlone_config::nestlone_home()
         .ok()
         .map(|home| home.join(Path::new(crate::prompts::CONSTITUTION_OVERRIDE_FILE)))
         .is_some_and(|path| path.exists());
 
-    codewhale_config::InheritedConfigFacts {
+    nestlone_config::InheritedConfigFacts {
         language: None,
         has_provider_route: !config.default_model().trim().is_empty(),
         has_credentials_or_local_runtime: doctor_has_credentials_or_local_runtime(config),
@@ -5241,7 +5241,7 @@ fn doctor_has_credentials_or_local_runtime(config: &Config) -> bool {
 fn print_doctor_setup_report(
     config: &Config,
     workspace: &Path,
-    state: &codewhale_config::SetupState,
+    state: &nestlone_config::SetupState,
     source: &str,
     ok_rgb: (u8, u8, u8),
     warn_rgb: (u8, u8, u8),
@@ -5312,7 +5312,7 @@ fn print_doctor_setup_report(
     println!(
         "  · next actions: /constitution (standing law), /setup report (readiness), /setup provider or /provider setup <name> (provider credentials), /model (route), /config (runtime posture), /setup fleet (Operate/Fleet readiness), /fleet setup (explicit profile authoring), /setup hotbar (optional shortcuts), /setup tools (Tools/MCP readiness), /setup remote (remote runtime on-ramp), /setup persistence (path review)"
     );
-    for step in codewhale_config::SetupStep::ALL {
+    for step in nestlone_config::SetupStep::ALL {
         let entry = state.steps.get(&step);
         let required = entry.is_some_and(|entry| entry.required);
         let version = entry.and_then(|entry| entry.version.as_deref());
@@ -5340,7 +5340,7 @@ fn doctor_ready_label(ready: bool) -> &'static str {
 /// file was removed out-of-band. Stale `.tmp*` files in `$CODEWHALE_HOME`
 /// are the other fingerprint of an interrupted atomic write.
 fn doctor_setup_consistency(
-    state: &codewhale_config::SetupState,
+    state: &nestlone_config::SetupState,
     source: &str,
 ) -> serde_json::Value {
     use serde_json::json;
@@ -5350,28 +5350,28 @@ fn doctor_setup_consistency(
     if source == "persisted"
         && matches!(
             state.constitution_source,
-            codewhale_config::ConstitutionSource::UserGlobal
+            nestlone_config::ConstitutionSource::UserGlobal
         )
     {
-        match codewhale_config::UserConstitution::load() {
-            Ok(codewhale_config::UserConstitutionLoad::Missing) => {
+        match nestlone_config::UserConstitution::load() {
+            Ok(nestlone_config::UserConstitutionLoad::Missing) => {
                 issues.push("setup_state_points_at_missing_user_constitution");
             }
-            Ok(codewhale_config::UserConstitutionLoad::Empty) => {
+            Ok(nestlone_config::UserConstitutionLoad::Empty) => {
                 issues.push("user_constitution_empty");
             }
-            Ok(codewhale_config::UserConstitutionLoad::Invalid(_)) => {
+            Ok(nestlone_config::UserConstitutionLoad::Invalid(_)) => {
                 issues.push("user_constitution_invalid");
             }
-            Ok(codewhale_config::UserConstitutionLoad::Unreadable(_)) | Err(_) => {
+            Ok(nestlone_config::UserConstitutionLoad::Unreadable(_)) | Err(_) => {
                 issues.push("user_constitution_unreadable");
             }
-            Ok(codewhale_config::UserConstitutionLoad::Loaded(_)) => {}
+            Ok(nestlone_config::UserConstitutionLoad::Loaded(_)) => {}
         }
     }
 
     if doctor_home_has_stale_setup_temp_files() {
-        issues.push("stale_setup_temp_files_in_codewhale_home");
+        issues.push("stale_setup_temp_files_in_nestlone_home");
     }
 
     json!({
@@ -5382,7 +5382,7 @@ fn doctor_setup_consistency(
 }
 
 fn doctor_home_has_stale_setup_temp_files() -> bool {
-    let Ok(home) = codewhale_config::codewhale_home() else {
+    let Ok(home) = nestlone_config::nestlone_home() else {
         return false;
     };
     let Ok(entries) = std::fs::read_dir(&home) else {
@@ -5394,26 +5394,26 @@ fn doctor_home_has_stale_setup_temp_files() -> bool {
     })
 }
 
-fn doctor_constitution_autonomy_preference() -> codewhale_config::AutonomyPreference {
-    codewhale_config::UserConstitution::load()
+fn doctor_constitution_autonomy_preference() -> nestlone_config::AutonomyPreference {
+    nestlone_config::UserConstitution::load()
         .ok()
         .and_then(|load| {
             load.constitution()
                 .map(|constitution| constitution.autonomy_preference)
         })
-        .unwrap_or(codewhale_config::AutonomyPreference::Unspecified)
+        .unwrap_or(nestlone_config::AutonomyPreference::Unspecified)
 }
 
 fn doctor_constitution_autonomy_preference_id() -> &'static str {
     autonomy_preference_id(doctor_constitution_autonomy_preference())
 }
 
-fn autonomy_preference_id(preference: codewhale_config::AutonomyPreference) -> &'static str {
+fn autonomy_preference_id(preference: nestlone_config::AutonomyPreference) -> &'static str {
     match preference {
-        codewhale_config::AutonomyPreference::Unspecified => "unspecified",
-        codewhale_config::AutonomyPreference::Cautious => "cautious",
-        codewhale_config::AutonomyPreference::Balanced => "balanced",
-        codewhale_config::AutonomyPreference::Autonomous => "autonomous",
+        nestlone_config::AutonomyPreference::Unspecified => "unspecified",
+        nestlone_config::AutonomyPreference::Cautious => "cautious",
+        nestlone_config::AutonomyPreference::Balanced => "balanced",
+        nestlone_config::AutonomyPreference::Autonomous => "autonomous",
     }
 }
 
@@ -5583,7 +5583,7 @@ fn doctor_provider_model_report_json(config: &Config) -> serde_json::Value {
             "credential_docs_url": credential_help.docs_url,
             "credential_guidance": credential_help.guidance,
             "oauth_only": credential_help.acquisition
-                == codewhale_config::provider::CredentialAcquisition::OAuth,
+                == nestlone_config::provider::CredentialAcquisition::OAuth,
         },
         "health": {
             "live_validation": false,
@@ -5613,7 +5613,7 @@ fn doctor_auth_present_or_local(
 
 fn doctor_external_credential_consent_statuses(
     config: &Config,
-) -> Vec<codewhale_config::ExternalCredentialConsentStatus> {
+) -> Vec<nestlone_config::ExternalCredentialConsentStatus> {
     [
         crate::config::ApiProvider::OpenaiCodex,
         crate::config::ApiProvider::Xai,
@@ -5635,7 +5635,7 @@ fn doctor_external_credential_consent_lines(config: &Config) -> Vec<String> {
                     status.provider,
                     status.source.as_str(),
                     status.owner,
-                    codewhale_config::quote_os_path(&status.path),
+                    nestlone_config::quote_os_path(&status.path),
                     status.consent_version,
                     status.route_state,
                     status.ambient_path_changed,
@@ -5661,7 +5661,7 @@ fn doctor_external_credential_consent_json(config: &Config) -> serde_json::Value
                     "access": status.access.as_str(),
                     "source": status.source.as_str(),
                     "owner": status.owner,
-                    "path": codewhale_config::quote_os_path(&status.path),
+                    "path": nestlone_config::quote_os_path(&status.path),
                     "consent_version": status.consent_version,
                     "scope_valid": status.scope_valid,
                     "ambient_path_changed": status.ambient_path_changed,
@@ -5709,7 +5709,7 @@ fn doctor_setup_report_json(config: &Config, workspace: &Path) -> serde_json::Va
         "default"
     };
     let workspace_trusted = !crate::tui::onboarding::needs_trust(workspace);
-    let steps: Vec<_> = codewhale_config::SetupStep::ALL
+    let steps: Vec<_> = nestlone_config::SetupStep::ALL
         .into_iter()
         .map(|step| {
             let entry = state.steps.get(&step);
@@ -5791,68 +5791,68 @@ fn doctor_setup_report_json(config: &Config, workspace: &Path) -> serde_json::Va
     })
 }
 
-fn setup_step_id(step: codewhale_config::SetupStep) -> &'static str {
+fn setup_step_id(step: nestlone_config::SetupStep) -> &'static str {
     match step {
-        codewhale_config::SetupStep::Language => "language",
-        codewhale_config::SetupStep::ProviderModel => "provider_model",
-        codewhale_config::SetupStep::TrustSandbox => "trust_sandbox",
-        codewhale_config::SetupStep::ToolsMcp => "tools_mcp",
-        codewhale_config::SetupStep::Hotbar => "hotbar",
-        codewhale_config::SetupStep::RemoteRuntime => "remote_runtime",
-        codewhale_config::SetupStep::Persistence => "persistence",
-        codewhale_config::SetupStep::Constitution => "constitution",
-        codewhale_config::SetupStep::OperateFleet => "operate_fleet",
-        codewhale_config::SetupStep::Verification => "verification",
+        nestlone_config::SetupStep::Language => "language",
+        nestlone_config::SetupStep::ProviderModel => "provider_model",
+        nestlone_config::SetupStep::TrustSandbox => "trust_sandbox",
+        nestlone_config::SetupStep::ToolsMcp => "tools_mcp",
+        nestlone_config::SetupStep::Hotbar => "hotbar",
+        nestlone_config::SetupStep::RemoteRuntime => "remote_runtime",
+        nestlone_config::SetupStep::Persistence => "persistence",
+        nestlone_config::SetupStep::Constitution => "constitution",
+        nestlone_config::SetupStep::OperateFleet => "operate_fleet",
+        nestlone_config::SetupStep::Verification => "verification",
     }
 }
 
-fn setup_status_id(status: codewhale_config::StepStatus) -> &'static str {
+fn setup_status_id(status: nestlone_config::StepStatus) -> &'static str {
     match status {
-        codewhale_config::StepStatus::NotStarted => "not_started",
-        codewhale_config::StepStatus::Recommended => "recommended",
-        codewhale_config::StepStatus::Optional => "optional",
-        codewhale_config::StepStatus::Deferred => "deferred",
-        codewhale_config::StepStatus::InProgress => "in_progress",
-        codewhale_config::StepStatus::Verified => "verified",
-        codewhale_config::StepStatus::NeedsAction => "needs_action",
-        codewhale_config::StepStatus::Failed => "failed",
-        codewhale_config::StepStatus::Skipped => "skipped",
+        nestlone_config::StepStatus::NotStarted => "not_started",
+        nestlone_config::StepStatus::Recommended => "recommended",
+        nestlone_config::StepStatus::Optional => "optional",
+        nestlone_config::StepStatus::Deferred => "deferred",
+        nestlone_config::StepStatus::InProgress => "in_progress",
+        nestlone_config::StepStatus::Verified => "verified",
+        nestlone_config::StepStatus::NeedsAction => "needs_action",
+        nestlone_config::StepStatus::Failed => "failed",
+        nestlone_config::StepStatus::Skipped => "skipped",
     }
 }
 
-fn constitution_choice_id(choice: codewhale_config::ConstitutionChoice) -> &'static str {
+fn constitution_choice_id(choice: nestlone_config::ConstitutionChoice) -> &'static str {
     match choice {
-        codewhale_config::ConstitutionChoice::Unset => "unset",
-        codewhale_config::ConstitutionChoice::Bundled => "bundled",
-        codewhale_config::ConstitutionChoice::GuidedCustom => "guided_custom",
-        codewhale_config::ConstitutionChoice::ExpertOverride => "expert_override",
-        codewhale_config::ConstitutionChoice::Deferred => "deferred",
+        nestlone_config::ConstitutionChoice::Unset => "unset",
+        nestlone_config::ConstitutionChoice::Bundled => "bundled",
+        nestlone_config::ConstitutionChoice::GuidedCustom => "guided_custom",
+        nestlone_config::ConstitutionChoice::ExpertOverride => "expert_override",
+        nestlone_config::ConstitutionChoice::Deferred => "deferred",
     }
 }
 
-fn constitution_source_id(source: codewhale_config::ConstitutionSource) -> &'static str {
+fn constitution_source_id(source: nestlone_config::ConstitutionSource) -> &'static str {
     match source {
-        codewhale_config::ConstitutionSource::Bundled => "bundled",
-        codewhale_config::ConstitutionSource::UserGlobal => "user_global",
-        codewhale_config::ConstitutionSource::ExpertOverride => "expert_override",
+        nestlone_config::ConstitutionSource::Bundled => "bundled",
+        nestlone_config::ConstitutionSource::UserGlobal => "user_global",
+        nestlone_config::ConstitutionSource::ExpertOverride => "expert_override",
     }
 }
 
-fn constitution_validity_id(validity: codewhale_config::ConstitutionValidity) -> &'static str {
+fn constitution_validity_id(validity: nestlone_config::ConstitutionValidity) -> &'static str {
     match validity {
-        codewhale_config::ConstitutionValidity::Unknown => "unknown",
-        codewhale_config::ConstitutionValidity::Valid => "valid",
-        codewhale_config::ConstitutionValidity::Invalid => "invalid",
-        codewhale_config::ConstitutionValidity::Empty => "empty",
-        codewhale_config::ConstitutionValidity::Unreadable => "unreadable",
+        nestlone_config::ConstitutionValidity::Unknown => "unknown",
+        nestlone_config::ConstitutionValidity::Valid => "valid",
+        nestlone_config::ConstitutionValidity::Invalid => "invalid",
+        nestlone_config::ConstitutionValidity::Empty => "empty",
+        nestlone_config::ConstitutionValidity::Unreadable => "unreadable",
     }
 }
 
-fn runtime_posture_source_id(source: codewhale_config::RuntimePostureSource) -> &'static str {
+fn runtime_posture_source_id(source: nestlone_config::RuntimePostureSource) -> &'static str {
     match source {
-        codewhale_config::RuntimePostureSource::Unset => "unset",
-        codewhale_config::RuntimePostureSource::Inherited => "inherited",
-        codewhale_config::RuntimePostureSource::Confirmed => "confirmed",
+        nestlone_config::RuntimePostureSource::Unset => "unset",
+        nestlone_config::RuntimePostureSource::Inherited => "inherited",
+        nestlone_config::RuntimePostureSource::Confirmed => "confirmed",
     }
 }
 
@@ -5862,7 +5862,7 @@ fn runtime_posture_source_id(source: codewhale_config::RuntimePostureSource) -> 
 fn run_doctor_json_config_error(error: &anyhow::Error) -> Result<()> {
     const MAX_ERROR_CHARS: usize = 2_000;
 
-    let redacted = codewhale_config::persistence::redact_secrets(&format!("{error:#}"));
+    let redacted = nestlone_config::persistence::redact_secrets(&format!("{error:#}"));
     let message =
         crate::utils::truncate_with_ellipsis(&redacted, MAX_ERROR_CHARS, "...[truncated]");
     let report = serde_json::json!({
@@ -5891,9 +5891,9 @@ fn run_doctor_json(
 
     let config_path = config_path_override
         .map(PathBuf::from)
-        .or_else(|| codewhale_config::resolve_config_path(None).ok())
+        .or_else(|| nestlone_config::resolve_config_path(None).ok())
         .unwrap_or_else(|| {
-            codewhale_config::codewhale_home()
+            nestlone_config::nestlone_home()
                 .unwrap_or_else(|_| PathBuf::from(".codewhale"))
                 .join("config.toml")
         });
@@ -6021,7 +6021,7 @@ fn run_doctor_json(
     let session_recovery = doctor_session_recovery_report(
         &code_home,
         &legacy_home,
-        codewhale_config::codewhale_home_is_explicit(),
+        nestlone_config::nestlone_home_is_explicit(),
     );
 
     let stash = crate::composer_stash::diagnostic_stash_report();
@@ -6302,13 +6302,13 @@ fn doctor_wire_protocol(provider: crate::config::ApiProvider) -> &'static str {
     let policy = provider
         .metadata()
         .map(|metadata| metadata.wire_policy())
-        .unwrap_or(codewhale_config::provider::WirePolicy::Fixed(
-            codewhale_config::provider::WireFormat::ChatCompletions,
+        .unwrap_or(nestlone_config::provider::WirePolicy::Fixed(
+            nestlone_config::provider::WireFormat::ChatCompletions,
         ));
     match policy.fixed() {
-        Some(codewhale_config::provider::WireFormat::ChatCompletions) => "chat_completions",
-        Some(codewhale_config::provider::WireFormat::Responses) => "responses",
-        Some(codewhale_config::provider::WireFormat::AnthropicMessages) => "anthropic_messages",
+        Some(nestlone_config::provider::WireFormat::ChatCompletions) => "chat_completions",
+        Some(nestlone_config::provider::WireFormat::Responses) => "responses",
+        Some(nestlone_config::provider::WireFormat::AnthropicMessages) => "anthropic_messages",
         None => "model_aware",
     }
 }
@@ -7062,8 +7062,8 @@ async fn run_xai_device_auth(config_path: Option<&Path>) -> Result<()> {
     let activation = xai_oauth::activate_device_login(pending, config_path, None)?;
     println!(
         "xAI OAuth is ready; activated {} via {}",
-        codewhale_config::quote_os_path(&activation.auth_path),
-        codewhale_config::quote_os_path(&activation.config_path)
+        nestlone_config::quote_os_path(&activation.auth_path),
+        nestlone_config::quote_os_path(&activation.config_path)
     );
     Ok(())
 }
@@ -8083,7 +8083,7 @@ fn load_mcp_config(path: &Path) -> Result<McpConfig> {
     let cfg: McpConfig = serde_json::from_str(&contents).map_err(|_| {
         anyhow::anyhow!(
             "Failed to parse MCP config {}; file contents were omitted",
-            codewhale_config::quote_os_path(path)
+            nestlone_config::quote_os_path(path)
         )
     })?;
     Ok(cfg)
@@ -8676,13 +8676,13 @@ fn merge_project_config_with_approval_baseline(
 
     // v0.8.44: prefer .codewhale/config.toml, fall back to .deepseek/
     let path = workspace
-        .join(codewhale_config::CODEWHALE_APP_DIR)
+        .join(nestlone_config::CODEWHALE_APP_DIR)
         .join("config.toml");
     let raw = match read_project_config_file(&path) {
         Ok(Some(r)) => r,
         Ok(None) => {
             let legacy = workspace
-                .join(codewhale_config::LEGACY_APP_DIR)
+                .join(nestlone_config::LEGACY_APP_DIR)
                 .join("config.toml");
             match read_project_config_file(&legacy) {
                 Ok(Some(r)) => r,
@@ -8771,7 +8771,7 @@ fn merge_project_config_with_approval_baseline(
             .approval_policy
             .as_deref()
             .or(saved_approval_baseline);
-        if codewhale_config::project_approval_policy_is_allowed(approval_baseline, v) {
+        if nestlone_config::project_approval_policy_is_allowed(approval_baseline, v) {
             config.approval_policy = Some(v.to_string());
         } else {
             eprintln!(
@@ -8785,7 +8785,7 @@ fn merge_project_config_with_approval_baseline(
     if let Some(v) = table.get("sandbox_mode").and_then(toml::Value::as_str)
         && !v.is_empty()
     {
-        if codewhale_config::project_sandbox_mode_is_allowed(config.sandbox_mode.as_deref(), v) {
+        if nestlone_config::project_sandbox_mode_is_allowed(config.sandbox_mode.as_deref(), v) {
             config.sandbox_mode = Some(v.to_string());
         } else {
             eprintln!(
@@ -9015,7 +9015,7 @@ async fn run_interactive_with_notice(
 
     // v0.8.44: migrate config from ~/.deepseek/ to ~/.codewhale/ on first
     // launch. Non-fatal — existing installs keep working either way.
-    match codewhale_config::migrate_config_if_needed() {
+    match nestlone_config::migrate_config_if_needed() {
         Ok(Some(migration)) => {
             eprintln!("{}", migration.user_notice());
         }
@@ -9922,7 +9922,7 @@ async fn build_direct_workflow_tool(
     .with_features(config.features())
     .with_skills_config(
         config.skills_dir(),
-        config.skills_config().scan_codewhale_only(),
+        config.skills_config().scan_nestlone_only(),
     )
     .with_plugin_registry(std::sync::Arc::clone(&plugin_registry))
     .with_shell_policy(shell_policy)
@@ -10524,7 +10524,7 @@ async fn run_exec_agent(
         notes_path: execution_config.notes_path(),
         mcp_config_path: execution_config.mcp_config_path(),
         skills_dir: execution_config.skills_dir(),
-        skills_scan_codewhale_only: execution_config.skills_config().scan_codewhale_only(),
+        skills_scan_nestlone_only: execution_config.skills_config().scan_nestlone_only(),
         instructions: {
             let mut instrs: Vec<crate::prompts::InstructionSource> = execution_config
                 .instructions_paths()
@@ -11609,7 +11609,7 @@ mod doctor_legacy_state_tests {
     }
 
     #[test]
-    fn explicit_codewhale_home_skips_session_recovery_scan() {
+    fn explicit_nestlone_home_skips_session_recovery_scan() {
         let tmp = TempDir::new().expect("tempdir");
         let (primary_root, legacy_root) = roots(&tmp);
         fs::create_dir_all(legacy_root.join("sessions")).expect("legacy sessions");
@@ -11619,7 +11619,7 @@ mod doctor_legacy_state_tests {
         let report = doctor_session_recovery_report(&primary_root, &legacy_root, true);
 
         assert_eq!(report.status, DoctorSessionRecoveryStatus::Isolated);
-        assert!(report.codewhale_home_is_explicit);
+        assert!(report.nestlone_home_is_explicit);
         assert_eq!(report.legacy_session_file_count, 0);
         assert_eq!(report.recoverable_file_count, 0);
         assert!(report.recoverable.is_empty());
@@ -11627,7 +11627,7 @@ mod doctor_legacy_state_tests {
     }
 
     #[test]
-    fn doctor_state_roots_ignore_ambient_legacy_home_when_codewhale_home_is_explicit() {
+    fn doctor_state_roots_ignore_ambient_legacy_home_when_nestlone_home_is_explicit() {
         let _env_lock = crate::test_support::lock_test_env();
         let tmp = TempDir::new().expect("tempdir");
         let explicit_home = tmp.path().join("isolated-codewhale");
@@ -11639,20 +11639,20 @@ mod doctor_legacy_state_tests {
         )
         .expect("ambient legacy config");
         let _home = EnvVarRestore::set("HOME", tmp.path());
-        let _codewhale_home = EnvVarRestore::set("CODEWHALE_HOME", &explicit_home);
+        let _nestlone_home = EnvVarRestore::set("CODEWHALE_HOME", &explicit_home);
 
         let (primary_root, legacy_root) = doctor_state_roots();
         let report = doctor_legacy_state_report(&primary_root, &legacy_root);
         let session_recovery = doctor_session_recovery_report(
             &primary_root,
             &legacy_root,
-            codewhale_config::codewhale_home_is_explicit(),
+            nestlone_config::nestlone_home_is_explicit(),
         );
 
         assert_eq!(primary_root, explicit_home);
         assert_eq!(
             legacy_root,
-            primary_root.join(codewhale_config::LEGACY_APP_DIR)
+            primary_root.join(nestlone_config::LEGACY_APP_DIR)
         );
         assert!(
             report
@@ -11676,11 +11676,11 @@ mod doctor_setup_state_tests {
     use tempfile::TempDir;
 
     fn prepare_env(tmp: &TempDir) -> (crate::test_support::EnvVarGuard, PathBuf) {
-        let codewhale_home = tmp.path().join(".codewhale");
-        fs::create_dir_all(&codewhale_home).expect("codewhale home");
+        let nestlone_home = tmp.path().join(".codewhale");
+        fs::create_dir_all(&nestlone_home).expect("codewhale home");
         (
-            crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", codewhale_home.as_os_str()),
-            codewhale_home,
+            crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", nestlone_home.as_os_str()),
+            nestlone_home,
         )
     }
 
@@ -11697,14 +11697,14 @@ mod doctor_setup_state_tests {
     fn doctor_setup_consistency_flags_missing_user_constitution() {
         let _guard = crate::test_support::lock_test_env();
         let tmp = TempDir::new().expect("tempdir");
-        let (_home_guard, _codewhale_home) = prepare_env(&tmp);
+        let (_home_guard, _nestlone_home) = prepare_env(&tmp);
         let _key = crate::test_support::EnvVarGuard::remove("DEEPSEEK_API_KEY");
         let _source = crate::test_support::EnvVarGuard::remove("DEEPSEEK_API_KEY_SOURCE");
         let workspace = tmp.path().join("workspace");
         fs::create_dir_all(&workspace).expect("workspace");
 
-        let state = codewhale_config::SetupState {
-            constitution_source: codewhale_config::ConstitutionSource::UserGlobal,
+        let state = nestlone_config::SetupState {
+            constitution_source: nestlone_config::ConstitutionSource::UserGlobal,
             ..Default::default()
         };
         state.save().expect("persist setup state");
@@ -11724,12 +11724,12 @@ mod doctor_setup_state_tests {
     fn doctor_setup_consistency_flags_stale_temp_files() {
         let _guard = crate::test_support::lock_test_env();
         let tmp = TempDir::new().expect("tempdir");
-        let (_home_guard, codewhale_home) = prepare_env(&tmp);
+        let (_home_guard, nestlone_home) = prepare_env(&tmp);
         let _key = crate::test_support::EnvVarGuard::remove("DEEPSEEK_API_KEY");
         let _source = crate::test_support::EnvVarGuard::remove("DEEPSEEK_API_KEY_SOURCE");
         let workspace = tmp.path().join("workspace");
         fs::create_dir_all(&workspace).expect("workspace");
-        fs::write(codewhale_home.join(".tmpAbC123"), b"orphaned atomic write")
+        fs::write(nestlone_home.join(".tmpAbC123"), b"orphaned atomic write")
             .expect("stale temp file");
 
         let report = doctor_setup_report_json(&Config::default(), &workspace);
@@ -11737,7 +11737,7 @@ mod doctor_setup_state_tests {
         assert_eq!(report["consistency"]["status"], "inconsistent");
         let issues = report["consistency"]["issues"].to_string();
         assert!(
-            issues.contains("stale_setup_temp_files_in_codewhale_home"),
+            issues.contains("stale_setup_temp_files_in_nestlone_home"),
             "{issues}"
         );
     }
@@ -11746,7 +11746,7 @@ mod doctor_setup_state_tests {
     fn doctor_setup_consistency_reports_consistent_for_clean_home() {
         let _guard = crate::test_support::lock_test_env();
         let tmp = TempDir::new().expect("tempdir");
-        let (_home_guard, _codewhale_home) = prepare_env(&tmp);
+        let (_home_guard, _nestlone_home) = prepare_env(&tmp);
         let _key = crate::test_support::EnvVarGuard::remove("DEEPSEEK_API_KEY");
         let _source = crate::test_support::EnvVarGuard::remove("DEEPSEEK_API_KEY_SOURCE");
         let workspace = tmp.path().join("workspace");
@@ -11768,7 +11768,7 @@ mod doctor_setup_state_tests {
     fn doctor_setup_report_json_derives_state_without_sidecar() {
         let _guard = crate::test_support::lock_test_env();
         let tmp = TempDir::new().expect("tempdir");
-        let (_home_guard, _codewhale_home) = prepare_env(&tmp);
+        let (_home_guard, _nestlone_home) = prepare_env(&tmp);
         let _key = crate::test_support::EnvVarGuard::remove("DEEPSEEK_API_KEY");
         let _source = crate::test_support::EnvVarGuard::remove("DEEPSEEK_API_KEY_SOURCE");
         let workspace = tmp.path().join("workspace");
@@ -11851,7 +11851,7 @@ mod doctor_setup_state_tests {
     fn doctor_setup_provider_model_json_covers_cn_codex_and_local_matrix() {
         let _guard = crate::test_support::lock_test_env();
         let tmp = TempDir::new().expect("tempdir");
-        let (_home_guard, _codewhale_home) = prepare_env(&tmp);
+        let (_home_guard, _nestlone_home) = prepare_env(&tmp);
         let _home = crate::test_support::EnvVarGuard::set("HOME", tmp.path());
         let _userprofile = crate::test_support::EnvVarGuard::set("USERPROFILE", tmp.path());
         let _deepseek_key = crate::test_support::EnvVarGuard::remove("DEEPSEEK_API_KEY");
@@ -11924,9 +11924,9 @@ mod doctor_setup_state_tests {
             "doctor must not stat or read external credentials without consent"
         );
 
-        let mut consent = codewhale_config::ExternalCredentialConsentToml::read_only(
-            codewhale_config::ProviderKind::OpenaiCodex,
-            codewhale_config::ExternalCredentialSource::CodexCli,
+        let mut consent = nestlone_config::ExternalCredentialConsentToml::read_only(
+            nestlone_config::ProviderKind::OpenaiCodex,
+            nestlone_config::ExternalCredentialSource::CodexCli,
             codex_auth_path.clone(),
         );
         let codex_read_only = Config {
@@ -11980,7 +11980,7 @@ mod doctor_setup_state_tests {
         assert!(human.contains("normal requests to the explicitly selected provider"));
         assert!(human.contains("consent remains pinned"), "{human}");
         assert!(
-            human.contains(&codewhale_config::quote_os_path(&codex_auth_path)),
+            human.contains(&nestlone_config::quote_os_path(&codex_auth_path)),
             "{human}"
         );
         assert!(!human.contains(&changed_ambient_path.display().to_string()));
@@ -11994,7 +11994,7 @@ mod doctor_setup_state_tests {
             codex_auth_raw
         );
 
-        consent.access = codewhale_config::ExternalCredentialAccess::Managed;
+        consent.access = nestlone_config::ExternalCredentialAccess::Managed;
         let codex_managed = Config {
             provider: Some("openai-codex".to_string()),
             providers: Some(crate::config::ProvidersConfig {
@@ -12072,31 +12072,31 @@ mod doctor_setup_state_tests {
     fn doctor_setup_report_json_uses_persisted_state() {
         let _guard = crate::test_support::lock_test_env();
         let tmp = TempDir::new().expect("tempdir");
-        let (_home_guard, _codewhale_home) = prepare_env(&tmp);
+        let (_home_guard, _nestlone_home) = prepare_env(&tmp);
         let workspace = tmp.path().join("workspace");
         fs::create_dir_all(&workspace).expect("workspace");
-        let mut state = codewhale_config::SetupState::default();
+        let mut state = nestlone_config::SetupState::default();
         state.set_step(
-            codewhale_config::SetupStep::Language,
-            codewhale_config::StepEntry::new(
-                codewhale_config::StepStatus::Verified,
+            nestlone_config::SetupStep::Language,
+            nestlone_config::StepEntry::new(
+                nestlone_config::StepStatus::Verified,
                 true,
                 crate::tui::setup::CONSTITUTION_CHECKPOINT_VERSION,
             ),
         );
         state.set_step(
-            codewhale_config::SetupStep::ProviderModel,
-            codewhale_config::StepEntry::new(
-                codewhale_config::StepStatus::Verified,
+            nestlone_config::SetupStep::ProviderModel,
+            nestlone_config::StepEntry::new(
+                nestlone_config::StepStatus::Verified,
                 true,
                 crate::tui::setup::CONSTITUTION_CHECKPOINT_VERSION,
             )
             .with_result("deepseek/deepseek-chat"),
         );
         state.set_step(
-            codewhale_config::SetupStep::TrustSandbox,
-            codewhale_config::StepEntry::new(
-                codewhale_config::StepStatus::Verified,
+            nestlone_config::SetupStep::TrustSandbox,
+            nestlone_config::StepEntry::new(
+                nestlone_config::StepStatus::Verified,
                 true,
                 crate::tui::setup::CONSTITUTION_CHECKPOINT_VERSION,
             ),
@@ -12104,20 +12104,20 @@ mod doctor_setup_state_tests {
         state
             .complete_constitution_checkpoint(
                 crate::tui::setup::CONSTITUTION_CHECKPOINT_VERSION,
-                codewhale_config::ConstitutionChoice::Bundled,
+                nestlone_config::ConstitutionChoice::Bundled,
             )
             .set_step(
-                codewhale_config::SetupStep::Constitution,
-                codewhale_config::StepEntry::new(
-                    codewhale_config::StepStatus::Verified,
+                nestlone_config::SetupStep::Constitution,
+                nestlone_config::StepEntry::new(
+                    nestlone_config::StepStatus::Verified,
                     true,
                     crate::tui::setup::CONSTITUTION_CHECKPOINT_VERSION,
                 ),
             );
-        state.runtime_posture_source = codewhale_config::RuntimePostureSource::Confirmed;
+        state.runtime_posture_source = nestlone_config::RuntimePostureSource::Confirmed;
         state.save().expect("persist setup state");
-        codewhale_config::UserConstitution {
-            autonomy_preference: codewhale_config::AutonomyPreference::Balanced,
+        nestlone_config::UserConstitution {
+            autonomy_preference: nestlone_config::AutonomyPreference::Balanced,
             ..Default::default()
         }
         .save()
@@ -12180,11 +12180,11 @@ mod doctor_setup_state_tests {
     fn doctor_reports_settings_permission_posture_when_approval_policy_unset() {
         let _guard = crate::test_support::lock_test_env();
         let tmp = TempDir::new().expect("tempdir");
-        let (_home_guard, codewhale_home) = prepare_env(&tmp);
+        let (_home_guard, nestlone_home) = prepare_env(&tmp);
         let workspace = tmp.path().join("workspace");
         fs::create_dir_all(&workspace).expect("workspace");
         fs::write(
-            codewhale_home.join("settings.toml"),
+            nestlone_home.join("settings.toml"),
             "permission_posture = \"full-access\"\n",
         )
         .expect("write settings.toml");
@@ -12225,35 +12225,35 @@ mod doctor_setup_state_tests {
     fn doctor_setup_report_json_fails_closed_without_operate_receipts() {
         let _guard = crate::test_support::lock_test_env();
         let tmp = TempDir::new().expect("tempdir");
-        let (_home_guard, _codewhale_home) = prepare_env(&tmp);
+        let (_home_guard, _nestlone_home) = prepare_env(&tmp);
         let workspace = tmp.path().join("workspace");
         fs::create_dir_all(&workspace).expect("workspace");
-        let mut state = codewhale_config::SetupState::default();
+        let mut state = nestlone_config::SetupState::default();
         state.set_step(
-            codewhale_config::SetupStep::Language,
-            codewhale_config::StepEntry::new(
-                codewhale_config::StepStatus::Verified,
+            nestlone_config::SetupStep::Language,
+            nestlone_config::StepEntry::new(
+                nestlone_config::StepStatus::Verified,
                 true,
                 crate::tui::setup::CONSTITUTION_CHECKPOINT_VERSION,
             ),
         );
         state.set_step(
-            codewhale_config::SetupStep::ProviderModel,
-            codewhale_config::StepEntry::new(
-                codewhale_config::StepStatus::Verified,
+            nestlone_config::SetupStep::ProviderModel,
+            nestlone_config::StepEntry::new(
+                nestlone_config::StepStatus::Verified,
                 true,
                 crate::tui::setup::CONSTITUTION_CHECKPOINT_VERSION,
             ),
         );
-        state.runtime_posture_source = codewhale_config::RuntimePostureSource::Confirmed;
+        state.runtime_posture_source = nestlone_config::RuntimePostureSource::Confirmed;
         state.complete_constitution_checkpoint(
             crate::tui::setup::CONSTITUTION_CHECKPOINT_VERSION,
-            codewhale_config::ConstitutionChoice::Bundled,
+            nestlone_config::ConstitutionChoice::Bundled,
         );
         state.set_step(
-            codewhale_config::SetupStep::OperateFleet,
-            codewhale_config::StepEntry::new(
-                codewhale_config::StepStatus::Verified,
+            nestlone_config::SetupStep::OperateFleet,
+            nestlone_config::StepEntry::new(
+                nestlone_config::StepStatus::Verified,
                 false,
                 crate::tui::setup::CONSTITUTION_CHECKPOINT_VERSION,
             )
@@ -12842,9 +12842,9 @@ mod terminal_mode_tests {
         let _env_lock = crate::test_support::lock_test_env();
         let temp = tempfile::tempdir().unwrap();
         let workspace = temp.path().join("workspace");
-        let codewhale_home = temp.path().join("home");
+        let nestlone_home = temp.path().join("home");
         std::fs::create_dir_all(&workspace).unwrap();
-        let _home = crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", &codewhale_home);
+        let _home = crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", &nestlone_home);
         let workspace_arg = workspace.to_string_lossy().into_owned();
 
         for route in [
@@ -12866,7 +12866,7 @@ mod terminal_mode_tests {
                 .registry_for_workspace(cli.workspace.as_deref().unwrap_or(workspace.as_path()));
             assert_eq!(registry.workspace(), workspace.as_path());
             assert!(
-                !codewhale_home.join("plugins/state.json").exists(),
+                !nestlone_home.join("plugins/state.json").exists(),
                 "startup discovery must remain read-only"
             );
         }
@@ -13119,7 +13119,7 @@ mod terminal_mode_tests {
     #[test]
     fn exec_model_resolution_uses_provider_scoped_default() {
         let _env_lock = crate::test_support::lock_test_env();
-        let _codewhale_model = crate::test_support::EnvVarGuard::remove("CODEWHALE_MODEL");
+        let _nestlone_model = crate::test_support::EnvVarGuard::remove("CODEWHALE_MODEL");
         let _deepseek_model = crate::test_support::EnvVarGuard::remove("DEEPSEEK_MODEL");
         let config = Config {
             provider: Some("openrouter".to_string()),
@@ -13145,9 +13145,9 @@ mod terminal_mode_tests {
     }
 
     #[test]
-    fn exec_model_resolution_prefers_codewhale_model_env_override() {
+    fn exec_model_resolution_prefers_nestlone_model_env_override() {
         let _env_lock = crate::test_support::lock_test_env();
-        let _codewhale_model = crate::test_support::EnvVarGuard::set("CODEWHALE_MODEL", " auto ");
+        let _nestlone_model = crate::test_support::EnvVarGuard::set("CODEWHALE_MODEL", " auto ");
         let _deepseek_model =
             crate::test_support::EnvVarGuard::set("DEEPSEEK_MODEL", "stale-deepseek-model");
         let config = Config {
@@ -13161,7 +13161,7 @@ mod terminal_mode_tests {
     #[test]
     fn exec_model_resolution_uses_legacy_deepseek_model_env_override() {
         let _env_lock = crate::test_support::lock_test_env();
-        let _codewhale_model = crate::test_support::EnvVarGuard::remove("CODEWHALE_MODEL");
+        let _nestlone_model = crate::test_support::EnvVarGuard::remove("CODEWHALE_MODEL");
         let _deepseek_model = crate::test_support::EnvVarGuard::set("DEEPSEEK_MODEL", " auto ");
         let config = Config {
             default_text_model: Some("deepseek/deepseek-v4-pro".to_string()),
@@ -13174,7 +13174,7 @@ mod terminal_mode_tests {
     #[test]
     fn exec_model_resolution_uses_provider_safe_default_for_zai() {
         let _env_lock = crate::test_support::lock_test_env();
-        let _codewhale_model = crate::test_support::EnvVarGuard::remove("CODEWHALE_MODEL");
+        let _nestlone_model = crate::test_support::EnvVarGuard::remove("CODEWHALE_MODEL");
         let _deepseek_model = crate::test_support::EnvVarGuard::remove("DEEPSEEK_MODEL");
         let config = Config {
             provider: Some("zai".to_string()),
@@ -14394,7 +14394,7 @@ mod terminal_mode_tests {
 
     #[test]
     fn workspace_dotenv_credential_allowlist_excludes_control_plane_names() {
-        for provider in codewhale_config::provider::providers_sorted_for_display() {
+        for provider in nestlone_config::provider::providers_sorted_for_display() {
             for key in provider.env_vars() {
                 assert!(
                     is_workspace_dotenv_credential_key(key),
@@ -15099,8 +15099,8 @@ mod project_config_tests {
     fn project_overlay_rejects_symlinked_primary_config() {
         let workspace = tempdir().expect("workspace tempdir");
         let outside = tempdir().expect("outside tempdir");
-        let primary_dir = workspace.path().join(codewhale_config::CODEWHALE_APP_DIR);
-        let legacy_dir = workspace.path().join(codewhale_config::LEGACY_APP_DIR);
+        let primary_dir = workspace.path().join(nestlone_config::CODEWHALE_APP_DIR);
+        let legacy_dir = workspace.path().join(nestlone_config::LEGACY_APP_DIR);
         fs::create_dir_all(&primary_dir).expect("mkdir primary");
         fs::create_dir_all(&legacy_dir).expect("mkdir legacy");
         let outside_config = outside.path().join("config.toml");
@@ -15148,7 +15148,7 @@ mod project_config_tests {
     fn project_overlay_skips_when_workspace_is_home_directory() {
         let _guard = crate::test_support::lock_test_env();
         let tmp = tempdir().expect("tempdir");
-        let project_dir = tmp.path().join(codewhale_config::CODEWHALE_APP_DIR);
+        let project_dir = tmp.path().join(nestlone_config::CODEWHALE_APP_DIR);
         fs::create_dir_all(&project_dir).expect("mkdir .codewhale");
         fs::write(
             project_dir.join("config.toml"),
@@ -16620,14 +16620,14 @@ mod setup_helper_tests {
     fn resolve_api_key_source_reports_standalone_secret_store() {
         let _lock = crate::test_support::lock_test_env();
         let temp = TempDir::new().expect("temp home");
-        let codewhale_home = temp.path().join("codewhale-home");
-        std::fs::create_dir_all(&codewhale_home).expect("create codewhale home");
+        let nestlone_home = temp.path().join("codewhale-home");
+        std::fs::create_dir_all(&nestlone_home).expect("create codewhale home");
         let _home =
-            crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", codewhale_home.as_os_str());
+            crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", nestlone_home.as_os_str());
         let _backend = crate::test_support::EnvVarGuard::set("CODEWHALE_SECRET_BACKEND", "file");
         let _deepseek_key = crate::test_support::EnvVarGuard::remove("DEEPSEEK_API_KEY");
         let _deepseek_source = crate::test_support::EnvVarGuard::remove("DEEPSEEK_API_KEY_SOURCE");
-        codewhale_secrets::Secrets::auto_detect()
+        nestlone_secrets::Secrets::auto_detect()
             .set("deepseek", "standalone-secret")
             .expect("save secret");
 
@@ -16641,16 +16641,16 @@ mod setup_helper_tests {
     fn custom_provider_env_source_precedes_saved_secret_store() {
         let _lock = crate::test_support::lock_test_env();
         let temp = TempDir::new().expect("temp home");
-        let codewhale_home = temp.path().join("codewhale-home");
-        std::fs::create_dir_all(&codewhale_home).expect("create codewhale home");
+        let nestlone_home = temp.path().join("codewhale-home");
+        std::fs::create_dir_all(&nestlone_home).expect("create codewhale home");
         let _home =
-            crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", codewhale_home.as_os_str());
+            crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", nestlone_home.as_os_str());
         let _backend = crate::test_support::EnvVarGuard::set("CODEWHALE_SECRET_BACKEND", "file");
         let _declared_env =
             crate::test_support::EnvVarGuard::set("QA_CUSTOM_API_KEY", "declared-env-key");
         let _deepseek_key = crate::test_support::EnvVarGuard::remove("DEEPSEEK_API_KEY");
         let _deepseek_source = crate::test_support::EnvVarGuard::remove("DEEPSEEK_API_KEY_SOURCE");
-        codewhale_secrets::Secrets::auto_detect()
+        nestlone_secrets::Secrets::auto_detect()
             .set("custom", "saved-custom-secret")
             .expect("save secret");
 
@@ -16685,14 +16685,14 @@ mod setup_helper_tests {
     fn named_custom_provider_does_not_report_generic_secret_store() {
         let _lock = crate::test_support::lock_test_env();
         let temp = TempDir::new().expect("temp home");
-        let codewhale_home = temp.path().join("codewhale-home");
-        std::fs::create_dir_all(&codewhale_home).expect("create codewhale home");
+        let nestlone_home = temp.path().join("codewhale-home");
+        std::fs::create_dir_all(&nestlone_home).expect("create codewhale home");
         let _home =
-            crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", codewhale_home.as_os_str());
+            crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", nestlone_home.as_os_str());
         let _backend = crate::test_support::EnvVarGuard::set("CODEWHALE_SECRET_BACKEND", "file");
         let _deepseek_key = crate::test_support::EnvVarGuard::remove("DEEPSEEK_API_KEY");
         let _deepseek_source = crate::test_support::EnvVarGuard::remove("DEEPSEEK_API_KEY_SOURCE");
-        codewhale_secrets::Secrets::auto_detect()
+        nestlone_secrets::Secrets::auto_detect()
             .set("custom", "unrelated-custom-secret")
             .expect("save secret");
 
@@ -16808,8 +16808,8 @@ mod setup_helper_tests {
         let _deepseek_source = crate::test_support::EnvVarGuard::remove("DEEPSEEK_API_KEY_SOURCE");
         let _openai_key = crate::test_support::EnvVarGuard::remove("OPENAI_API_KEY");
         let mut providers = crate::config::ProvidersConfig::default();
-        providers.openai.auth = Some(codewhale_config::ProviderAuthSourceToml {
-            source: codewhale_config::AuthSourceKind::Command,
+        providers.openai.auth = Some(nestlone_config::ProviderAuthSourceToml {
+            source: nestlone_config::AuthSourceKind::Command,
             command: vec!["secret-tool".to_string(), "lookup".to_string()],
             timeout_ms: Some(2000),
             secret_id: None,
@@ -16833,8 +16833,8 @@ mod setup_helper_tests {
         let _deepseek_source = crate::test_support::EnvVarGuard::remove("DEEPSEEK_API_KEY_SOURCE");
         let _openai_key = crate::test_support::EnvVarGuard::remove("OPENAI_API_KEY");
         let mut providers = crate::config::ProvidersConfig::default();
-        providers.openai.auth = Some(codewhale_config::ProviderAuthSourceToml {
-            source: codewhale_config::AuthSourceKind::Secret,
+        providers.openai.auth = Some(nestlone_config::ProviderAuthSourceToml {
+            source: nestlone_config::AuthSourceKind::Secret,
             command: Vec::new(),
             timeout_ms: None,
             secret_id: Some("codewhale/openai".to_string()),

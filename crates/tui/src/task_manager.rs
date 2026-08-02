@@ -2408,7 +2408,7 @@ mod tests {
     }
 
     #[test]
-    fn default_tasks_dir_prefers_existing_codewhale_tasks() {
+    fn default_tasks_dir_prefers_existing_nestlone_tasks() {
         let temp_home = tempfile::tempdir().unwrap();
         let home = temp_home.path();
         let primary_tasks = home.join(".codewhale").join("tasks");
@@ -2445,7 +2445,7 @@ mod tests {
     }
 
     #[test]
-    fn default_tasks_dir_uses_codewhale_tasks_for_new_installs() {
+    fn default_tasks_dir_uses_nestlone_tasks_for_new_installs() {
         let temp_home = tempfile::tempdir().unwrap();
         let home = temp_home.path();
 

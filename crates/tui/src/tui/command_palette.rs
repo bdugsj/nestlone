@@ -70,7 +70,7 @@ pub struct CommandPaletteView {
 pub fn build_entries(
     locale: Locale,
     skills_dir: &Path,
-    skills_scan_codewhale_only: bool,
+    skills_scan_nestlone_only: bool,
     workspace: &Path,
     mcp_config_path: &Path,
     mcp_snapshot: Option<&crate::mcp::McpManagerSnapshot>,
@@ -78,7 +78,7 @@ pub fn build_entries(
     build_entries_with_plugins(
         locale,
         skills_dir,
-        skills_scan_codewhale_only,
+        skills_scan_nestlone_only,
         workspace,
         mcp_config_path,
         mcp_snapshot,
@@ -89,7 +89,7 @@ pub fn build_entries(
 pub fn build_entries_with_plugins(
     locale: Locale,
     skills_dir: &Path,
-    skills_scan_codewhale_only: bool,
+    skills_scan_nestlone_only: bool,
     workspace: &Path,
     mcp_config_path: &Path,
     mcp_snapshot: Option<&crate::mcp::McpManagerSnapshot>,
@@ -159,7 +159,7 @@ pub fn build_entries_with_plugins(
     let skills = skills::discover_for_workspace_and_dir_with_mode_and_plugins(
         workspace,
         skills_dir,
-        skills::SkillDiscoveryMode::from_codewhale_only(skills_scan_codewhale_only),
+        skills::SkillDiscoveryMode::from_nestlone_only(skills_scan_nestlone_only),
         Some(plugins),
     )
     .into_enabled();
@@ -1241,7 +1241,7 @@ mod tests {
     }
 
     #[test]
-    fn command_palette_skills_respect_codewhale_only_scan() {
+    fn command_palette_skills_respect_nestlone_only_scan() {
         let tmp = TempDir::new().expect("tempdir");
         let workspace = tmp.path().join("workspace");
         let claude_skill_dir = workspace
@@ -1254,13 +1254,13 @@ mod tests {
             "---\nname: claude-skill\ndescription: Claude skill\n---\nbody",
         )
         .expect("write claude skill");
-        let codewhale_skill_dir = workspace
+        let nestlone_skill_dir = workspace
             .join(".codewhale")
             .join("skills")
             .join("codewhale-skill");
-        std::fs::create_dir_all(&codewhale_skill_dir).expect("create codewhale skill dir");
+        std::fs::create_dir_all(&nestlone_skill_dir).expect("create codewhale skill dir");
         std::fs::write(
-            codewhale_skill_dir.join("SKILL.md"),
+            nestlone_skill_dir.join("SKILL.md"),
             "---\nname: codewhale-skill\ndescription: CodeWhale skill\n---\nbody",
         )
         .expect("write codewhale skill");

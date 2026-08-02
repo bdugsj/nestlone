@@ -339,7 +339,7 @@ mod tests {
     use tempfile::TempDir;
 
     #[test]
-    fn test_global_commands_dir_contains_codewhale_commands() {
+    fn test_global_commands_dir_contains_nestlone_commands() {
         let dir = global_commands_dir();
         let parts: Vec<_> = dir
             .components()

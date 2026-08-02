@@ -19,7 +19,7 @@ use axum::response::{IntoResponse, Response};
 use axum::routing::{get, post};
 use axum::{Json, Router};
 use chrono::Utc;
-use codewhale_protocol::runtime::{
+use nestlone_protocol::runtime::{
     DynamicToolCallResult, RUNTIME_API_VERSION, RUNTIME_EVENT_ENVELOPE_SCHEMA_VERSION,
     RuntimeCapabilities, RuntimeEventEnvelope, RuntimeExperimentalCapabilities,
 };
@@ -40,7 +40,7 @@ use crate::automation_manager::{
 use crate::config::{
     ApiProvider, Config, DEFAULT_TEXT_MODEL, normalize_model_name_for_provider, validate_route,
 };
-use crate::fleet::executor::{FleetExecutor, configured_codewhale_binary};
+use crate::fleet::executor::{FleetExecutor, configured_nestlone_binary};
 use crate::fleet::ledger::{FleetLedgerState, FleetTaskLedgerStatus};
 use crate::fleet::manager::{
     FleetManager, FleetStatusSnapshot, FleetWorkerInspection, FleetWorkerRuntimeProjection,
@@ -67,7 +67,7 @@ use crate::tools::subagent::{
     AgentWorkerRecord, SharedSubAgentManager, load_persisted_agent_worker_records,
     new_shared_subagent_manager_with_timeout,
 };
-use codewhale_protocol::fleet::{
+use nestlone_protocol::fleet::{
     FleetArtifactKind, FleetRun, FleetRunId, FleetWorkerEventPayload, FleetWorkerStatus,
 };
 
@@ -116,7 +116,7 @@ pub struct RuntimeApiState {
     web: Option<web::RuntimeWebState>,
     /// Executable used by Runtime API-owned Fleet manager loops. Stored on
     /// state so tests and embedded callers can provide a hermetic worker.
-    fleet_codewhale_binary: String,
+    fleet_nestlone_binary: String,
     /// Shared McpPool reused for explicit live MCP discovery. Passive API
     /// calls do not initialize this pool so dashboards cannot accidentally
     /// become a second stdio-process owner. The outer mutex guards only the
@@ -352,7 +352,7 @@ struct SubmitUserInputResponse {
 struct RuntimeInfoResponse {
     service: &'static str,
     runtime_api_version: &'static str,
-    codewhale_version: &'static str,
+    nestlone_version: &'static str,
     bind_host: String,
     port: u16,
     auth_required: bool,
@@ -531,7 +531,7 @@ pub async fn run_http_server(
         bind_port: options.port,
         mobile_enabled: options.mobile,
         web,
-        fleet_codewhale_binary: configured_codewhale_binary(),
+        fleet_nestlone_binary: configured_nestlone_binary(),
         mcp_pool: Arc::new(Mutex::new(None)),
         #[cfg(test)]
         compat_stream_test_hook: None,
@@ -1100,7 +1100,7 @@ async fn restart_fleet_worker(
     let run_id = report.run_id.clone();
     let max_workers = report.max_workers;
     let workspace = state.workspace.clone();
-    let codewhale_binary = state.fleet_codewhale_binary.clone();
+    let nestlone_binary = state.fleet_nestlone_binary.clone();
     tokio::spawn(async move {
         let mut executor = FleetExecutor::new(&workspace);
         if let Err(err) = manager
@@ -1108,7 +1108,7 @@ async fn restart_fleet_worker(
                 &run_id,
                 max_workers,
                 &mut executor,
-                &codewhale_binary,
+                &nestlone_binary,
                 None,
                 Duration::from_millis(250),
             )
@@ -1277,7 +1277,7 @@ fn fleet_worker_runtime_json(runtime: &FleetWorkerRuntimeProjection) -> Value {
     })
 }
 
-fn fleet_artifact_json(artifact: &codewhale_protocol::fleet::FleetArtifactRef) -> Value {
+fn fleet_artifact_json(artifact: &nestlone_protocol::fleet::FleetArtifactRef) -> Value {
     json!({
         "kind": artifact_kind_label(&artifact.kind),
         "path": artifact.path.clone(),
@@ -1287,7 +1287,7 @@ fn fleet_artifact_json(artifact: &codewhale_protocol::fleet::FleetArtifactRef) -
     })
 }
 
-fn fleet_event_json(event: &codewhale_protocol::fleet::FleetWorkerEvent) -> Value {
+fn fleet_event_json(event: &nestlone_protocol::fleet::FleetWorkerEvent) -> Value {
     json!({
         "seq": event.seq,
         "run_id": event.run_id.0.clone(),
@@ -1399,8 +1399,8 @@ async fn list_skills(
     let (skills_dir, mode) = {
         let config = state.config.read();
         let skills_dir = resolve_skills_dir(&config, &state.workspace);
-        let mode = crate::skills::SkillDiscoveryMode::from_codewhale_only(
-            config.skills_config().scan_codewhale_only(),
+        let mode = crate::skills::SkillDiscoveryMode::from_nestlone_only(
+            config.skills_config().scan_nestlone_only(),
         );
         (skills_dir, mode)
     };
@@ -1471,8 +1471,8 @@ async fn set_skill_enabled(
     let (skills_dir, mode) = {
         let config = state.config.read();
         let skills_dir = resolve_skills_dir(&config, &state.workspace);
-        let mode = crate::skills::SkillDiscoveryMode::from_codewhale_only(
-            config.skills_config().scan_codewhale_only(),
+        let mode = crate::skills::SkillDiscoveryMode::from_nestlone_only(
+            config.skills_config().scan_nestlone_only(),
         );
         (skills_dir, mode)
     };
@@ -1575,7 +1575,7 @@ async fn runtime_info(State(state): State<RuntimeApiState>) -> Json<RuntimeInfoR
     Json(RuntimeInfoResponse {
         service: "codewhale-runtime-api",
         runtime_api_version: RUNTIME_API_VERSION,
-        codewhale_version: version,
+        nestlone_version: version,
         bind_host: state.bind_host.clone(),
         port: state.bind_port,
         auth_required: state.auth_required,
@@ -2835,12 +2835,12 @@ fn truncate_text(text: &str, max_chars: usize) -> String {
 }
 
 fn resolve_skills_dir(config: &Config, workspace: &std::path::Path) -> PathBuf {
-    if config.skills_config().scan_codewhale_only() {
+    if config.skills_config().scan_nestlone_only() {
         if config.skills_dir.is_some() {
             return config.skills_dir();
         }
-        if let Some(codewhale_skills_dir) = crate::skills::codewhale_workspace_skills_dir(workspace)
-            && let Ok(canonical_skills) = fs::canonicalize(&codewhale_skills_dir)
+        if let Some(nestlone_skills_dir) = crate::skills::nestlone_workspace_skills_dir(workspace)
+            && let Ok(canonical_skills) = fs::canonicalize(&nestlone_skills_dir)
         {
             return canonical_skills;
         }
@@ -3669,7 +3669,7 @@ async fn set_config(
                         "Invalid value '{value}' for subagents_max_depth: expected a non-negative integer"
                     ))
                 })?;
-                let clamped = raw.min(u64::from(codewhale_config::MAX_SPAWN_DEPTH_CEILING));
+                let clamped = raw.min(u64::from(nestlone_config::MAX_SPAWN_DEPTH_CEILING));
                 config_persistence::persist_subagents_integer_key(config_path, "max_depth", clamped)
             }
             "sandbox_mode" => {

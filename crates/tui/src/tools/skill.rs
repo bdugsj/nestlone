@@ -83,7 +83,7 @@ impl ToolSpec for LoadSkillTool {
         // already lists, so the model never asks for a name it
         // can't find.
         let discovery_mode =
-            SkillDiscoveryMode::from_codewhale_only(context.skills_scan_codewhale_only);
+            SkillDiscoveryMode::from_nestlone_only(context.skills_scan_nestlone_only);
         let registry = if let Some(skills_dir) = context.skills_dir.as_deref() {
             discover_for_workspace_and_dir_with_mode_and_plugins(
                 &context.workspace,
@@ -137,7 +137,7 @@ impl ToolSpec for LoadSkillTool {
                     .map(|p| p.display().to_string())
                     .collect();
                 if dirs.is_empty() {
-                    if context.skills_scan_codewhale_only {
+                    if context.skills_scan_nestlone_only {
                         "no skills directories found; install skills under `<workspace>/.codewhale/skills/<name>/SKILL.md` or `~/.codewhale/skills/<name>/SKILL.md`"
                             .to_string()
                     } else {
@@ -591,7 +591,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn execute_respects_codewhale_only_skill_discovery() {
+    async fn execute_respects_nestlone_only_skill_discovery() {
         let tmp = tempdir().unwrap();
         let workspace = tmp.path().to_path_buf();
         write_skill(
@@ -600,15 +600,15 @@ mod tests {
             "Claude skill",
             "Body content marker.",
         );
-        let codewhale_dir = workspace.join(".codewhale").join("skills");
+        let nestlone_dir = workspace.join(".codewhale").join("skills");
         write_skill(
-            &codewhale_dir,
+            &nestlone_dir,
             "codewhale-only",
             "CodeWhale skill",
             "Body content marker.",
         );
 
-        let context = ToolContext::new(workspace).with_skills_config(codewhale_dir, true);
+        let context = ToolContext::new(workspace).with_skills_config(nestlone_dir, true);
         let tool = LoadSkillTool;
 
         let result = tool

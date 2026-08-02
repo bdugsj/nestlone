@@ -21,7 +21,7 @@ async fn lock_mcp_loopback_tests() -> tokio::sync::MutexGuard<'static, ()> {
 
 struct WorkspaceTrustConfigGuard {
     config_path: PathBuf,
-    _codewhale_config_path: crate::test_support::EnvVarGuard,
+    _nestlone_config_path: crate::test_support::EnvVarGuard,
     _deepseek_config_path: crate::test_support::EnvVarGuard,
     _env_lock: crate::test_support::TestEnvLock,
 }
@@ -36,13 +36,13 @@ fn workspace_trust_config_guard(workspace: &Path) -> WorkspaceTrustConfigGuard {
     if let Some(parent) = config_path.parent() {
         fs::create_dir_all(parent).unwrap();
     }
-    let codewhale_config_path =
+    let nestlone_config_path =
         crate::test_support::EnvVarGuard::set("CODEWHALE_CONFIG_PATH", config_path.as_os_str());
     let deepseek_config_path = crate::test_support::EnvVarGuard::remove("DEEPSEEK_CONFIG_PATH");
 
     WorkspaceTrustConfigGuard {
         config_path,
-        _codewhale_config_path: codewhale_config_path,
+        _nestlone_config_path: nestlone_config_path,
         _deepseek_config_path: deepseek_config_path,
         _env_lock: env_lock,
     }

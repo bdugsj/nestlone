@@ -35,7 +35,7 @@ pub const PREVIEW_TITLE: &str = "Effective Base Prompt";
 
 /// Bytes-per-token divisor for the coarse, deterministic token estimate.
 /// Shared with the constitution's own projection so the two agree.
-pub(crate) const APPROX_BYTES_PER_TOKEN: usize = codewhale_config::APPROX_BYTES_PER_TOKEN;
+pub(crate) const APPROX_BYTES_PER_TOKEN: usize = nestlone_config::APPROX_BYTES_PER_TOKEN;
 
 /// Deterministic size measures for a run of prompt bytes.
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
@@ -354,7 +354,7 @@ fn classify(index: usize, text: &str, sources: &PreviewSources<'_>) -> SegmentPr
         .clone()
         .unwrap_or(BasePromptSource::Bundled);
     let mut parts = vec![base.provenance().label()];
-    if text.contains("<codewhale_user_constitution") {
+    if text.contains("<nestlone_user_constitution") {
         parts.push(match sources.user_constitution_path {
             Some(path) => SegmentProvenance::UserGlobalConstitution {
                 path: display_path(path, sources),
@@ -574,7 +574,7 @@ mod tests {
     #[test]
     fn constitution_block_provenance_never_invents_a_path() {
         let prompt = blocks(&[
-            "# Constitution\n\n<codewhale_user_constitution source=\"user-global\">\nx\n</codewhale_user_constitution>",
+            "# Constitution\n\n<nestlone_user_constitution source=\"user-global\">\nx\n</nestlone_user_constitution>",
         ]);
         let unknown = preview(&prompt, &PreviewSources::default());
         let label = unknown.segments[0].provenance.label();

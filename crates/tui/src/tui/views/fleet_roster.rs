@@ -825,24 +825,24 @@ mod tests {
         let mut profiles = BTreeMap::new();
         profiles.insert(
             "docs-writer".to_string(),
-            codewhale_config::FleetProfile {
-                slot: codewhale_config::FleetSlot::from_name("scout"),
-                role: codewhale_config::FleetRole {
+            nestlone_config::FleetProfile {
+                slot: nestlone_config::FleetSlot::from_name("scout"),
+                role: nestlone_config::FleetRole {
                     name: "scout".to_string(),
                     description: Some("Writes docs.".to_string()),
                     instructions: None,
                 },
-                loadout: codewhale_config::FleetLoadout::Fast,
+                loadout: nestlone_config::FleetLoadout::Fast,
                 model: None,
                 provider: None,
                 reasoning_effort: None,
-                permissions: codewhale_config::FleetProfilePermissions::default(),
-                delegation: codewhale_config::FleetDelegationHints::default(),
+                permissions: nestlone_config::FleetProfilePermissions::default(),
+                delegation: nestlone_config::FleetDelegationHints::default(),
             },
         );
-        let config = codewhale_config::FleetConfigToml {
+        let config = nestlone_config::FleetConfigToml {
             profiles,
-            ..codewhale_config::FleetConfigToml::default()
+            ..nestlone_config::FleetConfigToml::default()
         };
         let view = FleetRosterView::from_parts(operator(), FleetRoster::load(&config, tmp.path()));
         let extra = view.members.iter().find(|m| m.id == "docs-writer").unwrap();

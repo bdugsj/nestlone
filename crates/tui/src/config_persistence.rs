@@ -24,14 +24,14 @@ pub(crate) fn mutate_config_document<F>(path: &Path, mutate: F) -> anyhow::Resul
 where
     F: FnOnce(&mut toml_edit::DocumentMut) -> anyhow::Result<()>,
 {
-    codewhale_config::mutate_config_document(path, mutate)
+    nestlone_config::mutate_config_document(path, mutate)
 }
 
 /// Atomically replace `path` with `body` via a same-directory temp file and
 /// rename. On Unix the file lands with 0o600 permissions: config.toml can
 /// hold API keys, so this matches `ConfigStore::save` and the auth save path.
 pub(crate) fn write_config_toml_atomic(path: &Path, body: &str) -> anyhow::Result<()> {
-    codewhale_config::create_config_document(path, body)
+    nestlone_config::create_config_document(path, body)
 }
 
 /// Set the value at `segments` (parent tables plus the final key), creating
@@ -45,7 +45,7 @@ pub(crate) fn set_document_value(
     segments: &[&str],
     value: impl Into<toml_edit::Value>,
 ) -> anyhow::Result<()> {
-    codewhale_config::set_config_document_value(doc, segments, value)
+    nestlone_config::set_config_document_value(doc, segments, value)
 }
 
 /// Remove the value at `segments`. Returns `Ok(true)` when an entry was
@@ -54,7 +54,7 @@ pub(crate) fn unset_document_value(
     doc: &mut toml_edit::DocumentMut,
     segments: &[&str],
 ) -> anyhow::Result<bool> {
-    codewhale_config::unset_config_document_value(doc, segments)
+    nestlone_config::unset_config_document_value(doc, segments)
 }
 
 /// Remove every entry named `key` from `table` and, recursively, from nested
@@ -394,7 +394,7 @@ fn normalize_optional_custom_provider_field(raw: &str) -> Option<String> {
 
 pub(crate) fn persist_hotbar_bindings(
     config_path: Option<&Path>,
-    bindings: &[codewhale_config::HotbarBindingToml],
+    bindings: &[nestlone_config::HotbarBindingToml],
 ) -> anyhow::Result<PathBuf> {
     let path = config_toml_path(config_path)?;
     mutate_config_document(&path, |doc| {
@@ -443,8 +443,8 @@ mod tests {
     struct EnvGuard {
         home: Option<OsString>,
         userprofile: Option<OsString>,
-        codewhale_home: Option<OsString>,
-        codewhale_config_path: Option<OsString>,
+        nestlone_home: Option<OsString>,
+        nestlone_config_path: Option<OsString>,
         deepseek_config_path: Option<OsString>,
         _lock: crate::test_support::TestEnvLock,
     }
@@ -457,8 +457,8 @@ mod tests {
             let config_str = OsString::from(config_path.as_os_str());
             let home_prev = env::var_os("HOME");
             let userprofile_prev = env::var_os("USERPROFILE");
-            let codewhale_home_prev = env::var_os("CODEWHALE_HOME");
-            let codewhale_config_prev = env::var_os("CODEWHALE_CONFIG_PATH");
+            let nestlone_home_prev = env::var_os("CODEWHALE_HOME");
+            let nestlone_config_prev = env::var_os("CODEWHALE_CONFIG_PATH");
             let deepseek_config_prev = env::var_os("DEEPSEEK_CONFIG_PATH");
 
             // Safety: test-only environment mutation guarded by process-wide mutex.
@@ -473,8 +473,8 @@ mod tests {
             Self {
                 home: home_prev,
                 userprofile: userprofile_prev,
-                codewhale_home: codewhale_home_prev,
-                codewhale_config_path: codewhale_config_prev,
+                nestlone_home: nestlone_home_prev,
+                nestlone_config_path: nestlone_config_prev,
                 deepseek_config_path: deepseek_config_prev,
                 _lock: lock,
             }
@@ -507,7 +507,7 @@ mod tests {
                 }
             }
 
-            if let Some(value) = self.codewhale_home.take() {
+            if let Some(value) = self.nestlone_home.take() {
                 // Safety: test-only environment mutation guarded by a global mutex.
                 unsafe {
                     env::set_var("CODEWHALE_HOME", value);
@@ -519,7 +519,7 @@ mod tests {
                 }
             }
 
-            if let Some(value) = self.codewhale_config_path.take() {
+            if let Some(value) = self.nestlone_config_path.take() {
                 // Safety: test-only environment mutation guarded by a global mutex.
                 unsafe {
                     env::set_var("CODEWHALE_CONFIG_PATH", value);
@@ -577,7 +577,7 @@ mod tests {
     }
 
     #[test]
-    fn config_toml_path_uses_codewhale_home_for_fresh_installs() {
+    fn config_toml_path_uses_nestlone_home_for_fresh_installs() {
         let temp_root = temp_root("codewhale-config-path-fresh");
         fs::create_dir_all(&temp_root).unwrap();
         let _guard = EnvGuard::new(&temp_root);
@@ -608,7 +608,7 @@ mod tests {
     }
 
     #[test]
-    fn config_toml_path_ignores_legacy_config_when_codewhale_home_is_explicit() {
+    fn config_toml_path_ignores_legacy_config_when_nestlone_home_is_explicit() {
         let temp_root = temp_root("codewhale-config-path-explicit-home");
         let explicit_home = temp_root.join("isolated-codewhale");
         let legacy_config = temp_root.join(".deepseek").join("config.toml");
@@ -628,7 +628,7 @@ mod tests {
     }
 
     #[test]
-    fn config_toml_path_prefers_codewhale_env_over_legacy_env() {
+    fn config_toml_path_prefers_nestlone_env_over_legacy_env() {
         let temp_root = temp_root("codewhale-config-path-env");
         fs::create_dir_all(&temp_root).unwrap();
         let _guard = EnvGuard::new(&temp_root);
@@ -819,11 +819,11 @@ mod tests {
         assert_eq!(entry.model.as_deref(), Some("acme/code-1"));
         assert_eq!(entry.api_key_env.as_deref(), Some("ACME_API_KEY"));
 
-        let dispatcher = codewhale_config::ConfigStore::load(Some(written))
+        let dispatcher = nestlone_config::ConfigStore::load(Some(written))
             .expect("the dispatcher must parse the exact config written by the TUI");
         assert_eq!(
             dispatcher.config.provider,
-            codewhale_config::ProviderKind::Custom
+            nestlone_config::ProviderKind::Custom
         );
         assert_eq!(dispatcher.config.provider_id(), "acme_ai");
     }
@@ -866,7 +866,7 @@ mod tests {
             env::remove_var("DEEPSEEK_CONFIG_PATH");
         }
 
-        let bindings = vec![codewhale_config::HotbarBindingToml {
+        let bindings = vec![nestlone_config::HotbarBindingToml {
             slot: 1,
             action: "mode.plan".to_string(),
             label: Some("Plan".to_string()),
@@ -876,7 +876,7 @@ mod tests {
         assert_eq!(path, temp_root.join(".codewhale").join("config.toml"));
         let body = fs::read_to_string(&path).expect("written file should be readable");
         assert!(body.contains("[[hotbar]]"), "hotbar table missing: {body}");
-        let parsed: codewhale_config::ConfigToml =
+        let parsed: nestlone_config::ConfigToml =
             toml::from_str(&body).expect("written hotbar config should parse");
         assert_eq!(parsed.hotbar, Some(bindings));
     }
@@ -889,22 +889,22 @@ mod tests {
         fs::create_dir_all(&temp_root).unwrap();
         let _guard = EnvGuard::new(&temp_root);
 
-        let defaults = codewhale_config::default_hotbar_bindings_toml();
-        assert_eq!(defaults.len(), codewhale_config::HOTBAR_SLOT_COUNT as usize);
+        let defaults = nestlone_config::default_hotbar_bindings_toml();
+        assert_eq!(defaults.len(), nestlone_config::HOTBAR_SLOT_COUNT as usize);
 
         let path = persist_hotbar_bindings(None, &defaults).expect("persist should succeed");
         let body = fs::read_to_string(&path).expect("written file should be readable");
         assert!(body.contains("[[hotbar]]"), "hotbar table missing: {body}");
 
-        let parsed: codewhale_config::ConfigToml =
+        let parsed: nestlone_config::ConfigToml =
             toml::from_str(&body).expect("written hotbar config should parse");
         assert_eq!(parsed.hotbar, Some(defaults));
 
         // The persisted defaults resolve back to all eight recommended slots.
-        let resolved = parsed.resolve_hotbar_bindings(&codewhale_config::DEFAULT_HOTBAR_ACTIONS);
+        let resolved = parsed.resolve_hotbar_bindings(&nestlone_config::DEFAULT_HOTBAR_ACTIONS);
         assert_eq!(
             resolved.bindings,
-            codewhale_config::default_hotbar_bindings()
+            nestlone_config::default_hotbar_bindings()
         );
     }
 
@@ -933,7 +933,7 @@ enabled = true
         )
         .unwrap();
 
-        let bindings = vec![codewhale_config::HotbarBindingToml {
+        let bindings = vec![nestlone_config::HotbarBindingToml {
             slot: 2,
             action: "session.compact".to_string(),
             label: Some("Compact".to_string()),
@@ -956,7 +956,7 @@ enabled = true
             body.contains("action = \"session.compact\""),
             "new action missing: {body}"
         );
-        let parsed: codewhale_config::ConfigToml =
+        let parsed: nestlone_config::ConfigToml =
             toml::from_str(&body).expect("written hotbar config should parse");
         assert_eq!(parsed.hotbar, Some(bindings));
     }
@@ -974,7 +974,7 @@ enabled = true
         let body = fs::read_to_string(&written).expect("written file should be readable");
 
         assert!(body.contains("hotbar = []"), "empty hotbar missing: {body}");
-        let parsed: codewhale_config::ConfigToml =
+        let parsed: nestlone_config::ConfigToml =
             toml::from_str(&body).expect("written hotbar config should parse");
         assert_eq!(parsed.hotbar, Some(Vec::new()));
     }
@@ -1050,7 +1050,7 @@ action = "mode.plan"
         persist_status_items(&[crate::config::StatusItem::Mode]).unwrap();
         persist_hotbar_bindings(
             Some(&path),
-            &[codewhale_config::HotbarBindingToml {
+            &[nestlone_config::HotbarBindingToml {
                 slot: 2,
                 action: "session.compact".to_string(),
                 label: None,
@@ -1399,11 +1399,11 @@ slot = 1
                 .expect("the TUI must parse this config");
             let tui_model = tui.default_model();
 
-            let dispatcher = codewhale_config::ConfigStore::load(Some(path.clone()))
+            let dispatcher = nestlone_config::ConfigStore::load(Some(path.clone()))
                 .expect("the dispatcher must parse the same config");
             let runtime = dispatcher
                 .config
-                .resolve_runtime_options(&codewhale_config::CliRuntimeOverrides::default());
+                .resolve_runtime_options(&nestlone_config::CliRuntimeOverrides::default());
 
             assert_eq!(
                 tui_model, *expected,

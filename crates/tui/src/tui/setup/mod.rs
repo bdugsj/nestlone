@@ -30,7 +30,7 @@ use crate::tui::views::{
     render_panel_scroll_rail, render_underwater_surface,
 };
 
-use codewhale_config::{
+use nestlone_config::{
     AutonomyPreference, ConstitutionAuthoring, ConstitutionChoice, ConstitutionSource,
     ConstitutionValidity, InheritedConfigFacts, RuntimePostureSource, SetupState, SetupStep,
     StepEntry, StepStatus, UserConstitution, UserConstitutionLoad,
@@ -440,10 +440,10 @@ impl SetupRuntimeFacts {
             "state={hotbar_state}, configured_slots={configured_hotbar_slots}, active_slots={active_hotbar_slots}, actions={}, warnings={hotbar_warning_count}",
             app.hotbar_actions.len()
         );
-        let codewhale_home = setup_codewhale_home_dir();
-        let persistence = SetupPersistenceFacts::from_app_config(app, config, &codewhale_home);
+        let nestlone_home = setup_nestlone_home_dir();
+        let persistence = SetupPersistenceFacts::from_app_config(app, config, &nestlone_home);
         let tools_mcp =
-            tools_mcp::SetupToolsMcpFacts::from_app_config(app, config, &codewhale_home);
+            tools_mcp::SetupToolsMcpFacts::from_app_config(app, config, &nestlone_home);
         let tools_mcp_servers_result = tools_mcp.servers_result;
         let tools_mcp_skills_result = tools_mcp.skills_result;
         let tools_mcp_tools_result = tools_mcp.tools_result;
@@ -530,8 +530,8 @@ impl SetupRuntimeFacts {
     }
 }
 
-fn setup_codewhale_home_dir() -> std::path::PathBuf {
-    codewhale_config::codewhale_home().unwrap_or_else(|_| {
+fn setup_nestlone_home_dir() -> std::path::PathBuf {
+    nestlone_config::nestlone_home().unwrap_or_else(|_| {
         crate::config::effective_home_dir().map_or_else(
             || std::path::PathBuf::from(".codewhale"),
             |home| home.join(".codewhale"),
@@ -3805,7 +3805,7 @@ fn runtime_preset_diff_rows(preset: SetupRuntimePreset, facts: &SetupRuntimeFact
 }
 
 fn project_runtime_override_warning(workspace: &Path, locale: Locale) -> Option<String> {
-    let outcome = codewhale_config::load_project_config_outcome(workspace);
+    let outcome = nestlone_config::load_project_config_outcome(workspace);
     // A project config that exists but can't be parsed is not the same as no
     // project config: its restrictions are silently not in effect, and the
     // workspace falls back to the user's baseline. Say so here rather than
@@ -4901,7 +4901,7 @@ pub fn persist_user_constitution_choice(
 ) -> anyhow::Result<()> {
     let constitution_path = UserConstitution::path()?;
     let setup_state_path = SetupState::path()?;
-    let mut transaction = codewhale_config::persistence::SetupTransaction::new();
+    let mut transaction = nestlone_config::persistence::SetupTransaction::new();
     transaction.stage_json(constitution_path, &constitution.bounded())?;
     transaction.stage_json(setup_state_path, state)?;
     transaction.commit()
@@ -4984,7 +4984,7 @@ fn inherited_facts_for_app(app: &App, config: &Config) -> InheritedConfigFacts {
 }
 
 fn expert_override_path() -> Option<std::path::PathBuf> {
-    codewhale_config::codewhale_home()
+    nestlone_config::nestlone_home()
         .ok()
         .map(|home| home.join(Path::new(CONSTITUTION_OVERRIDE_FILE)))
 }
@@ -5313,7 +5313,7 @@ mod tests {
             panic!("expected guided constitution preview event");
         };
         assert!(title.contains("Draft for Ratification"));
-        assert!(content.contains("<codewhale_user_constitution"));
+        assert!(content.contains("<nestlone_user_constitution"));
         assert!(content.contains("press G to ratify and save"));
         assert!(content.contains("REDUCED CORE AND OPT-IN MODULES"));
         assert!(content.contains("The bundled core stays active"));
@@ -5514,11 +5514,11 @@ mod tests {
         let tmp = tempfile::TempDir::new().expect("tempdir");
         let workspace = tmp.path().join("workspace");
         std::fs::create_dir_all(&workspace).expect("workspace dir");
-        let codewhale_home = tmp.path().join(".codewhale");
+        let nestlone_home = tmp.path().join(".codewhale");
         let _home = crate::test_support::EnvVarGuard::set("HOME", tmp.path());
         let _userprofile = crate::test_support::EnvVarGuard::set("USERPROFILE", tmp.path());
-        let _codewhale_home =
-            crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", &codewhale_home);
+        let _nestlone_home =
+            crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", &nestlone_home);
         let _deepseek_key = crate::test_support::EnvVarGuard::remove("DEEPSEEK_API_KEY");
         let _nim_key = crate::test_support::EnvVarGuard::remove("NVIDIA_API_KEY");
         let _nim_alt_key = crate::test_support::EnvVarGuard::remove("NVIDIA_NIM_API_KEY");
@@ -5547,11 +5547,11 @@ mod tests {
         let tmp = tempfile::TempDir::new().expect("tempdir");
         let workspace = tmp.path().join("workspace");
         std::fs::create_dir_all(&workspace).expect("workspace dir");
-        let codewhale_home = tmp.path().join(".codewhale");
+        let nestlone_home = tmp.path().join(".codewhale");
         let _home = crate::test_support::EnvVarGuard::set("HOME", tmp.path());
         let _userprofile = crate::test_support::EnvVarGuard::set("USERPROFILE", tmp.path());
-        let _codewhale_home =
-            crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", &codewhale_home);
+        let _nestlone_home =
+            crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", &nestlone_home);
         let _moonshot_key = crate::test_support::EnvVarGuard::remove("MOONSHOT_API_KEY");
         let _kimi_key = crate::test_support::EnvVarGuard::remove("KIMI_API_KEY");
         let config = Config {
@@ -5607,11 +5607,11 @@ mod tests {
         let tmp = tempfile::TempDir::new().expect("tempdir");
         let workspace = tmp.path().join("workspace");
         std::fs::create_dir_all(&workspace).expect("workspace dir");
-        let codewhale_home = tmp.path().join(".codewhale");
+        let nestlone_home = tmp.path().join(".codewhale");
         let _home = crate::test_support::EnvVarGuard::set("HOME", tmp.path());
         let _userprofile = crate::test_support::EnvVarGuard::set("USERPROFILE", tmp.path());
-        let _codewhale_home =
-            crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", &codewhale_home);
+        let _nestlone_home =
+            crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", &nestlone_home);
         let _openai_codex_key =
             crate::test_support::EnvVarGuard::remove("OPENAI_CODEX_ACCESS_TOKEN");
         let _codex_key = crate::test_support::EnvVarGuard::remove("CODEX_ACCESS_TOKEN");
@@ -5641,11 +5641,11 @@ mod tests {
         let tmp = tempfile::TempDir::new().expect("tempdir");
         let workspace = tmp.path().join("workspace");
         std::fs::create_dir_all(&workspace).expect("workspace dir");
-        let codewhale_home = tmp.path().join(".codewhale");
+        let nestlone_home = tmp.path().join(".codewhale");
         let _home = crate::test_support::EnvVarGuard::set("HOME", tmp.path());
         let _userprofile = crate::test_support::EnvVarGuard::set("USERPROFILE", tmp.path());
-        let _codewhale_home =
-            crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", &codewhale_home);
+        let _nestlone_home =
+            crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", &nestlone_home);
         let _deepseek_key = crate::test_support::EnvVarGuard::remove("DEEPSEEK_API_KEY");
         let _deepseek_source = crate::test_support::EnvVarGuard::remove("DEEPSEEK_API_KEY_SOURCE");
 
@@ -5783,11 +5783,11 @@ mod tests {
         let tmp = tempfile::TempDir::new().expect("tempdir");
         let workspace = tmp.path().join("workspace");
         std::fs::create_dir_all(&workspace).expect("workspace dir");
-        let codewhale_home = tmp.path().join(".codewhale");
+        let nestlone_home = tmp.path().join(".codewhale");
         let _home = crate::test_support::EnvVarGuard::set("HOME", tmp.path());
         let _userprofile = crate::test_support::EnvVarGuard::set("USERPROFILE", tmp.path());
-        let _codewhale_home =
-            crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", &codewhale_home);
+        let _nestlone_home =
+            crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", &nestlone_home);
         let config = Config {
             provider: Some("openrouter".to_string()),
             ..Config::default()
@@ -5815,11 +5815,11 @@ mod tests {
         let tmp = tempfile::TempDir::new().expect("tempdir");
         let workspace = tmp.path().join("workspace");
         std::fs::create_dir_all(&workspace).expect("workspace dir");
-        let codewhale_home = tmp.path().join(".codewhale");
+        let nestlone_home = tmp.path().join(".codewhale");
         let _home = crate::test_support::EnvVarGuard::set("HOME", tmp.path());
         let _userprofile = crate::test_support::EnvVarGuard::set("USERPROFILE", tmp.path());
-        let _codewhale_home =
-            crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", &codewhale_home);
+        let _nestlone_home =
+            crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", &nestlone_home);
         let mut custom = std::collections::HashMap::new();
         custom.insert(
             "lm-studio".to_string(),
@@ -6129,7 +6129,7 @@ mod tests {
         assert!(title.contains("Draft for Ratification"));
         assert!(content.contains("Drafted by GLM-5.2"));
         assert!(content.contains("A GLM-5.2 user shipping Rust."));
-        assert!(content.contains("<codewhale_user_constitution"));
+        assert!(content.contains("<nestlone_user_constitution"));
 
         // The install satisfied the preview gate; G ratifies the model draft.
         let action = view.handle_key(key(KeyCode::Char('g')));
@@ -6360,13 +6360,13 @@ mod tests {
             &DraftProvenance::Guided,
         );
 
-        assert!(english.contains("<codewhale_user_constitution"));
+        assert!(english.contains("<nestlone_user_constitution"));
         assert!(english.contains("Layer order"));
         assert!(english.contains("press G to ratify and save"));
         // Framing: powers and limits, not case-by-case; continuity, not memory.
         assert!(english.contains("powers and limits rather than deciding every case"));
         assert!(english.contains("but it is not memory"));
-        assert!(zh_hans.contains("<codewhale_user_constitution"));
+        assert!(zh_hans.contains("<nestlone_user_constitution"));
         assert!(zh_hans.contains("按 G 确认并保存"));
         assert!(zh_hans.contains("它界定协作方式与行为边界"));
         assert!(zh_hans.contains("但它不是记忆"));
@@ -6757,7 +6757,7 @@ mod tests {
         assert!(content.contains("shown unchanged"), "{content}");
         assert!(content.contains("press K to keep it"), "{content}");
         assert!(
-            content.contains("<codewhale_user_constitution"),
+            content.contains("<nestlone_user_constitution"),
             "{content}"
         );
 
@@ -6885,11 +6885,11 @@ mod tests {
         let tmp = tempfile::TempDir::new().expect("tempdir");
         let workspace = tmp.path().join("workspace");
         std::fs::create_dir_all(&workspace).expect("workspace");
-        let codewhale_home = tmp.path().join(".codewhale");
+        let nestlone_home = tmp.path().join(".codewhale");
         let _home = crate::test_support::EnvVarGuard::set("HOME", tmp.path());
         let _userprofile = crate::test_support::EnvVarGuard::set("USERPROFILE", tmp.path());
-        let _codewhale_home =
-            crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", &codewhale_home);
+        let _nestlone_home =
+            crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", &nestlone_home);
         let _deepseek_env = crate::test_support::EnvVarGuard::remove("DEEPSEEK_API_KEY");
         let config = Config {
             api_key: Some("saved-deepseek-key".to_string()),
@@ -6962,11 +6962,11 @@ mod tests {
         let tmp = tempfile::TempDir::new().expect("tempdir");
         let workspace = tmp.path().join("workspace");
         std::fs::create_dir_all(&workspace).expect("workspace dir");
-        let codewhale_home = tmp.path().join(".codewhale");
+        let nestlone_home = tmp.path().join(".codewhale");
         let _home = crate::test_support::EnvVarGuard::set("HOME", tmp.path());
         let _userprofile = crate::test_support::EnvVarGuard::set("USERPROFILE", tmp.path());
-        let _codewhale_home =
-            crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", &codewhale_home);
+        let _nestlone_home =
+            crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", &nestlone_home);
 
         let mut config = Config {
             api_key: Some("sk-runtime-posture-secret".to_string()),
@@ -7069,7 +7069,7 @@ mod tests {
     #[test]
     fn runtime_posture_detail_lines_warn_about_project_overrides() {
         let tmp = tempfile::TempDir::new().expect("workspace");
-        let project_dir = tmp.path().join(codewhale_config::CODEWHALE_APP_DIR);
+        let project_dir = tmp.path().join(nestlone_config::CODEWHALE_APP_DIR);
         std::fs::create_dir_all(&project_dir).expect("project config dir");
         std::fs::write(
             project_dir.join("config.toml"),

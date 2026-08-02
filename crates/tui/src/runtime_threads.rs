@@ -50,7 +50,7 @@ use crate::tools::plan::new_shared_plan_state;
 use crate::tools::subagent::SubAgentStatus;
 use crate::tools::todo::new_shared_todo_list;
 use crate::tui::app::AppMode;
-use codewhale_protocol::runtime::{
+use nestlone_protocol::runtime::{
     DynamicToolCallContent, DynamicToolCallParams, DynamicToolCallResult, DynamicToolSpec,
     TurnEnvironmentParams,
 };
@@ -321,7 +321,7 @@ where
             if value.len() == 64 && value.bytes().all(|byte| byte.is_ascii_hexdigit()) {
                 value.to_ascii_lowercase()
             } else {
-                codewhale_config::catalog::base_url_fingerprint(value)
+                nestlone_config::catalog::base_url_fingerprint(value)
             }
         })
         .collect::<Vec<_>>()
@@ -621,7 +621,7 @@ impl TurnRecord {
 }
 
 fn routed_usage_source_fingerprint(source_id: &str) -> String {
-    codewhale_config::catalog::base_url_fingerprint(source_id.trim())
+    nestlone_config::catalog::base_url_fingerprint(source_id.trim())
 }
 
 /// The only mutation path for routed provider usage. Every source is recorded
@@ -1812,7 +1812,7 @@ fn resolve_runtime_thread_route_for_identity(
 fn runtime_compaction_config(
     provider: ApiProvider,
     model: &str,
-    route_limits: Option<codewhale_config::route::RouteLimits>,
+    route_limits: Option<nestlone_config::route::RouteLimits>,
     auto_compact: bool,
     auto_compact_explicit: bool,
     threshold_percent: f64,
@@ -5434,7 +5434,7 @@ impl RuntimeThreadManager {
                 notes_path: cfg.notes_path(),
                 mcp_config_path: cfg.mcp_config_path(),
                 skills_dir: cfg.skills_dir(),
-                skills_scan_codewhale_only: cfg.skills_config().scan_codewhale_only(),
+                skills_scan_nestlone_only: cfg.skills_config().scan_nestlone_only(),
                 instructions: cfg
                     .instructions_paths()
                     .into_iter()

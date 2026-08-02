@@ -466,7 +466,7 @@ impl RepoConstitution {
             }
         }
         format!(
-            "<codewhale_repo_constitution source=\"{}\">\nCodewhale-specific repo authority policy (local law: subordinate to the global Constitution and the current user request, but above memory and old handoffs; WHALE.md is ignored and should be migrated, not treated as law).\n\n{}</codewhale_repo_constitution>",
+            "<nestlone_repo_constitution source=\"{}\">\nCodewhale-specific repo authority policy (local law: subordinate to the global Constitution and the current user request, but above memory and old handoffs; WHALE.md is ignored and should be migrated, not treated as law).\n\n{}</nestlone_repo_constitution>",
             source.display(),
             body.trim_end()
         )
@@ -1856,7 +1856,7 @@ mod tests {
             .constitution_block
             .as_deref()
             .expect("constitution block rendered");
-        assert!(block.contains("<codewhale_repo_constitution"));
+        assert!(block.contains("<nestlone_repo_constitution"));
         assert!(block.contains("current user request"));
         assert!(block.contains("run focused tests"));
         assert!(block.contains("keep the tool-catalog head byte-stable"));
@@ -1874,7 +1874,7 @@ mod tests {
         assert!(
             ctx.as_system_block()
                 .expect("system block")
-                .contains("codewhale_repo_constitution")
+                .contains("nestlone_repo_constitution")
         );
     }
 
@@ -2370,14 +2370,14 @@ mod tests {
     }
 
     #[test]
-    fn test_codewhale_specific_path_wins_over_agents_path() {
+    fn test_nestlone_specific_path_wins_over_agents_path() {
         let workspace = tempdir().expect("workspace tempdir");
         let home = tempdir().expect("home tempdir");
 
-        let codewhale_dir = home.path().join(".codewhale");
-        fs::create_dir(&codewhale_dir).expect("mkdir .codewhale");
-        let codewhale_agents = codewhale_dir.join("AGENTS.md");
-        fs::write(&codewhale_agents, "Codewhale-specific instructions")
+        let nestlone_dir = home.path().join(".codewhale");
+        fs::create_dir(&nestlone_dir).expect("mkdir .codewhale");
+        let nestlone_agents = nestlone_dir.join("AGENTS.md");
+        fs::write(&nestlone_agents, "Codewhale-specific instructions")
             .expect("write codewhale agents");
 
         let agents_dir = home.path().join(".agents");
@@ -2397,7 +2397,7 @@ mod tests {
             !instructions.contains("Vendor-neutral instructions"),
             "lower-priority .agents file should be skipped:\n{instructions}"
         );
-        assert_eq!(ctx.source_path, Some(codewhale_agents));
+        assert_eq!(ctx.source_path, Some(nestlone_agents));
     }
 
     #[test]
@@ -2405,9 +2405,9 @@ mod tests {
         let workspace = tempdir().expect("workspace tempdir");
         let home = tempdir().expect("home tempdir");
 
-        let codewhale_dir = home.path().join(".codewhale");
-        fs::create_dir(&codewhale_dir).expect("mkdir .codewhale");
-        fs::write(codewhale_dir.join("WHALE.md"), "Global WHALE legacy")
+        let nestlone_dir = home.path().join(".codewhale");
+        fs::create_dir(&nestlone_dir).expect("mkdir .codewhale");
+        fs::write(nestlone_dir.join("WHALE.md"), "Global WHALE legacy")
             .expect("write codewhale whale");
 
         let agents_dir = home.path().join(".agents");
@@ -2442,9 +2442,9 @@ mod tests {
         let workspace = tempdir().expect("workspace tempdir");
         let home = tempdir().expect("home tempdir");
 
-        let codewhale_dir = home.path().join(".codewhale");
-        fs::create_dir(&codewhale_dir).expect("mkdir .codewhale");
-        let global_whale = codewhale_dir.join("WHALE.md");
+        let nestlone_dir = home.path().join(".codewhale");
+        fs::create_dir(&nestlone_dir).expect("mkdir .codewhale");
+        let global_whale = nestlone_dir.join("WHALE.md");
         fs::write(&global_whale, "Global WHALE legacy").expect("write codewhale whale");
 
         let ctx = load_project_context_with_parents_and_home(workspace.path(), Some(home.path()));
@@ -2471,11 +2471,11 @@ mod tests {
         let workspace = tempdir().expect("workspace tempdir");
         let home = tempdir().expect("home tempdir");
 
-        let codewhale_dir = home.path().join(".codewhale");
-        fs::create_dir(&codewhale_dir).expect("mkdir .codewhale");
-        fs::write(codewhale_dir.join("WHALE.md"), "Global WHALE legacy")
+        let nestlone_dir = home.path().join(".codewhale");
+        fs::create_dir(&nestlone_dir).expect("mkdir .codewhale");
+        fs::write(nestlone_dir.join("WHALE.md"), "Global WHALE legacy")
             .expect("write codewhale whale");
-        let global_instructions = codewhale_dir.join("instructions.md");
+        let global_instructions = nestlone_dir.join("instructions.md");
         fs::write(&global_instructions, "Global instructions body")
             .expect("write global instructions");
 
@@ -2507,12 +2507,12 @@ mod tests {
         let workspace = tempdir().expect("workspace tempdir");
         let home = tempdir().expect("home tempdir");
 
-        let codewhale_dir = home.path().join(".codewhale");
-        fs::create_dir(&codewhale_dir).expect("mkdir .codewhale");
-        let global_agents = codewhale_dir.join("AGENTS.md");
+        let nestlone_dir = home.path().join(".codewhale");
+        fs::create_dir(&nestlone_dir).expect("mkdir .codewhale");
+        let global_agents = nestlone_dir.join("AGENTS.md");
         fs::write(&global_agents, "Global AGENTS canonical").expect("write global agents");
         fs::write(
-            codewhale_dir.join("instructions.md"),
+            nestlone_dir.join("instructions.md"),
             "Global instructions body",
         )
         .expect("write global instructions");
@@ -2630,7 +2630,7 @@ mod tests {
     // ── Rules directory auto-discovery tests ──
 
     #[test]
-    fn rules_from_codewhale_dir_are_loaded_as_project_context() {
+    fn rules_from_nestlone_dir_are_loaded_as_project_context() {
         let tmp = tempdir().expect("tempdir");
         let rules_dir = tmp.path().join(".codewhale/rules");
         fs::create_dir_all(&rules_dir).expect("mkdir rules");
@@ -2836,11 +2836,11 @@ mod tests {
     #[test]
     fn rules_from_both_dirs_are_loaded_together() {
         let tmp = tempdir().expect("tempdir");
-        let codewhale_rules = tmp.path().join(".codewhale/rules");
+        let nestlone_rules = tmp.path().join(".codewhale/rules");
         let claude_rules = tmp.path().join(".claude/rules");
-        fs::create_dir_all(&codewhale_rules).expect("mkdir codewhale rules");
+        fs::create_dir_all(&nestlone_rules).expect("mkdir codewhale rules");
         fs::create_dir_all(&claude_rules).expect("mkdir claude rules");
-        fs::write(codewhale_rules.join("cw.md"), "codewhale-rule").expect("write");
+        fs::write(nestlone_rules.join("cw.md"), "codewhale-rule").expect("write");
         fs::write(claude_rules.join("claude.md"), "claude-rule").expect("write");
 
         let ctx = load_project_context(tmp.path());

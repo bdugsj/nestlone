@@ -1367,7 +1367,7 @@ fn control_plane_url(
 }
 
 fn load_persisted_enrollment() -> Result<Option<PersistedEnrollment>, String> {
-    let Some(raw) = codewhale_secrets::Secrets::auto_detect()
+    let Some(raw) = nestlone_secrets::Secrets::auto_detect()
         .get(ENROLLMENT_SECRET_SLOT)
         .map_err(|error| format!("Could not read the saved remote-control enrollment: {error}"))?
     else {
@@ -1381,13 +1381,13 @@ fn load_persisted_enrollment() -> Result<Option<PersistedEnrollment>, String> {
 fn save_persisted_enrollment(enrollment: &PersistedEnrollment) -> Result<(), String> {
     let raw = serde_json::to_string(enrollment)
         .map_err(|_| "Could not encode the remote-control enrollment.".to_string())?;
-    codewhale_secrets::Secrets::auto_detect()
+    nestlone_secrets::Secrets::auto_detect()
         .set(ENROLLMENT_SECRET_SLOT, &raw)
         .map_err(|error| format!("Could not securely save the remote-control enrollment: {error}"))
 }
 
 fn delete_persisted_enrollment() {
-    if let Err(error) = codewhale_secrets::Secrets::auto_detect().delete(ENROLLMENT_SECRET_SLOT) {
+    if let Err(error) = nestlone_secrets::Secrets::auto_detect().delete(ENROLLMENT_SECRET_SLOT) {
         tracing::warn!("could not delete revoked remote-control enrollment: {error}");
     }
 }

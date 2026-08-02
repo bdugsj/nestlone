@@ -44,7 +44,7 @@ struct ToolLifecycleWorld {
 }
 
 #[given("an offline CodeWhale workspace containing:")]
-fn offline_codewhale_workspace_containing(world: &mut ToolLifecycleWorld, step: &Step) {
+fn offline_nestlone_workspace_containing(world: &mut ToolLifecycleWorld, step: &Step) {
     let workspace = TempDir::new().expect("workspace tempdir");
     let home = TempDir::new().expect("home tempdir");
 
@@ -105,7 +105,7 @@ fn mocked_llm_will_answer_after_tool_result(world: &mut ToolLifecycleWorld, step
 #[when(regex = r#"^the user asks "([^"]+)"$"#)]
 async fn user_asks(world: &mut ToolLifecycleWorld, prompt: String) {
     let server = start_mock_llm(world).await;
-    let output = run_codewhale_exec(world, &server, &prompt);
+    let output = run_nestlone_exec(world, &server, &prompt);
 
     world.prompt = Some(prompt);
     world.stdout = String::from_utf8_lossy(&output.stdout).into_owned();
@@ -134,7 +134,7 @@ async fn user_asks(world: &mut ToolLifecycleWorld, prompt: String) {
 }
 
 #[then("CodeWhale should send the user request to the mocked LLM")]
-fn codewhale_should_send_user_request_to_mocked_llm(world: &mut ToolLifecycleWorld) {
+fn nestlone_should_send_user_request_to_mocked_llm(world: &mut ToolLifecycleWorld) {
     let first_request = world
         .requests
         .first()
@@ -193,7 +193,7 @@ fn public_tool_result_should_return_directory_entries(world: &mut ToolLifecycleW
 }
 
 #[then("CodeWhale should send the tool result back to the mocked LLM")]
-fn codewhale_should_send_tool_result_back_to_mocked_llm(world: &mut ToolLifecycleWorld) {
+fn nestlone_should_send_tool_result_back_to_mocked_llm(world: &mut ToolLifecycleWorld) {
     let request = world
         .requests
         .iter()
@@ -235,7 +235,7 @@ fn public_tool_result_should_report_error_for(world: &mut ToolLifecycleWorld, to
 }
 
 #[then("CodeWhale should send the tool error back to the mocked LLM")]
-fn codewhale_should_send_tool_error_back_to_mocked_llm(world: &mut ToolLifecycleWorld) {
+fn nestlone_should_send_tool_error_back_to_mocked_llm(world: &mut ToolLifecycleWorld) {
     let request = world
         .requests
         .iter()
@@ -291,7 +291,7 @@ fn public_tool_result_should_report_malformed_arguments_for(
 }
 
 #[then("CodeWhale should send the malformed argument error back to the mocked LLM")]
-fn codewhale_should_send_malformed_argument_error_back_to_mocked_llm(
+fn nestlone_should_send_malformed_argument_error_back_to_mocked_llm(
     world: &mut ToolLifecycleWorld,
 ) {
     let request = world
@@ -337,7 +337,7 @@ fn public_tool_result_should_report_real_error(
 }
 
 #[then("CodeWhale should send the real tool error back to the mocked LLM")]
-fn codewhale_should_send_real_tool_error_back_to_mocked_llm(world: &mut ToolLifecycleWorld) {
+fn nestlone_should_send_real_tool_error_back_to_mocked_llm(world: &mut ToolLifecycleWorld) {
     let request = world
         .requests
         .iter()
@@ -367,7 +367,7 @@ fn public_tool_result_should_be_an_empty_list(world: &mut ToolLifecycleWorld) {
 }
 
 #[then("CodeWhale should send the empty tool result back to the mocked LLM")]
-fn codewhale_should_send_empty_tool_result_back_to_mocked_llm(world: &mut ToolLifecycleWorld) {
+fn nestlone_should_send_empty_tool_result_back_to_mocked_llm(world: &mut ToolLifecycleWorld) {
     let request = world
         .requests
         .iter()
@@ -536,7 +536,7 @@ async fn start_mock_llm(world: &ToolLifecycleWorld) -> MockServer {
     server
 }
 
-fn run_codewhale_exec(
+fn run_nestlone_exec(
     world: &ToolLifecycleWorld,
     server: &MockServer,
     prompt: &str,
@@ -549,7 +549,7 @@ fn run_codewhale_exec(
         .to_path_buf();
     let home = world.home.as_ref().expect("home").path().to_path_buf();
 
-    let mut command = Command::new(codewhale_tui_binary());
+    let mut command = Command::new(nestlone_tui_binary());
     preserve_host_env(&mut command);
     command
         .current_dir(&workspace)
@@ -929,7 +929,7 @@ fn row_value(row: &[(String, String)], header: &str) -> String {
         .unwrap_or_else(|| panic!("data table row missing {header} value"))
 }
 
-fn codewhale_tui_binary() -> PathBuf {
+fn nestlone_tui_binary() -> PathBuf {
     if let Some(path) = option_env!("CARGO_BIN_EXE_codewhale-tui") {
         return PathBuf::from(path);
     }

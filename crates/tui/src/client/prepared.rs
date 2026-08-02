@@ -26,7 +26,7 @@
 use serde::Serialize;
 use serde_json::Value;
 
-use codewhale_config::provider::WireFormat;
+use nestlone_config::provider::WireFormat;
 
 use crate::config::ApiProvider;
 

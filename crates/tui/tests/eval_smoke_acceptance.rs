@@ -32,7 +32,7 @@ struct EvalSmokeWorld {
 }
 
 #[given("a clean CodeWhale evaluation workspace")]
-fn clean_codewhale_evaluation_workspace(world: &mut EvalSmokeWorld) {
+fn clean_nestlone_evaluation_workspace(world: &mut EvalSmokeWorld) {
     world._record_dir = Some(TempDir::new().expect("evaluation TempDir"));
 }
 
@@ -43,7 +43,7 @@ fn eval_harness_runs_shell_command(world: &mut EvalSmokeWorld) {
         .as_ref()
         .expect("evaluation workspace should exist");
 
-    let output = Command::new(codewhale_tui_binary())
+    let output = Command::new(nestlone_tui_binary())
         .args([
             "eval",
             "--json",
@@ -176,7 +176,7 @@ fn assert_no_signal_crash(status: &ExitStatus) {
 #[cfg(not(unix))]
 fn assert_no_signal_crash(_status: &ExitStatus) {}
 
-fn codewhale_tui_binary() -> PathBuf {
+fn nestlone_tui_binary() -> PathBuf {
     if let Some(path) = option_env!("CARGO_BIN_EXE_codewhale-tui") {
         return PathBuf::from(path);
     }

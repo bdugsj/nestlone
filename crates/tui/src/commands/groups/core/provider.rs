@@ -733,9 +733,9 @@ mod tests {
     #[test]
     fn provider_fallback_status_and_reset_use_configured_chain() {
         let mut app = create_test_app();
-        app.provider_chain = Some(codewhale_config::ProviderChain::new(
-            codewhale_config::ProviderKind::Deepseek,
-            &[codewhale_config::ProviderKind::Openrouter],
+        app.provider_chain = Some(nestlone_config::ProviderChain::new(
+            nestlone_config::ProviderKind::Deepseek,
+            &[nestlone_config::ProviderKind::Openrouter],
         ));
 
         let status = provider(&mut app, Some("fallback"));
@@ -765,9 +765,9 @@ mod tests {
         let _lock = lock_test_env();
         let mut app = create_test_app();
         app.api_provider = ApiProvider::Deepseek;
-        app.provider_chain = Some(codewhale_config::ProviderChain::new(
-            codewhale_config::ProviderKind::Deepseek,
-            &[codewhale_config::ProviderKind::Openrouter],
+        app.provider_chain = Some(nestlone_config::ProviderChain::new(
+            nestlone_config::ProviderKind::Deepseek,
+            &[nestlone_config::ProviderKind::Openrouter],
         ));
         // Simulate having already fallen back to the secondary provider.
         // (Openrouter is treated as ready by default — no readiness snapshot.)

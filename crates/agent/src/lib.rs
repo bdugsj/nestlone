@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use codewhale_config::{ProviderKind, opencode_go_chat_model_id};
+use nestlone_config::{ProviderKind, opencode_go_chat_model_id};
 use serde::{Deserialize, Serialize};
 
 /// High-level model family used for shared identity affordances across clients.

@@ -61,7 +61,7 @@ impl Fixture {
     }
 
     fn command(&self) -> Command {
-        let mut command = Command::new(codewhale_binary());
+        let mut command = Command::new(nestlone_binary());
         command
             .env_clear()
             .env("PATH", std::env::var("PATH").unwrap_or_default())
@@ -122,7 +122,7 @@ impl Fixture {
     }
 }
 
-fn codewhale_binary() -> PathBuf {
+fn nestlone_binary() -> PathBuf {
     if let Some(path) = option_env!("CARGO_BIN_EXE_codewhale") {
         return PathBuf::from(path);
     }

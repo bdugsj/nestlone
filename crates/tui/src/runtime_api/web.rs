@@ -18,7 +18,7 @@ const BOOTSTRAP_TTL: Duration = Duration::from_secs(120);
 const WEB_SESSION_TTL: Duration = Duration::from_secs(12 * 60 * 60);
 const BOOTSTRAP_PREFIX: &str = "cwwb_";
 const WEB_SESSION_PREFIX: &str = "cwws_";
-const WEB_SESSION_COOKIE_NAME: &str = "codewhale_web_session";
+const WEB_SESSION_COOKIE_NAME: &str = "nestlone_web_session";
 const CONTENT_SECURITY_POLICY: &str = "default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'; object-src 'none'";
 
 #[derive(Clone)]
@@ -268,7 +268,7 @@ mod tests {
             "the same process-local session remains valid across a page reload"
         );
         assert!(!state.matches_session_cookie(Some(
-            "codewhale_web_session=cwws_0000000000000000000000000000000000000000000000000000000000000000"
+            "nestlone_web_session=cwws_0000000000000000000000000000000000000000000000000000000000000000"
         )));
 
         let (expired, _nonce) =
@@ -313,7 +313,7 @@ mod tests {
         let cookie = web_session_cookie(&session_token);
         assert_eq!(
             cookie,
-            format!("codewhale_web_session={session_token}; HttpOnly; SameSite=Strict; Path=/")
+            format!("nestlone_web_session={session_token}; HttpOnly; SameSite=Strict; Path=/")
         );
         assert!(!cookie.contains(runtime_bearer));
         assert!(!cookie.contains("Domain="));
@@ -335,7 +335,7 @@ mod tests {
         for asset in [WEB_HTML, WEB_JS] {
             assert!(!asset.contains("localStorage"));
             assert!(!asset.contains("sessionStorage"));
-            assert!(!asset.contains("codewhale_runtime_token"));
+            assert!(!asset.contains("nestlone_runtime_token"));
             assert!(!asset.contains("innerHTML"));
             assert!(!asset.contains("http://"));
             assert!(!asset.contains("https://"));

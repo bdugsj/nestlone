@@ -12,18 +12,18 @@ use std::process::Command;
 use anyhow::{Context, Result, anyhow, bail};
 use clap::{Args, CommandFactory, Parser, Subcommand, ValueEnum};
 use clap_complete::{Shell, generate};
-use codewhale_agent::ModelRegistry;
-use codewhale_app_server::{
+use nestlone_agent::ModelRegistry;
+use nestlone_app_server::{
     AppServerOptions, run as run_app_server, run_stdio as run_app_server_stdio,
 };
-use codewhale_config::{
+use nestlone_config::{
     CliRuntimeOverrides, ConfigStore, ConfigToml, ProviderKind, ProviderSource,
     ResolvedRuntimeOptions, RuntimeApiKeySource, provider_base_url_is_official,
 };
-use codewhale_execpolicy::{AskForApproval, ExecPolicyContext, ExecPolicyEngine};
-use codewhale_mcp::{McpServerDefinition, run_stdio_server};
-use codewhale_secrets::Secrets;
-use codewhale_state::{StateStore, ThreadListFilters};
+use nestlone_execpolicy::{AskForApproval, ExecPolicyContext, ExecPolicyEngine};
+use nestlone_mcp::{McpServerDefinition, run_stdio_server};
+use nestlone_secrets::Secrets;
+use nestlone_state::{StateStore, ThreadListFilters};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, ValueEnum)]
 enum ProviderArg {
@@ -698,7 +698,7 @@ struct LaneStartRequest {
 }
 
 fn start_lane(request: LaneStartRequest) -> Result<()> {
-    use codewhale_lane::{
+    use nestlone_lane::{
         LaneRegistry, LaneStartSpec, RuntimeBackendKind, WorktreeProvision, resolve_backend,
     };
 
@@ -767,9 +767,9 @@ fn start_lane(request: LaneStartRequest) -> Result<()> {
 /// Print one shared control receipt on the CLI surface.
 ///
 /// The CLI does not format Lane control results itself: it renders the same
-/// [`codewhale_lane::ControlReceipt`] the slash command and hotbar render, so
+/// [`nestlone_lane::ControlReceipt`] the slash command and hotbar render, so
 /// the three surfaces cannot drift in what they report (#1888).
-fn emit_control_receipt(receipt: &codewhale_lane::ControlReceipt, json: bool) -> Result<()> {
+fn emit_control_receipt(receipt: &nestlone_lane::ControlReceipt, json: bool) -> Result<()> {
     if json {
         // v0.9.2 compatibility: `lane list --json` has always emitted an array
         // of `LaneRecord`, and `lane status --json` a single one. Scripts
@@ -777,10 +777,10 @@ fn emit_control_receipt(receipt: &codewhale_lane::ControlReceipt, json: bool) ->
         // receipt does not replace it. The receipt is what every other verb
         // emits, and what the human renderer shows for these two.
         match receipt.operation {
-            codewhale_lane::ControlOperation::LaneList => {
+            nestlone_lane::ControlOperation::LaneList => {
                 println!("{}", serde_json::to_string_pretty(&receipt.lane_records)?);
             }
-            codewhale_lane::ControlOperation::LaneStatus => match receipt.lane_records.first() {
+            nestlone_lane::ControlOperation::LaneStatus => match receipt.lane_records.first() {
                 Some(record) => println!("{}", serde_json::to_string_pretty(record)?),
                 // Legacy behaviour for an unknown id: `reg.load()` failed, so
                 // the command errored on stderr and printed *nothing* on
@@ -809,12 +809,12 @@ fn emit_control_receipt(receipt: &codewhale_lane::ControlReceipt, json: bool) ->
 }
 
 fn run_lane_control(
-    operation: codewhale_lane::ControlOperation,
+    operation: nestlone_lane::ControlOperation,
     lane_id: Option<&str>,
     json: bool,
 ) -> Result<()> {
-    let receipt = codewhale_lane::control::execute_lane_control(
-        codewhale_lane::ControlSurface::Cli,
+    let receipt = nestlone_lane::control::execute_lane_control(
+        nestlone_lane::ControlSurface::Cli,
         operation,
         lane_id,
     );
@@ -822,7 +822,7 @@ fn run_lane_control(
 }
 
 fn run_lane_command(args: LaneArgs) -> Result<()> {
-    use codewhale_lane::{ControlOperation, LaneRegistry, backend_for};
+    use nestlone_lane::{ControlOperation, LaneRegistry, backend_for};
     use std::io::{BufRead, Seek, Write};
     use std::process::Command;
     use std::thread;
@@ -967,7 +967,7 @@ fn run_lane_command(args: LaneArgs) -> Result<()> {
 }
 
 fn run_lane_log_proxy_command(args: LaneLogProxyArgs) -> Result<()> {
-    let exit_code = codewhale_lane::run_lane_log_proxy(codewhale_lane::LaneLogProxySpec {
+    let exit_code = nestlone_lane::run_lane_log_proxy(nestlone_lane::LaneLogProxySpec {
         command: args.command,
         log_path: args.log_path,
         receipt_path: args.receipt_path,
@@ -1012,7 +1012,7 @@ fn run_workflow_command(
             };
 
             let roots = named_fleet_search_roots(&workspace);
-            let named_fleet = codewhale_workflow::load_named_fleet(&fleet, &roots)
+            let named_fleet = nestlone_workflow::load_named_fleet(&fleet, &roots)
                 .with_context(|| format!("load fleet `{fleet}` from {}", display_roots(&roots)))?;
             if workflow == "stopship" || fleet == "stopship" || fleet == "v0868-stopship" {
                 named_fleet
@@ -1144,10 +1144,10 @@ fn validate_workflow_source_file(path: &Path) -> Result<()> {
     {
         let identifier = path.display().to_string();
         if path.extension().and_then(|ext| ext.to_str()) == Some("ts") {
-            codewhale_workflow::compile_typescript_workflow(&identifier, &source)
+            nestlone_workflow::compile_typescript_workflow(&identifier, &source)
                 .with_context(|| format!("parse declarative Workflow {}", path.display()))?;
         } else {
-            codewhale_workflow::compile_javascript_workflow(&identifier, &source)
+            nestlone_workflow::compile_javascript_workflow(&identifier, &source)
                 .with_context(|| format!("parse declarative Workflow {}", path.display()))?;
         }
     }
@@ -1156,7 +1156,7 @@ fn validate_workflow_source_file(path: &Path) -> Result<()> {
 
 fn named_fleet_search_roots(workspace: &Path) -> Vec<PathBuf> {
     let mut roots = Vec::new();
-    if let Ok(home) = codewhale_config::codewhale_home() {
+    if let Ok(home) = nestlone_config::nestlone_home() {
         roots.push(home);
     }
     roots.push(workspace.to_path_buf());
@@ -1961,7 +1961,7 @@ fn run_login_command_with_secrets(
     let destination = if secret_store_saved {
         secrets.backend_name().to_string()
     } else {
-        codewhale_config::quote_os_path(store.path())
+        nestlone_config::quote_os_path(store.path())
     };
     if provider == ProviderKind::Deepseek {
         println!("logged in using API key mode (deepseek); saved key to {destination}");
@@ -1979,7 +1979,7 @@ fn run_logout_command(store: &mut ConfigStore) -> Result<()> {
 }
 
 fn run_logout_command_with_secrets(store: &mut ConfigStore, secrets: &Secrets) -> Result<()> {
-    codewhale_config::with_xai_oauth_revocation_transaction(|| {
+    nestlone_config::with_xai_oauth_revocation_transaction(|| {
         run_logout_command_with_secrets_unlocked(store, secrets)
     })
 }
@@ -2024,7 +2024,7 @@ fn provider_slot(provider: ProviderKind) -> &'static str {
 #[cfg(test)]
 fn no_keyring_secrets() -> Secrets {
     Secrets::new(std::sync::Arc::new(
-        codewhale_secrets::InMemoryKeyringStore::new(),
+        nestlone_secrets::InMemoryKeyringStore::new(),
     ))
 }
 
@@ -2070,7 +2070,7 @@ fn persist_provider_api_key(
     api_key: &str,
 ) -> Result<bool> {
     if provider == ProviderKind::Xai {
-        return codewhale_config::with_xai_oauth_revocation_transaction(|| {
+        return nestlone_config::with_xai_oauth_revocation_transaction(|| {
             persist_provider_api_key_unlocked(store, secrets, provider, api_key)
         });
     }
@@ -2133,7 +2133,7 @@ fn persist_provider_api_key_unlocked(
         }
         return Err(error);
     }
-    codewhale_config::scrub_plaintext_api_keys_from_config_backup(store.path())?;
+    nestlone_config::scrub_plaintext_api_keys_from_config_backup(store.path())?;
     Ok(secret_store_saved)
 }
 
@@ -2192,7 +2192,7 @@ fn openai_codex_auth_file_path() -> PathBuf {
     if let Ok(path) = std::env::var("OPENAI_CODEX_AUTH_FILE") {
         let path = PathBuf::from(path);
         if !path.as_os_str().is_empty() {
-            return codewhale_config::resolve_external_credential_path(&path).unwrap_or(path);
+            return nestlone_config::resolve_external_credential_path(&path).unwrap_or(path);
         }
     }
 
@@ -2204,7 +2204,7 @@ fn openai_codex_auth_file_path() -> PathBuf {
                 .join(".codex")
         });
     let path = codex_home.join("auth.json");
-    codewhale_config::resolve_external_credential_path(&path).unwrap_or(path)
+    nestlone_config::resolve_external_credential_path(&path).unwrap_or(path)
 }
 
 fn grok_auth_file_path() -> PathBuf {
@@ -2212,7 +2212,7 @@ fn grok_auth_file_path() -> PathBuf {
         if let Ok(path) = std::env::var(key) {
             let path = PathBuf::from(path.trim());
             if !path.as_os_str().is_empty() {
-                return codewhale_config::resolve_external_credential_path(&path).unwrap_or(path);
+                return nestlone_config::resolve_external_credential_path(&path).unwrap_or(path);
             }
         }
     }
@@ -2220,27 +2220,27 @@ fn grok_auth_file_path() -> PathBuf {
         let home = PathBuf::from(home.trim());
         if !home.as_os_str().is_empty() {
             let path = home.join("auth.json");
-            return codewhale_config::resolve_external_credential_path(&path).unwrap_or(path);
+            return nestlone_config::resolve_external_credential_path(&path).unwrap_or(path);
         }
     }
     let path = dirs::home_dir()
         .unwrap_or_else(|| PathBuf::from("."))
         .join(".grok")
         .join("auth.json");
-    codewhale_config::resolve_external_credential_path(&path).unwrap_or(path)
+    nestlone_config::resolve_external_credential_path(&path).unwrap_or(path)
 }
 
 fn external_credential_target(
     provider: ProviderKind,
     path_override: Option<PathBuf>,
-) -> Result<(codewhale_config::ExternalCredentialSource, PathBuf)> {
+) -> Result<(nestlone_config::ExternalCredentialSource, PathBuf)> {
     let (source, default_path) = match provider {
         ProviderKind::OpenaiCodex => (
-            codewhale_config::ExternalCredentialSource::CodexCli,
+            nestlone_config::ExternalCredentialSource::CodexCli,
             openai_codex_auth_file_path(),
         ),
         ProviderKind::Xai => (
-            codewhale_config::ExternalCredentialSource::GrokCli,
+            nestlone_config::ExternalCredentialSource::GrokCli,
             grok_auth_file_path(),
         ),
         ProviderKind::Moonshot => bail!(
@@ -2252,7 +2252,7 @@ fn external_credential_target(
         ),
     };
     let path =
-        codewhale_config::resolve_external_credential_path(path_override.unwrap_or(default_path))?;
+        nestlone_config::resolve_external_credential_path(path_override.unwrap_or(default_path))?;
     Ok((source, path))
 }
 
@@ -2292,7 +2292,7 @@ fn clear_provider_api_key_from_keyring(secrets: &Secrets, provider: ProviderKind
 fn external_consent(
     store: &ConfigStore,
     provider: ProviderKind,
-) -> Option<&codewhale_config::ExternalCredentialConsentToml> {
+) -> Option<&nestlone_config::ExternalCredentialConsentToml> {
     store
         .config
         .providers
@@ -2304,7 +2304,7 @@ fn external_consent(
 fn external_read_consent(
     store: &ConfigStore,
     provider: ProviderKind,
-) -> Option<&codewhale_config::ExternalCredentialConsentToml> {
+) -> Option<&nestlone_config::ExternalCredentialConsentToml> {
     let (source, expected_path) = external_credential_target(provider, None).ok()?;
     external_consent(store, provider)
         .filter(|consent| consent.read_grant(provider, source, &expected_path).is_ok())
@@ -2441,7 +2441,7 @@ fn xai_oauth_generation_pointer(store: &ConfigStore) -> XaiOAuthGenerationPointe
         .as_deref()
     {
         None => XaiOAuthGenerationPointer::Absent,
-        Some(generation) if codewhale_config::is_valid_xai_oauth_generation(generation) => {
+        Some(generation) if nestlone_config::is_valid_xai_oauth_generation(generation) => {
             XaiOAuthGenerationPointer::Valid
         }
         Some(_) => XaiOAuthGenerationPointer::Invalid,
@@ -2999,7 +2999,7 @@ fn auth_status_lines_for_provider_with_runtime(
         lookup_order,
         format!(
             "config file: {} ({})",
-            codewhale_config::quote_os_path(store.path()),
+            nestlone_config::quote_os_path(store.path()),
             source_status(config_key, "missing")
         ),
         format!(
@@ -3011,7 +3011,7 @@ fn auth_status_lines_for_provider_with_runtime(
     ];
 
     if let Ok((source, expected_path)) = external_credential_target(provider, None) {
-        let status = codewhale_config::external_credential_consent_status(
+        let status = nestlone_config::external_credential_consent_status(
             external,
             provider,
             source,
@@ -3024,7 +3024,7 @@ fn auth_status_lines_for_provider_with_runtime(
             status.provider,
             status.source.as_str(),
             status.owner,
-            codewhale_config::quote_os_path(&status.path),
+            nestlone_config::quote_os_path(&status.path),
             status.consent_version,
             status.route_state,
             status.scope_valid,
@@ -3072,7 +3072,7 @@ fn xai_auth_status_lines_for_provider(
         xai_lookup_order(&diagnostics),
         format!(
             "config file: {} ({})",
-            codewhale_config::quote_os_path(store.path()),
+            nestlone_config::quote_os_path(store.path()),
             xai_storage_detail(
                 &diagnostics,
                 api_key.as_ref(),
@@ -3152,7 +3152,7 @@ fn xai_auth_status_lines_for_provider(
     }
 
     if let Ok((source, expected_path)) = external_credential_target(ProviderKind::Xai, None) {
-        let status = codewhale_config::external_credential_consent_status(
+        let status = nestlone_config::external_credential_consent_status(
             external,
             ProviderKind::Xai,
             source,
@@ -3165,7 +3165,7 @@ fn xai_auth_status_lines_for_provider(
             status.provider,
             status.source.as_str(),
             status.owner,
-            codewhale_config::quote_os_path(&status.path),
+            nestlone_config::quote_os_path(&status.path),
             status.consent_version,
             status.route_state,
             status.scope_valid,
@@ -3257,39 +3257,39 @@ fn run_auth_command_with_secrets_and_runtime(
                 "external credential path cannot be persisted losslessly because it is not valid UTF-8",
             )?;
             let provider_key = provider.provider().provider_config_key();
-            codewhale_config::mutate_config_document(store.path(), |document| {
+            nestlone_config::mutate_config_document(store.path(), |document| {
                 if matches!(provider, ProviderKind::OpenaiCodex | ProviderKind::Xai) {
-                    codewhale_config::set_config_document_value(
+                    nestlone_config::set_config_document_value(
                         document,
                         &["providers", provider_key, "auth_mode"],
                         "oauth",
                     )?;
                 }
                 let prefix = &["providers", provider_key, "external_credentials"];
-                codewhale_config::set_config_document_value(
+                nestlone_config::set_config_document_value(
                     document,
                     &[prefix[0], prefix[1], prefix[2], "access"],
                     "read_only",
                 )?;
-                codewhale_config::set_config_document_value(
+                nestlone_config::set_config_document_value(
                     document,
                     &[prefix[0], prefix[1], prefix[2], "provider"],
                     provider.as_str(),
                 )?;
-                codewhale_config::set_config_document_value(
+                nestlone_config::set_config_document_value(
                     document,
                     &[prefix[0], prefix[1], prefix[2], "source"],
                     source.as_str(),
                 )?;
-                codewhale_config::set_config_document_value(
+                nestlone_config::set_config_document_value(
                     document,
                     &[prefix[0], prefix[1], prefix[2], "path"],
                     path_value,
                 )?;
-                codewhale_config::set_config_document_value(
+                nestlone_config::set_config_document_value(
                     document,
                     &[prefix[0], prefix[1], prefix[2], "consent_version"],
-                    i64::from(codewhale_config::EXTERNAL_CREDENTIAL_CONSENT_VERSION),
+                    i64::from(nestlone_config::EXTERNAL_CREDENTIAL_CONSENT_VERSION),
                 )
             })?;
             store
@@ -3299,9 +3299,9 @@ fn run_auth_command_with_secrets_and_runtime(
                 "saved read-only external credential consent: provider={}, owner={}, path={}, consent_version={} ({})",
                 provider.as_str(),
                 source.as_str(),
-                codewhale_config::quote_os_path(&path),
-                codewhale_config::EXTERNAL_CREDENTIAL_CONSENT_VERSION,
-                codewhale_config::EXTERNAL_CREDENTIAL_READ_ONLY_SEMANTICS,
+                nestlone_config::quote_os_path(&path),
+                nestlone_config::EXTERNAL_CREDENTIAL_CONSENT_VERSION,
+                nestlone_config::EXTERNAL_CREDENTIAL_READ_ONLY_SEMANTICS,
             );
             println!(
                 "revoke with: codewhale auth external-revoke --provider {}",
@@ -3312,8 +3312,8 @@ fn run_auth_command_with_secrets_and_runtime(
         AuthCommand::ExternalRevoke { provider } => {
             let provider: ProviderKind = provider.into();
             let provider_key = provider.provider().provider_config_key();
-            codewhale_config::mutate_config_document(store.path(), |document| {
-                codewhale_config::unset_config_document_value(
+            nestlone_config::mutate_config_document(store.path(), |document| {
+                nestlone_config::unset_config_document_value(
                     document,
                     &["providers", provider_key, "external_credentials"],
                 )?;
@@ -3398,7 +3398,7 @@ fn run_auth_command_with_secrets_and_runtime(
         AuthCommand::Clear { provider } => {
             let provider: ProviderKind = provider.into();
             if provider == ProviderKind::Xai {
-                codewhale_config::with_xai_oauth_revocation_transaction(|| {
+                nestlone_config::with_xai_oauth_revocation_transaction(|| {
                     clear_auth_provider(store, secrets, provider)
                 })
             } else {
@@ -3417,7 +3417,7 @@ fn run_auth_command_with_secrets_and_runtime(
 
 fn external_consent_preview_lines(
     provider: ProviderKind,
-    source: codewhale_config::ExternalCredentialSource,
+    source: nestlone_config::ExternalCredentialSource,
     path: &Path,
 ) -> Vec<String> {
     vec![
@@ -3430,11 +3430,11 @@ fn external_consent_preview_lines(
         ),
         format!(
             "  exact resolved path: {}",
-            codewhale_config::quote_os_path(path)
+            nestlone_config::quote_os_path(path)
         ),
         format!(
             "  access: read_only ({})",
-            codewhale_config::EXTERNAL_CREDENTIAL_READ_ONLY_SEMANTICS
+            nestlone_config::EXTERNAL_CREDENTIAL_READ_ONLY_SEMANTICS
         ),
         "  managed: unavailable (no reviewed schema-safe preservation adapter)".to_string(),
         format!(
@@ -3555,7 +3555,7 @@ fn run_auth_migrate(store: &mut ConfigStore, secrets: &Secrets, dry_run: bool) -
             .context("failed to write updated config.toml")?;
     }
     if !dry_run {
-        codewhale_config::scrub_plaintext_api_keys_from_config_backup(store.path())
+        nestlone_config::scrub_plaintext_api_keys_from_config_backup(store.path())
             .context("failed to remove plaintext API keys from config backup")?;
     }
 
@@ -4654,7 +4654,7 @@ fn read_api_key_from_stdin() -> Result<String> {
 mod tests {
     use super::*;
     use clap::error::ErrorKind;
-    use codewhale_config::{ModelSource, ProviderSource};
+    use nestlone_config::{ModelSource, ProviderSource};
     use std::ffi::OsString;
     use std::sync::{Mutex, OnceLock};
 
@@ -4741,11 +4741,11 @@ mod tests {
         }
     }
 
-    impl codewhale_secrets::KeyringStore for RecordingKeyringStore {
+    impl nestlone_secrets::KeyringStore for RecordingKeyringStore {
         fn get(
             &self,
             key: &str,
-        ) -> std::result::Result<Option<String>, codewhale_secrets::SecretsError> {
+        ) -> std::result::Result<Option<String>, nestlone_secrets::SecretsError> {
             self.gets
                 .lock()
                 .expect("recording gets lock")
@@ -4762,12 +4762,12 @@ mod tests {
             &self,
             key: &str,
             value: &str,
-        ) -> std::result::Result<(), codewhale_secrets::SecretsError> {
+        ) -> std::result::Result<(), nestlone_secrets::SecretsError> {
             self.set_value(key, value);
             Ok(())
         }
 
-        fn delete(&self, key: &str) -> std::result::Result<(), codewhale_secrets::SecretsError> {
+        fn delete(&self, key: &str) -> std::result::Result<(), nestlone_secrets::SecretsError> {
             self.values
                 .lock()
                 .expect("recording values lock")
@@ -5553,9 +5553,9 @@ model = "qwen-2.5-7b"
     /// declares, under the same ids — no CLI-only verb, no missing verb.
     #[test]
     fn cli_lane_subcommands_cover_the_shared_control_contract() {
-        use codewhale_lane::{ControlDomain, ControlOperation, ControlSurface};
+        use nestlone_lane::{ControlDomain, ControlOperation, ControlSurface};
 
-        for descriptor in codewhale_lane::control::operations_for_domain(ControlDomain::Lane) {
+        for descriptor in nestlone_lane::control::operations_for_domain(ControlDomain::Lane) {
             let argv = [
                 "codewhale".to_string(),
                 "lane".to_string(),
@@ -5598,7 +5598,7 @@ model = "qwen-2.5-7b"
     /// `lane stop` is a compatibility spelling, not a second verb.
     #[test]
     fn lane_stop_and_interrupt_resolve_to_one_verb() {
-        use codewhale_lane::{ControlDomain, ControlOperation};
+        use nestlone_lane::{ControlDomain, ControlOperation};
 
         for spelling in ["stop", "interrupt", "cancel", "kill"] {
             assert_eq!(
@@ -5839,11 +5839,11 @@ model = "qwen-2.5-7b"
     fn deepseek_login_uses_isolated_file_store_and_preserves_tui_defaults() {
         let _lock = env_lock();
         let dir = tempfile::TempDir::new().expect("tempdir");
-        let codewhale_home = dir.path().join("codewhale-home");
-        let codewhale_home_value = codewhale_home.to_string_lossy().into_owned();
-        let _home = ScopedEnvVar::set("CODEWHALE_HOME", &codewhale_home_value);
+        let nestlone_home = dir.path().join("codewhale-home");
+        let nestlone_home_value = nestlone_home.to_string_lossy().into_owned();
+        let _home = ScopedEnvVar::set("CODEWHALE_HOME", &nestlone_home_value);
         let _backend = ScopedEnvVar::set("CODEWHALE_SECRET_BACKEND", "file");
-        let path = codewhale_home.join("config.toml");
+        let path = nestlone_home.join("config.toml");
         let mut store = ConfigStore::load(Some(path.clone())).expect("store should load");
         let secrets = Secrets::auto_detect();
 
@@ -6152,7 +6152,7 @@ model = "qwen-2.5-7b"
 
     #[test]
     fn auth_set_writes_secret_store_and_keeps_config_credential_free() {
-        use codewhale_secrets::{InMemoryKeyringStore, KeyringStore};
+        use nestlone_secrets::{InMemoryKeyringStore, KeyringStore};
         use std::sync::Arc;
 
         let nanos = chrono::Utc::now().timestamp_nanos_opt().unwrap_or_default();
@@ -6194,7 +6194,7 @@ model = "qwen-2.5-7b"
 
     #[test]
     fn auth_set_uses_plaintext_config_only_when_secret_store_write_fails() {
-        use codewhale_secrets::{KeyringStore, SecretsError};
+        use nestlone_secrets::{KeyringStore, SecretsError};
         use std::sync::Arc;
 
         struct FailingStore;
@@ -6315,7 +6315,7 @@ model = "qwen-2.5-7b"
 
     #[test]
     fn auth_clear_removes_from_config() {
-        use codewhale_secrets::{InMemoryKeyringStore, KeyringStore};
+        use nestlone_secrets::{InMemoryKeyringStore, KeyringStore};
         use std::sync::Arc;
 
         let nanos = chrono::Utc::now().timestamp_nanos_opt().unwrap_or_default();
@@ -6350,7 +6350,7 @@ model = "qwen-2.5-7b"
 
     #[test]
     fn auth_status_scoped_probe_and_list_all_provider_keyrings() {
-        use codewhale_secrets::{KeyringStore, SecretsError};
+        use nestlone_secrets::{KeyringStore, SecretsError};
         use std::sync::{Arc, Mutex};
 
         #[derive(Default)]
@@ -6417,7 +6417,7 @@ model = "qwen-2.5-7b"
 
     #[test]
     fn auth_status_reports_all_active_provider_sources_with_last4() {
-        use codewhale_secrets::{InMemoryKeyringStore, KeyringStore};
+        use nestlone_secrets::{InMemoryKeyringStore, KeyringStore};
         use std::sync::Arc;
 
         let _lock = env_lock();
@@ -6456,7 +6456,7 @@ model = "qwen-2.5-7b"
 
     #[test]
     fn auth_status_all_providers_lists_every_known_provider() {
-        use codewhale_secrets::{InMemoryKeyringStore, KeyringStore};
+        use nestlone_secrets::{InMemoryKeyringStore, KeyringStore};
         use std::sync::Arc;
 
         let nanos = chrono::Utc::now().timestamp_nanos_opt().unwrap_or_default();
@@ -6496,7 +6496,7 @@ model = "qwen-2.5-7b"
 
     #[test]
     fn auth_status_never_probes_codex_file_and_reports_exact_consent() {
-        use codewhale_secrets::InMemoryKeyringStore;
+        use nestlone_secrets::InMemoryKeyringStore;
         use std::sync::Arc;
 
         let _lock = env_lock();
@@ -6529,9 +6529,9 @@ model = "qwen-2.5-7b"
         assert!(!output.contains("secret-token"));
 
         store.config.providers.openai_codex.external_credentials =
-            Some(codewhale_config::ExternalCredentialConsentToml::read_only(
+            Some(nestlone_config::ExternalCredentialConsentToml::read_only(
                 ProviderKind::OpenaiCodex,
-                codewhale_config::ExternalCredentialSource::CodexCli,
+                nestlone_config::ExternalCredentialSource::CodexCli,
                 auth_path.clone(),
             ));
         let output =
@@ -6544,11 +6544,11 @@ model = "qwen-2.5-7b"
         assert!(output.contains("source=codex_cli"));
         assert!(output.contains(&format!(
             "path={}",
-            codewhale_config::quote_os_path(&auth_path)
+            nestlone_config::quote_os_path(&auth_path)
         )));
         assert!(output.contains(&format!(
             "consent_version={}",
-            codewhale_config::EXTERNAL_CREDENTIAL_CONSENT_VERSION
+            nestlone_config::EXTERNAL_CREDENTIAL_CONSENT_VERSION
         )));
         assert!(output.contains("file not probed"));
         assert!(!output.contains("secret-token"));
@@ -6562,7 +6562,7 @@ model = "qwen-2.5-7b"
         assert!(changed.contains("ambient_path_changed=true"), "{changed}");
         assert!(changed.contains("consent remains pinned"), "{changed}");
         assert!(
-            changed.contains(&codewhale_config::quote_os_path(&auth_path)),
+            changed.contains(&nestlone_config::quote_os_path(&auth_path)),
             "{changed}"
         );
         assert!(!changed.contains(&ambient_path_str), "{changed}");
@@ -6589,9 +6589,9 @@ model = "qwen-2.5-7b"
         store.config.providers.xai.oauth_credential_generation =
             Some("xai-auth-0123456789abcdef0123456789abcdef.json".to_string());
         store.config.providers.xai.external_credentials =
-            Some(codewhale_config::ExternalCredentialConsentToml::read_only(
+            Some(nestlone_config::ExternalCredentialConsentToml::read_only(
                 ProviderKind::Xai,
-                codewhale_config::ExternalCredentialSource::GrokCli,
+                nestlone_config::ExternalCredentialSource::GrokCli,
                 external_path.clone(),
             ));
         let keyring = Arc::new(RecordingKeyringStore::default());
@@ -6692,9 +6692,9 @@ model = "qwen-2.5-7b"
         store.config.providers.xai.api_key = Some("fake-cfg-key-1234".to_string());
         store.config.providers.xai.oauth_credential_generation = Some("../unsafe.json".to_string());
         store.config.providers.xai.external_credentials =
-            Some(codewhale_config::ExternalCredentialConsentToml::read_only(
+            Some(nestlone_config::ExternalCredentialConsentToml::read_only(
                 ProviderKind::Xai,
-                codewhale_config::ExternalCredentialSource::GrokCli,
+                nestlone_config::ExternalCredentialSource::GrokCli,
                 external_path.clone(),
             ));
         let keyring = Arc::new(RecordingKeyringStore::default());
@@ -6775,9 +6775,9 @@ model = "qwen-2.5-7b"
         store.config.providers.xai.oauth_credential_generation =
             Some("xai-auth-0123456789abcdef0123456789abcdef.json".to_string());
         store.config.providers.xai.external_credentials =
-            Some(codewhale_config::ExternalCredentialConsentToml::read_only(
+            Some(nestlone_config::ExternalCredentialConsentToml::read_only(
                 ProviderKind::Xai,
-                codewhale_config::ExternalCredentialSource::GrokCli,
+                nestlone_config::ExternalCredentialSource::GrokCli,
                 external_path.clone(),
             ));
         let keyring = Arc::new(RecordingKeyringStore::default());
@@ -6874,9 +6874,9 @@ model = "qwen-2.5-7b"
         store.config.providers.xai.oauth_credential_generation =
             Some("xai-auth-0123456789abcdef0123456789abcdef.json".to_string());
         store.config.providers.xai.external_credentials =
-            Some(codewhale_config::ExternalCredentialConsentToml::read_only(
+            Some(nestlone_config::ExternalCredentialConsentToml::read_only(
                 ProviderKind::Xai,
-                codewhale_config::ExternalCredentialSource::GrokCli,
+                nestlone_config::ExternalCredentialSource::GrokCli,
                 external_path.clone(),
             ));
         let keyring = Arc::new(RecordingKeyringStore::default());
@@ -6996,9 +6996,9 @@ model = "qwen-2.5-7b"
         store.config.provider = ProviderKind::Xai;
         store.config.providers.xai.auth_mode = Some("oauth".to_string());
         store.config.providers.xai.external_credentials =
-            Some(codewhale_config::ExternalCredentialConsentToml::read_only(
+            Some(nestlone_config::ExternalCredentialConsentToml::read_only(
                 ProviderKind::Xai,
-                codewhale_config::ExternalCredentialSource::GrokCli,
+                nestlone_config::ExternalCredentialSource::GrokCli,
                 external_path.clone(),
             ));
         let keyring = Arc::new(RecordingKeyringStore::default());
@@ -7063,7 +7063,7 @@ model = "qwen-2.5-7b"
 
     #[test]
     fn auth_list_uses_persisted_consent_without_probing_codex_file() {
-        use codewhale_secrets::InMemoryKeyringStore;
+        use nestlone_secrets::InMemoryKeyringStore;
         use std::sync::Arc;
 
         let _lock = env_lock();
@@ -7081,9 +7081,9 @@ model = "qwen-2.5-7b"
         let mut store = ConfigStore::load(Some(config_path)).expect("store should load");
         store.config.provider = ProviderKind::OpenaiCodex;
         store.config.providers.openai_codex.external_credentials =
-            Some(codewhale_config::ExternalCredentialConsentToml::read_only(
+            Some(nestlone_config::ExternalCredentialConsentToml::read_only(
                 ProviderKind::OpenaiCodex,
-                codewhale_config::ExternalCredentialSource::CodexCli,
+                nestlone_config::ExternalCredentialSource::CodexCli,
                 auth_path,
             ));
         let secrets = Secrets::new(Arc::new(InMemoryKeyringStore::new()));
@@ -7116,7 +7116,7 @@ model = "qwen-2.5-7b"
 
         let preview = external_consent_preview_lines(
             ProviderKind::Xai,
-            codewhale_config::ExternalCredentialSource::GrokCli,
+            nestlone_config::ExternalCredentialSource::GrokCli,
             &external_path,
         )
         .join("\n");
@@ -7124,7 +7124,7 @@ model = "qwen-2.5-7b"
         assert!(
             preview.contains(&format!(
                 "exact resolved path: {}",
-                codewhale_config::quote_os_path(&external_path)
+                nestlone_config::quote_os_path(&external_path)
             )),
             "{preview}"
         );
@@ -7183,17 +7183,17 @@ model = "qwen-2.5-7b"
             .expect("persisted consent");
         assert_eq!(
             consent.access,
-            codewhale_config::ExternalCredentialAccess::ReadOnly
+            nestlone_config::ExternalCredentialAccess::ReadOnly
         );
         assert_eq!(consent.provider, ProviderKind::Xai.as_str());
         assert_eq!(
             consent.source,
-            codewhale_config::ExternalCredentialSource::GrokCli
+            nestlone_config::ExternalCredentialSource::GrokCli
         );
         assert_eq!(consent.path, external_path);
         assert_eq!(
             consent.consent_version,
-            codewhale_config::EXTERNAL_CREDENTIAL_CONSENT_VERSION
+            nestlone_config::EXTERNAL_CREDENTIAL_CONSENT_VERSION
         );
         assert_eq!(
             store.config.providers.xai.auth_mode.as_deref(),
@@ -7215,12 +7215,12 @@ model = "qwen-2.5-7b"
         assert_eq!(reloaded_consent.provider, ProviderKind::Xai.as_str());
         assert_eq!(
             reloaded_consent.source,
-            codewhale_config::ExternalCredentialSource::GrokCli
+            nestlone_config::ExternalCredentialSource::GrokCli
         );
         assert_eq!(reloaded_consent.path, external_path);
         assert_eq!(
             reloaded_consent.consent_version,
-            codewhale_config::EXTERNAL_CREDENTIAL_CONSENT_VERSION
+            nestlone_config::EXTERNAL_CREDENTIAL_CONSENT_VERSION
         );
 
         run_auth_command_with_secrets(
@@ -7348,9 +7348,9 @@ model = "qwen-2.5-7b"
             let mut store = ConfigStore::load(Some(config_path.clone())).expect("load store");
             store.config.providers.xai.auth_mode = Some("oauth".to_string());
             store.config.providers.xai.external_credentials =
-                Some(codewhale_config::ExternalCredentialConsentToml::read_only(
+                Some(nestlone_config::ExternalCredentialConsentToml::read_only(
                     ProviderKind::Xai,
-                    codewhale_config::ExternalCredentialSource::GrokCli,
+                    nestlone_config::ExternalCredentialSource::GrokCli,
                     dir.path().join("external.json"),
                 ));
             std::fs::create_dir(&config_path).expect("turn config target into a directory");
@@ -7386,7 +7386,7 @@ model = "qwen-2.5-7b"
 
     #[test]
     fn auth_status_scoped_provider_shows_detailed_info() {
-        use codewhale_secrets::InMemoryKeyringStore;
+        use nestlone_secrets::InMemoryKeyringStore;
         use std::sync::Arc;
 
         let nanos = chrono::Utc::now().timestamp_nanos_opt().unwrap_or_default();
@@ -7414,7 +7414,7 @@ model = "qwen-2.5-7b"
 
     #[test]
     fn dispatch_uses_secret_store_without_rehydrating_plaintext_config() {
-        use codewhale_secrets::{InMemoryKeyringStore, KeyringStore};
+        use nestlone_secrets::{InMemoryKeyringStore, KeyringStore};
         use std::sync::Arc;
 
         // Runtime resolution reads process-global provider environment overrides.
@@ -7484,10 +7484,10 @@ model = "qwen-2.5-7b"
         store.config.providers.xai.oauth_credential_generation = Some(generation.to_string());
         store.save().unwrap();
         let credentials = home.join("credentials");
-        codewhale_config::with_xai_oauth_lifecycle_lock(|owned| {
+        nestlone_config::with_xai_oauth_lifecycle_lock(|owned| {
             owned.write(generation, b"xai-generation", false)?;
             owned.write(
-                codewhale_config::LEGACY_XAI_OAUTH_FILE_NAME,
+                nestlone_config::LEGACY_XAI_OAUTH_FILE_NAME,
                 b"legacy-xai",
                 false,
             )?;
@@ -7521,7 +7521,7 @@ model = "qwen-2.5-7b"
 
     #[test]
     fn auth_migrate_moves_plaintext_keys_into_keyring_and_strips_file() {
-        use codewhale_secrets::{InMemoryKeyringStore, KeyringStore};
+        use nestlone_secrets::{InMemoryKeyringStore, KeyringStore};
         use std::sync::Arc;
 
         let nanos = chrono::Utc::now().timestamp_nanos_opt().unwrap_or_default();
@@ -7598,7 +7598,7 @@ model = "qwen-2.5-7b"
 
     #[test]
     fn auth_migrate_dry_run_does_not_modify_anything() {
-        use codewhale_secrets::{InMemoryKeyringStore, KeyringStore};
+        use nestlone_secrets::{InMemoryKeyringStore, KeyringStore};
         use std::sync::Arc;
 
         let nanos = chrono::Utc::now().timestamp_nanos_opt().unwrap_or_default();
@@ -7685,7 +7685,7 @@ model = "qwen-2.5-7b"
 
     #[test]
     fn cli_provider_helpers_follow_config_metadata() {
-        let registry_kinds: Vec<ProviderKind> = codewhale_config::provider::all_providers()
+        let registry_kinds: Vec<ProviderKind> = nestlone_config::provider::all_providers()
             .iter()
             .map(|provider| provider.kind())
             .collect();
@@ -8683,7 +8683,7 @@ model = "qwen-2.5-7b"
     /// `CODEWHALE_TUI_BIN` is the canonical override name and outranks the
     /// legacy `DEEPSEEK_TUI_BIN` alias when both are set.
     #[test]
-    fn locate_sibling_tui_binary_prefers_codewhale_env_override() {
+    fn locate_sibling_tui_binary_prefers_nestlone_env_override() {
         let _lock = env_lock();
         let dir = tempfile::TempDir::new().expect("tempdir");
         let canonical = dir

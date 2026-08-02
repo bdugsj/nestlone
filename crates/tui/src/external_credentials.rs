@@ -11,7 +11,7 @@ use std::io::{self, Read};
 use std::path::Path;
 
 use anyhow::{Context, Result, bail};
-use codewhale_config::ExternalCredentialReadGrant;
+use nestlone_config::ExternalCredentialReadGrant;
 
 /// Credential JSON is expected to be tiny. Bound reads so a replaced regular
 /// file cannot turn read-only consent into unbounded memory consumption.
@@ -56,7 +56,7 @@ pub(crate) fn read_to_string(grant: &ExternalCredentialReadGrant) -> Result<Opti
                 format!(
                     "securely opening external {} credential file {}",
                     grant.source().as_str(),
-                    codewhale_config::quote_os_path(grant.path())
+                    nestlone_config::quote_os_path(grant.path())
                 )
             });
         }
@@ -73,14 +73,14 @@ pub(crate) fn read_to_string(grant: &ExternalCredentialReadGrant) -> Result<Opti
             format!(
                 "reading external {} credential file {}",
                 grant.source().as_str(),
-                codewhale_config::quote_os_path(grant.path())
+                nestlone_config::quote_os_path(grant.path())
             )
         })?;
     if bytes.len() as u64 > MAX_EXTERNAL_CREDENTIAL_BYTES {
         bail!(
             "external {} credential file {} exceeds the {} byte safety limit",
             grant.source().as_str(),
-            codewhale_config::quote_os_path(grant.path()),
+            nestlone_config::quote_os_path(grant.path()),
             MAX_EXTERNAL_CREDENTIAL_BYTES
         );
     }
@@ -88,7 +88,7 @@ pub(crate) fn read_to_string(grant: &ExternalCredentialReadGrant) -> Result<Opti
         format!(
             "external {} credential file {} is not valid UTF-8",
             grant.source().as_str(),
-            codewhale_config::quote_os_path(grant.path())
+            nestlone_config::quote_os_path(grant.path())
         )
     })?;
     Ok(Some(contents))
@@ -99,7 +99,7 @@ pub(crate) fn read_to_string(grant: &ExternalCredentialReadGrant) -> Result<Opti
 /// must belong to the effective user and have no group/other permission bits.
 /// The caller is responsible for constraining `path` to a validated basename
 /// below Codewhale's credentials directory before invoking this function.
-pub(crate) fn read_codewhale_owned_to_string(path: &Path) -> Result<Option<String>> {
+pub(crate) fn read_nestlone_owned_to_string(path: &Path) -> Result<Option<String>> {
     let mut file = match open_secure_regular_file(path, true) {
         Ok(file) => file,
         Err(error) if error.kind() == io::ErrorKind::NotFound => return Ok(None),
@@ -107,7 +107,7 @@ pub(crate) fn read_codewhale_owned_to_string(path: &Path) -> Result<Option<Strin
             return Err(error).with_context(|| {
                 format!(
                     "securely opening Codewhale-owned credential file {}",
-                    codewhale_config::quote_os_path(path)
+                    nestlone_config::quote_os_path(path)
                 )
             });
         }
@@ -119,20 +119,20 @@ pub(crate) fn read_codewhale_owned_to_string(path: &Path) -> Result<Option<Strin
         .with_context(|| {
             format!(
                 "reading Codewhale-owned credential file {}",
-                codewhale_config::quote_os_path(path)
+                nestlone_config::quote_os_path(path)
             )
         })?;
     if bytes.len() as u64 > MAX_EXTERNAL_CREDENTIAL_BYTES {
         bail!(
             "Codewhale-owned credential file {} exceeds the {} byte safety limit",
-            codewhale_config::quote_os_path(path),
+            nestlone_config::quote_os_path(path),
             MAX_EXTERNAL_CREDENTIAL_BYTES
         );
     }
     String::from_utf8(bytes).map(Some).with_context(|| {
         format!(
             "Codewhale-owned credential file {} is not valid UTF-8",
-            codewhale_config::quote_os_path(path)
+            nestlone_config::quote_os_path(path)
         )
     })
 }
@@ -362,7 +362,7 @@ fn normalize_windows_path_for_comparison(path: &Path) -> io::Result<String> {
 /// Apply a protected DACL granting only the current Windows user full access.
 /// Directories propagate that owner-only policy to newly staged generations.
 #[cfg(all(windows, test))]
-pub(crate) fn secure_codewhale_owned_windows_path(
+pub(crate) fn secure_nestlone_owned_windows_path(
     path: &Path,
     inherit_to_children: bool,
 ) -> io::Result<()> {
@@ -615,7 +615,7 @@ fn reject_windows_reparse_components(path: &Path) -> io::Result<()> {
                 io::ErrorKind::PermissionDenied,
                 format!(
                     "external credential path contains reparse point {}",
-                    codewhale_config::quote_os_path(&current)
+                    nestlone_config::quote_os_path(&current)
                 ),
             ));
         }
@@ -672,7 +672,7 @@ pub(crate) fn record_oauth_network() {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use codewhale_config::{ExternalCredentialConsentToml, ExternalCredentialSource, ProviderKind};
+    use nestlone_config::{ExternalCredentialConsentToml, ExternalCredentialSource, ProviderKind};
 
     fn grant(path: &Path) -> ExternalCredentialReadGrant {
         ExternalCredentialConsentToml::read_only(
@@ -786,14 +786,14 @@ mod tests {
         std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o644))
             .expect("loose mode");
         assert!(
-            read_codewhale_owned_to_string(&path).is_err(),
+            read_nestlone_owned_to_string(&path).is_err(),
             "group/other-readable owned credentials must fail closed"
         );
 
         std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o600))
             .expect("owner-only mode");
         assert_eq!(
-            read_codewhale_owned_to_string(&path)
+            read_nestlone_owned_to_string(&path)
                 .expect("secure owned read")
                 .as_deref(),
             Some("owned-secret")
@@ -802,14 +802,14 @@ mod tests {
         let hardlink = root.join("owned-hardlink.json");
         std::fs::hard_link(&path, &hardlink).expect("hardlink fixture");
         assert!(
-            read_codewhale_owned_to_string(&path).is_err(),
+            read_nestlone_owned_to_string(&path).is_err(),
             "owned reads must reject multiply-linked files"
         );
         std::fs::remove_file(hardlink).expect("remove hardlink fixture");
 
         let link = root.join("owned-link.json");
         symlink(&path, &link).expect("symlink");
-        assert!(read_codewhale_owned_to_string(&link).is_err());
+        assert!(read_nestlone_owned_to_string(&link).is_err());
     }
 
     #[cfg(unix)]
@@ -828,17 +828,17 @@ mod tests {
         file.set_len(MAX_EXTERNAL_CREDENTIAL_BYTES + 1).unwrap();
         file.set_permissions(std::fs::Permissions::from_mode(0o600))
             .unwrap();
-        let error = read_codewhale_owned_to_string(&path).expect_err("oversized owned file");
+        let error = read_nestlone_owned_to_string(&path).expect_err("oversized owned file");
         assert!(error.to_string().contains("safety limit"), "{error:#}");
     }
 
     #[cfg(windows)]
     fn secured_owned_windows_fixture(contents: &[u8]) -> (tempfile::TempDir, std::path::PathBuf) {
         let dir = tempfile::tempdir().expect("tempdir");
-        secure_codewhale_owned_windows_path(dir.path(), true).expect("owner-only directory");
+        secure_nestlone_owned_windows_path(dir.path(), true).expect("owner-only directory");
         let path = dir.path().join("owned.json");
         std::fs::write(&path, contents).expect("fixture");
-        secure_codewhale_owned_windows_path(&path, false).expect("owner-only file");
+        secure_nestlone_owned_windows_path(&path, false).expect("owner-only file");
         (dir, path)
     }
 
@@ -848,7 +848,7 @@ mod tests {
         let _env = crate::test_support::lock_test_env();
         let (_dir, path) = secured_owned_windows_fixture(b"owned-secret");
         assert_eq!(
-            read_codewhale_owned_to_string(&path)
+            read_nestlone_owned_to_string(&path)
                 .expect("secure owned read")
                 .as_deref(),
             Some("owned-secret")
@@ -863,7 +863,7 @@ mod tests {
         let hardlink = dir.path().join("owned-hardlink.json");
         std::fs::hard_link(&path, &hardlink).expect("hardlink fixture");
         assert!(
-            read_codewhale_owned_to_string(&path).is_err(),
+            read_nestlone_owned_to_string(&path).is_err(),
             "owned reads must reject multiply-linked files"
         );
         std::fs::remove_file(hardlink).expect("remove hardlink fixture");
@@ -880,7 +880,7 @@ mod tests {
             .expect("reopen fixture");
         file.set_len(MAX_EXTERNAL_CREDENTIAL_BYTES + 1)
             .expect("oversize fixture");
-        let error = read_codewhale_owned_to_string(&path).expect_err("oversized owned file");
+        let error = read_nestlone_owned_to_string(&path).expect_err("oversized owned file");
         assert!(error.to_string().contains("safety limit"), "{error:#}");
     }
 
@@ -892,7 +892,7 @@ mod tests {
         let link = dir.path().join("owned-link.json");
         if std::os::windows::fs::symlink_file(&path, &link).is_ok() {
             assert!(
-                read_codewhale_owned_to_string(&link).is_err(),
+                read_nestlone_owned_to_string(&link).is_err(),
                 "owned reads must reject leaf reparse points"
             );
         }

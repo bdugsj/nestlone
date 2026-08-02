@@ -28,7 +28,7 @@ use crate::tools::handle::{SharedHandleStore, new_shared_handle_store};
 use crate::tools::shell::{SharedShellManager, new_shared_shell_manager};
 use crate::worker_profile::ShellPolicy;
 #[allow(unused_imports)]
-pub use codewhale_tools::{
+pub use nestlone_tools::{
     ApprovalRequirement, PreparedToolCall, ResourceClaim, ToolCapability, ToolError,
     ToolExecutionOutcome, ToolResult, ToolTerminalStatus, optional_bool, optional_str,
     optional_u64, required_str, required_u64, schedule_non_conflicting,
@@ -462,7 +462,7 @@ pub struct ToolExecutionState {
     /// Explicit skills directory used for model-visible skill discovery.
     pub skills_dir: Option<PathBuf>,
     /// Restrict skill discovery to CodeWhale-owned roots plus `skills_dir`.
-    pub skills_scan_codewhale_only: bool,
+    pub skills_scan_nestlone_only: bool,
     /// Immutable registry snapshot for this workspace/engine context.
     pub plugin_registry: Option<Arc<crate::plugins::PluginRegistry>>,
     /// Elevated sandbox policy override (used when retrying after sandbox denial).
@@ -544,7 +544,7 @@ pub struct ToolExecutionState {
     /// when the exact route capability says server-side search is supported.
     pub(crate) provider_native_search: Option<crate::client::ProviderNativeSearchClient>,
     /// Exact active route capability facts. Unknown stays fail-closed.
-    pub(crate) route_capabilities: codewhale_config::route::RouteCapabilities,
+    pub(crate) route_capabilities: nestlone_config::route::RouteCapabilities,
 
     /// Per-session workshop variable store (#548). Holds the raw content of
     /// the most recent large-tool routing event so the parent can call
@@ -574,10 +574,10 @@ impl ToolContext {
     pub fn new(workspace: impl Into<PathBuf>) -> Self {
         let workspace = workspace.into();
         // Prefer .codewhale, fall back to .deepseek for project-local state
-        let notes_path = codewhale_config::resolve_project_state_dir(&workspace, "notes.md")
+        let notes_path = nestlone_config::resolve_project_state_dir(&workspace, "notes.md")
             .expect("hardcoded project notes state path is valid")
             .1;
-        let mcp_config_path = codewhale_config::resolve_project_state_dir(&workspace, "mcp.json")
+        let mcp_config_path = nestlone_config::resolve_project_state_dir(&workspace, "mcp.json")
             .expect("hardcoded project MCP state path is valid")
             .1;
         Self::with_options(workspace, false, notes_path, mcp_config_path)
@@ -606,7 +606,7 @@ impl ToolContext {
                 notes_path: notes_path.into(),
                 mcp_config_path: mcp_config_path.into(),
                 skills_dir: None,
-                skills_scan_codewhale_only: false,
+                skills_scan_nestlone_only: false,
                 plugin_registry: None,
                 elevated_sandbox_policy: None,
                 shell_network_denied_hint: None,
@@ -629,7 +629,7 @@ impl ToolContext {
                 search_api_key: None,
                 search_base_url: None,
                 provider_native_search: None,
-                route_capabilities: codewhale_config::route::RouteCapabilities::default(),
+                route_capabilities: nestlone_config::route::RouteCapabilities::default(),
                 workshop_vars: None,
             }),
         }
@@ -699,10 +699,10 @@ impl ToolContext {
     pub fn with_skills_config(
         mut self,
         skills_dir: impl Into<PathBuf>,
-        scan_codewhale_only: bool,
+        scan_nestlone_only: bool,
     ) -> Self {
         self.skills_dir = Some(skills_dir.into());
-        self.skills_scan_codewhale_only = scan_codewhale_only;
+        self.skills_scan_nestlone_only = scan_nestlone_only;
         self
     }
 

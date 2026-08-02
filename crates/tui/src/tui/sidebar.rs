@@ -427,7 +427,7 @@ fn render_hotbar_panel(f: &mut Frame, area: Rect, app: &mut App, config: &Config
 }
 
 fn hotbar_panel_row_actions() -> Vec<Option<SidebarRowAction>> {
-    (1..=codewhale_config::HOTBAR_SLOT_COUNT)
+    (1..=nestlone_config::HOTBAR_SLOT_COUNT)
         .step_by(HOTBAR_ROW_COLUMNS)
         .map(|slot| Some(SidebarRowAction::HotbarSlot(slot)))
         .collect()
@@ -446,7 +446,7 @@ fn hotbar_panel_slots(app: &App, config: &Config) -> Vec<HotbarPanelSlot> {
     // Lead each hover tip with the platform-correct chord (⌥+1 / alt+1); keep
     // the "Slot N" suffix so existing assertions and the "Slot" wording remain.
     let alt_prefix = super::widgets::key_hint::alt_prefix();
-    (1..=codewhale_config::HOTBAR_SLOT_COUNT)
+    (1..=nestlone_config::HOTBAR_SLOT_COUNT)
         .map(|slot| {
             let Some(binding) = bindings.remove(&slot) else {
                 return HotbarPanelSlot {
@@ -494,7 +494,7 @@ fn hotbar_panel_slots(app: &App, config: &Config) -> Vec<HotbarPanelSlot> {
         .collect()
 }
 
-fn resolved_hotbar_bindings(app: &App, config: &Config) -> Vec<codewhale_config::HotbarBinding> {
+fn resolved_hotbar_bindings(app: &App, config: &Config) -> Vec<nestlone_config::HotbarBinding> {
     let known_action_ids = app
         .hotbar_actions
         .iter()
@@ -3652,7 +3652,7 @@ mod tests {
     fn usd_only_priced_audit(usd: f64) -> crate::pricing::TurnCostAudit {
         crate::pricing::TurnCostAudit {
             estimate: Some(crate::pricing::CostEstimate::usd_only(usd)),
-            provenance: Some(codewhale_config::pricing::PricingProvenance::ModelsDevBundled),
+            provenance: Some(nestlone_config::pricing::PricingProvenance::ModelsDevBundled),
             unpriced_classes: Vec::new(),
             unpriced_reason: None,
             live_pricing_defect: None,
@@ -3664,7 +3664,7 @@ mod tests {
     fn dual_currency_priced_audit(usd: f64, cny: f64) -> crate::pricing::TurnCostAudit {
         crate::pricing::TurnCostAudit {
             estimate: Some(crate::pricing::CostEstimate { usd, cny }),
-            provenance: Some(codewhale_config::pricing::PricingProvenance::ModelsDevBundled),
+            provenance: Some(nestlone_config::pricing::PricingProvenance::ModelsDevBundled),
             unpriced_classes: Vec::new(),
             unpriced_reason: None,
             live_pricing_defect: None,
@@ -3849,7 +3849,7 @@ mod tests {
 
         // Real bindings are never disabled.
         let active = Config {
-            hotbar: Some(vec![codewhale_config::HotbarBindingToml {
+            hotbar: Some(vec![nestlone_config::HotbarBindingToml {
                 slot: 1,
                 action: "mode.plan".to_string(),
                 label: None,
@@ -3898,9 +3898,9 @@ mod tests {
         app.sidebar_focus = SidebarFocus::Pinned;
         let config = Config {
             hotbar: Some(
-                codewhale_config::default_hotbar_bindings()
+                nestlone_config::default_hotbar_bindings()
                     .into_iter()
-                    .map(|binding| codewhale_config::HotbarBindingToml {
+                    .map(|binding| nestlone_config::HotbarBindingToml {
                         slot: binding.slot,
                         action: binding.action,
                         label: binding.label,
@@ -3957,12 +3957,12 @@ mod tests {
 
         let partial_config = Config {
             hotbar: Some(vec![
-                codewhale_config::HotbarBindingToml {
+                nestlone_config::HotbarBindingToml {
                     slot: 2,
                     action: "mode.plan".to_string(),
                     label: Some("Plan!".to_string()),
                 },
-                codewhale_config::HotbarBindingToml {
+                nestlone_config::HotbarBindingToml {
                     slot: 5,
                     action: "plugin.missing".to_string(),
                     label: Some("Ghost".to_string()),
@@ -3993,9 +3993,9 @@ mod tests {
         app.sidebar_focus = SidebarFocus::Pinned;
         let config = Config {
             hotbar: Some(
-                codewhale_config::default_hotbar_bindings()
+                nestlone_config::default_hotbar_bindings()
                     .into_iter()
-                    .map(|binding| codewhale_config::HotbarBindingToml {
+                    .map(|binding| nestlone_config::HotbarBindingToml {
                         slot: binding.slot,
                         action: binding.action,
                         label: binding.label,
@@ -4069,7 +4069,7 @@ mod tests {
         // #3807: the panel is hidden on a fresh config, so opt in explicitly
         // with the default bindings to smoke-test the rendered panel.
         let config = Config {
-            hotbar: Some(codewhale_config::default_hotbar_bindings_toml()),
+            hotbar: Some(nestlone_config::default_hotbar_bindings_toml()),
             ..Config::default()
         };
 

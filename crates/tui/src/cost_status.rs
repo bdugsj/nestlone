@@ -1090,7 +1090,7 @@ pub fn endpoint_fingerprint(base_url: &str) -> Option<String> {
     parsed.set_query(None);
     parsed.set_fragment(None);
     let canonical = parsed.as_str().trim_end_matches('/');
-    Some(codewhale_config::catalog::base_url_fingerprint(canonical))
+    Some(nestlone_config::catalog::base_url_fingerprint(canonical))
 }
 
 /// Currency tag for a receipt, derived from authoritative currency coverage —

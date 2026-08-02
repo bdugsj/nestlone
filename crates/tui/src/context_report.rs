@@ -10,7 +10,7 @@ use std::path::Path;
 use chrono::{SecondsFormat, Utc};
 use serde::Serialize;
 
-use codewhale_config::route::RouteLimits;
+use nestlone_config::route::RouteLimits;
 
 use crate::compaction::{estimate_input_tokens_conservative, estimate_text_tokens_conservative};
 use crate::config::{ApiProvider, Config};
@@ -398,7 +398,7 @@ fn base_source_entries(model: &str, workspace: &Path, skills_dir: Option<&Path>)
         builder.push(SourceEntry::text(
             SourceKind::UserConstitution,
             "User-global constitution",
-            codewhale_config::UserConstitution::path()
+            nestlone_config::UserConstitution::path()
                 .ok()
                 .map(|path| path.display().to_string()),
             ActivationReason::FilePresent,

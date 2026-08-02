@@ -1,5 +1,5 @@
 [package]
-name = "codewhale-agent"
+name = "nestlone-agent"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
@@ -8,5 +8,5 @@ repository.workspace = true
 description = "Model/provider registry and fallback strategy for Codewhale"
 
 [dependencies]
-codewhale-config = { path = "../config", version = "0.0.2" }
+nestlone-config = { path = "../config", version = "0.0.2" }
 serde.workspace = true

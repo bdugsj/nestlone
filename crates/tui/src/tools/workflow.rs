@@ -10,7 +10,7 @@ use std::sync::{Arc, Mutex, MutexGuard};
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use async_trait::async_trait;
-use codewhale_workflow::{
+use nestlone_workflow::{
     AgentType, BranchResult, BranchSpec, BudgetSpec, ControlNodeKind, ControlNodeResult,
     FleetRoleMap, GateKind, GateOn, GateOutcome, GateSpec, GateState, GateStatusLine,
     HandoffArtifact, LaneGateBoard, LeafResult, LeafSpec, ReduceSpec, SequenceSpec, TaskMode,
@@ -19,7 +19,7 @@ use codewhale_workflow::{
     compile_javascript_workflow, compile_typescript_workflow, leaf_wants_worktree,
     resolve_workflow_agent,
 };
-use codewhale_workflow_js::{
+use nestlone_workflow_js::{
     BudgetSnapshot, DriverError, ProgressEvent, SpawnedTask, TaskCompletion, TaskRequest,
     WORKFLOW_MAX_CONCURRENT, WorkflowDriver, WorkflowRunCancel, WorkflowVm,
 };
@@ -501,7 +501,7 @@ struct WorkflowTaskStartedEvent {
     /// when a Router made it. `default` keeps events written before this field
     /// existed — and every legacy/non-fleet task — readable unchanged.
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    fleet_receipt: Option<codewhale_workflow::FleetTaskReceipt>,
+    fleet_receipt: Option<nestlone_workflow::FleetTaskReceipt>,
 }
 
 impl WorkflowUiEventKind {
@@ -805,7 +805,7 @@ impl ToolSpec for WorkflowTool {
     fn approval_requirement_for(&self, input: &Value) -> ApprovalRequirement {
         // Product defaults for [workflow] when the tool has no live Config
         // handle. YOLO/bypass still short-circuit upstream of this check.
-        let config = codewhale_config::WorkflowConfigToml::default();
+        let config = nestlone_config::WorkflowConfigToml::default();
         workflow_approval_requirement_for(input, &config)
     }
 
@@ -932,7 +932,7 @@ async fn start_workflow(
 
     // Capture the approved plan envelope for audit/receipt (#4126). Reaching
     // execute means the approval gate already passed (or YOLO/auto-start).
-    let workflow_cfg = codewhale_config::WorkflowConfigToml::default();
+    let workflow_cfg = nestlone_config::WorkflowConfigToml::default();
     let summary = source
         .spec
         .as_ref()
@@ -1326,7 +1326,7 @@ fn apply_named_fleet_to_task_request(
 /// [`route_admitted_exact_task`].
 fn bind_exact_fleet_task_request(
     operation: &crate::fleet::exact::ExactFleetWorkflow,
-    session: codewhale_workflow::PermissionCeiling,
+    session: nestlone_workflow::PermissionCeiling,
     request: &mut TaskRequest,
 ) -> Result<crate::fleet::exact::ExactMemberBinding, DriverError> {
     let fleet = operation.snapshot().fleet().qualified();
@@ -1407,7 +1407,7 @@ fn bind_exact_fleet_task_request(
 /// own field. Non-Fleet tasks keep the previous metadata-then-request order
 /// exactly.
 fn displayed_resolved_role(
-    fleet_receipt: Option<&codewhale_workflow::FleetTaskReceipt>,
+    fleet_receipt: Option<&nestlone_workflow::FleetTaskReceipt>,
     metadata_role: Option<&str>,
     request_role: Option<&str>,
 ) -> Option<String> {
@@ -1423,7 +1423,7 @@ fn displayed_resolved_role(
 /// driver, and so the receipt's own content-free `line()` stays the single
 /// source of what a receipt may say.
 fn orphaned_fleet_receipt_line(
-    receipt: &codewhale_workflow::FleetTaskReceipt,
+    receipt: &nestlone_workflow::FleetTaskReceipt,
     error: &str,
 ) -> String {
     format!(
@@ -1480,7 +1480,7 @@ async fn route_admitted_exact_task(
     operation: &crate::fleet::exact::ExactFleetWorkflow,
     binding: &crate::fleet::exact::ExactMemberBinding,
     request: &mut TaskRequest,
-) -> Result<codewhale_workflow::FleetTaskReceipt, DriverError> {
+) -> Result<nestlone_workflow::FleetTaskReceipt, DriverError> {
     let fleet = operation.snapshot().fleet().qualified();
     let launch = operation
         .route_admitted_task(binding, &request.description)
@@ -2639,7 +2639,7 @@ fn leaf_task_options_expression(
     let write_roots = if spec.mode == TaskMode::ReadWrite {
         spec.file_scope
             .iter()
-            .map(|scope| codewhale_workflow::normalize_file_scope_root(scope))
+            .map(|scope| nestlone_workflow::normalize_file_scope_root(scope))
             .collect::<Vec<_>>()
     } else {
         Vec::new()
@@ -2677,7 +2677,7 @@ fn validate_leaf_runtime_contract(spec: &LeafSpec) -> Result<(), ToolError> {
         )));
     }
     for scope in &spec.file_scope {
-        let normalized = codewhale_workflow::normalize_file_scope_root(scope);
+        let normalized = nestlone_workflow::normalize_file_scope_root(scope);
         if normalized.is_empty() || normalized.contains('*') {
             return Err(ToolError::invalid_input(format!(
                 "Workflow leaf '{}' has unsupported file_scope '{}'; use a concrete path or a trailing /* or /** directory scope",
@@ -2785,8 +2785,8 @@ fn read_only_allowed_tools(agent_type: AgentType) -> &'static [&'static str] {
 
 fn is_write_or_shell_tool(tool: &str) -> bool {
     // One list, owned by the workflow crate. This used to be a second copy
-    // that drifted from `elevation.rs`'s — see `codewhale_workflow::is_write_tool`.
-    codewhale_workflow::is_write_tool(tool) || codewhale_workflow::is_shell_tool(tool)
+    // that drifted from `elevation.rs`'s — see `nestlone_workflow::is_write_tool`.
+    nestlone_workflow::is_write_tool(tool) || nestlone_workflow::is_shell_tool(tool)
 }
 
 // Pre-existing builder that grew `allowed_tools`; each arg maps 1:1 onto one
@@ -3335,7 +3335,7 @@ impl SubAgentWorkflowDriver {
         request: &TaskRequest,
         metadata: &WorkflowTaskSpawnMetadata,
         result: &crate::tools::subagent::SubAgentResult,
-        fleet_receipt: Option<codewhale_workflow::FleetTaskReceipt>,
+        fleet_receipt: Option<nestlone_workflow::FleetTaskReceipt>,
     ) {
         // Prefer typed spawn metadata over request fields so panel/history never
         // need to re-derive labels from the child prompt (#4119).
@@ -3411,7 +3411,7 @@ impl SubAgentWorkflowDriver {
     /// would make all three unrecoverable.
     fn record_orphaned_fleet_receipt(
         &self,
-        receipt: &codewhale_workflow::FleetTaskReceipt,
+        receipt: &nestlone_workflow::FleetTaskReceipt,
         error: &str,
     ) {
         self.record_run_event(WorkflowUiEvent::new(WorkflowUiEventKind::Log {
@@ -4861,11 +4861,11 @@ mod tests {
     use crate::tools::ToolRegistryBuilder;
     use crate::tools::subagent::{SubAgentRuntime, new_shared_subagent_manager};
     use axum::{Json, Router, routing::post};
-    use codewhale_workflow::{IsolationMode, leaf_is_write_capable};
+    use nestlone_workflow::{IsolationMode, leaf_is_write_capable};
     use std::sync::atomic::{AtomicUsize, Ordering};
 
     #[test]
-    fn settled_runs_leave_a_report_artifact_under_codewhale_reports() {
+    fn settled_runs_leave_a_report_artifact_under_nestlone_reports() {
         let tmp = tempfile::tempdir().expect("tempdir");
         let mut record = WorkflowRunRecord::new("workflow_report_1".to_string(), None, None, None);
         record.status = WorkflowRunStatus::Completed;
@@ -5254,18 +5254,18 @@ permissions = "read_only"
         }
     }
 
-    fn exact_session() -> codewhale_workflow::PermissionCeiling {
-        codewhale_workflow::PermissionCeiling::preset("full").expect("preset")
+    fn exact_session() -> nestlone_workflow::PermissionCeiling {
+        nestlone_workflow::PermissionCeiling::preset("full").expect("preset")
     }
 
     fn exact_workflow_with(
         text: &str,
         router: Option<std::sync::Arc<crate::fleet::exact::StaticFleetRouter>>,
     ) -> crate::fleet::exact::ExactFleetWorkflow {
-        let document = codewhale_workflow::FleetDocument::parse(text).expect("exact fleet parses");
+        let document = nestlone_workflow::FleetDocument::parse(text).expect("exact fleet parses");
         crate::fleet::exact::ExactFleetWorkflow::for_tests(
             &document,
-            codewhale_workflow::QualifiedFleetId {
+            nestlone_workflow::QualifiedFleetId {
                 name: "glm-pair".to_string(),
                 origin: "workspace".to_string(),
             },
@@ -5354,7 +5354,7 @@ permissions = "read_only"
             role: "scout".to_string(),
             on: GateOn::RoleComplete,
             gate: GateKind::Approve,
-            on_fail: codewhale_workflow::GateOnFail::Block,
+            on_fail: nestlone_workflow::GateOnFail::Block,
             blocks_role: Some("builder".to_string()),
             max_retries: 0,
             artifact_kind: Some("findings".to_string()),
@@ -5681,10 +5681,10 @@ permissions = "read_only"
     #[test]
     fn a_read_only_session_narrows_a_write_capable_exact_member() {
         let operation = exact_workflow(EXACT_GLM_FLEET);
-        let session = codewhale_workflow::PermissionCeiling {
+        let session = nestlone_workflow::PermissionCeiling {
             write: false,
             network_tool: false,
-            shell: codewhale_workflow::ShellCeiling::ReadOnly,
+            shell: nestlone_workflow::ShellCeiling::ReadOnly,
             delegation_depth: 0,
             tools: true,
         };
@@ -5849,10 +5849,10 @@ permissions = "read_only"
         let second = {
             let text = EXACT_GLM_FLEET.replace("name = \"glm-pair\"", "name = \"glm-solo\"");
             let document =
-                codewhale_workflow::FleetDocument::parse(&text).expect("second fleet parses");
+                nestlone_workflow::FleetDocument::parse(&text).expect("second fleet parses");
             crate::fleet::exact::ExactFleetWorkflow::for_tests(
                 &document,
-                codewhale_workflow::QualifiedFleetId {
+                nestlone_workflow::QualifiedFleetId {
                     name: "glm-solo".to_string(),
                     origin: "workspace".to_string(),
                 },
@@ -5898,12 +5898,12 @@ permissions = "read_only"
         let path = fleets.join("glm-pair.toml");
         std::fs::write(&path, EXACT_GLM_FLEET).expect("write fleet");
 
-        let roots = vec![codewhale_workflow::FleetSearchRoot::new(
+        let roots = vec![nestlone_workflow::FleetSearchRoot::new(
             "workspace",
             tmp.path(),
         )];
         let (document, id) =
-            codewhale_workflow::FleetDocument::load_by_name("glm-pair", &roots).expect("load");
+            nestlone_workflow::FleetDocument::load_by_name("glm-pair", &roots).expect("load");
         let operation = crate::fleet::exact::ExactFleetWorkflow::for_tests(
             &document,
             id,
@@ -5948,7 +5948,7 @@ permissions = "read_only"
 
         // A fresh Workflow does see the edit.
         let (reloaded, reloaded_id) =
-            codewhale_workflow::FleetDocument::load_by_name("glm-pair", &roots).expect("reload");
+            nestlone_workflow::FleetDocument::load_by_name("glm-pair", &roots).expect("reload");
         let next = crate::fleet::exact::ExactFleetWorkflow::for_tests(
             &reloaded,
             reloaded_id,
@@ -7308,7 +7308,7 @@ reviewer = "reviewer"
             role: "scout".to_string(),
             on: GateOn::RoleComplete,
             gate: GateKind::Approve,
-            on_fail: codewhale_workflow::GateOnFail::Block,
+            on_fail: nestlone_workflow::GateOnFail::Block,
             blocks_role: Some("implementer".to_string()),
             max_retries: 0,
             artifact_kind: Some("findings".to_string()),
@@ -7475,7 +7475,7 @@ reviewer = "reviewer"
             role: "scout".to_string(),
             on: GateOn::RoleComplete,
             gate: GateKind::Approve,
-            on_fail: codewhale_workflow::GateOnFail::Block,
+            on_fail: nestlone_workflow::GateOnFail::Block,
             blocks_role: Some("implementer".to_string()),
             max_retries: 0,
             artifact_kind: Some("findings".to_string()),
@@ -7600,7 +7600,7 @@ reviewer = "reviewer"
             role: "scout".to_string(),
             on: GateOn::RoleComplete,
             gate: GateKind::Approve,
-            on_fail: codewhale_workflow::GateOnFail::Block,
+            on_fail: nestlone_workflow::GateOnFail::Block,
             blocks_role: Some("implementer".to_string()),
             max_retries: 0,
             artifact_kind: Some("findings".to_string()),
@@ -7915,7 +7915,7 @@ reviewer = "reviewer"
             role: "reviewer".to_string(),
             on: GateOn::RoleComplete,
             gate: GateKind::Review,
-            on_fail: codewhale_workflow::GateOnFail::Block,
+            on_fail: nestlone_workflow::GateOnFail::Block,
             blocks_role: Some("verifier".to_string()),
             max_retries: 0,
             artifact_kind: Some("review_report".to_string()),
@@ -8377,13 +8377,13 @@ reviewer = "reviewer"
         let source = std::fs::read_to_string(workflow_dir.join("stopship.workflow.js"))
             .expect("read stopship acceptance fixture");
         let compiled =
-            codewhale_workflow::compile_javascript_workflow("stopship.workflow.js", &source)
+            nestlone_workflow::compile_javascript_workflow("stopship.workflow.js", &source)
                 .expect("compile stopship acceptance fixture");
-        let codewhale_workflow::WorkflowNode::Sequence(sequence) = &compiled.nodes[0] else {
+        let nestlone_workflow::WorkflowNode::Sequence(sequence) = &compiled.nodes[0] else {
             panic!("stopship fixture should be one ordered role chain");
         };
         for (index, node) in sequence.children.iter().enumerate() {
-            let codewhale_workflow::WorkflowNode::Leaf(leaf) = node else {
+            let nestlone_workflow::WorkflowNode::Leaf(leaf) = node else {
                 panic!("stopship role chain must contain only leaves");
             };
             let tools = leaf_allowed_tools(leaf).expect("lower stopship child tools");

@@ -80,7 +80,7 @@ pub fn validate_xai_oauth_generation(value: &str) -> Result<&str> {
 }
 
 pub fn xai_oauth_credentials_dir() -> Result<PathBuf> {
-    lexical_absolute_path(&crate::codewhale_home()?.join("credentials"))
+    lexical_absolute_path(&crate::nestlone_home()?.join("credentials"))
 }
 
 /// Make an owned path absolute without resolving any filesystem component.

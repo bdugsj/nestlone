@@ -1177,7 +1177,7 @@ fn start_remote_control_session(app: &mut App) {
         .filter(|value| !value.is_empty())
         .unwrap_or("Codewhale session")
         .to_string();
-    let runtime_commit = option_env!("CODEWHALE_BUILD_COMMIT")
+    let runtime_commit = option_env!("NESTLONE_BUILD_COMMIT")
         .unwrap_or("")
         .to_string();
     match app
@@ -2422,7 +2422,7 @@ fn build_engine_config(app: &App, config: &Config) -> EngineConfig {
         notes_path: config.notes_path(),
         mcp_config_path: config.mcp_config_path(),
         skills_dir: app.skills_dir.clone(),
-        skills_scan_codewhale_only: app.skills_scan_codewhale_only,
+        skills_scan_nestlone_only: app.skills_scan_nestlone_only,
         plugin_registry: Some(std::sync::Arc::clone(&app.plugin_registry)),
         instructions: configured_instruction_sources(config),
         project_context_pack_enabled: config.project_context_pack_enabled(),
@@ -2532,8 +2532,8 @@ fn preview_effective_base_prompt(app: &mut App, config: &Config) {
     use crate::prompts::base_preview;
 
     let prompt = build_app_system_prompt_with_goal(app, config, app.hunt.quarry.as_deref());
-    let home = codewhale_config::codewhale_home().ok();
-    let constitution_path = codewhale_config::UserConstitution::path().ok();
+    let home = nestlone_config::nestlone_home().ok();
+    let constitution_path = nestlone_config::UserConstitution::path().ok();
     let sources = base_preview::PreviewSources {
         base_prompt: Some(crate::prompts::effective_base_prompt_source(
             home.as_deref(),
@@ -2585,7 +2585,7 @@ fn build_app_system_prompt_with_goal(
             )),
             show_thinking: app.show_thinking,
             verbosity: app.verbosity.as_deref(),
-            skills_scan_codewhale_only: app.skills_scan_codewhale_only,
+            skills_scan_nestlone_only: app.skills_scan_nestlone_only,
             plugin_registry: Some(app.plugin_registry.as_ref()),
             mode: app.mode,
         },
@@ -6290,7 +6290,7 @@ async fn run_event_loop(
                     build_command_palette_entries(
                         app.ui_locale,
                         &app.skills_dir,
-                        app.skills_scan_codewhale_only,
+                        app.skills_scan_nestlone_only,
                         &app.workspace,
                         &app.mcp_config_path,
                         app.mcp_snapshot.as_ref(),
@@ -8040,7 +8040,7 @@ fn deliver_constitution_draft_result(
     app: &mut App,
     model_label: String,
     locale: crate::localization::Locale,
-    outcome: Result<Box<codewhale_config::UserConstitution>, String>,
+    outcome: Result<Box<nestlone_config::UserConstitution>, String>,
 ) {
     match outcome {
         Ok(constitution) => {
@@ -10701,7 +10701,7 @@ async fn apply_model_and_compaction_update(
     engine_handle: &EngineHandle,
     compaction: crate::compaction::CompactionConfig,
     mode: AppMode,
-    route_limits: Option<codewhale_config::route::RouteLimits>,
+    route_limits: Option<nestlone_config::route::RouteLimits>,
 ) {
     let _ = engine_handle
         .send(Op::SetModel {
@@ -10726,7 +10726,7 @@ fn try_apply_model_and_compaction_update(
     engine_handle: &EngineHandle,
     compaction: crate::compaction::CompactionConfig,
     mode: AppMode,
-    route_limits: Option<codewhale_config::route::RouteLimits>,
+    route_limits: Option<nestlone_config::route::RouteLimits>,
 ) -> bool {
     if engine_handle
         .try_send(Op::SetModel {
@@ -11282,7 +11282,7 @@ async fn switch_provider(
         .clamp(1, crate::config::MAX_SUBAGENTS);
     app.provider_chain = target
         .kind()
-        .map(|kind| codewhale_config::ProviderChain::new(kind, &config.fallback_providers))
+        .map(|kind| nestlone_config::ProviderChain::new(kind, &config.fallback_providers))
         .filter(|chain| chain.providers().len() > 1);
     app.last_fallback_reason = None;
     app.model_ids_passthrough = config.model_ids_pass_through();
@@ -11387,7 +11387,7 @@ async fn switch_provider(
 
 struct ProviderFallbackRollback {
     identity: ProviderIdentity,
-    chain: Option<codewhale_config::ProviderChain>,
+    chain: Option<nestlone_config::ProviderChain>,
 }
 
 async fn apply_provider_fallback_switch(
@@ -11617,7 +11617,7 @@ fn launch_worktree_slug(requested: &str) -> String {
 fn launch_worktree_spec(
     workspace: &std::path::Path,
     requested: &str,
-) -> Result<codewhale_lane::WorktreeProvision> {
+) -> Result<nestlone_lane::WorktreeProvision> {
     let output = std::process::Command::new("git")
         .current_dir(workspace)
         .args(["rev-parse", "--show-toplevel"])
@@ -11640,7 +11640,7 @@ fn launch_worktree_spec(
     if path.exists() {
         anyhow::bail!("worktree path already exists: {}", path.display());
     }
-    Ok(codewhale_lane::WorktreeProvision {
+    Ok(nestlone_lane::WorktreeProvision {
         repo_root,
         branch: format!("codex/{slug}"),
         path,
@@ -11651,7 +11651,7 @@ fn launch_worktree_spec(
 async fn provision_launch_worktree(workspace: PathBuf, requested: String) -> Result<PathBuf> {
     let spec = launch_worktree_spec(&workspace, &requested)?;
     let provisioned =
-        tokio::task::spawn_blocking(move || codewhale_lane::provision_worktree(&spec))
+        tokio::task::spawn_blocking(move || nestlone_lane::provision_worktree(&spec))
             .await
             .context("new worktree task failed")??;
     Ok(provisioned.path)
@@ -11873,7 +11873,7 @@ async fn apply_command_result(
                 sync_mode_update(app, engine_handle).await;
             }
             AppAction::PermissionRulesChanged => {
-                match codewhale_config::load_permissions_snapshot(app.config_path.clone()) {
+                match nestlone_config::load_permissions_snapshot(app.config_path.clone()) {
                     Ok(snapshot) => {
                         let ruleset = snapshot.permissions().ruleset();
                         config.exec_policy_engine.set_ruleset(ruleset.clone());
@@ -12661,7 +12661,7 @@ fn apply_workspace_runtime_state(app: &mut App, config: &Config, workspace: Path
         workspace.clone(),
     );
     app.skills_dir = crate::tui::app::resolve_skills_dir(&workspace, &config.skills_dir(), config);
-    app.skills_scan_codewhale_only = config.skills_config().scan_codewhale_only();
+    app.skills_scan_nestlone_only = config.skills_config().scan_nestlone_only();
     app.refresh_skill_cache();
     app.workspace_context = None;
     if let Ok(mut cell) = app.workspace_context_cell.lock() {
@@ -12982,7 +12982,7 @@ fn mcp_ui_action_refreshes_discovery(action: &crate::tui::app::McpUiAction) -> b
 }
 
 fn mcp_import_consent_path() -> PathBuf {
-    codewhale_config::codewhale_home()
+    nestlone_config::nestlone_home()
         .unwrap_or_else(|_| PathBuf::from("."))
         .join("mcp-import-consent.json")
 }
@@ -12990,7 +12990,7 @@ fn mcp_import_consent_path() -> PathBuf {
 fn mcp_external_import_status_text(workspace: &std::path::Path) -> String {
     use crate::mcp::external_import::{discover_external_sources, format_candidates_for_display};
     let home = crate::config::effective_home_dir().unwrap_or_else(|| PathBuf::from("."));
-    let market_path = codewhale_config::codewhale_home()
+    let market_path = nestlone_config::nestlone_home()
         .ok()
         .map(|h| h.join("mcp-marketplace.json"));
     let markets: Vec<PathBuf> = market_path.into_iter().collect();
@@ -13014,7 +13014,7 @@ fn mcp_import_apply(
     use std::time::{SystemTime, UNIX_EPOCH};
 
     let home = crate::config::effective_home_dir().unwrap_or_else(|| PathBuf::from("."));
-    let market_path = codewhale_config::codewhale_home()
+    let market_path = nestlone_config::nestlone_home()
         .ok()
         .map(|h| h.join("mcp-marketplace.json"));
     let markets: Vec<PathBuf> = market_path.into_iter().collect();
@@ -14275,7 +14275,7 @@ fn open_model_picker_for_provider(
 fn apply_hotbar_setup_saved(
     app: &mut App,
     config: &mut Config,
-    bindings: Vec<codewhale_config::HotbarBindingToml>,
+    bindings: Vec<nestlone_config::HotbarBindingToml>,
 ) {
     match crate::config_persistence::persist_hotbar_bindings(app.config_path.as_deref(), &bindings)
     {
@@ -14310,15 +14310,15 @@ fn use_bundled_constitution(app: &mut App, config: &Config) {
     let mut state = crate::tui::setup::load_setup_state_for_app(app, config);
     state.complete_constitution_checkpoint(
         crate::tui::setup::CONSTITUTION_CHECKPOINT_VERSION,
-        codewhale_config::ConstitutionChoice::Bundled,
+        nestlone_config::ConstitutionChoice::Bundled,
     );
-    state.constitution_source = codewhale_config::ConstitutionSource::Bundled;
-    state.constitution_validity = codewhale_config::ConstitutionValidity::Unknown;
+    state.constitution_source = nestlone_config::ConstitutionSource::Bundled;
+    state.constitution_validity = nestlone_config::ConstitutionValidity::Unknown;
     state.constitution_preview_hash = None;
     state.set_step(
-        codewhale_config::SetupStep::Constitution,
-        codewhale_config::StepEntry::new(
-            codewhale_config::StepStatus::Verified,
+        nestlone_config::SetupStep::Constitution,
+        nestlone_config::StepEntry::new(
+            nestlone_config::StepStatus::Verified,
             true,
             crate::tui::setup::CONSTITUTION_CHECKPOINT_VERSION,
         )
@@ -14370,7 +14370,7 @@ fn disable_hotbar(app: &mut App, config: &mut Config) {
 /// rather than deleting the key. This is an explicit reset, so any custom
 /// bindings are replaced with the recommended set.
 fn restore_hotbar_defaults(app: &mut App, config: &mut Config) {
-    let defaults = codewhale_config::default_hotbar_bindings_toml();
+    let defaults = nestlone_config::default_hotbar_bindings_toml();
     match crate::config_persistence::persist_hotbar_bindings(app.config_path.as_deref(), &defaults)
     {
         Ok(path) => {
@@ -15140,7 +15140,7 @@ async fn handle_view_events(
                     app.needs_redraw = true;
                     continue;
                 }
-                let mut txn = codewhale_config::persistence::SetupTransaction::new();
+                let mut txn = nestlone_config::persistence::SetupTransaction::new();
                 txn.stage(target.clone(), draft.render_toml().into_bytes());
                 match txn.commit() {
                     Ok(()) => {
@@ -15798,7 +15798,7 @@ struct ApprovalDecisionEvent {
     timed_out: bool,
     approval_key: String,
     approval_grouping_key: String,
-    persistent_rules: Vec<codewhale_config::ToolAskRule>,
+    persistent_rules: Vec<nestlone_config::ToolAskRule>,
 }
 
 async fn apply_approval_decision(
@@ -15904,7 +15904,7 @@ fn apply_setup_runtime_preset(
     app: &mut App,
     config: &mut Config,
     preset: crate::tui::setup::SetupRuntimePreset,
-    state: codewhale_config::SetupState,
+    state: nestlone_config::SetupState,
 ) -> Result<String> {
     if let Some(source) = config.runtime_preset_blocker(
         app.config_path.as_deref(),
@@ -16044,16 +16044,16 @@ fn apply_setup_runtime_preset(
 fn persist_rules_from_approval(
     app: &mut App,
     config: &mut Config,
-    rules: &[codewhale_config::ToolAskRule],
+    rules: &[nestlone_config::ToolAskRule],
 ) {
     let action = rules.first().map(|rule| rule.action);
-    match codewhale_config::ConfigStore::load(app.config_path.clone()).and_then(|mut store| {
+    match nestlone_config::ConfigStore::load(app.config_path.clone()).and_then(|mut store| {
         let added = match action {
-            Some(codewhale_execpolicy::PermissionAction::Ask) => store.append_ask_rules(rules)?,
-            Some(codewhale_execpolicy::PermissionAction::Allow) => {
+            Some(nestlone_execpolicy::PermissionAction::Ask) => store.append_ask_rules(rules)?,
+            Some(nestlone_execpolicy::PermissionAction::Allow) => {
                 store.append_allow_rules(rules)?
             }
-            Some(codewhale_execpolicy::PermissionAction::Deny) => {
+            Some(nestlone_execpolicy::PermissionAction::Deny) => {
                 anyhow::bail!("the approval UI cannot persist deny rules")
             }
             None => 0,
@@ -16064,7 +16064,7 @@ fn persist_rules_from_approval(
     }) {
         Ok((added, path)) if added > 0 => {
             let action = match action {
-                Some(codewhale_execpolicy::PermissionAction::Allow) => "allow",
+                Some(nestlone_execpolicy::PermissionAction::Allow) => "allow",
                 _ => "ask",
             };
             app.status_message = Some(format!(
@@ -16074,7 +16074,7 @@ fn persist_rules_from_approval(
         }
         Ok((_added, path)) => {
             let action = match action {
-                Some(codewhale_execpolicy::PermissionAction::Allow) => "Allow",
+                Some(nestlone_execpolicy::PermissionAction::Allow) => "Allow",
                 _ => "Ask",
             };
             app.status_message = Some(format!(
@@ -16719,7 +16719,7 @@ fn mirror_saved_api_key_in_config(config: &mut Config, provider: ApiProvider, ap
     }
 }
 
-async fn apply_codewhale_owned_xai_login(
+async fn apply_nestlone_owned_xai_login(
     app: &mut App,
     engine_handle: &mut EngineHandle,
     config: &mut Config,
@@ -16734,8 +16734,8 @@ async fn apply_codewhale_owned_xai_login(
         Ok(activation) => {
             app.status_message = Some(format!(
                 "{status_prefix}; activated {} via {}",
-                codewhale_config::quote_os_path(&activation.auth_path),
-                codewhale_config::quote_os_path(&activation.config_path)
+                nestlone_config::quote_os_path(&activation.auth_path),
+                nestlone_config::quote_os_path(&activation.config_path)
             ));
             app.api_key_env_only = false;
         }
@@ -16776,7 +16776,7 @@ async fn run_xai_device_login_from_tui(
 
     match login_result {
         Ok(pending) => {
-            apply_codewhale_owned_xai_login(
+            apply_nestlone_owned_xai_login(
                 app,
                 engine_handle,
                 config,
@@ -17056,7 +17056,7 @@ fn restore_loaded_session_provider(app: &mut App, config: &mut Config, identity:
         .clamp(1, crate::config::MAX_SUBAGENTS);
     app.provider_chain = provider
         .kind()
-        .map(|kind| codewhale_config::ProviderChain::new(kind, &config.fallback_providers))
+        .map(|kind| nestlone_config::ProviderChain::new(kind, &config.fallback_providers))
         .filter(|chain| chain.providers().len() > 1);
     app.last_fallback_reason = None;
     app.model_ids_passthrough = config.model_ids_pass_through();
@@ -18126,8 +18126,8 @@ async fn version_hint_from_startup_source(
                 return version_hint_from_release_mirror_env(current).await;
             }
 
-            let body = codewhale_release::fetch_release_json_async(
-                codewhale_release::LATEST_RELEASE_URL,
+            let body = nestlone_release::fetch_release_json_async(
+                nestlone_release::LATEST_RELEASE_URL,
                 "latest release",
             )
             .await
@@ -18143,23 +18143,23 @@ async fn version_hint_from_release_mirror_env(current: &str) -> Option<UpdateNot
         return None;
     }
     let tag =
-        codewhale_release::latest_release_tag_async(codewhale_release::ReleaseChannel::Stable)
+        nestlone_release::latest_release_tag_async(nestlone_release::ReleaseChannel::Stable)
             .await
             .ok()?;
     version_hint_from_latest_tag(&tag, current)
 }
 
 fn release_mirror_env_configured() -> bool {
-    let version = codewhale_release::update_version_from_env()
+    let version = nestlone_release::update_version_from_env()
         .unwrap_or_else(|| env!("CARGO_PKG_VERSION").to_string());
-    codewhale_release::release_base_url_from_env(&version).is_some()
+    nestlone_release::release_base_url_from_env(&version).is_some()
 }
 
 async fn version_hint_from_configured_update_uri(
     update_uri: &str,
     current: &str,
 ) -> Result<Option<UpdateNotice>> {
-    let body = codewhale_release::fetch_release_json_async(update_uri, "configured latest release")
+    let body = nestlone_release::fetch_release_json_async(update_uri, "configured latest release")
         .await?;
     let json: serde_json::Value = serde_json::from_str(&body).with_context(|| {
         format!("failed to parse release JSON from configured URI {update_uri}")
@@ -18362,9 +18362,9 @@ mod provider_key_validation_tests {
                 xai: ProviderConfig {
                     auth_mode: Some("oauth".to_string()),
                     external_credentials: Some(
-                        codewhale_config::ExternalCredentialConsentToml::read_only(
-                            codewhale_config::ProviderKind::Xai,
-                            codewhale_config::ExternalCredentialSource::GrokCli,
+                        nestlone_config::ExternalCredentialConsentToml::read_only(
+                            nestlone_config::ProviderKind::Xai,
+                            nestlone_config::ExternalCredentialSource::GrokCli,
                             external_path,
                         ),
                     ),

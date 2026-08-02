@@ -23,7 +23,7 @@ use serde_json::Value;
 
 // Re-export protocol's ThreadStatus so callers in the state crate and
 // external consumers (e.g. core) can reference a single canonical definition.
-pub use codewhale_protocol::ThreadStatus;
+pub use nestlone_protocol::ThreadStatus;
 
 /// Indicates how a session was initiated.
 ///
@@ -1795,7 +1795,7 @@ fn default_state_db_path() -> PathBuf {
     // defeat the isolation the override promises (CI, containers, multi-project,
     // test harnesses). Legacy ~/.deepseek migration only applies to the default
     // home location.
-    if let Some(overridden) = codewhale_home_override() {
+    if let Some(overridden) = nestlone_home_override() {
         return overridden.join("state.db");
     }
     let home = dirs::home_dir().unwrap_or_else(|| PathBuf::from("."));
@@ -1812,13 +1812,13 @@ fn default_state_db_path() -> PathBuf {
 /// Resolve `$CODEWHALE_HOME` as a hard override of the data directory root.
 ///
 /// Returns the path verbatim (the env var IS the home dir, matching
-/// `codewhale_home()` in config — `$CODEWHALE_HOME=/data/cw` means the home is
+/// `nestlone_home()` in config — `$CODEWHALE_HOME=/data/cw` means the home is
 /// `/data/cw`, not `/data/cw/.codewhale`). Returns `None` when unset/empty so
 /// callers can branch on "explicit override" vs "default home + legacy
 /// fallback." Mirrors config's helper without taking a dependency on it (state
 /// is a low-level leaf crate; config cannot be a dependency here without
 /// inverting the layering).
-fn codewhale_home_override() -> Option<PathBuf> {
+fn nestlone_home_override() -> Option<PathBuf> {
     std::env::var_os("CODEWHALE_HOME")
         .filter(|value| !value.is_empty())
         .map(PathBuf::from)
@@ -2420,41 +2420,41 @@ mod tests {
     }
 
     #[test]
-    fn codewhale_home_override_returns_the_env_value_verbatim() {
+    fn nestlone_home_override_returns_the_env_value_verbatim() {
         let _lock = CODEWHALE_HOME_TEST_LOCK.lock().unwrap();
         let _g = CodeWhaleHomeGuard::set("/tmp/cw-isolated-state");
         // The env var IS the home dir — no ".codewhale" appended. This matches
-        // codewhale_home() in config ($CODEWHALE_HOME=/x means home is /x).
+        // nestlone_home() in config ($CODEWHALE_HOME=/x means home is /x).
         assert_eq!(
-            codewhale_home_override().as_deref(),
+            nestlone_home_override().as_deref(),
             Some(std::path::Path::new("/tmp/cw-isolated-state"))
         );
     }
 
     #[test]
-    fn codewhale_home_override_none_when_unset() {
+    fn nestlone_home_override_none_when_unset() {
         let _lock = CODEWHALE_HOME_TEST_LOCK.lock().unwrap();
         let _g = CodeWhaleHomeGuard::remove();
-        assert!(codewhale_home_override().is_none());
+        assert!(nestlone_home_override().is_none());
     }
 
     #[test]
-    fn codewhale_home_override_none_when_empty() {
+    fn nestlone_home_override_none_when_empty() {
         let _lock = CODEWHALE_HOME_TEST_LOCK.lock().unwrap();
         let _g = CodeWhaleHomeGuard::set("   ");
         // The helper filters empty values (after the OsString check). Note:
         // var_os returns the raw "   ", and our filter only catches truly-empty,
         // so this documents that whitespace-only is NOT treated as unset at the
-        // override layer (config's codewhale_home trims; we don't here — the
+        // override layer (config's nestlone_home trims; we don't here — the
         // branch is "was it set at all").
         assert!(
-            codewhale_home_override().is_some(),
+            nestlone_home_override().is_some(),
             "non-empty (even whitespace) counts as set; trimming is the caller's job"
         );
     }
 
     #[test]
-    fn default_state_db_path_uses_codewhale_home_when_set() {
+    fn default_state_db_path_uses_nestlone_home_when_set() {
         let _lock = CODEWHALE_HOME_TEST_LOCK.lock().unwrap();
         let dir = std::env::temp_dir().join(format!(
             "cw-home-state-{}-{}",

@@ -249,7 +249,7 @@ const REDACTED_PATH: &str = "<path-redacted>";
 /// span, no token-shaped run, and no control character, and is truncated to
 /// [`MAX_ERROR_LEN`].
 pub(crate) fn safe_error_text(raw: &str) -> String {
-    let redacted = codewhale_config::persistence::redact_secrets(raw);
+    let redacted = nestlone_config::persistence::redact_secrets(raw);
     let mut out = String::with_capacity(redacted.len().min(MAX_ERROR_LEN));
     let mut last_was_redacted = false;
     for token in redacted.split_whitespace() {

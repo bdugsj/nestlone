@@ -198,7 +198,7 @@ mod tests {
     }
 
     #[test]
-    fn dark_theme_uses_codewhale_semantic_roles() {
+    fn dark_theme_uses_nestlone_semantic_roles() {
         let theme = Theme::dark();
         assert_eq!(theme.variant, Variant::Dark);
         assert_eq!(theme.section_border_color, palette::BORDER_COLOR);

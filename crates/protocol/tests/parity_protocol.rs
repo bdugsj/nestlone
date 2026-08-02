@@ -1,4 +1,4 @@
-use codewhale_protocol::{
+use nestlone_protocol::{
     AppRequest, EventFrame, ThreadGoal, ThreadGoalProgressParams, ThreadGoalSetParams,
     ThreadGoalStatus, ThreadListParams, ThreadRequest, ThreadResumeParams, UserInputAnswerEvent,
     UserInputOptionEvent, UserInputQuestionEvent, UserInputRequestEvent,

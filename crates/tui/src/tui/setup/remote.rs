@@ -162,7 +162,7 @@ impl SetupRemoteFacts {
             .iter()
             .map(|bridge| bridge.slug)
             .collect::<Vec<_>>();
-        let provider_count = codewhale_config::ProviderKind::all().len();
+        let provider_count = nestlone_config::ProviderKind::all().len();
         // Keep the exact route identity. Named custom routes are not yet
         // representable by the remote bundle registry, so the generated CLI
         // command must fail explicitly for that name instead of silently

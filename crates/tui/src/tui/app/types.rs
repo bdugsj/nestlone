@@ -901,7 +901,7 @@ pub enum AppAction {
     OpenSetupWizard,
     /// Open the constitution-first `/setup` wizard at a specific step.
     OpenSetupWizardAt {
-        step: codewhale_config::SetupStep,
+        step: nestlone_config::SetupStep,
     },
     /// Record that the bundled/default constitution should be used.
     UseBundledConstitution,

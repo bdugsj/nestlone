@@ -195,11 +195,11 @@ pub fn tips_lines(app: &App) -> Vec<ratatui::text::Line<'static>> {
 }
 
 pub fn default_marker_path() -> Option<PathBuf> {
-    let primary_home = codewhale_config::codewhale_home().ok()?;
-    let legacy_home = if codewhale_config::codewhale_home_is_explicit() {
+    let primary_home = nestlone_config::nestlone_home().ok()?;
+    let legacy_home = if nestlone_config::nestlone_home_is_explicit() {
         None
     } else {
-        codewhale_config::legacy_deepseek_home().ok()
+        nestlone_config::legacy_deepseek_home().ok()
     };
     Some(marker_path_with_roots(
         &primary_home,
@@ -548,7 +548,7 @@ mod tests {
     }
 
     #[test]
-    fn fresh_install_marker_path_uses_codewhale_not_legacy() {
+    fn fresh_install_marker_path_uses_nestlone_not_legacy() {
         let tmp = tempfile::tempdir().expect("tempdir");
 
         let expected = tmp.path().join(".codewhale").join(ONBOARDED_MARKER_FILE);
@@ -578,7 +578,7 @@ mod tests {
     }
 
     #[test]
-    fn codewhale_marker_wins_over_legacy_marker() {
+    fn nestlone_marker_wins_over_legacy_marker() {
         let tmp = tempfile::tempdir().expect("tempdir");
         let primary = tmp.path().join(".codewhale").join(ONBOARDED_MARKER_FILE);
         let legacy = tmp.path().join(".deepseek").join(ONBOARDED_MARKER_FILE);
@@ -591,7 +591,7 @@ mod tests {
     }
 
     #[test]
-    fn explicit_codewhale_home_marker_survives_restart_resolution() {
+    fn explicit_nestlone_home_marker_survives_restart_resolution() {
         let _env_lock = crate::test_support::lock_test_env();
         let tmp = tempfile::tempdir().expect("tempdir");
         let ambient_home = tmp.path().join("ambient profile");
@@ -602,7 +602,7 @@ mod tests {
         std::fs::write(&ambient_legacy, "").expect("seed ambient legacy marker");
         let _home = crate::test_support::EnvVarGuard::set("HOME", &ambient_home);
         let _userprofile = crate::test_support::EnvVarGuard::set("USERPROFILE", &ambient_home);
-        let _codewhale_home =
+        let _nestlone_home =
             crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", &isolated_home);
 
         let expected = isolated_home.join(ONBOARDED_MARKER_FILE);

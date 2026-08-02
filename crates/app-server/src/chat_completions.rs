@@ -14,8 +14,8 @@ use axum::Json;
 use axum::extract::State;
 use axum::http::{HeaderName, StatusCode};
 use axum::response::IntoResponse;
-use codewhale_agent::ModelRegistry;
-use codewhale_config::{
+use nestlone_agent::ModelRegistry;
+use nestlone_config::{
     ConfigToml, ProviderKind, auth_mode_disables_api_key, is_upstream_auth_header,
     provider::WireFormat,
     provider_base_url_is_official, provider_preserves_custom_base_url_model,
@@ -391,7 +391,7 @@ pub(crate) async fn chat_completions_handler(
     }
 
     // Build upstream request.
-    let upstream_req = codewhale_release::platform_http_client_builder()
+    let upstream_req = nestlone_release::platform_http_client_builder()
         .build()
         .map_err(|e| {
             (
@@ -480,7 +480,7 @@ mod tests {
     use super::*;
     use axum::body::Body;
     use axum::http::{Method, Request};
-    use codewhale_config::provider::WireFormat;
+    use nestlone_config::provider::WireFormat;
     use std::fs;
     use std::sync::OnceLock;
     use tokio::sync::mpsc;

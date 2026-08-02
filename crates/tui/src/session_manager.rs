@@ -1232,7 +1232,7 @@ fn is_git_metadata_entry(path: &Path) -> bool {
 /// If an older build already created an empty primary sessions directory, copy
 /// missing legacy entries into it without overwriting newer CodeWhale data.
 pub fn default_sessions_dir() -> std::io::Result<PathBuf> {
-    let dir = codewhale_config::ensure_state_dir("sessions")
+    let dir = nestlone_config::ensure_state_dir("sessions")
         .map_err(|e| std::io::Error::new(std::io::ErrorKind::NotFound, e.to_string()))?;
     match merge_missing_legacy_session_entries(&dir) {
         Ok(0) => {}
@@ -1255,11 +1255,11 @@ pub fn default_sessions_dir() -> std::io::Result<PathBuf> {
 }
 
 fn merge_missing_legacy_session_entries(primary: &Path) -> io::Result<usize> {
-    if codewhale_home_is_explicit() {
+    if nestlone_home_is_explicit() {
         return Ok(0);
     }
 
-    let legacy = codewhale_config::legacy_deepseek_home()
+    let legacy = nestlone_config::legacy_deepseek_home()
         .map_err(|e| io::Error::new(io::ErrorKind::NotFound, e.to_string()))?
         .join("sessions");
     if !legacy.is_dir() || paths_equivalent(primary, &legacy) {
@@ -1269,7 +1269,7 @@ fn merge_missing_legacy_session_entries(primary: &Path) -> io::Result<usize> {
     copy_missing_dir_entries(&legacy, primary)
 }
 
-fn codewhale_home_is_explicit() -> bool {
+fn nestlone_home_is_explicit() -> bool {
     std::env::var("CODEWHALE_HOME")
         .map(|value| !value.trim().is_empty())
         .unwrap_or(false)
@@ -2135,7 +2135,7 @@ mod tests {
         let tmp = tempdir().expect("tempdir");
         let home = tmp.path().join("home");
         let _home = crate::test_support::EnvVarGuard::set("HOME", &home);
-        let _codewhale_home = crate::test_support::EnvVarGuard::remove("CODEWHALE_HOME");
+        let _nestlone_home = crate::test_support::EnvVarGuard::remove("CODEWHALE_HOME");
 
         let primary_sessions = home.join(".codewhale").join("sessions");
         let legacy_sessions = home.join(".deepseek").join("sessions");
@@ -2180,7 +2180,7 @@ mod tests {
         let tmp = tempdir().expect("tempdir");
         let home = tmp.path().join("home");
         let _home = crate::test_support::EnvVarGuard::set("HOME", &home);
-        let _codewhale_home = crate::test_support::EnvVarGuard::remove("CODEWHALE_HOME");
+        let _nestlone_home = crate::test_support::EnvVarGuard::remove("CODEWHALE_HOME");
 
         let primary_sessions = home.join(".codewhale").join("sessions");
         let legacy_sessions = home.join(".deepseek").join("sessions");
@@ -2204,13 +2204,13 @@ mod tests {
     }
 
     #[test]
-    fn explicit_codewhale_home_disables_legacy_session_copy() {
+    fn explicit_nestlone_home_disables_legacy_session_copy() {
         let _lock = crate::test_support::lock_test_env();
         let tmp = tempdir().expect("tempdir");
         let home = tmp.path().join("home");
         let explicit_home = tmp.path().join("explicit-codewhale");
         let _home = crate::test_support::EnvVarGuard::set("HOME", &home);
-        let _codewhale_home =
+        let _nestlone_home =
             crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", &explicit_home);
 
         let legacy_sessions = home.join(".deepseek").join("sessions");

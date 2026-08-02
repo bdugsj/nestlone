@@ -168,7 +168,7 @@ pub fn resolve_user_theme(value: &str) -> Result<Option<(ThemeId, UiTheme)>, Str
 }
 
 pub fn user_themes_dir() -> Result<PathBuf, String> {
-    codewhale_config::codewhale_home()
+    nestlone_config::nestlone_home()
         .map(|home| home.join("themes"))
         .map_err(|error| format!("failed to resolve Codewhale themes directory: {error}"))
 }

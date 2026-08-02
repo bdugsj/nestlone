@@ -56,9 +56,9 @@ use crate::tui::views::{
     ActionHint, EmptyState, ListDetailLayout, ModalKind, ModalView, ViewAction, ViewEvent,
     centered_modal_area, render_modal_footer, render_modal_surface,
 };
-use codewhale_config::catalog::{CatalogOffering, CatalogSnapshot};
-use codewhale_config::provider::WireFormat;
-use codewhale_config::route::{PricingSku, RequestProtocol};
+use nestlone_config::catalog::{CatalogOffering, CatalogSnapshot};
+use nestlone_config::provider::WireFormat;
+use nestlone_config::route::{PricingSku, RequestProtocol};
 use serde_json::Value;
 use std::borrow::Cow;
 use std::sync::OnceLock;
@@ -197,7 +197,7 @@ pub struct ProviderDashboardRow {
     pub(crate) readiness: ResolvedProviderReadiness,
     pub maturity: ProviderMaturity,
     pub messages: Vec<String>,
-    external_credential_status: Option<codewhale_config::ExternalCredentialConsentStatus>,
+    external_credential_status: Option<nestlone_config::ExternalCredentialConsentStatus>,
     pub is_active: bool,
     has_key: bool,
     credential_state: CredentialState,
@@ -542,7 +542,7 @@ impl ProviderDashboardRow {
             ProviderRequestConcurrencySummary::for_row(provider, config, runtime_status, is_active);
 
         let compatibility_kind = (provider == ApiProvider::DeepseekCN)
-            .then_some(codewhale_config::ProviderKind::Deepseek);
+            .then_some(nestlone_config::ProviderKind::Deepseek);
         let Some(kind) = provider.kind().or(compatibility_kind) else {
             return Self {
                 provider,
@@ -1013,7 +1013,7 @@ fn bundled_reasoning_catalog() -> &'static CatalogSnapshot {
         // hand-maintained per-row seed, so provider reasoning rows (GLM-5.2,
         // etc.) cannot drift from the catalog and every bundled provider with
         // reasoning facts is covered, not just GLM.
-        offerings: codewhale_config::catalog::bundled_catalog_offerings(),
+        offerings: nestlone_config::catalog::bundled_catalog_offerings(),
     })
 }
 
@@ -1370,24 +1370,24 @@ fn compact_base_url(base_url: &str) -> String {
 pub(crate) fn external_consent_target_for_provider(
     provider: ApiProvider,
 ) -> Option<(
-    codewhale_config::ProviderKind,
-    codewhale_config::ExternalCredentialSource,
+    nestlone_config::ProviderKind,
+    nestlone_config::ExternalCredentialSource,
     std::path::PathBuf,
 )> {
     let (consent_provider, source, path) = match provider {
         ApiProvider::OpenaiCodex => (
-            codewhale_config::ProviderKind::OpenaiCodex,
-            codewhale_config::ExternalCredentialSource::CodexCli,
+            nestlone_config::ProviderKind::OpenaiCodex,
+            nestlone_config::ExternalCredentialSource::CodexCli,
             crate::oauth::auth_file_path(),
         ),
         ApiProvider::Xai => (
-            codewhale_config::ProviderKind::Xai,
-            codewhale_config::ExternalCredentialSource::GrokCli,
+            nestlone_config::ProviderKind::Xai,
+            nestlone_config::ExternalCredentialSource::GrokCli,
             crate::xai_oauth::auth_file_path(),
         ),
         _ => return None,
     };
-    let path = codewhale_config::resolve_external_credential_path(path).ok()?;
+    let path = nestlone_config::resolve_external_credential_path(path).ok()?;
     Some((consent_provider, source, path))
 }
 
@@ -1762,8 +1762,8 @@ impl ProviderPickerView {
     fn selected_external_consent_target(
         &self,
     ) -> Option<(
-        codewhale_config::ProviderKind,
-        codewhale_config::ExternalCredentialSource,
+        nestlone_config::ProviderKind,
+        nestlone_config::ExternalCredentialSource,
         std::path::PathBuf,
     )> {
         external_consent_target_for_provider(self.selected_provider())
@@ -2341,7 +2341,7 @@ impl ProviderPickerView {
             let owner_path = self
                 .tr(MessageId::ProviderExternalOwnerPath)
                 .replace("{owner}", status.owner)
-                .replace("{path}", &codewhale_config::quote_os_path(&status.path));
+                .replace("{path}", &nestlone_config::quote_os_path(&status.path));
             let mut owner_path_spans = vec![Span::styled(
                 owner_path,
                 Style::default().fg(palette::TEXT_MUTED),
@@ -2350,7 +2350,7 @@ impl ProviderPickerView {
                 let warning = self
                     .tr(MessageId::ProviderExternalPinnedPathWarning)
                     .replace("{owner}", status.owner)
-                    .replace("{path}", &codewhale_config::quote_os_path(&status.path));
+                    .replace("{path}", &nestlone_config::quote_os_path(&status.path));
                 owner_path_spans.push(Span::styled(
                     " | ",
                     Style::default().fg(palette::TEXT_MUTED),
@@ -2362,13 +2362,13 @@ impl ProviderPickerView {
             }
             lines.push(Line::from(owner_path_spans));
             let semantics = match status.access {
-                codewhale_config::ExternalCredentialAccess::Disabled => {
+                nestlone_config::ExternalCredentialAccess::Disabled => {
                     self.tr(MessageId::ProviderExternalDisabledDetail)
                 }
-                codewhale_config::ExternalCredentialAccess::ReadOnly => {
+                nestlone_config::ExternalCredentialAccess::ReadOnly => {
                     self.tr(MessageId::ProviderExternalReadOnlySemantics)
                 }
-                codewhale_config::ExternalCredentialAccess::Managed => {
+                nestlone_config::ExternalCredentialAccess::Managed => {
                     self.tr(MessageId::ProviderExternalManagedDetail)
                 }
             };
@@ -2695,7 +2695,7 @@ impl ProviderPickerView {
             )),
             Line::from(format!(
                 "{exact_path_label}: {}",
-                codewhale_config::quote_os_path(&path)
+                nestlone_config::quote_os_path(&path)
             )),
             Line::from(""),
             Line::from(format!(
@@ -4193,11 +4193,11 @@ mod tests {
     fn setup_provider_key_entry_matrix_keeps_hosted_codex_and_local_hints_distinct() {
         let _guard = crate::test_support::lock_test_env();
         let tmp = tempfile::TempDir::new().expect("tempdir");
-        let codewhale_home = tmp.path().join(".codewhale");
+        let nestlone_home = tmp.path().join(".codewhale");
         let _home = crate::test_support::EnvVarGuard::set("HOME", tmp.path());
         let _userprofile = crate::test_support::EnvVarGuard::set("USERPROFILE", tmp.path());
-        let _codewhale_home =
-            crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", &codewhale_home);
+        let _nestlone_home =
+            crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", &nestlone_home);
         let _deepseek_key = crate::test_support::EnvVarGuard::remove("DEEPSEEK_API_KEY");
         let _deepseek_source = crate::test_support::EnvVarGuard::remove("DEEPSEEK_API_KEY_SOURCE");
         let _codex_key = crate::test_support::EnvVarGuard::remove("OPENAI_CODEX_ACCESS_TOKEN");
@@ -4930,8 +4930,8 @@ mod tests {
                 kind: Some("openai-compatible".to_string()),
                 base_url: Some("https://gateway.example.test/v1".to_string()),
                 model: Some("private-model".to_string()),
-                auth: Some(codewhale_config::ProviderAuthSourceToml {
-                    source: codewhale_config::AuthSourceKind::Command,
+                auth: Some(nestlone_config::ProviderAuthSourceToml {
+                    source: nestlone_config::AuthSourceKind::Command,
                     command: vec!["secret-tool".to_string(), "lookup".to_string()],
                     timeout_ms: Some(2_000),
                     secret_id: None,
@@ -6239,8 +6239,8 @@ mod tests {
             picker.handle_key(key(KeyCode::Enter)),
             ViewAction::EmitAndClose(ViewEvent::ProviderPickerExternalConsentConfirmed {
                 provider: ApiProvider::OpenaiCodex,
-                consent_provider: codewhale_config::ProviderKind::OpenaiCodex,
-                source: codewhale_config::ExternalCredentialSource::CodexCli,
+                consent_provider: nestlone_config::ProviderKind::OpenaiCodex,
+                source: nestlone_config::ExternalCredentialSource::CodexCli,
                 ..
             })
         ));
@@ -6350,7 +6350,7 @@ mod tests {
         std::fs::write(&grok_path, grok_raw).expect("write Grok trap");
         let owned_home = temp.path().join("codewhale-owned");
 
-        let _codewhale_home = crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", &owned_home);
+        let _nestlone_home = crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", &owned_home);
         let _codex_path =
             crate::test_support::EnvVarGuard::set("OPENAI_CODEX_AUTH_FILE", &codex_path);
         let _grok_path = crate::test_support::EnvVarGuard::set("GROK_AUTH_PATH", &grok_path);
@@ -6366,9 +6366,9 @@ mod tests {
                 openai_codex: crate::config::ProviderConfig {
                     auth_mode: Some("oauth".to_string()),
                     external_credentials: Some(
-                        codewhale_config::ExternalCredentialConsentToml::read_only(
-                            codewhale_config::ProviderKind::OpenaiCodex,
-                            codewhale_config::ExternalCredentialSource::CodexCli,
+                        nestlone_config::ExternalCredentialConsentToml::read_only(
+                            nestlone_config::ProviderKind::OpenaiCodex,
+                            nestlone_config::ExternalCredentialSource::CodexCli,
                             codex_path.clone(),
                         ),
                     ),
@@ -6377,9 +6377,9 @@ mod tests {
                 xai: crate::config::ProviderConfig {
                     auth_mode: Some("oauth".to_string()),
                     external_credentials: Some(
-                        codewhale_config::ExternalCredentialConsentToml::read_only(
-                            codewhale_config::ProviderKind::Xai,
-                            codewhale_config::ExternalCredentialSource::GrokCli,
+                        nestlone_config::ExternalCredentialConsentToml::read_only(
+                            nestlone_config::ProviderKind::Xai,
+                            nestlone_config::ExternalCredentialSource::GrokCli,
                             grok_path.clone(),
                         ),
                     ),

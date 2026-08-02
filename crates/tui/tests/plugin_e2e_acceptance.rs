@@ -365,7 +365,7 @@ fn scanner_should_report_missing_path(world: &mut PluginE2EWorld) {
 /// Prove the binary still loads after the plugin module extraction.
 #[tokio::test(flavor = "current_thread")]
 async fn plugin_module_does_not_break_binary_load() {
-    let output = Command::new(codewhale_tui_binary())
+    let output = Command::new(nestlone_tui_binary())
         .arg("--version")
         .output()
         .expect("codewhale-tui --version should start");
@@ -826,7 +826,7 @@ async fn run_scenario(name: &'static str, expected_steps: usize) {
 // Helpers
 // ---------------------------------------------------------------------------
 
-fn codewhale_tui_binary() -> PathBuf {
+fn nestlone_tui_binary() -> PathBuf {
     if let Some(path) = option_env!("CARGO_BIN_EXE_codewhale-tui") {
         return PathBuf::from(path);
     }

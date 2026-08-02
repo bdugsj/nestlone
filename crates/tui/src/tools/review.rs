@@ -260,7 +260,7 @@ pub fn write_review_receipt(
         }
         path.to_path_buf()
     } else {
-        let dir = codewhale_config::ensure_state_dir("review-receipts")?;
+        let dir = nestlone_config::ensure_state_dir("review-receipts")?;
         let digest = receipt
             .diff_fingerprint
             .strip_prefix("sha256:")
@@ -282,7 +282,7 @@ pub fn read_review_receipt(path: &Path) -> anyhow::Result<ReviewReceipt> {
 pub fn latest_review_receipt_for_diff(
     diff: &str,
 ) -> anyhow::Result<Option<(PathBuf, ReviewReceipt)>> {
-    let dir = codewhale_config::resolve_state_dir("review-receipts")?;
+    let dir = nestlone_config::resolve_state_dir("review-receipts")?;
     if !dir.is_dir() {
         return Ok(None);
     }

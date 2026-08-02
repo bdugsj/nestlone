@@ -867,8 +867,8 @@ mod tests {
         let home = tmpdir.path().join("home");
         let sessions_dir = home.join("sessions");
         std::fs::create_dir_all(&sessions_dir).unwrap();
-        let codewhale_home = EnvVarGuard::set("CODEWHALE_HOME", &home);
-        let previous_codewhale_home = codewhale_home.previous();
+        let nestlone_home = EnvVarGuard::set("CODEWHALE_HOME", &home);
+        let previous_nestlone_home = nestlone_home.previous();
         let mut app = create_test_app_with_tmpdir(&tmpdir);
         let result = save(&mut app, None);
         assert!(result.message.is_some());
@@ -884,7 +884,7 @@ mod tests {
         } else {
             Vec::new()
         };
-        drop(codewhale_home);
+        drop(nestlone_home);
         // Session should be saved to the managed dir, not the workspace root.
         assert!(
             !entries.is_empty(),
@@ -895,7 +895,7 @@ mod tests {
             .as_deref()
             .expect("current session id");
         assert!(sessions_dir.join(format!("{session_id}.json")).exists());
-        assert_eq!(std::env::var_os("CODEWHALE_HOME"), previous_codewhale_home);
+        assert_eq!(std::env::var_os("CODEWHALE_HOME"), previous_nestlone_home);
     }
 
     #[test]

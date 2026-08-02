@@ -3824,7 +3824,7 @@ pub fn load_config(path: &Path) -> Result<McpConfig> {
     serde_json::from_str(&contents).map_err(|_| {
         anyhow::anyhow!(
             "Failed to parse MCP config {}; file contents were omitted",
-            codewhale_config::quote_os_path(path)
+            nestlone_config::quote_os_path(path)
         )
     })
 }
@@ -4448,7 +4448,7 @@ pub async fn discover_manager_snapshot_with_workspace_and_plugins(
 }
 
 pub(crate) fn format_mcp_error_for_display(error: &anyhow::Error) -> String {
-    codewhale_config::persistence::redact_secrets(&format!("{error:#}"))
+    nestlone_config::persistence::redact_secrets(&format!("{error:#}"))
 }
 
 impl McpPool {

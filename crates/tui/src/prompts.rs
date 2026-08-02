@@ -50,7 +50,7 @@ pub struct PromptSessionContext<'a> {
     pub verbosity: Option<&'a str>,
     /// Restrict skill discovery to Codewhale-owned roots plus explicit
     /// `skills_dir` configuration.
-    pub skills_scan_codewhale_only: bool,
+    pub skills_scan_nestlone_only: bool,
     /// Immutable plugin snapshot owned by this App/Engine workspace context.
     /// Never sourced from process-global mutable state.
     pub plugin_registry: Option<&'a crate::plugins::PluginRegistry>,
@@ -76,7 +76,7 @@ impl Default for PromptSessionContext<'_> {
             context_window_override: None,
             show_thinking: true,
             verbosity: None,
-            skills_scan_codewhale_only: false,
+            skills_scan_nestlone_only: false,
             plugin_registry: None,
             mode: crate::tui::app::AppMode::Agent,
         }
@@ -203,7 +203,7 @@ for the current turn."
 /// configured instructions / skills). `locale_tag` is resolved by the caller
 /// from `Settings` so this function stays I/O-free.
 fn render_environment_block(_workspace: &Path, locale_tag: &str) -> String {
-    let codewhale_version = env!("CARGO_PKG_VERSION");
+    let nestlone_version = env!("CARGO_PKG_VERSION");
     let platform = std::env::consts::OS;
     let shell = crate::shell_dispatcher::global_dispatcher()
         .kind()
@@ -227,7 +227,7 @@ fn render_environment_block(_workspace: &Path, locale_tag: &str) -> String {
         "## Environment\n\
          \n\
          - lang: {locale_tag}\n\
-         - codewhale_version: {codewhale_version}\n\
+         - nestlone_version: {nestlone_version}\n\
          - platform: {platform}\n\
          - shell: {shell}"
     )
@@ -355,7 +355,7 @@ pub(crate) fn load_user_constitution_block() -> Option<String> {
         return None;
     }
 
-    let path = match codewhale_config::UserConstitution::path() {
+    let path = match nestlone_config::UserConstitution::path() {
         Ok(path) => path,
         Err(err) => {
             tracing::warn!(
@@ -366,13 +366,13 @@ pub(crate) fn load_user_constitution_block() -> Option<String> {
         }
     };
 
-    match codewhale_config::UserConstitution::load_from(&path) {
-        codewhale_config::UserConstitutionLoad::Loaded(constitution) => {
+    match nestlone_config::UserConstitution::load_from(&path) {
+        nestlone_config::UserConstitutionLoad::Loaded(constitution) => {
             constitution.render_block(None)
         }
-        codewhale_config::UserConstitutionLoad::Missing
-        | codewhale_config::UserConstitutionLoad::Empty => None,
-        codewhale_config::UserConstitutionLoad::Invalid(err) => {
+        nestlone_config::UserConstitutionLoad::Missing
+        | nestlone_config::UserConstitutionLoad::Empty => None,
+        nestlone_config::UserConstitutionLoad::Invalid(err) => {
             tracing::warn!(
                 target: "prompts",
                 "skipping invalid user-global constitution {}: {err}",
@@ -380,7 +380,7 @@ pub(crate) fn load_user_constitution_block() -> Option<String> {
             );
             None
         }
-        codewhale_config::UserConstitutionLoad::Unreadable(err) => {
+        nestlone_config::UserConstitutionLoad::Unreadable(err) => {
             tracing::warn!(
                 target: "prompts",
                 "skipping unreadable user-global constitution {}: {err}",
@@ -392,12 +392,12 @@ pub(crate) fn load_user_constitution_block() -> Option<String> {
 }
 
 fn user_constitution_disabled_by_setup_state() -> bool {
-    match codewhale_config::SetupState::load() {
+    match nestlone_config::SetupState::load() {
         Ok(Some(state)) => matches!(
             state.constitution_choice,
-            codewhale_config::ConstitutionChoice::Bundled
-                | codewhale_config::ConstitutionChoice::Deferred
-                | codewhale_config::ConstitutionChoice::ExpertOverride
+            nestlone_config::ConstitutionChoice::Bundled
+                | nestlone_config::ConstitutionChoice::Deferred
+                | nestlone_config::ConstitutionChoice::ExpertOverride
         ),
         Ok(None) => false,
         Err(err) => {
@@ -692,7 +692,7 @@ pub fn load_config_dir_prompt_overrides(config_dir: &Path) -> Vec<&'static str> 
 /// startup wiring; silently does nothing when the config home cannot be
 /// resolved.
 pub fn load_prompt_overrides_from_config_home() {
-    let Ok(home) = codewhale_config::codewhale_home() else {
+    let Ok(home) = nestlone_config::nestlone_home() else {
         return;
     };
     let applied = load_config_dir_prompt_overrides(&home);
@@ -1266,7 +1266,7 @@ pub fn system_prompt_for_mode_with_context_and_skills(
             context_window_override: None,
             show_thinking: true,
             verbosity: None,
-            skills_scan_codewhale_only: false,
+            skills_scan_nestlone_only: false,
             plugin_registry: None,
             mode: crate::tui::app::AppMode::Agent,
         },
@@ -1383,12 +1383,12 @@ pub fn system_prompt_for_mode_with_context_skills_session_and_approval(
     // 3. Skills block. #432: default discovery walks every compatible
     // workspace/global skill directory so skills installed for other AI-tool
     // conventions show up in the catalogue. Users can opt into a Codewhale-only
-    // scan with `[skills] scan_codewhale_only = true`. When an explicit
+    // scan with `[skills] scan_nestlone_only = true`. When an explicit
     // `skills_dir` is configured, union it with the workspace view instead of
     // treating it as a fallback; the workspace view often returns Some and
     // would otherwise shadow the configured directory entirely.
-    let skill_discovery_mode = crate::skills::SkillDiscoveryMode::from_codewhale_only(
-        session_context.skills_scan_codewhale_only,
+    let skill_discovery_mode = crate::skills::SkillDiscoveryMode::from_nestlone_only(
+        session_context.skills_scan_nestlone_only,
     );
     let skills_block = match skills_dir {
         Some(dir) => {
@@ -2237,7 +2237,7 @@ start it",
         assert!(block.starts_with("## Environment"));
         assert!(block.contains("- lang: zh-Hans"));
         assert!(block.contains(&format!(
-            "- codewhale_version: {}",
+            "- nestlone_version: {}",
             env!("CARGO_PKG_VERSION")
         )));
         // pwd is now delivered per-turn via `turn_meta`, not in the static block.
@@ -2313,7 +2313,7 @@ start it",
                     context_window_override: None,
                     show_thinking: true,
                     verbosity: None,
-                    skills_scan_codewhale_only: false,
+                    skills_scan_nestlone_only: false,
                     plugin_registry: None,
                     mode: crate::tui::app::AppMode::Agent,
                 },
@@ -2439,7 +2439,7 @@ start it",
                     context_window_override: None,
                     show_thinking: true,
                     verbosity: None,
-                    skills_scan_codewhale_only: false,
+                    skills_scan_nestlone_only: false,
                     plugin_registry: None,
                     mode: crate::tui::app::AppMode::Agent,
                 },
@@ -2485,7 +2485,7 @@ start it",
                     context_window_override: None,
                     show_thinking: false,
                     verbosity: None,
-                    skills_scan_codewhale_only: false,
+                    skills_scan_nestlone_only: false,
                     plugin_registry: None,
                     mode: crate::tui::app::AppMode::Agent,
                 },
@@ -2541,7 +2541,7 @@ start it",
                     context_window_override: None,
                     show_thinking: true,
                     verbosity: None,
-                    skills_scan_codewhale_only: false,
+                    skills_scan_nestlone_only: false,
                     plugin_registry: None,
                     mode: crate::tui::app::AppMode::Agent,
                 },
@@ -2642,14 +2642,14 @@ start it",
                     context_window_override: None,
                     show_thinking: true,
                     verbosity: None,
-                    skills_scan_codewhale_only: false,
+                    skills_scan_nestlone_only: false,
                     plugin_registry: None,
                     mode: crate::tui::app::AppMode::Agent,
                 },
             ));
         assert!(prompt.contains("## Environment"));
         assert!(prompt.contains("- lang: ja"));
-        assert!(prompt.contains("- codewhale_version:"));
+        assert!(prompt.contains("- nestlone_version:"));
     }
 
     #[test]
@@ -2658,22 +2658,22 @@ start it",
         let tmp = tempdir().expect("tempdir");
         let workspace = tmp.path().join("workspace");
         std::fs::create_dir_all(&workspace).expect("workspace dir");
-        let codewhale_home = tmp.path().join("codewhale-home");
-        std::fs::create_dir_all(&codewhale_home).expect("codewhale home");
-        let _codewhale_home =
-            crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", codewhale_home.as_os_str());
+        let nestlone_home = tmp.path().join("codewhale-home");
+        std::fs::create_dir_all(&nestlone_home).expect("codewhale home");
+        let _nestlone_home =
+            crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", nestlone_home.as_os_str());
 
-        let constitution = codewhale_config::UserConstitution {
+        let constitution = nestlone_config::UserConstitution {
             about: Some("Maintains Codewhale release lanes.".to_string()),
             working_style: vec!["Prefer live verification before claims.".to_string()],
             priorities: vec!["Keep release gates green.".to_string()],
-            autonomy_preference: codewhale_config::AutonomyPreference::Balanced,
-            ..codewhale_config::UserConstitution::default()
+            autonomy_preference: nestlone_config::AutonomyPreference::Balanced,
+            ..nestlone_config::UserConstitution::default()
         };
         constitution
             .save_to(
-                &codewhale_home
-                    .join(codewhale_config::user_constitution::USER_CONSTITUTION_FILE_NAME),
+                &nestlone_home
+                    .join(nestlone_config::user_constitution::USER_CONSTITUTION_FILE_NAME),
             )
             .expect("save user constitution");
 
@@ -2691,10 +2691,10 @@ start it",
 
         let base_at = prompt.find("### Whose word wins").expect("base prompt");
         let user_block_at = prompt
-            .find("<codewhale_user_constitution")
+            .find("<nestlone_user_constitution")
             .expect("user constitution block");
         let env_at = prompt
-            .find("- codewhale_version:")
+            .find("- nestlone_version:")
             .expect("rendered environment block");
         assert!(
             base_at < user_block_at && user_block_at < env_at,
@@ -2704,7 +2704,7 @@ start it",
         assert!(prompt.contains("Maintains Codewhale release lanes."));
         assert!(prompt.contains("Prefer live verification before claims."));
         assert!(
-            !prompt.contains(&codewhale_home.display().to_string()),
+            !prompt.contains(&nestlone_home.display().to_string()),
             "prompt should use the stable user-global source label, not a device-specific home path"
         );
     }
@@ -2715,29 +2715,29 @@ start it",
         let tmp = tempdir().expect("tempdir");
         let workspace = tmp.path().join("workspace");
         std::fs::create_dir_all(&workspace).expect("workspace dir");
-        let codewhale_home = tmp.path().join("codewhale-home");
-        std::fs::create_dir_all(&codewhale_home).expect("codewhale home");
-        let _codewhale_home =
-            crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", codewhale_home.as_os_str());
+        let nestlone_home = tmp.path().join("codewhale-home");
+        std::fs::create_dir_all(&nestlone_home).expect("codewhale home");
+        let _nestlone_home =
+            crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", nestlone_home.as_os_str());
 
-        let constitution = codewhale_config::UserConstitution {
+        let constitution = nestlone_config::UserConstitution {
             about: Some("This file should stay inactive.".to_string()),
-            ..codewhale_config::UserConstitution::default()
+            ..nestlone_config::UserConstitution::default()
         };
         constitution
             .save_to(
-                &codewhale_home
-                    .join(codewhale_config::user_constitution::USER_CONSTITUTION_FILE_NAME),
+                &nestlone_home
+                    .join(nestlone_config::user_constitution::USER_CONSTITUTION_FILE_NAME),
             )
             .expect("save user constitution");
 
-        let mut state = codewhale_config::SetupState::default();
+        let mut state = nestlone_config::SetupState::default();
         state.complete_constitution_checkpoint(
             "0.8.67",
-            codewhale_config::ConstitutionChoice::Bundled,
+            nestlone_config::ConstitutionChoice::Bundled,
         );
         state
-            .save_to(&codewhale_home.join(codewhale_config::setup_state::SETUP_STATE_FILE_NAME))
+            .save_to(&nestlone_home.join(nestlone_config::setup_state::SETUP_STATE_FILE_NAME))
             .expect("save setup state");
 
         let prompt =
@@ -2752,7 +2752,7 @@ start it",
                 },
             ));
 
-        assert!(!prompt.contains("<codewhale_user_constitution"));
+        assert!(!prompt.contains("<nestlone_user_constitution"));
         assert!(!prompt.contains("This file should stay inactive."));
     }
 
@@ -2762,15 +2762,15 @@ start it",
         let tmp = tempdir().expect("tempdir");
         let workspace = tmp.path().join("workspace");
         std::fs::create_dir_all(&workspace).expect("workspace dir");
-        let codewhale_home = tmp.path().join("codewhale-home");
-        std::fs::create_dir_all(&codewhale_home).expect("codewhale home");
+        let nestlone_home = tmp.path().join("codewhale-home");
+        std::fs::create_dir_all(&nestlone_home).expect("codewhale home");
         std::fs::write(
-            codewhale_home.join(codewhale_config::user_constitution::USER_CONSTITUTION_FILE_NAME),
+            nestlone_home.join(nestlone_config::user_constitution::USER_CONSTITUTION_FILE_NAME),
             "{ not valid json",
         )
         .expect("write invalid user constitution");
-        let _codewhale_home =
-            crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", codewhale_home.as_os_str());
+        let _nestlone_home =
+            crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", nestlone_home.as_os_str());
 
         let prompt =
             system_prompt_flat_text(&system_prompt_for_mode_with_context_skills_and_session(
@@ -2784,7 +2784,7 @@ start it",
                 },
             ));
 
-        assert!(!prompt.contains("<codewhale_user_constitution"));
+        assert!(!prompt.contains("<nestlone_user_constitution"));
     }
 
     #[test]
@@ -2828,7 +2828,7 @@ start it",
                     context_window_override: None,
                     show_thinking: true,
                     verbosity: None,
-                    skills_scan_codewhale_only: false,
+                    skills_scan_nestlone_only: false,
                     plugin_registry: None,
                     mode: crate::tui::app::AppMode::Agent,
                 },
@@ -2859,7 +2859,7 @@ start it",
                     context_window_override: None,
                     show_thinking: true,
                     verbosity: None,
-                    skills_scan_codewhale_only: false,
+                    skills_scan_nestlone_only: false,
                     plugin_registry: None,
                     mode: crate::tui::app::AppMode::Agent,
                 },
@@ -2973,7 +2973,7 @@ start it",
                     context_window_override: None,
                     show_thinking: true,
                     verbosity: None,
-                    skills_scan_codewhale_only: false,
+                    skills_scan_nestlone_only: false,
                     plugin_registry: None,
                     mode: crate::tui::app::AppMode::Agent,
                 },
@@ -3005,7 +3005,7 @@ start it",
                     context_window_override: None,
                     show_thinking: true,
                     verbosity: None,
-                    skills_scan_codewhale_only: false,
+                    skills_scan_nestlone_only: false,
                     plugin_registry: None,
                     mode: crate::tui::app::AppMode::Agent,
                 },
@@ -3331,7 +3331,7 @@ start it",
                     context_window_override: None,
                     show_thinking: true,
                     verbosity: None,
-                    skills_scan_codewhale_only: false,
+                    skills_scan_nestlone_only: false,
                     plugin_registry: None,
                     mode: crate::tui::app::AppMode::Agent,
                 },
@@ -3368,7 +3368,7 @@ start it",
                     context_window_override: None,
                     show_thinking: true,
                     verbosity: None,
-                    skills_scan_codewhale_only: false,
+                    skills_scan_nestlone_only: false,
                     plugin_registry: None,
                     mode: crate::tui::app::AppMode::Agent,
                 },
@@ -3460,7 +3460,7 @@ start it",
                     context_window_override: Some(1_000_000),
                     show_thinking: true,
                     verbosity: None,
-                    skills_scan_codewhale_only: false,
+                    skills_scan_nestlone_only: false,
                     plugin_registry: None,
                     mode: crate::tui::app::AppMode::Agent,
                 },
@@ -4031,7 +4031,7 @@ start it",
                     context_window_override: None,
                     show_thinking: true,
                     verbosity: Some(" Concise "),
-                    skills_scan_codewhale_only: false,
+                    skills_scan_nestlone_only: false,
                     plugin_registry: None,
                     mode: crate::tui::app::AppMode::Agent,
                 },
@@ -4076,7 +4076,7 @@ start it",
                 context_window_override: None,
                 show_thinking: true,
                 verbosity: Some("concise"),
-                skills_scan_codewhale_only: false,
+                skills_scan_nestlone_only: false,
                 plugin_registry: None,
                 mode: crate::tui::app::AppMode::Agent,
             },
@@ -4126,7 +4126,7 @@ start it",
             context_window_override: None,
             show_thinking: true,
             verbosity: None,
-            skills_scan_codewhale_only: false,
+            skills_scan_nestlone_only: false,
             plugin_registry: None,
             mode: crate::tui::app::AppMode::Agent,
         };

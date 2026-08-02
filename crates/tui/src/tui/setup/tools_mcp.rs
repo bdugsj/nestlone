@@ -118,13 +118,13 @@ impl Default for SetupToolsMcpFacts {
 }
 
 impl SetupToolsMcpFacts {
-    pub(super) fn from_app_config(app: &App, config: &Config, codewhale_home: &Path) -> Self {
+    pub(super) fn from_app_config(app: &App, config: &Config, nestlone_home: &Path) -> Self {
         let project_mcp_path = crate::mcp::workspace_mcp_config_path(&app.workspace);
         let mcp = mcp_inventory(app, &project_mcp_path);
         let skills = skills_inventory(app);
-        let tools_dir = codewhale_home.join("tools");
+        let tools_dir = nestlone_home.join("tools");
         let tools = tools_dir_inventory(&tools_dir);
-        let plugins = plugins_inventory(app, config, codewhale_home);
+        let plugins = plugins_inventory(app, config, nestlone_home);
         let hotbar = hotbar_source_inventory(app);
 
         let overall = mcp
@@ -140,7 +140,7 @@ impl SetupToolsMcpFacts {
 
         let mcp_path_display = display_path(&app.mcp_config_path);
         let skills_path_display = display_path(&app.skills_dir);
-        let plugins_path_display = display_path(&plugins_dir_for(app, config, codewhale_home));
+        let plugins_path_display = display_path(&plugins_dir_for(app, config, nestlone_home));
 
         let servers_result = format!("{} — {}", mcp.status_label(), mcp.detail);
         let skills_result = format!("{} — {}", skills.status.as_str(), skills.detail);
@@ -487,8 +487,8 @@ fn tools_dir_inventory(tools_dir: &Path) -> InventoryRow {
     }
 }
 
-fn plugins_inventory(app: &App, config: &Config, codewhale_home: &Path) -> InventoryRow {
-    let plugins_dir = plugins_dir_for(app, config, codewhale_home);
+fn plugins_inventory(app: &App, config: &Config, nestlone_home: &Path) -> InventoryRow {
+    let plugins_dir = plugins_dir_for(app, config, nestlone_home);
     let path = display_path(&plugins_dir);
 
     // Manifest-based plugins (plugin.toml) are owned by this App's immutable,
@@ -546,8 +546,8 @@ fn plugins_inventory(app: &App, config: &Config, codewhale_home: &Path) -> Inven
     }
 }
 
-fn plugins_dir_for(_app: &App, _config: &Config, codewhale_home: &Path) -> PathBuf {
-    codewhale_home.join("plugins")
+fn plugins_dir_for(_app: &App, _config: &Config, nestlone_home: &Path) -> PathBuf {
+    nestlone_home.join("plugins")
 }
 
 fn hotbar_source_inventory(app: &App) -> InventoryRow {

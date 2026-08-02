@@ -2,7 +2,7 @@
 //! kinds, their serde aliases, and identity helpers (`all`, `as_str`, `parse`,
 //! `provider`). Extracted verbatim from `lib.rs` to separate provider identity
 //! from config schema/loading; re-exported at the crate root so
-//! `codewhale_config::ProviderKind` is unchanged. Behavior is identical.
+//! `nestlone_config::ProviderKind` is unchanged. Behavior is identical.
 
 use serde::{Deserialize, Serialize};
 

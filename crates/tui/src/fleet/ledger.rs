@@ -13,7 +13,7 @@ use std::io::{BufRead, Read, Seek, SeekFrom, Write};
 use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result, bail};
-use codewhale_protocol::fleet::*;
+use nestlone_protocol::fleet::*;
 use serde::{Deserialize, Serialize};
 
 const FLEET_DIR: &str = ".codewhale";

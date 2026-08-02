@@ -14,5 +14,5 @@ fn main() -> std::process::ExitCode {
         libc::signal(libc::SIGPIPE, libc::SIG_DFL);
     }
 
-    codewhale_cli::run_cli()
+    nestlone_cli::run_cli()
 }

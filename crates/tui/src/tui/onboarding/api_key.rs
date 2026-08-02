@@ -68,7 +68,7 @@ pub fn lines(app: &App) -> Vec<Line<'static>> {
             Style::default().fg(palette::TEXT_MUTED),
         )));
     } else if credential_help.acquisition
-        == codewhale_config::provider::CredentialAcquisition::LocalOptional
+        == nestlone_config::provider::CredentialAcquisition::LocalOptional
     {
         lines.push(Line::from(Span::styled(
             app.tr(MessageId::OnboardApiKeyLocalHint).to_string(),

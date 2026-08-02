@@ -13,7 +13,7 @@ pub(super) use crate::route_budget::effective_max_output_tokens_for_route;
 #[cfg(test)]
 pub(super) use crate::route_budget::{TURN_MAX_OUTPUT_TOKENS, effective_max_output_tokens};
 use crate::tools::spec::ToolResult;
-use codewhale_config::route::RouteLimits;
+use nestlone_config::route::RouteLimits;
 use serde_json::Value;
 /// Keep this many most recent messages when emergency trimming is required.
 pub(super) const MIN_RECENT_MESSAGES_TO_KEEP: usize = 4;

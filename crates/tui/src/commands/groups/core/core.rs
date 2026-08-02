@@ -471,7 +471,7 @@ fn public_site_locale_segment(locale: Locale) -> &'static str {
 }
 
 /// Show Codewhale documentation, community, managed-app, and provider links.
-pub fn codewhale_links(app: &mut App) -> CommandResult {
+pub fn nestlone_links(app: &mut App) -> CommandResult {
     let locale = app.ui_locale;
     let active_provider = app.api_provider.as_str();
     let site_locale = public_site_locale_segment(locale);
@@ -508,7 +508,7 @@ pub fn codewhale_links(app: &mut App) -> CommandResult {
         tr(locale, MessageId::LinksTitle)
     );
 
-    for provider in codewhale_config::provider::providers_sorted_for_display() {
+    for provider in nestlone_config::provider::providers_sorted_for_display() {
         let links = provider.credential_help();
         let active_marker = if provider.id() == active_provider {
             " <- current"
@@ -545,7 +545,7 @@ pub fn codewhale_links(app: &mut App) -> CommandResult {
                 docs_url
             );
         }
-        if provider.kind() == codewhale_config::ProviderKind::Moonshot {
+        if provider.kind() == nestlone_config::ProviderKind::Moonshot {
             let _ = writeln!(
                 message,
                 "{}",
@@ -1509,9 +1509,9 @@ mod tests {
     }
 
     #[test]
-    fn test_codewhale_links() {
+    fn test_nestlone_links() {
         let mut app = create_test_app();
-        let result = codewhale_links(&mut app);
+        let result = nestlone_links(&mut app);
         assert!(result.message.is_some());
         let msg = result.message.unwrap();
         assert!(msg.contains("Codewhale & community"));
@@ -1550,7 +1550,7 @@ mod tests {
     #[test]
     fn provider_links_emit_urls_as_inline_code_for_narrow_transcripts() {
         let mut app = create_test_app();
-        let result = codewhale_links(&mut app);
+        let result = nestlone_links(&mut app);
         let msg = result.message.expect("links should return a message");
 
         assert!(msg.contains("`https://platform.openai.com/api-keys`"));
@@ -1574,12 +1574,12 @@ mod tests {
     #[test]
     fn provider_link_metadata_marks_custom_routes_as_configuration_owned() {
         let links =
-            codewhale_config::provider::provider_for_kind(codewhale_config::ProviderKind::Custom)
+            nestlone_config::provider::provider_for_kind(nestlone_config::ProviderKind::Custom)
                 .credential_help();
 
         assert_eq!(
             links.acquisition,
-            codewhale_config::provider::CredentialAcquisition::Configuration
+            nestlone_config::provider::CredentialAcquisition::Configuration
         );
         assert_eq!(links.docs_url, None);
         assert_eq!(links.credential_url, None);
@@ -1590,7 +1590,7 @@ mod tests {
         let mut app = create_test_app();
         app.ui_locale = Locale::ZhHans;
 
-        let msg = codewhale_links(&mut app)
+        let msg = nestlone_links(&mut app)
             .message
             .expect("links should return a message");
 

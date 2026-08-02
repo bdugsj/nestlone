@@ -261,7 +261,7 @@ pub static COMMAND_ARITY: &[(&str, u8)] = &[
 /// # Examples
 ///
 /// ```
-/// # use codewhale_tui::command_safety::classify_command;
+/// # use nestlone_tui::command_safety::classify_command;
 /// assert_eq!(classify_command(&["git", "status", "-s"]),            "git status");
 /// assert_eq!(classify_command(&["git", "push", "origin"]),          "git push");
 /// assert_eq!(classify_command(&["cargo", "check", "--workspace"]),  "cargo check");
@@ -322,7 +322,7 @@ pub fn classify_command(tokens: &[&str]) -> String {
 /// # Examples
 ///
 /// ```
-/// # use codewhale_tui::command_safety::prefix_allow_matches;
+/// # use nestlone_tui::command_safety::prefix_allow_matches;
 /// assert!( prefix_allow_matches("git status",    "git status --porcelain"));
 /// assert!(!prefix_allow_matches("git status",    "git push origin main"));
 /// assert!( prefix_allow_matches("cargo check",   "cargo check --workspace"));
@@ -413,7 +413,7 @@ pub fn is_parallel_readonly_command(command: &str) -> bool {
         .iter()
         .map(String::as_str)
         .collect::<Vec<_>>();
-    if is_codewhale_readonly_invocation(&command_refs) {
+    if is_nestlone_readonly_invocation(&command_refs) {
         return true;
     }
     let canonical = classify_command(&command_refs);
@@ -463,7 +463,7 @@ fn has_exec_capable_readonly_flag(canonical: &str, tokens: &[&str]) -> bool {
     }
 }
 
-fn is_codewhale_readonly_invocation(tokens: &[&str]) -> bool {
+fn is_nestlone_readonly_invocation(tokens: &[&str]) -> bool {
     let Some((command, args)) = tokens.split_first() else {
         return false;
     };
@@ -1086,7 +1086,7 @@ fn is_safe_command(command: &str) -> bool {
             .iter()
             .map(String::as_str)
             .collect::<Vec<_>>();
-        if is_codewhale_readonly_invocation(&refs) {
+        if is_nestlone_readonly_invocation(&refs) {
             return true;
         }
     }

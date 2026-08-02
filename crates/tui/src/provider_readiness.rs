@@ -8,7 +8,7 @@ use std::borrow::Cow;
 
 use crate::config::ApiProvider;
 use crate::error_taxonomy::{ErrorCategory, ErrorEnvelope};
-use codewhale_config::route::{LogicalModelRef, RouteRequest, RouteResolver};
+use nestlone_config::route::{LogicalModelRef, RouteRequest, RouteResolver};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum CredentialState {
@@ -257,7 +257,7 @@ pub(crate) fn credential_state_for_provider(
         } else if provider != config.api_provider()
             && config.external_credential_read_consent_configured(
                 provider,
-                codewhale_config::ExternalCredentialSource::CodexCli,
+                nestlone_config::ExternalCredentialSource::CodexCli,
             )
         {
             CredentialState::ExternalConsent
@@ -278,7 +278,7 @@ pub(crate) fn credential_state_for_provider(
         } else if provider != config.api_provider()
             && config.external_credential_read_consent_configured(
                 provider,
-                codewhale_config::ExternalCredentialSource::GrokCli,
+                nestlone_config::ExternalCredentialSource::GrokCli,
             )
         {
             CredentialState::ExternalConsent
@@ -336,7 +336,7 @@ pub(crate) fn route_is_valid_for_model(
     model: Option<&str>,
 ) -> bool {
     let compatibility_kind =
-        (provider == ApiProvider::DeepseekCN).then_some(codewhale_config::ProviderKind::Deepseek);
+        (provider == ApiProvider::DeepseekCN).then_some(nestlone_config::ProviderKind::Deepseek);
     let Some(kind) = provider.kind().or(compatibility_kind) else {
         return true;
     };
@@ -1035,7 +1035,7 @@ mod tests {
     fn disabled_external_imports_are_not_probed_by_readiness() {
         let _lock = crate::test_support::lock_test_env();
         let temp = tempfile::tempdir().expect("oauth fixture root");
-        let _codewhale_home = crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", temp.path());
+        let _nestlone_home = crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", temp.path());
         let kimi_home = temp.path().join("kimi");
         std::fs::create_dir_all(kimi_home.join("credentials")).expect("kimi credentials dir");
         std::fs::write(kimi_home.join("credentials/kimi-code.json"), "{not-json")
@@ -1331,8 +1331,8 @@ mod tests {
             provider: Some("openai".to_string()),
             providers: Some(crate::config::ProvidersConfig {
                 openai: crate::config::ProviderConfig {
-                    auth: Some(codewhale_config::ProviderAuthSourceToml {
-                        source: codewhale_config::AuthSourceKind::Command,
+                    auth: Some(nestlone_config::ProviderAuthSourceToml {
+                        source: nestlone_config::AuthSourceKind::Command,
                         command: vec!["secret-tool".to_string(), "lookup".to_string()],
                         timeout_ms: Some(2_000),
                         secret_id: None,
@@ -1352,8 +1352,8 @@ mod tests {
             provider: Some("xai".to_string()),
             providers: Some(crate::config::ProvidersConfig {
                 xai: crate::config::ProviderConfig {
-                    auth: Some(codewhale_config::ProviderAuthSourceToml {
-                        source: codewhale_config::AuthSourceKind::Secret,
+                    auth: Some(nestlone_config::ProviderAuthSourceToml {
+                        source: nestlone_config::AuthSourceKind::Secret,
                         command: Vec::new(),
                         timeout_ms: None,
                         secret_id: Some("codewhale/xai".to_string()),

@@ -1108,7 +1108,7 @@ mod tests {
         let config = deepseek_config();
         let (mut engine, _handle, _tmp) = preview_engine(&config);
         engine.api_provider = ApiProvider::Deepseek;
-        engine.active_route_limits = Some(codewhale_config::route::RouteLimits {
+        engine.active_route_limits = Some(nestlone_config::route::RouteLimits {
             context_tokens: Some(4_096),
             input_tokens: None,
             output_tokens: Some(512),
@@ -1116,7 +1116,7 @@ mod tests {
         let prompt_context = NextTurnPromptContext::for_planned_turn(
             ApiProvider::Openrouter,
             "qwen/qwen3.6-flash".to_string(),
-            Some(codewhale_config::route::RouteLimits {
+            Some(nestlone_config::route::RouteLimits {
                 context_tokens: Some(123_456),
                 input_tokens: None,
                 output_tokens: Some(4_096),
@@ -2557,7 +2557,7 @@ mod tests {
         let identity = deepseek_identity();
         let (mut engine, _handle, _tmp) = preview_engine(&config);
         engine.config.features.disable(Feature::Mcp);
-        engine.active_route_limits = Some(codewhale_config::route::RouteLimits {
+        engine.active_route_limits = Some(nestlone_config::route::RouteLimits {
             context_tokens: Some(4_096),
             input_tokens: Some(3_000),
             output_tokens: Some(512),

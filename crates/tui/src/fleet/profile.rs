@@ -11,7 +11,7 @@ use serde::Deserialize;
 use crate::tui::app::ReasoningEffort;
 
 #[allow(unused_imports)]
-pub use codewhale_config::{
+pub use nestlone_config::{
     FleetDelegationHints, FleetLoadout, FleetProfile, FleetProfilePermissions, FleetRole, FleetSlot,
 };
 
@@ -53,7 +53,7 @@ impl FleetProfileScope {
 }
 
 pub fn personal_agent_profile_dir() -> Result<PathBuf> {
-    Ok(codewhale_config::codewhale_home()?.join(PERSONAL_AGENT_PROFILE_DIR))
+    Ok(nestlone_config::nestlone_home()?.join(PERSONAL_AGENT_PROFILE_DIR))
 }
 
 pub fn agent_profile_dir_for_scope(scope: FleetProfileScope, workspace: &Path) -> Result<PathBuf> {

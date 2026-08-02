@@ -21,7 +21,7 @@ struct DirectoryListingWorld {
 }
 
 #[given("an offline CodeWhale evaluation workspace")]
-fn offline_codewhale_evaluation_workspace(world: &mut DirectoryListingWorld) {
+fn offline_nestlone_evaluation_workspace(world: &mut DirectoryListingWorld) {
     world.record_dir = Some(TempDir::new().expect("record tempdir"));
 }
 
@@ -33,7 +33,7 @@ fn user_asks(world: &mut DirectoryListingWorld, prompt: String) {
         .record_dir
         .as_ref()
         .expect("offline evaluation workspace should be initialized");
-    let output = Command::new(codewhale_tui_binary())
+    let output = Command::new(nestlone_tui_binary())
         .args(["eval", "--json", "--shell-command", "echo eval-harness"])
         .arg("--record")
         .arg(record_dir.path())
@@ -164,7 +164,7 @@ fn read_jsonl_records(path: &Path) -> Vec<serde_json::Value> {
         .collect()
 }
 
-fn codewhale_tui_binary() -> PathBuf {
+fn nestlone_tui_binary() -> PathBuf {
     if let Some(path) = option_env!("CARGO_BIN_EXE_codewhale-tui") {
         return PathBuf::from(path);
     }

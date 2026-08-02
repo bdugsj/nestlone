@@ -1,5 +1,5 @@
 use chrono::{DateTime, Duration, Utc};
-use codewhale_config::route::{
+use nestlone_config::route::{
     LimitField, LogicalModelRef, OverrideSource, ReadyRouteCandidate, RouteRequest, RouteResolver,
     SourcedLimitOverride, WireModelId,
 };
@@ -197,7 +197,7 @@ pub(crate) fn validate_unpinned_model_provider(
     let Some(kind) = provider.kind() else {
         return Ok(());
     };
-    let Some(owner) = codewhale_config::known_foreign_model_owner(kind, model, base_url) else {
+    let Some(owner) = nestlone_config::known_foreign_model_owner(kind, model, base_url) else {
         return Ok(());
     };
     Err(format!(
@@ -653,10 +653,10 @@ mod tests {
         assert_eq!(candidate.limits().context_tokens, Some(1_048_576));
         assert_eq!(candidate.limits().output_tokens, Some(1_048_576));
         assert!(candidate.applied_limit_overrides().contains(
-            &codewhale_config::route::SourcedLimitOverride {
-                field: codewhale_config::route::LimitField::OutputTokens,
+            &nestlone_config::route::SourcedLimitOverride {
+                field: nestlone_config::route::LimitField::OutputTokens,
                 value: Some(1_048_576),
-                source: codewhale_config::route::OverrideSource::DocumentedRouteOutputMaximum,
+                source: nestlone_config::route::OverrideSource::DocumentedRouteOutputMaximum,
             }
         ));
         assert_eq!(
@@ -1106,7 +1106,7 @@ mod tests {
 
     #[test]
     fn custom_provider_resolves_to_custom_endpoint_and_verbatim_model() {
-        use codewhale_config::route::RequestProtocol;
+        use nestlone_config::route::RequestProtocol;
 
         let config = custom_config("https://api.example.com/v1", "vendor/custom-model-v1");
         let route = resolve_runtime_route(&config, ApiProvider::Custom, None)

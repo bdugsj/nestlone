@@ -1166,7 +1166,7 @@ pub fn default_automations_dir() -> PathBuf {
     // (docs/CONFIGURATION.md): when SET, automations live under it and we do
     // NOT fall back to the legacy ~/.deepseek path — silent fallback would
     // defeat the isolation the override promises. Check the env var directly
-    // (not codewhale_home()'s Ok/Err, which succeeds for the default home too).
+    // (not nestlone_home()'s Ok/Err, which succeeds for the default home too).
     if let Some(home) = std::env::var_os("CODEWHALE_HOME").filter(|value| !value.is_empty()) {
         return PathBuf::from(home).join("automations");
     }
@@ -2037,7 +2037,7 @@ mod tests {
     }
 
     #[test]
-    fn default_automations_dir_honors_codewhale_home_as_hard_override() {
+    fn default_automations_dir_honors_nestlone_home_as_hard_override() {
         let _lock = crate::test_support::lock_test_env();
         let tmp = tempfile::TempDir::new().unwrap();
         // SAFETY: serialised by lock_test_env.
@@ -2055,7 +2055,7 @@ mod tests {
     }
 
     #[test]
-    fn default_automations_dir_prefers_deepseek_automations_dir_over_codewhale_home() {
+    fn default_automations_dir_prefers_deepseek_automations_dir_over_nestlone_home() {
         let _lock = crate::test_support::lock_test_env();
         let tmp = tempfile::TempDir::new().unwrap();
         // SAFETY: serialised by lock_test_env.

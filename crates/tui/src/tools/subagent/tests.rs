@@ -2758,7 +2758,7 @@ fn test_parse_spawn_request_rejects_invalid_session_name() {
 
 #[test]
 fn test_parse_spawn_request_rejects_out_of_range_max_depth() {
-    let ceiling = codewhale_config::MAX_SPAWN_DEPTH_CEILING;
+    let ceiling = nestlone_config::MAX_SPAWN_DEPTH_CEILING;
     let input = json!({
         "name": "review.parser",
         "prompt": "inspect parser",
@@ -2771,19 +2771,19 @@ fn test_parse_spawn_request_rejects_out_of_range_max_depth() {
     );
 }
 
-fn fleet_roster_with(id: &str, profile: codewhale_config::FleetProfile) -> FleetRoster {
+fn fleet_roster_with(id: &str, profile: nestlone_config::FleetProfile) -> FleetRoster {
     let tmp = tempdir().expect("tempdir");
-    let config = codewhale_config::FleetConfigToml {
+    let config = nestlone_config::FleetConfigToml {
         profiles: std::collections::BTreeMap::from([(id.to_string(), profile)]),
         ..Default::default()
     };
     FleetRoster::load(&config, tmp.path())
 }
 
-fn custom_fleet_profile(role: &str) -> codewhale_config::FleetProfile {
-    codewhale_config::FleetProfile {
-        slot: codewhale_config::FleetSlot::from_name(role),
-        role: codewhale_config::FleetRole {
+fn custom_fleet_profile(role: &str) -> nestlone_config::FleetProfile {
+    nestlone_config::FleetProfile {
+        slot: nestlone_config::FleetSlot::from_name(role),
+        role: nestlone_config::FleetRole {
             name: role.to_string(),
             description: None,
             instructions: None,
@@ -2975,7 +2975,7 @@ fn spawn_model_selection_has_stable_four_tier_precedence_and_source() {
     assert_eq!(selected.source, SpawnRouteSource::AgentProfileModel);
 
     let mut strong_profile = custom_fleet_profile("reviewer");
-    strong_profile.loadout = codewhale_config::FleetLoadout::Custom("strong".to_string());
+    strong_profile.loadout = nestlone_config::FleetLoadout::Custom("strong".to_string());
     let strong_roster = fleet_roster_with("architect", strong_profile);
     let selected =
         resolve_spawn_model_selection(&runtime, &request, strong_roster.get("architect"))
@@ -2984,7 +2984,7 @@ fn spawn_model_selection_has_stable_four_tier_precedence_and_source() {
     assert_eq!(selected.source, SpawnRouteSource::RunModel);
 
     let mut fast_profile = custom_fleet_profile("reviewer");
-    fast_profile.loadout = codewhale_config::FleetLoadout::Fast;
+    fast_profile.loadout = nestlone_config::FleetLoadout::Fast;
     let fast_roster = fleet_roster_with("fast-reviewer", fast_profile);
     let selected =
         resolve_spawn_model_selection(&runtime, &request, fast_roster.get("fast-reviewer"))
@@ -3073,10 +3073,10 @@ fn test_child_max_spawn_depth_profile_hint_only_narrows() {
         child_max_spawn_depth_for_spawn(
             2,
             0,
-            Some(codewhale_config::MAX_SPAWN_DEPTH_CEILING),
+            Some(nestlone_config::MAX_SPAWN_DEPTH_CEILING),
             None
         ),
-        codewhale_config::MAX_SPAWN_DEPTH_CEILING
+        nestlone_config::MAX_SPAWN_DEPTH_CEILING
     );
     // Neither request nor hint: inherit unchanged.
     assert_eq!(child_max_spawn_depth_for_spawn(5, 2, None, None), 5);
@@ -6678,9 +6678,9 @@ fn persist_state_rejects_symlinked_state_directory() {
     let tmp = tempdir().expect("tempdir");
     let workspace = tmp.path().join("workspace");
     let outside = tmp.path().join("outside-state");
-    let codewhale_dir = workspace.join(".codewhale");
-    let state_dir = codewhale_dir.join("state");
-    std::fs::create_dir_all(&codewhale_dir).expect("mkdir codewhale");
+    let nestlone_dir = workspace.join(".codewhale");
+    let state_dir = nestlone_dir.join("state");
+    std::fs::create_dir_all(&nestlone_dir).expect("mkdir codewhale");
     std::fs::create_dir_all(&outside).expect("mkdir outside");
     std::os::unix::fs::symlink(&outside, &state_dir).expect("symlink state dir");
 
@@ -7569,7 +7569,7 @@ fn would_exceed_depth_at_boundary() {
 
 #[test]
 fn clamp_child_max_spawn_depth_enforces_absolute_ceiling() {
-    let ceiling = codewhale_config::MAX_SPAWN_DEPTH_CEILING;
+    let ceiling = nestlone_config::MAX_SPAWN_DEPTH_CEILING;
     // Deep child re-supplying max_depth cannot push the cap past the ceiling —
     // this is the recursion-ring-limit bypass fix. Once at the ceiling, the
     // resulting cap equals the ceiling, so `would_exceed_depth` blocks.
@@ -12873,8 +12873,8 @@ async fn child_work_state_publishes_only_real_changes_from_its_own_list() {
 fn an_exact_member_with_tools_false_gets_no_model_tools_at_all() {
     let tmp = tempdir().expect("tempdir");
     let authority = crate::fleet::exact::ChildAuthority::clamp(
-        codewhale_workflow::PermissionCeiling::ROUTER,
-        codewhale_workflow::PermissionCeiling::preset("full").expect("preset"),
+        nestlone_workflow::PermissionCeiling::ROUTER,
+        nestlone_workflow::PermissionCeiling::preset("full").expect("preset"),
     );
     assert_eq!(authority.allowed_tools.as_deref(), Some(&[] as &[String]));
 
@@ -12909,8 +12909,8 @@ fn an_exact_member_with_tools_false_gets_no_model_tools_at_all() {
 fn an_exact_member_without_a_network_tool_really_loses_the_network_surface() {
     let tmp = tempdir().expect("tempdir");
     let authority = crate::fleet::exact::ChildAuthority::clamp(
-        codewhale_workflow::PermissionCeiling::preset("read_write").expect("preset"),
-        codewhale_workflow::PermissionCeiling::preset("full").expect("preset"),
+        nestlone_workflow::PermissionCeiling::preset("read_write").expect("preset"),
+        nestlone_workflow::PermissionCeiling::preset("full").expect("preset"),
     );
     assert!(authority.ceiling.tools);
     assert!(!authority.ceiling.network_tool);
@@ -12984,8 +12984,8 @@ fn an_exact_member_without_a_network_tool_really_loses_the_network_surface() {
 fn the_unified_rlm_action_cannot_bypass_a_denied_alias() {
     let tmp = tempdir().expect("tempdir");
     let authority = crate::fleet::exact::ChildAuthority::clamp(
-        codewhale_workflow::PermissionCeiling::preset("read_write").expect("preset"),
-        codewhale_workflow::PermissionCeiling::preset("full").expect("preset"),
+        nestlone_workflow::PermissionCeiling::preset("read_write").expect("preset"),
+        nestlone_workflow::PermissionCeiling::preset("full").expect("preset"),
     );
     assert!(!authority.ceiling.network_tool);
 
@@ -13200,15 +13200,15 @@ fn a_shell_capable_read_only_member_keeps_test_selection_arguments() {
 #[test]
 fn a_parent_read_only_session_narrows_a_full_exact_member_in_the_child_registry() {
     let tmp = tempdir().expect("tempdir");
-    let session = codewhale_workflow::PermissionCeiling {
+    let session = nestlone_workflow::PermissionCeiling {
         write: false,
         network_tool: false,
-        shell: codewhale_workflow::ShellCeiling::ReadOnly,
+        shell: nestlone_workflow::ShellCeiling::ReadOnly,
         delegation_depth: 0,
         tools: true,
     };
     let authority = crate::fleet::exact::ChildAuthority::clamp(
-        codewhale_workflow::PermissionCeiling::preset("full").expect("preset"),
+        nestlone_workflow::PermissionCeiling::preset("full").expect("preset"),
         session,
     );
     assert!(!authority.ceiling.write);
@@ -13263,7 +13263,7 @@ fn the_session_ceiling_reflects_the_live_parent_posture() {
     no_shell.allow_shell = false;
     assert_ne!(
         crate::fleet::exact::session_permission_ceiling(&no_shell).shell,
-        codewhale_workflow::ShellCeiling::Full
+        nestlone_workflow::ShellCeiling::Full
     );
 }
 
@@ -13290,8 +13290,8 @@ fn read_only_with_shell_registry() -> (tempfile::TempDir, SubAgentToolRegistry) 
     let tmp = tempdir().expect("tempdir");
     let authority = crate::fleet::exact::ChildAuthority::clamp_for_role(
         "verifier",
-        codewhale_workflow::PermissionCeiling::preset("verifier").expect("preset"),
-        codewhale_workflow::PermissionCeiling::preset("full").expect("preset"),
+        nestlone_workflow::PermissionCeiling::preset("verifier").expect("preset"),
+        nestlone_workflow::PermissionCeiling::preset("full").expect("preset"),
     );
     assert!(
         !authority.ceiling.write,
@@ -13299,7 +13299,7 @@ fn read_only_with_shell_registry() -> (tempfile::TempDir, SubAgentToolRegistry) 
     );
     assert_eq!(
         authority.ceiling.shell,
-        codewhale_workflow::ShellCeiling::Full,
+        nestlone_workflow::ShellCeiling::Full,
         "…that nonetheless kept `shell = full` so it can run checks"
     );
 
@@ -13543,8 +13543,8 @@ fn a_write_capable_member_keeps_every_execution_gate() {
     let tmp = tempdir().expect("tempdir");
     let authority = crate::fleet::exact::ChildAuthority::clamp_for_role(
         "builder",
-        codewhale_workflow::PermissionCeiling::preset("full").expect("preset"),
-        codewhale_workflow::PermissionCeiling::preset("full").expect("preset"),
+        nestlone_workflow::PermissionCeiling::preset("full").expect("preset"),
+        nestlone_workflow::PermissionCeiling::preset("full").expect("preset"),
     );
     assert!(authority.ceiling.write);
 
@@ -13621,8 +13621,8 @@ fn the_durable_work_families_resolve_their_actions_through_the_policy_seam() {
 #[test]
 fn posture_denials_survive_a_child_that_declines_to_inherit() {
     let authority = crate::fleet::exact::ChildAuthority::clamp(
-        codewhale_workflow::PermissionCeiling::preset("read_write").expect("preset"),
-        codewhale_workflow::PermissionCeiling::preset("full").expect("preset"),
+        nestlone_workflow::PermissionCeiling::preset("read_write").expect("preset"),
+        nestlone_workflow::PermissionCeiling::preset("full").expect("preset"),
     );
     assert!(!authority.ceiling.network_tool);
 
@@ -13664,11 +13664,11 @@ fn posture_denials_survive_a_child_that_declines_to_inherit() {
 /// proves nothing.
 #[test]
 fn the_authority_fingerprint_distinguishes_every_envelope_it_names() {
-    let session = codewhale_workflow::PermissionCeiling::preset("full").expect("preset");
+    let session = nestlone_workflow::PermissionCeiling::preset("full").expect("preset");
     let fingerprint = |preset: &str, role: &str| {
         crate::fleet::exact::ChildAuthority::clamp_for_role(
             role,
-            codewhale_workflow::PermissionCeiling::preset(preset).expect("preset"),
+            nestlone_workflow::PermissionCeiling::preset(preset).expect("preset"),
             session,
         )
         .fingerprint()
@@ -13698,8 +13698,8 @@ fn the_authority_fingerprint_distinguishes_every_envelope_it_names() {
     // a narrower session is a different envelope.
     let narrow = crate::fleet::exact::ChildAuthority::clamp_for_role(
         "builder",
-        codewhale_workflow::PermissionCeiling::preset("full").expect("preset"),
-        codewhale_workflow::PermissionCeiling::preset("read_only").expect("preset"),
+        nestlone_workflow::PermissionCeiling::preset("full").expect("preset"),
+        nestlone_workflow::PermissionCeiling::preset("read_only").expect("preset"),
     );
     assert_ne!(narrow.fingerprint(), fingerprint("full", "builder"));
 }
@@ -13711,8 +13711,8 @@ fn the_authority_fingerprint_distinguishes_every_envelope_it_names() {
 fn the_spawn_boundary_fails_closed_on_a_missing_or_mismatched_authority() {
     let authority = crate::fleet::exact::ChildAuthority::clamp_for_role(
         "verifier",
-        codewhale_workflow::PermissionCeiling::preset("verifier").expect("preset"),
-        codewhale_workflow::PermissionCeiling::preset("full").expect("preset"),
+        nestlone_workflow::PermissionCeiling::preset("verifier").expect("preset"),
+        nestlone_workflow::PermissionCeiling::preset("full").expect("preset"),
     );
     let fingerprint = authority.fingerprint();
 
@@ -13774,8 +13774,8 @@ fn the_spawn_boundary_fails_closed_on_a_missing_or_mismatched_authority() {
 fn the_launched_authority_is_the_one_the_spawn_boundary_accepts() {
     let authority = crate::fleet::exact::ChildAuthority::clamp_for_role(
         "auditor",
-        codewhale_workflow::PermissionCeiling::preset("analyst").expect("preset"),
-        codewhale_workflow::PermissionCeiling::preset("full").expect("preset"),
+        nestlone_workflow::PermissionCeiling::preset("analyst").expect("preset"),
+        nestlone_workflow::PermissionCeiling::preset("full").expect("preset"),
     );
     // An arbitrary fleet role falls back to the ceiling-derived posture rather
     // than to the full-write General surface.
@@ -13796,8 +13796,8 @@ fn the_launched_authority_is_the_one_the_spawn_boundary_accepts() {
     // A different member's envelope must not satisfy it.
     let other = crate::fleet::exact::ChildAuthority::clamp_for_role(
         "builder",
-        codewhale_workflow::PermissionCeiling::preset("full").expect("preset"),
-        codewhale_workflow::PermissionCeiling::preset("full").expect("preset"),
+        nestlone_workflow::PermissionCeiling::preset("full").expect("preset"),
+        nestlone_workflow::PermissionCeiling::preset("full").expect("preset"),
     );
     assert!(
         verify_fleet_authority_input(&other.fingerprint(), &input).is_err(),

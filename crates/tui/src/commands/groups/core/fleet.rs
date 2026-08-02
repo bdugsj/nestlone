@@ -11,8 +11,8 @@
 //! appeared. The session view is still reachable as `/fleet workers` (and
 //! `/subagents`), now labelled as what it is.
 
-use codewhale_lane::control::operations_for_domain;
-use codewhale_lane::{ControlDomain, ControlOperation, ControlSurface};
+use nestlone_lane::control::operations_for_domain;
+use nestlone_lane::{ControlDomain, ControlOperation, ControlSurface};
 
 use crate::commands::traits::{CommandInfo, RegisterCommand};
 use crate::fleet::control::execute_fleet_control;

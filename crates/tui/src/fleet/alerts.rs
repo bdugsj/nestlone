@@ -6,7 +6,7 @@ use std::collections::BTreeMap;
 use std::time::Duration;
 
 use anyhow::{Context, Result, anyhow};
-use codewhale_protocol::fleet::{
+use nestlone_protocol::fleet::{
     FleetAlertEventClass, FleetReceipt, FleetRunId, FleetTaskFailureKind, FleetWorkerEvent,
     FleetWorkerEventPayload,
 };
@@ -525,7 +525,7 @@ fn default_pagerduty_severity() -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use codewhale_protocol::fleet::{FleetScore, FleetTaskResult};
+    use nestlone_protocol::fleet::{FleetScore, FleetTaskResult};
 
     #[derive(Default)]
     struct MapResolver {

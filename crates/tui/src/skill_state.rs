@@ -117,7 +117,7 @@ impl SkillStateStore {
 fn default_state_path() -> Result<PathBuf> {
     // Listing, prompt construction, and doctor are read-only. The explicit
     // mutation path creates the parent from `persist` when needed.
-    Ok(codewhale_config::codewhale_home()
+    Ok(nestlone_config::nestlone_home()
         .context("could not resolve Codewhale state directory")?
         .join(STATE_FILE_NAME))
 }
@@ -155,7 +155,7 @@ fn persist_disabled(path: &Path, disabled: &BTreeSet<String>) -> Result<()> {
         disabled: disabled.iter().cloned().collect(),
     };
     let body = toml::to_string_pretty(&on_disk).context("serialize skill state")?;
-    codewhale_config::persistence::atomic_write(path, body.as_bytes())
+    nestlone_config::persistence::atomic_write(path, body.as_bytes())
         .with_context(|| format!("atomically persist skill state at {}", path.display()))
 }
 

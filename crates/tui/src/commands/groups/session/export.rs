@@ -678,7 +678,7 @@ pub(super) fn sanitize_text(input: &str) -> String {
     let urls = url_regex().replace_all(&jwt, |captures: &regex::Captures<'_>| {
         redact_url_match(captures.get(0).map_or("", |value| value.as_str()))
     });
-    codewhale_config::persistence::redact_secrets(&urls)
+    nestlone_config::persistence::redact_secrets(&urls)
 }
 
 fn redact_url_match(raw: &str) -> String {

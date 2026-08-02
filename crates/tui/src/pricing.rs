@@ -6,7 +6,7 @@
 //! reliable balance endpoint exists.
 
 use chrono::{DateTime, TimeZone, Utc};
-use codewhale_config::pricing::{
+use nestlone_config::pricing::{
     Currency, LIVE_PRICING_MAX_AGE_SECS, LivePricingDefect, OfferingPricing, PricingProvenance,
     TokenClass, TokenUsage,
 };
@@ -1315,12 +1315,12 @@ pub(crate) fn audit_turn_cost_for_provider_on_endpoint_at(
 /// Keeping this distinct from the ordinary `None` projection prevents a bad
 /// published row from becoming indistinguishable from an absent price.
 fn invalid_catalog_pricing_audit(
-    offering: &codewhale_config::catalog::CatalogOffering,
+    offering: &nestlone_config::catalog::CatalogOffering,
 ) -> Option<TurnCostAudit> {
     offering
         .cost
         .as_ref()
-        .is_some_and(|cost| !codewhale_config::pricing::catalog_cost_is_valid(cost))
+        .is_some_and(|cost| !nestlone_config::pricing::catalog_cost_is_valid(cost))
         .then(|| TurnCostAudit::unpriced(UnpricedReason::InvalidPricingRow))
 }
 
@@ -1328,11 +1328,11 @@ fn invalid_catalog_pricing_audit(
 enum VerifiedOffering {
     /// The row is authoritative as-is (bundled, user override, or a live row
     /// proven fresh and endpoint-matched).
-    Usable(codewhale_config::catalog::CatalogOffering),
+    Usable(nestlone_config::catalog::CatalogOffering),
     /// The live row could not be verified, so the bundled published row is used
     /// instead. The defect is retained as the receipt for why.
     DegradedToBundled {
-        offering: codewhale_config::catalog::CatalogOffering,
+        offering: nestlone_config::catalog::CatalogOffering,
         defect: LivePricingDefect,
     },
     /// The live row could not be verified and no bundled row exists.
@@ -1345,7 +1345,7 @@ enum VerifiedOffering {
 /// live row as authoritative.
 ///
 /// `endpoint_fingerprint` is the non-secret SHA-256 digest of the base URL the turn
-/// was actually served on (see [`codewhale_config::catalog::base_url_fingerprint`]).
+/// was actually served on (see [`nestlone_config::catalog::base_url_fingerprint`]).
 /// Callers that do not know the endpoint pass `None`, which cannot *confirm* a
 /// live row — so those callers degrade to the bundled snapshot rather than
 /// billing against a rate whose endpoint scope is unproven.
@@ -1643,7 +1643,7 @@ fn provider_owned_hand_pricing_at(
 fn effective_offering_pricing(
     provider: ApiProvider,
     model: &str,
-    offering: &codewhale_config::catalog::CatalogOffering,
+    offering: &nestlone_config::catalog::CatalogOffering,
     classes: &TokenUsage,
 ) -> Option<OfferingPricing> {
     let mut pricing = OfferingPricing::from_catalog_offering(offering)?;
@@ -1669,7 +1669,7 @@ fn effective_offering_pricing(
 fn catalog_cost_estimate_for_route(
     provider: ApiProvider,
     model: &str,
-    offering: &codewhale_config::catalog::CatalogOffering,
+    offering: &nestlone_config::catalog::CatalogOffering,
     usage: &Usage,
 ) -> Option<CostEstimate> {
     let classes = token_usage_for_pricing(usage);
@@ -1858,10 +1858,10 @@ mod tests {
 
     #[test]
     fn malformed_catalog_row_has_an_explicit_runtime_reason() {
-        let offering = codewhale_config::catalog::CatalogOffering {
+        let offering = nestlone_config::catalog::CatalogOffering {
             provider: "openrouter".to_string(),
             wire_model_id: "openai/gpt-5.5".to_string(),
-            cost: Some(codewhale_config::models_dev::ModelsDevCost {
+            cost: Some(nestlone_config::models_dev::ModelsDevCost {
                 input: Some(f64::NAN),
                 output: Some(30.0),
                 cache_read: Some(0.05),
@@ -2992,11 +2992,11 @@ mod tests {
 
     #[test]
     fn catalog_pricing_uses_its_cache_write_rate() {
-        let offering = codewhale_config::catalog::CatalogOffering {
+        let offering = nestlone_config::catalog::CatalogOffering {
             provider: "anthropic".to_string(),
             wire_model_id: "catalog-priced-model".to_string(),
             endpoint_key: "chat".to_string(),
-            cost: Some(codewhale_config::models_dev::ModelsDevCost {
+            cost: Some(nestlone_config::models_dev::ModelsDevCost {
                 input: Some(10.0),
                 output: Some(50.0),
                 cache_read: Some(1.0),

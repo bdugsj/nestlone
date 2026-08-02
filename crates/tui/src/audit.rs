@@ -41,5 +41,5 @@ fn append_event(event: &str, details: Value) -> anyhow::Result<()> {
 }
 
 fn default_audit_path() -> anyhow::Result<PathBuf> {
-    Ok(codewhale_config::codewhale_home()?.join("audit.log"))
+    Ok(nestlone_config::nestlone_home()?.join("audit.log"))
 }

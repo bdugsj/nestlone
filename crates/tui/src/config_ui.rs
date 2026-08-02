@@ -1545,16 +1545,16 @@ mod tests {
     fn persisted_config_ui_reasoning_updates_the_startup_precedence_layer() {
         let _lock = lock_test_env();
         let temp_root = tempfile::tempdir().expect("isolated Codewhale home");
-        let codewhale_home = temp_root.path().join(".codewhale");
-        fs::create_dir_all(&codewhale_home).expect("settings dir");
+        let nestlone_home = temp_root.path().join(".codewhale");
+        fs::create_dir_all(&nestlone_home).expect("settings dir");
         fs::write(
-            codewhale_home.join("settings.toml"),
+            nestlone_home.join("settings.toml"),
             "default_model = \"auto\"\nreasoning_effort = \"max\"\n",
         )
         .expect("seed settings");
         let config_path = temp_root.path().join("config.toml");
         fs::write(&config_path, "reasoning_effort = \"max\"\n").expect("seed config");
-        let _home = EnvVarGuard::set("CODEWHALE_HOME", &codewhale_home);
+        let _home = EnvVarGuard::set("CODEWHALE_HOME", &nestlone_home);
 
         let mut app = app();
         app.config_path = Some(config_path.clone());
@@ -1691,11 +1691,11 @@ background_color = "#1A1B26"
     fn build_document_accepts_every_shipped_locale_from_settings() {
         let _lock = lock_test_env();
         let temp_root = tempfile::tempdir().expect("isolated Codewhale home");
-        let codewhale_home = temp_root.path().join(".codewhale");
-        fs::create_dir_all(&codewhale_home).expect("settings dir");
-        let settings_path = codewhale_home.join("settings.toml");
+        let nestlone_home = temp_root.path().join(".codewhale");
+        fs::create_dir_all(&nestlone_home).expect("settings dir");
+        let settings_path = nestlone_home.join("settings.toml");
         fs::write(&settings_path, "").expect("seed settings");
-        let _home = EnvVarGuard::set("CODEWHALE_HOME", &codewhale_home);
+        let _home = EnvVarGuard::set("CODEWHALE_HOME", &nestlone_home);
 
         let app = app();
         let config = Config::default();
@@ -1720,8 +1720,8 @@ background_color = "#1A1B26"
     fn custom_theme_round_trips_through_typed_config_document() {
         let _lock = lock_test_env();
         let temp_root = tempfile::tempdir().expect("isolated Codewhale home");
-        let codewhale_home = temp_root.path().join(".codewhale");
-        let themes_dir = codewhale_home.join("themes");
+        let nestlone_home = temp_root.path().join(".codewhale");
+        let themes_dir = nestlone_home.join("themes");
         fs::create_dir_all(&themes_dir).expect("themes dir");
         fs::write(
             themes_dir.join("ocean.json"),
@@ -1729,12 +1729,12 @@ background_color = "#1A1B26"
         )
         .expect("custom theme");
         fs::write(
-            codewhale_home.join("settings.toml"),
+            nestlone_home.join("settings.toml"),
             r#"theme = "custom:ocean"
 "#,
         )
         .expect("settings");
-        let _home = EnvVarGuard::set("CODEWHALE_HOME", &codewhale_home);
+        let _home = EnvVarGuard::set("CODEWHALE_HOME", &nestlone_home);
 
         let mut app = app();
         let mut config = Config::default();

@@ -364,7 +364,7 @@ impl SkillRootCatalog {
                         continue;
                     }
                     if root.kind == SkillRootKind::CodeWhaleProject
-                        && !codewhale_project_root_is_inside_workspace(workspace, &root.path)
+                        && !nestlone_project_root_is_inside_workspace(workspace, &root.path)
                     {
                         continue;
                     }
@@ -439,9 +439,9 @@ pub fn skills_directories_with_home_and_mode(
 
 /// CodeWhale project skills dir when it exists and stays inside the workspace.
 #[must_use]
-pub fn codewhale_workspace_skills_dir(workspace: &Path) -> Option<PathBuf> {
+pub fn nestlone_workspace_skills_dir(workspace: &Path) -> Option<PathBuf> {
     let skills_dir = workspace.join(".codewhale").join("skills");
-    codewhale_project_root_is_inside_workspace(workspace, &skills_dir).then_some(skills_dir)
+    nestlone_project_root_is_inside_workspace(workspace, &skills_dir).then_some(skills_dir)
 }
 
 /// Filter candidate paths to existing directories, preserving order and
@@ -554,7 +554,7 @@ pub fn paths_refer_to_same_dir(left: &Path, right: &Path) -> bool {
     }
 }
 
-fn codewhale_project_root_is_inside_workspace(workspace: &Path, skills_dir: &Path) -> bool {
+fn nestlone_project_root_is_inside_workspace(workspace: &Path, skills_dir: &Path) -> bool {
     let Ok(canonical_workspace) = fs::canonicalize(workspace) else {
         return false;
     };
@@ -812,7 +812,7 @@ mod tests {
     }
 
     #[test]
-    fn owned_roots_are_writable_and_codewhale_only() {
+    fn owned_roots_are_writable_and_nestlone_only() {
         let tmp = TempDir::new().unwrap();
         let workspace = tmp.path().join("ws");
         let home = tmp.path().join("home");

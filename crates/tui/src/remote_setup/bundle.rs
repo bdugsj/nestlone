@@ -22,7 +22,7 @@ pub const DEFAULT_WORKERS: u32 = 2;
 pub const DEFAULT_RUNTIME_URL: &str = "http://127.0.0.1:7878";
 
 /// Minimal provider facts the bundle needs, read from the existing
-/// `codewhale_config::provider` registry (the single source of truth).
+/// `nestlone_config::provider` registry (the single source of truth).
 #[derive(Debug, Clone)]
 pub struct ProviderInfo {
     /// Canonical provider slug, e.g. `"deepseek"`.
@@ -39,8 +39,8 @@ impl ProviderInfo {
     /// Resolve a [`ProviderInfo`] from a slug against the config provider registry.
     #[must_use]
     pub fn from_slug(slug: &str) -> Option<Self> {
-        let kind = codewhale_config::ProviderKind::parse(slug)?;
-        let p = codewhale_config::provider::provider_for_kind(kind);
+        let kind = nestlone_config::ProviderKind::parse(slug)?;
+        let p = nestlone_config::provider::provider_for_kind(kind);
         let key_var = p.env_vars().first().copied().unwrap_or("CODEWHALE_API_KEY");
         Some(Self {
             slug: p.id().to_string(),
@@ -559,7 +559,7 @@ mod tests {
     }
 
     #[test]
-    fn env_files_lead_with_codewhale_keys() {
+    fn env_files_lead_with_nestlone_keys() {
         let inputs = sample_inputs(&DIGITALOCEAN, &TELEGRAM, "deepseek");
         let files = render_bundle(&inputs);
         let runtime = &files
@@ -639,7 +639,7 @@ mod tests {
     }
 
     #[test]
-    fn systemd_units_reference_codewhale_paths() {
+    fn systemd_units_reference_nestlone_paths() {
         let inputs = sample_inputs(&LIGHTHOUSE, &FEISHU, "deepseek");
         let files = render_bundle(&inputs);
         let unit = &files

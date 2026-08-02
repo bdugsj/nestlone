@@ -19,9 +19,9 @@ use ratatui::{
     widgets::{Block, Paragraph, Widget},
 };
 
-use codewhale_config::catalog::CatalogSource;
-use codewhale_config::model_reference::ModelReferenceCard;
-use codewhale_config::pricing::OfferingPricing;
+use nestlone_config::catalog::CatalogSource;
+use nestlone_config::model_reference::ModelReferenceCard;
+use nestlone_config::pricing::OfferingPricing;
 
 use crate::codex_model_cache::{
     self, CodexModelCacheFreshness, CodexModelMetadata, CodexModelRoster,
@@ -1461,7 +1461,7 @@ fn row_provider_identity(row: &ModelPickerRow) -> Option<&str> {
     })
 }
 
-fn offering_for_row(row: &ModelPickerRow) -> Option<codewhale_config::catalog::CatalogOffering> {
+fn offering_for_row(row: &ModelPickerRow) -> Option<nestlone_config::catalog::CatalogOffering> {
     let provider = row.provider?;
     catalog_offering_for_model(provider, &row.id)
 }

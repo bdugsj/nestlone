@@ -111,7 +111,7 @@ impl HarnessBuilder {
         }
         if let Some(home) = self.seal_home.as_deref() {
             std::fs::create_dir_all(home).context("create sealed HOME")?;
-            let codewhale_config = home.join(".codewhale").join("config.toml");
+            let nestlone_config = home.join(".codewhale").join("config.toml");
             let deepseek_config = home.join(".deepseek").join("config.toml");
             builder = builder
                 .env("HOME", home.to_string_lossy())
@@ -119,7 +119,7 @@ impl HarnessBuilder {
                 .env("XDG_DATA_HOME", home.join(".local/share").to_string_lossy())
                 .env("XDG_CACHE_HOME", home.join(".cache").to_string_lossy())
                 .env("USERPROFILE", home.to_string_lossy())
-                .env("CODEWHALE_CONFIG_PATH", codewhale_config.to_string_lossy())
+                .env("CODEWHALE_CONFIG_PATH", nestlone_config.to_string_lossy())
                 .env("DEEPSEEK_CONFIG_PATH", deepseek_config.to_string_lossy());
         }
         for (k, v) in &self.env {

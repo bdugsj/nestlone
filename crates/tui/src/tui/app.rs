@@ -13,7 +13,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use thiserror::Error;
 
-use codewhale_config::{ProviderChain, route::RouteLimits};
+use nestlone_config::{ProviderChain, route::RouteLimits};
 
 use crate::artifacts::ArtifactRecord;
 use crate::client::{CacheWarmupKey, PromptInspection};
@@ -131,13 +131,13 @@ pub(crate) fn resolve_skills_dir(
     global_skills_dir: &Path,
     config: &Config,
 ) -> PathBuf {
-    if config.skills_config().scan_codewhale_only() {
+    if config.skills_config().scan_nestlone_only() {
         if config.skills_dir.is_some() {
             return global_skills_dir.to_path_buf();
         }
-        if let Some(codewhale_skills_dir) = crate::skills::codewhale_workspace_skills_dir(workspace)
+        if let Some(nestlone_skills_dir) = crate::skills::nestlone_workspace_skills_dir(workspace)
         {
-            return codewhale_skills_dir;
+            return nestlone_skills_dir;
         }
         return global_skills_dir.to_path_buf();
     }
@@ -387,7 +387,7 @@ impl AgentCurrentActivity {
 pub(crate) fn bound_agent_activity_text(value: &str) -> String {
     let mut visible = String::with_capacity(value.len());
     crate::tui::osc8::strip_ansi_into(value, &mut visible);
-    let redacted = codewhale_config::persistence::redact_secrets(&visible);
+    let redacted = nestlone_config::persistence::redact_secrets(&visible);
     crate::tui::history::summarize_tool_output(&redacted)
 }
 
@@ -1237,7 +1237,7 @@ pub struct App {
     pub legacy_plugin_tools_dir: Option<PathBuf>,
     pub mcp_config_path: PathBuf,
     pub skills_dir: PathBuf,
-    pub skills_scan_codewhale_only: bool,
+    pub skills_scan_nestlone_only: bool,
     /// Path to the user-memory file (#489). Always populated; only
     /// consulted when `use_memory` is `true`.
     pub memory_path: PathBuf,
@@ -1746,7 +1746,7 @@ pub struct App {
                 u64,
                 String,
                 crate::localization::Locale,
-                Result<Box<codewhale_config::UserConstitution>, String>,
+                Result<Box<nestlone_config::UserConstitution>, String>,
             )>,
         >,
     >,
@@ -2086,13 +2086,13 @@ impl App {
     fn discover_cached_skills(
         workspace: &std::path::Path,
         skills_dir: &std::path::Path,
-        scan_codewhale_only: bool,
+        scan_nestlone_only: bool,
         plugins: &crate::plugins::PluginRegistry,
     ) -> Vec<(String, String)> {
         crate::skills::discover_for_workspace_and_dir_with_mode_and_plugins(
             workspace,
             skills_dir,
-            crate::skills::SkillDiscoveryMode::from_codewhale_only(scan_codewhale_only),
+            crate::skills::SkillDiscoveryMode::from_nestlone_only(scan_nestlone_only),
             Some(plugins),
         )
         .into_enabled()
@@ -2107,7 +2107,7 @@ impl App {
         let cached_skills = Self::discover_cached_skills(
             &self.workspace,
             &skills_dir,
-            self.skills_scan_codewhale_only,
+            self.skills_scan_nestlone_only,
             self.plugin_registry.as_ref(),
         );
         self.hotbar_actions.replace_skills(&cached_skills);

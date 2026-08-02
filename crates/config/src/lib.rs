@@ -56,10 +56,10 @@ use std::sync::OnceLock;
 
 use anyhow::{Context, Result, bail};
 pub use auth_source::{AuthSourceKind, ProviderAuthSourceToml};
-pub use codewhale_execpolicy::ToolAskRule;
-use codewhale_execpolicy::{ExecPolicyEngine, PermissionAction, Ruleset};
-use codewhale_secrets::SecretSource;
-pub use codewhale_secrets::Secrets;
+pub use nestlone_execpolicy::ToolAskRule;
+use nestlone_execpolicy::{ExecPolicyEngine, PermissionAction, Ruleset};
+use nestlone_secrets::SecretSource;
+pub use nestlone_secrets::Secrets;
 pub use external_credentials::{
     EXTERNAL_CREDENTIAL_CONSENT_VERSION, EXTERNAL_CREDENTIAL_READ_ONLY_SEMANTICS,
     ExternalCredentialAccess, ExternalCredentialConsentStatus, ExternalCredentialConsentToml,
@@ -2421,7 +2421,7 @@ impl ConfigToml {
     #[must_use]
     pub fn resolve_runtime_options(&self, cli: &CliRuntimeOverrides) -> ResolvedRuntimeOptions {
         let no_keyring = Secrets::new(std::sync::Arc::new(
-            codewhale_secrets::InMemoryKeyringStore::new(),
+            nestlone_secrets::InMemoryKeyringStore::new(),
         ));
         self.resolve_runtime_options_with_secrets(cli, &no_keyring)
     }
@@ -3767,7 +3767,7 @@ fn env_api_key_for_provider(provider: ProviderKind) -> Option<String> {
             });
     }
 
-    codewhale_secrets::env_for(provider.as_str())
+    nestlone_secrets::env_for(provider.as_str())
 }
 
 fn auth_mode_requires_api_key(auth_mode: Option<&str>) -> bool {
@@ -4081,7 +4081,7 @@ impl ConfigStore {
             let Some(workspace) = rule
                 .workspace
                 .as_deref()
-                .and_then(codewhale_execpolicy::normalize_workspace_scope)
+                .and_then(nestlone_execpolicy::normalize_workspace_scope)
             else {
                 bail!("persistent allow rules must be scoped to a workspace");
             };
@@ -4097,7 +4097,7 @@ impl ConfigStore {
                 bail!("persistent command allow rules must not be empty");
             }
             if let Some(path) = rule.path.as_deref()
-                && codewhale_execpolicy::normalize_workspace_relative_path(path, &workspace)
+                && nestlone_execpolicy::normalize_workspace_relative_path(path, &workspace)
                     .is_none_or(|path| path.is_empty())
             {
                 bail!("persistent path allow rules must stay within the workspace");
@@ -4362,7 +4362,7 @@ fn copy_item_decor_table(target: &mut toml_edit::Table, source: &toml_edit::Tabl
 
 /// Process-wide default [`Secrets`] façade. The first caller wins; the
 /// lock is exposed so test or CLI code can install an explicit
-/// backend (e.g. an [`codewhale_secrets::InMemoryKeyringStore`]) before
+/// backend (e.g. an [`nestlone_secrets::InMemoryKeyringStore`]) before
 /// any resolver runs.
 pub fn default_secrets() -> &'static Secrets {
     static SECRETS: OnceLock<Secrets> = OnceLock::new();
@@ -4374,7 +4374,7 @@ pub fn default_secrets() -> &'static Secrets {
         #[cfg(test)]
         {
             Secrets::new(std::sync::Arc::new(
-                codewhale_secrets::InMemoryKeyringStore::new(),
+                nestlone_secrets::InMemoryKeyringStore::new(),
             ))
         }
         #[cfg(not(test))]
@@ -4401,15 +4401,15 @@ pub const LEGACY_APP_DIR: &str = ".deepseek";
 ///
 /// `$CODEWHALE_HOME` takes precedence when set. Otherwise defaults to
 /// `$HOME/.codewhale`. This is the write target for new product state.
-pub fn codewhale_home() -> Result<PathBuf> {
-    if let Some(path) = codewhale_home_env_override() {
+pub fn nestlone_home() -> Result<PathBuf> {
+    if let Some(path) = nestlone_home_env_override() {
         return Ok(path);
     }
     let home = effective_home_dir().context("failed to resolve home directory")?;
     Ok(home.join(CODEWHALE_APP_DIR))
 }
 
-fn codewhale_home_env_override() -> Option<PathBuf> {
+fn nestlone_home_env_override() -> Option<PathBuf> {
     let val = std::env::var("CODEWHALE_HOME").ok()?;
     let trimmed = val.trim();
     if trimmed.is_empty() {
@@ -4423,8 +4423,8 @@ fn codewhale_home_env_override() -> Option<PathBuf> {
 ///
 /// An explicit CodeWhale home is an isolation boundary: state/config resolvers
 /// must not fall back to ambient legacy `~/.deepseek` data outside that root.
-pub fn codewhale_home_is_explicit() -> bool {
-    codewhale_home_env_override().is_some()
+pub fn nestlone_home_is_explicit() -> bool {
+    nestlone_home_env_override().is_some()
 }
 
 /// Resolve the legacy DeepSeek home directory (`$HOME/.deepseek`).
@@ -4482,9 +4482,9 @@ fn ensure_safe_state_subdir(subdir: &str) -> Result<()> {
 /// from the legacy path for users who haven't migrated yet.
 pub fn resolve_state_dir(subdir: &str) -> Result<PathBuf> {
     ensure_safe_state_subdir(subdir)?;
-    let explicit_codewhale_home = codewhale_home_env_override().is_some();
-    let primary = codewhale_home()?.join(subdir);
-    if explicit_codewhale_home || primary.exists() {
+    let explicit_nestlone_home = nestlone_home_env_override().is_some();
+    let primary = nestlone_home()?.join(subdir);
+    if explicit_nestlone_home || primary.exists() {
         return Ok(primary);
     }
     let legacy = legacy_deepseek_home()?.join(subdir);
@@ -4554,9 +4554,9 @@ impl StateMigration {
 /// tests and future UI surfaces that want to render the notice themselves.
 pub fn ensure_state_dir_with_migration(subdir: &str) -> Result<(PathBuf, Option<StateMigration>)> {
     ensure_safe_state_subdir(subdir)?;
-    let explicit_codewhale_home = codewhale_home_env_override().is_some();
-    let dir = codewhale_home()?.join(subdir);
-    let migration = if !explicit_codewhale_home {
+    let explicit_nestlone_home = nestlone_home_env_override().is_some();
+    let dir = nestlone_home()?.join(subdir);
+    let migration = if !explicit_nestlone_home {
         migrate_legacy_state_dir(&dir, subdir)?
     } else {
         None
@@ -5058,8 +5058,8 @@ fn write_permissions_atomic(path: &Path, body: &[u8]) -> Result<()> {
 pub fn default_config_path() -> Result<PathBuf> {
     // Prefer ~/.codewhale/config.toml when it exists (fresh install or
     // migrated), otherwise fall back to ~/.deepseek/config.toml.
-    let primary = codewhale_home()?.join(CONFIG_FILE_NAME);
-    if codewhale_home_is_explicit() || primary.exists() {
+    let primary = nestlone_home()?.join(CONFIG_FILE_NAME);
+    if nestlone_home_is_explicit() || primary.exists() {
         return Ok(primary);
     }
     let legacy = legacy_deepseek_home()?.join(CONFIG_FILE_NAME);
@@ -5091,10 +5091,10 @@ impl ConfigMigration {
 /// is loaded; copies the legacy file if the primary doesn't exist yet.
 /// Never overwrites an existing primary config.
 pub fn migrate_config_if_needed() -> Result<Option<ConfigMigration>> {
-    if codewhale_home_is_explicit() {
+    if nestlone_home_is_explicit() {
         return Ok(None);
     }
-    let primary = codewhale_home()?.join(CONFIG_FILE_NAME);
+    let primary = nestlone_home()?.join(CONFIG_FILE_NAME);
     if primary.exists() {
         return Ok(None);
     }

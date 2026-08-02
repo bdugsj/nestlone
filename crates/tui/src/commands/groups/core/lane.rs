@@ -6,8 +6,8 @@
 //! so the slash surface, its hotbar action, and the CLI produce identical
 //! availability, target selection, outcomes, and receipts.
 
-use codewhale_lane::control::{execute_lane_control, operations_for_domain};
-use codewhale_lane::{ControlDomain, ControlOperation, ControlSurface};
+use nestlone_lane::control::{execute_lane_control, operations_for_domain};
+use nestlone_lane::{ControlDomain, ControlOperation, ControlSurface};
 
 use crate::commands::traits::{CommandInfo, RegisterCommand};
 use crate::localization::MessageId;
@@ -244,7 +244,7 @@ mod tests {
         let descriptor = ControlOperation::LaneList.descriptor();
         assert_eq!(
             descriptor.authority,
-            codewhale_lane::ControlAuthority::Read,
+            nestlone_lane::ControlAuthority::Read,
             "a bare hotbar press must not be a write"
         );
         assert!(

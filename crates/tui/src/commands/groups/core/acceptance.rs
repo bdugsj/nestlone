@@ -149,7 +149,7 @@ fn execute_isolated(world: &mut CoreCommandWorld, command: &str) -> CommandResul
 
     let _lock = lock_test_env();
     let _home = EnvVarGuard::set("HOME", &home);
-    let _codewhale_home = EnvVarGuard::set("CODEWHALE_HOME", home.join(".codewhale"));
+    let _nestlone_home = EnvVarGuard::set("CODEWHALE_HOME", home.join(".codewhale"));
 
     let app = world.app.as_deref_mut().expect("app should exist");
     commands::user_registry::reload(Some(&app.workspace));

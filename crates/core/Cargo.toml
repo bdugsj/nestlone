@@ -1,5 +1,5 @@
 [package]
-name = "codewhale-core"
+name = "nestlone-core"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
@@ -10,14 +10,14 @@ description = "Core runtime boundaries for Codewhale"
 [dependencies]
 anyhow.workspace = true
 chrono.workspace = true
-codewhale-agent = { path = "../agent", version = "0.0.2" }
-codewhale-config = { path = "../config", version = "0.0.2" }
-codewhale-execpolicy = { path = "../execpolicy", version = "0.0.2" }
-codewhale-hooks = { path = "../hooks", version = "0.0.2" }
-codewhale-mcp = { path = "../mcp", version = "0.0.2" }
-codewhale-protocol = { path = "../protocol", version = "0.0.2" }
-codewhale-state = { path = "../state", version = "0.0.2" }
-codewhale-tools = { path = "../tools", version = "0.0.2" }
+nestlone-agent = { path = "../agent", version = "0.0.2" }
+nestlone-config = { path = "../config", version = "0.0.2" }
+nestlone-execpolicy = { path = "../execpolicy", version = "0.0.2" }
+nestlone-hooks = { path = "../hooks", version = "0.0.2" }
+nestlone-mcp = { path = "../mcp", version = "0.0.2" }
+nestlone-protocol = { path = "../protocol", version = "0.0.2" }
+nestlone-state = { path = "../state", version = "0.0.2" }
+nestlone-tools = { path = "../tools", version = "0.0.2" }
 serde_json.workspace = true
 tokio = { workspace = true, features = ["time"] }
 tracing.workspace = true

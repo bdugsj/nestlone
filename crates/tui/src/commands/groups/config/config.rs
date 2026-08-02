@@ -1175,7 +1175,7 @@ fn set_subagents_config_value(
                 Ok(raw) => raw,
                 Err(err) => return CommandResult::error(err),
             };
-            let ceiling = u64::from(codewhale_config::MAX_SPAWN_DEPTH_CEILING);
+            let ceiling = u64::from(nestlone_config::MAX_SPAWN_DEPTH_CEILING);
             let clamped = raw.min(ceiling);
             if clamped != raw {
                 note = Some(format!("clamped from {raw} to {clamped}"));
@@ -2433,9 +2433,9 @@ mod tests {
     struct EnvGuard {
         home: Option<OsString>,
         userprofile: Option<OsString>,
-        codewhale_config_path: Option<OsString>,
+        nestlone_config_path: Option<OsString>,
         deepseek_config_path: Option<OsString>,
-        codewhale_allow_shell: Option<OsString>,
+        nestlone_allow_shell: Option<OsString>,
         deepseek_allow_shell: Option<OsString>,
         deepseek_approval_policy: Option<OsString>,
         no_animations: Option<OsString>,
@@ -2452,9 +2452,9 @@ mod tests {
             let config_str = OsString::from(config_path.as_os_str());
             let home_prev = env::var_os("HOME");
             let userprofile_prev = env::var_os("USERPROFILE");
-            let codewhale_config_prev = env::var_os("CODEWHALE_CONFIG_PATH");
+            let nestlone_config_prev = env::var_os("CODEWHALE_CONFIG_PATH");
             let deepseek_config_prev = env::var_os("DEEPSEEK_CONFIG_PATH");
-            let codewhale_allow_shell_prev = env::var_os("CODEWHALE_ALLOW_SHELL");
+            let nestlone_allow_shell_prev = env::var_os("CODEWHALE_ALLOW_SHELL");
             let deepseek_allow_shell_prev = env::var_os("DEEPSEEK_ALLOW_SHELL");
             let deepseek_approval_policy_prev = env::var_os("DEEPSEEK_APPROVAL_POLICY");
             let no_animations_prev = env::var_os("NO_ANIMATIONS");
@@ -2478,9 +2478,9 @@ mod tests {
             Self {
                 home: home_prev,
                 userprofile: userprofile_prev,
-                codewhale_config_path: codewhale_config_prev,
+                nestlone_config_path: nestlone_config_prev,
                 deepseek_config_path: deepseek_config_prev,
-                codewhale_allow_shell: codewhale_allow_shell_prev,
+                nestlone_allow_shell: nestlone_allow_shell_prev,
                 deepseek_allow_shell: deepseek_allow_shell_prev,
                 deepseek_approval_policy: deepseek_approval_policy_prev,
                 no_animations: no_animations_prev,
@@ -2517,7 +2517,7 @@ mod tests {
                 }
             }
 
-            if let Some(value) = self.codewhale_config_path.take() {
+            if let Some(value) = self.nestlone_config_path.take() {
                 // Safety: test-only environment mutation guarded by a global mutex.
                 unsafe {
                     env::set_var("CODEWHALE_CONFIG_PATH", value);
@@ -2542,7 +2542,7 @@ mod tests {
             }
 
             for (key, value) in [
-                ("CODEWHALE_ALLOW_SHELL", self.codewhale_allow_shell.take()),
+                ("CODEWHALE_ALLOW_SHELL", self.nestlone_allow_shell.take()),
                 ("DEEPSEEK_ALLOW_SHELL", self.deepseek_allow_shell.take()),
                 (
                     "DEEPSEEK_APPROVAL_POLICY",
@@ -3359,10 +3359,10 @@ mod tests {
         let root_config = temp_root.join(".deepseek").join("config.toml");
         fs::write(&root_config, "# user root\n").unwrap();
         let workspace = temp_root.join("workspace");
-        fs::create_dir_all(workspace.join(codewhale_config::CODEWHALE_APP_DIR)).unwrap();
+        fs::create_dir_all(workspace.join(nestlone_config::CODEWHALE_APP_DIR)).unwrap();
         fs::write(
             workspace
-                .join(codewhale_config::CODEWHALE_APP_DIR)
+                .join(nestlone_config::CODEWHALE_APP_DIR)
                 .join("config.toml"),
             "allow_shell = false\n",
         )
@@ -3430,10 +3430,10 @@ mod tests {
         let root_config = temp_root.join(".deepseek").join("config.toml");
         fs::write(&root_config, "# root\n").unwrap();
         let workspace = temp_root.join("workspace");
-        fs::create_dir_all(workspace.join(codewhale_config::CODEWHALE_APP_DIR)).unwrap();
+        fs::create_dir_all(workspace.join(nestlone_config::CODEWHALE_APP_DIR)).unwrap();
         fs::write(
             workspace
-                .join(codewhale_config::CODEWHALE_APP_DIR)
+                .join(nestlone_config::CODEWHALE_APP_DIR)
                 .join("config.toml"),
             "approval_policy = \"never\"\n",
         )
@@ -3522,7 +3522,7 @@ mod tests {
         let result = config_command(&mut app, Some("subagents max_depth 99 --save"));
         let msg = result.message.unwrap();
         let saved = fs::read_to_string(&config_path).unwrap();
-        let ceiling = codewhale_config::MAX_SPAWN_DEPTH_CEILING;
+        let ceiling = nestlone_config::MAX_SPAWN_DEPTH_CEILING;
 
         assert!(!result.is_error);
         assert!(msg.contains(&format!("subagents.max_depth = {ceiling}")));
@@ -3667,7 +3667,7 @@ context_window = 262144
         app.config_path = Some(config_path);
         app.api_provider = ApiProvider::Moonshot;
         app.model = "kimi-k3".to_string();
-        app.active_route_limits = Some(codewhale_config::route::RouteLimits {
+        app.active_route_limits = Some(nestlone_config::route::RouteLimits {
             context_tokens: Some(262_144),
             ..Default::default()
         });

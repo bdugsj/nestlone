@@ -509,7 +509,7 @@ impl SetupState {
 
     /// Path to the setup-state sidecar under `$CODEWHALE_HOME`.
     pub fn path() -> Result<PathBuf> {
-        Ok(crate::codewhale_home()?.join(SETUP_STATE_FILE_NAME))
+        Ok(crate::nestlone_home()?.join(SETUP_STATE_FILE_NAME))
     }
 
     /// Load the persisted setup-state from the home sidecar.

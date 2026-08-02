@@ -72,7 +72,7 @@ pub enum SkillDiscoveryMode {
 
 impl SkillDiscoveryMode {
     #[must_use]
-    pub fn from_codewhale_only(value: bool) -> Self {
+    pub fn from_nestlone_only(value: bool) -> Self {
         if value {
             Self::CodeWhaleOnly
         } else {
@@ -777,7 +777,7 @@ fn skills_directories_with_home_and_mode(
     roots::skills_directories_with_home_and_mode(workspace, home_dir, mode)
 }
 
-pub(crate) use roots::codewhale_workspace_skills_dir;
+pub(crate) use roots::nestlone_workspace_skills_dir;
 #[cfg(test)]
 pub(crate) use roots::existing_skill_dirs;
 
@@ -1969,7 +1969,7 @@ body";
     }
 
     #[test]
-    fn codewhale_only_mode_ignores_cross_tool_skill_dirs() {
+    fn nestlone_only_mode_ignores_cross_tool_skill_dirs() {
         let tmpdir = TempDir::new().unwrap();
         let workspace = tmpdir.path().join("workspace");
         let home = tmpdir.path().join("home");
@@ -2017,7 +2017,7 @@ body";
     }
 
     #[test]
-    fn codewhale_only_mode_still_honors_explicit_configured_dir() {
+    fn nestlone_only_mode_still_honors_explicit_configured_dir() {
         let tmpdir = TempDir::new().unwrap();
         let workspace = tmpdir.path().join("workspace");
         let home = tmpdir.path().join("home");
@@ -2042,7 +2042,7 @@ body";
     }
 
     #[test]
-    fn codewhale_only_mode_rejects_workspace_codewhale_symlink_escape() {
+    fn nestlone_only_mode_rejects_workspace_nestlone_symlink_escape() {
         let tmpdir = TempDir::new().unwrap();
         let workspace = tmpdir.path().join("workspace");
         let home = tmpdir.path().join("home");

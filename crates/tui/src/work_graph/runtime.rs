@@ -6,7 +6,7 @@ use std::sync::{Arc, Mutex, MutexGuard};
 use crate::fleet::ledger::FleetLedger;
 use crate::tools::plan::{PlanSnapshot, PlanState, SharedPlanState, StepStatus};
 use crate::tools::todo::{SharedTodoList, TodoList, TodoListSnapshot, TodoStatus};
-use codewhale_lane::LaneRegistry;
+use nestlone_lane::LaneRegistry;
 
 use super::{
     BindingId, ChangeCtx, CompatPlanMetadata, CompatProjectionState, CompatTodoBinding, EdgeKind,

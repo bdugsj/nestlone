@@ -1,5 +1,5 @@
 [package]
-name = "codewhale-config"
+name = "nestlone-config"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
@@ -9,8 +9,8 @@ description = "Config schema and precedence model for Codewhale"
 
 [dependencies]
 anyhow.workspace = true
-codewhale-execpolicy = { path = "../execpolicy", version = "0.0.2" }
-codewhale-secrets = { path = "../secrets", version = "0.0.2" }
+nestlone-execpolicy = { path = "../execpolicy", version = "0.0.2" }
+nestlone-secrets = { path = "../secrets", version = "0.0.2" }
 dirs.workspace = true
 fd-lock = "4.0.4"
 libc = "0.2"

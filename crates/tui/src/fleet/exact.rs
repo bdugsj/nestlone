@@ -32,7 +32,7 @@
 use std::sync::Arc;
 
 use async_trait::async_trait;
-use codewhale_workflow::{
+use nestlone_workflow::{
     CapturedReasoningRouter, CredentialReadiness, EffectiveReasoning, EndpointIdentity,
     FleetDocument, FleetRouterRef, FleetSearchRoot, FleetSnapshot, FleetSnapshotMember,
     FleetTaskReceipt, NamedFleetError, PermissionCeiling, PreflightError, PreflightedRoute,
@@ -55,8 +55,8 @@ use crate::tui::app::ReasoningEffort;
 #[must_use]
 pub(crate) fn fleet_search_roots(workspace: &std::path::Path) -> Vec<FleetSearchRoot> {
     let mut roots = Vec::new();
-    if let Ok(home) = codewhale_config::codewhale_home() {
-        roots.push(FleetSearchRoot::new("codewhale_home", home));
+    if let Ok(home) = nestlone_config::nestlone_home() {
+        roots.push(FleetSearchRoot::new("nestlone_home", home));
     }
     roots.push(FleetSearchRoot::new("workspace", workspace.to_path_buf()));
     roots
@@ -1571,14 +1571,14 @@ fn exact_member_profile(
         |route| route.provider_id.clone(),
     );
 
-    let profile = codewhale_config::FleetProfile {
-        slot: codewhale_config::FleetSlot::Custom(member.role.clone()),
-        role: codewhale_config::FleetRole {
+    let profile = nestlone_config::FleetProfile {
+        slot: nestlone_config::FleetSlot::Custom(member.role.clone()),
+        role: nestlone_config::FleetRole {
             name: posture_role.to_string(),
             description: Some(format!("exact fleet member `{}`", member.id)),
             instructions: None,
         },
-        loadout: codewhale_config::FleetLoadout::Inherit,
+        loadout: nestlone_config::FleetLoadout::Inherit,
         model: Some(wire_model.clone()),
         // The exact provider pin is the whole point: it is what makes the
         // child client bind to this member's provider instead of the
@@ -1587,12 +1587,12 @@ fn exact_member_profile(
         // Reasoning is decided per task (a member may be `auto`), so it is
         // placed on the spawn request explicitly rather than baked in here.
         reasoning_effort: None,
-        permissions: codewhale_config::FleetProfilePermissions {
+        permissions: nestlone_config::FleetProfilePermissions {
             allow_shell: member.permissions.shell == ShellCeiling::Full,
             trust: false,
             approval_required: true,
         },
-        delegation: codewhale_config::FleetDelegationHints {
+        delegation: nestlone_config::FleetDelegationHints {
             max_spawn_depth: Some(member.permissions.delegation_depth),
             max_concurrency: None,
         },
@@ -1635,14 +1635,14 @@ impl StaticFleetRouter {
             identity: RouterIdentity {
                 id: "luna-low".to_string(),
                 origin: "workspace".to_string(),
-                service_kind: codewhale_workflow::REASONING_ROUTER_SERVICE_KIND.to_string(),
+                service_kind: nestlone_workflow::REASONING_ROUTER_SERVICE_KIND.to_string(),
                 legacy_inline: false,
                 provider: "openai".to_string(),
                 model: "gpt-5.6-luna".to_string(),
                 endpoint: Some(EndpointIdentity::from_base_url("https://api.openai.com/v1")),
                 call: Some(
                     router_call_plan(
-                        codewhale_workflow::RouterCallReasoning::Low,
+                        nestlone_workflow::RouterCallReasoning::Low,
                         &ReasoningCapability::tiered(),
                     )
                     .disclosure,
@@ -1889,7 +1889,7 @@ mod shell_ceiling_tests {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use codewhale_workflow::{
+    use nestlone_workflow::{
         EffectiveReasoningSource, ProviderEffectiveReasoning, RequestedReasoning,
     };
 
@@ -2681,9 +2681,9 @@ permissions = "read_only"
         }
 
         // And the resolver carries that all the way onto the receipt.
-        let resolved = codewhale_workflow::resolve_exact_member_reasoning(
+        let resolved = nestlone_workflow::resolve_exact_member_reasoning(
             "implementer",
-            &codewhale_workflow::FrozenRoute {
+            &nestlone_workflow::FrozenRoute {
                 provider: "deepseek".to_string(),
                 model: "deepseek-v4-pro".to_string(),
             },
@@ -2697,7 +2697,7 @@ permissions = "read_only"
         assert_eq!(resolved.requested(), RequestedReasoning::Low);
         assert_eq!(
             resolved.effective(),
-            codewhale_workflow::EffectiveReasoning::Tier(ReasoningTier::High)
+            nestlone_workflow::EffectiveReasoning::Tier(ReasoningTier::High)
         );
         assert!(resolved.capability_normalized());
     }

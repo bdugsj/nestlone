@@ -14,7 +14,7 @@ use std::process::{Child, Command, ExitStatus, Stdio};
 use std::thread;
 use std::time::{Duration, Instant};
 
-use codewhale_protocol::fleet::FleetHostSpec;
+use nestlone_protocol::fleet::FleetHostSpec;
 use thiserror::Error;
 
 #[cfg(unix)]
@@ -467,7 +467,7 @@ pub struct SshFleetHostConfig {
     pub host_key_fingerprint: Option<String>,
     pub working_directory: PathBuf,
     pub env_allowlist: BTreeSet<String>,
-    pub codewhale_binary: String,
+    pub nestlone_binary: String,
     pub ssh_binary: String,
     pub connect_timeout_seconds: u64,
 }
@@ -483,7 +483,7 @@ impl SshFleetHostConfig {
             host_key_fingerprint: None,
             working_directory: working_directory.into(),
             env_allowlist: BTreeSet::new(),
-            codewhale_binary: "codewhale".to_string(),
+            nestlone_binary: "codewhale".to_string(),
             ssh_binary: "ssh".to_string(),
             connect_timeout_seconds: DEFAULT_CONNECT_TIMEOUT_SECONDS,
         }
@@ -499,7 +499,7 @@ impl SshFleetHostConfig {
             host_key_fingerprint,
             working_directory,
             env_allowlist,
-            codewhale_binary,
+            nestlone_binary,
         } = spec
         else {
             return Err(FleetHostError::configuration(
@@ -509,8 +509,8 @@ impl SshFleetHostConfig {
         let working_directory = working_directory.clone().ok_or_else(|| {
             FleetHostError::configuration("SSH fleet host spec requires working_directory")
         })?;
-        let codewhale_binary = codewhale_binary.clone().ok_or_else(|| {
-            FleetHostError::configuration("SSH fleet host spec requires codewhale_binary")
+        let nestlone_binary = nestlone_binary.clone().ok_or_else(|| {
+            FleetHostError::configuration("SSH fleet host spec requires nestlone_binary")
         })?;
         let mut config = Self::new(host.clone(), working_directory);
         config.port = *port;
@@ -519,7 +519,7 @@ impl SshFleetHostConfig {
         config.known_hosts = known_hosts.clone();
         config.host_key_fingerprint = host_key_fingerprint.clone();
         config.env_allowlist = env_allowlist.iter().cloned().collect();
-        config.codewhale_binary = codewhale_binary;
+        config.nestlone_binary = nestlone_binary;
         config.validate()?;
         Ok(config)
     }
@@ -530,7 +530,7 @@ impl SshFleetHostConfig {
                 "SSH fleet host requires an explicit host",
             ));
         }
-        if self.codewhale_binary.trim().is_empty() {
+        if self.nestlone_binary.trim().is_empty() {
             return Err(FleetHostError::configuration(
                 "SSH fleet host requires an explicit codewhale binary path",
             ));
@@ -623,7 +623,7 @@ impl SshFleetHostAdapter {
             shell_quote(&self.config.working_directory.display().to_string()),
             "&&".to_string(),
             "exec".to_string(),
-            shell_quote(&self.config.codewhale_binary),
+            shell_quote(&self.config.nestlone_binary),
         ];
         parts.extend(request.command.args.iter().map(|arg| shell_quote(arg)));
         parts.join(" ")
@@ -1970,7 +1970,7 @@ mod tests {
         config.user = Some("fleet".to_string());
         config.port = Some(2222);
         config.identity = Some(PathBuf::from("/tmp/fleet_id"));
-        config.codewhale_binary = "/usr/local/bin/codewhale".to_string();
+        config.nestlone_binary = "/usr/local/bin/codewhale".to_string();
         config.env_allowlist = BTreeSet::from(["FLEET_PROFILE".to_string()]);
         let adapter = SshFleetHostAdapter::new(tmp.path(), config).unwrap();
         let mut request = FleetWorkerStartRequest::new(
@@ -2017,7 +2017,7 @@ mod tests {
             host_key_fingerprint: None,
             working_directory: Some(PathBuf::from("/srv/codewhale")),
             env_allowlist: vec!["FLEET_PROFILE".to_string()],
-            codewhale_binary: Some("/usr/local/bin/codewhale".to_string()),
+            nestlone_binary: Some("/usr/local/bin/codewhale".to_string()),
         };
 
         let config = SshFleetHostConfig::from_host_spec(&spec).unwrap();
@@ -2027,6 +2027,6 @@ mod tests {
         assert_eq!(config.user.as_deref(), Some("fleet"));
         assert_eq!(config.working_directory, PathBuf::from("/srv/codewhale"));
         assert!(config.env_allowlist.contains("FLEET_PROFILE"));
-        assert_eq!(config.codewhale_binary, "/usr/local/bin/codewhale");
+        assert_eq!(config.nestlone_binary, "/usr/local/bin/codewhale");
     }
 }

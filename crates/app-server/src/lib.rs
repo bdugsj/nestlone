@@ -12,17 +12,17 @@ use axum::middleware::{self, Next};
 use axum::response::{IntoResponse, Response};
 use axum::routing::{get, post};
 use axum::{Json, Router};
-use codewhale_agent::ModelRegistry;
-use codewhale_config::{CliRuntimeOverrides, ConfigStore};
-use codewhale_core::Runtime;
-use codewhale_hooks::{HookDispatcher, JsonlHookSink, StdoutHookSink, UnixSocketHookSink};
-use codewhale_mcp::McpManager;
-use codewhale_protocol::{
+use nestlone_agent::ModelRegistry;
+use nestlone_config::{CliRuntimeOverrides, ConfigStore};
+use nestlone_core::Runtime;
+use nestlone_hooks::{HookDispatcher, JsonlHookSink, StdoutHookSink, UnixSocketHookSink};
+use nestlone_mcp::McpManager;
+use nestlone_protocol::{
     AppRequest, AppResponse, PromptRequest, PromptResponse, ThreadGoalClearParams,
     ThreadGoalGetParams, ThreadGoalSetParams, ThreadRequest, ThreadResponse, UserInputAnswerEvent,
 };
-use codewhale_state::StateStore;
-use codewhale_tools::{ToolCall, ToolRegistry};
+use nestlone_state::StateStore;
+use nestlone_tools::{ToolCall, ToolRegistry};
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
@@ -33,7 +33,7 @@ use uuid::Uuid;
 
 /// Answers submitted for a pending `request_user_input` clarification.
 ///
-/// The headless runtime emits [`codewhale_protocol::EventFrame::UserInputRequest`]
+/// The headless runtime emits [`nestlone_protocol::EventFrame::UserInputRequest`]
 /// fire-and-return (it has no resume channel, mirroring headless approval).
 /// Clients POST answers back via [`AppRequest::SubmitUserInput`]; we record
 /// them here keyed by `request_id` so a driver can retrieve and feed them into
@@ -111,7 +111,7 @@ type SharedRuntimeBridge = Arc<Mutex<RuntimeBridge>>;
 #[derive(Clone)]
 struct AppState {
     config_path: Option<PathBuf>,
-    config: Arc<RwLock<codewhale_config::ConfigToml>>,
+    config: Arc<RwLock<nestlone_config::ConfigToml>>,
     /// Read/write split mirrors [`Runtime`]'s own receivers: `&self`
     /// operations (tool calls, status, MCP startup) share a read guard and
     /// run concurrently; `&mut self` turns (prompt/thread) and config pushes
@@ -555,11 +555,11 @@ async fn tool_handler(
         cfg.approval_policy
             .as_deref()
             .and_then(|p| match p.trim().to_ascii_lowercase().as_str() {
-                "auto" | "yolo" => Some(codewhale_execpolicy::AskForApproval::UnlessTrusted),
-                "never" | "deny" => Some(codewhale_execpolicy::AskForApproval::Never),
+                "auto" | "yolo" => Some(nestlone_execpolicy::AskForApproval::UnlessTrusted),
+                "never" | "deny" => Some(nestlone_execpolicy::AskForApproval::Never),
                 _ => None,
             })
-            .unwrap_or(codewhale_execpolicy::AskForApproval::OnRequest)
+            .unwrap_or(nestlone_execpolicy::AskForApproval::OnRequest)
     };
     // `invoke_tool` takes `&self`, so long-running tool executions share a
     // read guard: they run concurrently with each other and with status
@@ -948,7 +948,7 @@ async fn interrupt_stdio_turn(
     let Some(turn) = state.in_flight_turns.lock().await.get(thread_id).cloned() else {
         return Ok(false);
     };
-    let mut request = codewhale_release::platform_http_client_builder()
+    let mut request = nestlone_release::platform_http_client_builder()
         .timeout(Duration::from_secs(10))
         .build()
         .map_err(|err| JsonRpcError::internal(err.to_string()))?
@@ -986,7 +986,7 @@ impl RuntimeBridge {
             .context("failed to start runtime API bridge")?;
         let mut bridge = Self {
             base_url: format!("http://127.0.0.1:{port}"),
-            client: codewhale_release::platform_http_client_builder()
+            client: nestlone_release::platform_http_client_builder()
                 .build()
                 .context("failed to build runtime API client")?,
             auth_token: Some(auth_token),
@@ -1302,7 +1302,7 @@ impl RuntimeBridge {
         install_rustls_crypto_provider();
         Self {
             base_url,
-            client: codewhale_release::platform_http_client_builder()
+            client: nestlone_release::platform_http_client_builder()
                 .timeout(Duration::from_secs(5))
                 .build()
                 .expect("build reqwest test client"),
@@ -1874,8 +1874,8 @@ async fn process_app_request(
         AppRequest::ThreadLoadedList => {
             let mut runtime = state.runtime.write().await;
             let response = runtime
-                .handle_thread(codewhale_protocol::ThreadRequest::List(
-                    codewhale_protocol::ThreadListParams {
+                .handle_thread(nestlone_protocol::ThreadRequest::List(
+                    nestlone_protocol::ThreadListParams {
                         include_archived: false,
                         limit: Some(50),
                     },
@@ -1937,8 +1937,8 @@ async fn process_app_request(
 /// the source of truth there.
 async fn apply_config_update(
     state: &AppState,
-    snapshot: codewhale_config::ConfigToml,
-    exec_policy: Option<codewhale_execpolicy::ExecPolicyEngine>,
+    snapshot: nestlone_config::ConfigToml,
+    exec_policy: Option<nestlone_execpolicy::ExecPolicyEngine>,
     persist: bool,
 ) {
     if persist && let Err(e) = persist_config(state, snapshot.clone()).await {
@@ -1962,7 +1962,7 @@ async fn apply_config_update(
     invalidate_stdio_bridge(state).await;
 }
 
-async fn persist_config(state: &AppState, config: codewhale_config::ConfigToml) -> Result<()> {
+async fn persist_config(state: &AppState, config: nestlone_config::ConfigToml) -> Result<()> {
     if state.config_path.is_none() {
         return Ok(());
     }
@@ -1977,7 +1977,7 @@ mod tests {
     use axum::body::{Body, to_bytes};
     use axum::extract::{Path as AxumPath, Query};
     use axum::http::header;
-    use codewhale_protocol::AppRequest;
+    use nestlone_protocol::AppRequest;
     use std::collections::HashMap;
     use std::fs;
     use tokio::io::AsyncReadExt;
@@ -2115,12 +2115,12 @@ mod tests {
         let runtime = state.runtime.read().await;
         let decision = runtime
             .exec_policy
-            .check(codewhale_execpolicy::ExecPolicyContext {
+            .check(nestlone_execpolicy::ExecPolicyContext {
                 command: "cargo test --workspace",
                 cwd: "/workspace",
                 tool: Some("exec_shell"),
                 path: None,
-                ask_for_approval: codewhale_execpolicy::AskForApproval::UnlessTrusted,
+                ask_for_approval: nestlone_execpolicy::AskForApproval::UnlessTrusted,
                 sandbox_mode: Some("workspace-write"),
             })
             .expect("policy check");
@@ -2151,12 +2151,12 @@ mod tests {
             assert_eq!(runtime.config.model.as_deref(), Some("deepseek-chat"));
             let decision = runtime
                 .exec_policy
-                .check(codewhale_execpolicy::ExecPolicyContext {
+                .check(nestlone_execpolicy::ExecPolicyContext {
                     command: "cargo test",
                     cwd: "/workspace",
                     tool: Some("exec_shell"),
                     path: None,
-                    ask_for_approval: codewhale_execpolicy::AskForApproval::UnlessTrusted,
+                    ask_for_approval: nestlone_execpolicy::AskForApproval::UnlessTrusted,
                     sandbox_mode: Some("workspace-write"),
                 })
                 .expect("policy check");
@@ -2197,12 +2197,12 @@ mod tests {
             assert_eq!(runtime.config.model.as_deref(), Some("deepseek-reasoner"));
             let decision = runtime
                 .exec_policy
-                .check(codewhale_execpolicy::ExecPolicyContext {
+                .check(nestlone_execpolicy::ExecPolicyContext {
                     command: "cargo test --workspace",
                     cwd: "/workspace",
                     tool: Some("exec_shell"),
                     path: None,
-                    ask_for_approval: codewhale_execpolicy::AskForApproval::UnlessTrusted,
+                    ask_for_approval: nestlone_execpolicy::AskForApproval::UnlessTrusted,
                     sandbox_mode: Some("workspace-write"),
                 })
                 .expect("policy check");
@@ -2246,12 +2246,12 @@ mod tests {
             // exec_policy was empty at startup and must remain empty.
             let decision = runtime
                 .exec_policy
-                .check(codewhale_execpolicy::ExecPolicyContext {
+                .check(nestlone_execpolicy::ExecPolicyContext {
                     command: "cargo test",
                     cwd: "/workspace",
                     tool: Some("exec_shell"),
                     path: None,
-                    ask_for_approval: codewhale_execpolicy::AskForApproval::UnlessTrusted,
+                    ask_for_approval: nestlone_execpolicy::AskForApproval::UnlessTrusted,
                     sandbox_mode: Some("workspace-write"),
                 })
                 .expect("policy check");

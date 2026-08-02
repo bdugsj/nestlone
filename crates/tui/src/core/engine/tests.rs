@@ -2486,7 +2486,7 @@ async fn started_nonretryable_continuation_failure_blocks_goal_with_bounded_reas
     assert!(blocker.contains("resume the goal"), "{blocker}");
     assert!(!blocker.contains(leaked_secret), "{blocker}");
     assert!(
-        blocker.contains(codewhale_config::persistence::REDACTED),
+        blocker.contains(nestlone_config::persistence::REDACTED),
         "{blocker}"
     );
     assert!(
@@ -3218,17 +3218,17 @@ fn parallel_batch_indices(batch: &ToolExecutionBatch) -> Vec<usize> {
     }
 }
 
-fn ask_rule_engine(command: &str) -> codewhale_execpolicy::ExecPolicyEngine {
-    codewhale_execpolicy::ExecPolicyEngine::with_rulesets(vec![
-        codewhale_execpolicy::Ruleset::user(vec![], vec![])
-            .with_ask_rules(vec![codewhale_execpolicy::ToolAskRule::exec_shell(command)]),
+fn ask_rule_engine(command: &str) -> nestlone_execpolicy::ExecPolicyEngine {
+    nestlone_execpolicy::ExecPolicyEngine::with_rulesets(vec![
+        nestlone_execpolicy::Ruleset::user(vec![], vec![])
+            .with_ask_rules(vec![nestlone_execpolicy::ToolAskRule::exec_shell(command)]),
     ])
 }
 
-fn file_ask_rule_engine(tool: &str, path: &str) -> codewhale_execpolicy::ExecPolicyEngine {
-    codewhale_execpolicy::ExecPolicyEngine::with_rulesets(vec![
-        codewhale_execpolicy::Ruleset::user(vec![], vec![]).with_ask_rules(vec![
-            codewhale_execpolicy::ToolAskRule::file_path(tool, path),
+fn file_ask_rule_engine(tool: &str, path: &str) -> nestlone_execpolicy::ExecPolicyEngine {
+    nestlone_execpolicy::ExecPolicyEngine::with_rulesets(vec![
+        nestlone_execpolicy::Ruleset::user(vec![], vec![]).with_ask_rules(vec![
+            nestlone_execpolicy::ToolAskRule::file_path(tool, path),
         ]),
     ])
 }
@@ -4508,11 +4508,11 @@ fn exec_shell_ask_rule_decision_ignores_unmatched_command() {
 
 #[test]
 fn exec_shell_allow_rule_decision_allows_only_exact_command_in_scoped_repo() {
-    let rule = codewhale_execpolicy::ToolAskRule::exec_shell("cargo test")
+    let rule = nestlone_execpolicy::ToolAskRule::exec_shell("cargo test")
         .into_exact_workspace_allow("/repo");
     let config = EngineConfig {
-        exec_policy_engine: codewhale_execpolicy::ExecPolicyEngine::with_rulesets(vec![
-            codewhale_execpolicy::Ruleset::user(vec![], vec![]).with_ask_rules(vec![rule]),
+        exec_policy_engine: nestlone_execpolicy::ExecPolicyEngine::with_rulesets(vec![
+            nestlone_execpolicy::Ruleset::user(vec![], vec![]).with_ask_rules(vec![rule]),
         ]),
         ..EngineConfig::default()
     };
@@ -4666,13 +4666,13 @@ fn apply_patch_allow_requires_every_touched_path_to_match() {
     let rules = ["src/a.rs", "src/b.rs"]
         .into_iter()
         .map(|path| {
-            codewhale_execpolicy::ToolAskRule::file_path("apply_patch", path)
+            nestlone_execpolicy::ToolAskRule::file_path("apply_patch", path)
                 .into_exact_workspace_allow("/repo")
         })
         .collect();
     let config = EngineConfig {
-        exec_policy_engine: codewhale_execpolicy::ExecPolicyEngine::with_rulesets(vec![
-            codewhale_execpolicy::Ruleset::user(vec![], vec![]).with_ask_rules(rules),
+        exec_policy_engine: nestlone_execpolicy::ExecPolicyEngine::with_rulesets(vec![
+            nestlone_execpolicy::Ruleset::user(vec![], vec![]).with_ask_rules(rules),
         ]),
         ..EngineConfig::default()
     };
@@ -8733,8 +8733,8 @@ fn turn_tool_context_uses_planned_authority_and_route_not_installed_session() {
     let route = TurnRouteContext {
         provider: ApiProvider::Deepseek,
         model: "planned-next-model".to_string(),
-        capabilities: codewhale_config::route::RouteCapabilities::default(),
-        limits: Some(codewhale_config::route::RouteLimits {
+        capabilities: nestlone_config::route::RouteCapabilities::default(),
+        limits: Some(nestlone_config::route::RouteLimits {
             context_tokens: Some(123_456),
             input_tokens: None,
             output_tokens: Some(4_096),
@@ -10025,7 +10025,7 @@ fn route_context_budget_uses_shared_budget_service() {
 #[test]
 fn route_context_budget_prefers_resolved_route_limits() {
     let _lock = lock_test_env();
-    let limits = codewhale_config::route::RouteLimits {
+    let limits = nestlone_config::route::RouteLimits {
         context_tokens: Some(128_000),
         input_tokens: None,
         output_tokens: Some(32_768),
@@ -10058,7 +10058,7 @@ fn kimi_catalog_output_ceiling_does_not_collapse_input_budget() {
     // context window and provider output ceiling. That ceiling must not be
     // reserved as though every normal turn requested 262K of output; the
     // integrated Kimi route cap is 32K.
-    let limits = codewhale_config::route::RouteLimits {
+    let limits = nestlone_config::route::RouteLimits {
         context_tokens: Some(262_144),
         input_tokens: None,
         output_tokens: Some(262_144),
@@ -10076,7 +10076,7 @@ fn kimi_catalog_output_ceiling_does_not_collapse_input_budget() {
 #[test]
 fn effective_max_output_tokens_for_route_caps_to_route_output_limit() {
     let _lock = lock_test_env();
-    let limits = codewhale_config::route::RouteLimits {
+    let limits = nestlone_config::route::RouteLimits {
         context_tokens: Some(1_000_000),
         input_tokens: None,
         output_tokens: Some(8_192),
@@ -10095,7 +10095,7 @@ fn effective_max_output_tokens_for_route_caps_to_route_output_limit() {
 #[test]
 fn effective_max_output_tokens_for_route_caps_to_context_window() {
     let _lock = lock_test_env();
-    let limits = codewhale_config::route::RouteLimits {
+    let limits = nestlone_config::route::RouteLimits {
         context_tokens: Some(32_000),
         input_tokens: None,
         output_tokens: None,
@@ -10117,7 +10117,7 @@ fn effective_max_output_tokens_for_route_caps_to_context_window() {
 #[test]
 fn effective_max_output_tokens_for_route_keeps_tiny_window_positive() {
     let _lock = lock_test_env();
-    let limits = codewhale_config::route::RouteLimits {
+    let limits = nestlone_config::route::RouteLimits {
         context_tokens: Some(2_048),
         input_tokens: None,
         output_tokens: None,
@@ -10136,7 +10136,7 @@ fn effective_max_output_tokens_for_route_keeps_tiny_window_positive() {
 #[test]
 fn codex_route_without_output_metadata_uses_oauth_capability_floor() {
     let _lock = lock_test_env();
-    let limits = codewhale_config::route::RouteLimits {
+    let limits = nestlone_config::route::RouteLimits {
         context_tokens: Some(272_000),
         input_tokens: None,
         output_tokens: None,
@@ -10297,7 +10297,7 @@ fn v4_keeps_large_file_reads_but_compacts_noisy_shell_output() {
 fn codex_tool_retention_uses_oauth_route_window_not_api_model_window() {
     let content = "route-effective context\n".repeat(900);
     let output = ToolResult::success(content.clone());
-    let limits = codewhale_config::route::RouteLimits {
+    let limits = nestlone_config::route::RouteLimits {
         context_tokens: Some(272_000),
         input_tokens: None,
         output_tokens: None,

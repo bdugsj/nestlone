@@ -184,13 +184,13 @@ fn validate_owned_target_chain(
         return Ok(());
     }
 
-    let codewhale_dir = anchor.join(".codewhale");
-    let codewhale_exists = checked_real_directory(&codewhale_dir)?;
-    if !codewhale_exists {
+    let nestlone_dir = anchor.join(".codewhale");
+    let nestlone_exists = checked_real_directory(&nestlone_dir)?;
+    if !nestlone_exists {
         if require_existing {
             bail!(
                 "owned skill parent {} does not exist",
-                codewhale_dir.display()
+                nestlone_dir.display()
             );
         }
         return Ok(());
@@ -247,9 +247,9 @@ fn prepare_owned_target(
         bail!("owned skill anchor {} does not exist", anchor.display());
     }
 
-    let codewhale_dir = anchor.join(".codewhale");
-    if !checked_real_directory(&codewhale_dir)? {
-        create_owned_directory(&codewhale_dir)?;
+    let nestlone_dir = anchor.join(".codewhale");
+    if !checked_real_directory(&nestlone_dir)? {
+        create_owned_directory(&nestlone_dir)?;
     }
     validate_owned_target_chain(anchor, &skills_dir, false)?;
     if !checked_real_directory(&skills_dir)? {

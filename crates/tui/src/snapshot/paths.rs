@@ -12,7 +12,7 @@ use std::path::{Path, PathBuf};
 /// Compute the snapshot directory for a given workspace path.
 ///
 /// Returns `$STATE_DIR/snapshots/<project_hash>/<worktree_hash>/` where
-/// `$STATE_DIR` is resolved via `codewhale_config::resolve_state_dir`.
+/// `$STATE_DIR` is resolved via `nestlone_config::resolve_state_dir`.
 /// The caller is responsible for creating it on disk; we purposefully
 /// don't touch the filesystem here so this is cheap to call repeatedly.
 ///

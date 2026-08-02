@@ -312,7 +312,7 @@ mod tests {
     // #3240: a fresh install must resolve the history file under `.codewhale`,
     // never the legacy `.deepseek` dir, so normal use doesn't recreate it.
     #[test]
-    fn fresh_install_uses_codewhale_not_legacy() {
+    fn fresh_install_uses_nestlone_not_legacy() {
         let tmp = tempfile::tempdir().expect("tempdir");
         let path = history_path_with_home(Some(tmp.path().to_path_buf()))
             .expect("path resolves with a home dir");
@@ -336,7 +336,7 @@ mod tests {
 
     // Once a `.codewhale` history exists it wins over any legacy file.
     #[test]
-    fn codewhale_history_preferred_over_legacy() {
+    fn nestlone_history_preferred_over_legacy() {
         let tmp = tempfile::tempdir().expect("tempdir");
         let primary = tmp.path().join(".codewhale").join(HISTORY_FILE_NAME);
         let legacy = tmp.path().join(".deepseek").join(HISTORY_FILE_NAME);

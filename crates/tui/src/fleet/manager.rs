@@ -14,7 +14,7 @@ use std::time::Duration;
 
 use anyhow::{Context, Result, anyhow, bail};
 use chrono::{DateTime, SecondsFormat, Utc};
-use codewhale_protocol::fleet::*;
+use nestlone_protocol::fleet::*;
 use serde_json::Value;
 use uuid::Uuid;
 
@@ -39,11 +39,11 @@ pub struct FleetManager {
     workspace: PathBuf,
     ledger: FleetLedger,
     stale_after: Duration,
-    exec_config: codewhale_config::FleetExecConfig,
+    exec_config: nestlone_config::FleetExecConfig,
     /// `[fleet]` table used to build the agent roster for dispatch
     /// (#fleet-roster cutover (v0.8.67)). Defaults keep built-in + workspace
     /// members resolvable even when the caller has no parsed config.
-    fleet_config: codewhale_config::FleetConfigToml,
+    fleet_config: nestlone_config::FleetConfigToml,
     /// Optional sub-agent manager for headless worker execution.
     /// When set, fleet workers spawn real sub-agents; when None,
     /// the manager falls back to local simulation.
@@ -218,8 +218,8 @@ impl FleetManager {
             workspace,
             ledger,
             stale_after: Duration::from_secs(DEFAULT_STALE_AFTER_SECONDS),
-            exec_config: codewhale_config::FleetExecConfig::default(),
-            fleet_config: codewhale_config::FleetConfigToml::default(),
+            exec_config: nestlone_config::FleetExecConfig::default(),
+            fleet_config: nestlone_config::FleetConfigToml::default(),
             sub_agent_manager: None,
             session_model: None,
             route_config: None,
@@ -256,14 +256,14 @@ impl FleetManager {
     }
 
     /// Apply fleet headless-worker execution policy from config.
-    pub fn with_exec_config(mut self, exec_config: codewhale_config::FleetExecConfig) -> Self {
+    pub fn with_exec_config(mut self, exec_config: nestlone_config::FleetExecConfig) -> Self {
         self.exec_config = exec_config;
         self
     }
 
     /// Apply the parsed `[fleet]` table so `[fleet.profiles]` members join
     /// the dispatch roster (#fleet-roster cutover (v0.8.67)).
-    pub fn with_fleet_config(mut self, fleet_config: codewhale_config::FleetConfigToml) -> Self {
+    pub fn with_fleet_config(mut self, fleet_config: nestlone_config::FleetConfigToml) -> Self {
         self.fleet_config = fleet_config;
         self
     }
@@ -581,7 +581,7 @@ impl FleetManager {
         run_id: &FleetRunId,
         max_workers: usize,
         executor: &mut FleetExecutor,
-        codewhale_binary: &str,
+        nestlone_binary: &str,
         model: Option<&str>,
         tick_interval: Duration,
     ) -> Result<FleetStatusSnapshot> {
@@ -647,7 +647,7 @@ impl FleetManager {
             // handle has been observed and forgotten below.
             let unavailable_workers = executor.worker_ids().into_iter().collect();
             self.schedule_run_excluding(run_id, max_workers, &unavailable_workers)?;
-            self.drive_executor_tick(run_id, executor, codewhale_binary, model)?;
+            self.drive_executor_tick(run_id, executor, nestlone_binary, model)?;
             self.refresh_run_status(run_id)?;
             // A separate `fleet interrupt` process can make the ledger
             // terminal while this manager still owns a live host child. Keep
@@ -664,11 +664,11 @@ impl FleetManager {
         &self,
         run_id: &FleetRunId,
         executor: &mut FleetExecutor,
-        codewhale_binary: &str,
+        nestlone_binary: &str,
         model: Option<&str>,
     ) -> Result<FleetExecutorTickReport> {
         let mut report = FleetExecutorTickReport::default();
-        report.started += self.start_leased_workers(run_id, executor, codewhale_binary, model)?;
+        report.started += self.start_leased_workers(run_id, executor, nestlone_binary, model)?;
 
         for worker_id in executor.worker_ids() {
             let tracked_attempt = executor.tracked_attempt(&worker_id);
@@ -1221,7 +1221,7 @@ impl FleetManager {
         &self,
         run_id: &FleetRunId,
         executor: &mut FleetExecutor,
-        codewhale_binary: &str,
+        nestlone_binary: &str,
         model: Option<&str>,
     ) -> Result<usize> {
         let state = self.ledger.rebuild_state()?;
@@ -1291,7 +1291,7 @@ impl FleetManager {
                     None => expected_launch_spec,
                 };
                 let command = build_worker_exec_command_with_launch_spec(
-                    codewhale_binary,
+                    nestlone_binary,
                     &task_spec,
                     &launch_spec,
                     &self.exec_config,
@@ -2342,7 +2342,7 @@ mod tests {
             host_key_fingerprint: None,
             working_directory: Some(PathBuf::from("/srv/codewhale")),
             env_allowlist: Vec::new(),
-            codewhale_binary: Some("/usr/local/bin/codewhale".to_string()),
+            nestlone_binary: Some("/usr/local/bin/codewhale".to_string()),
         };
 
         let error = validate_task_cwd_for_host(tmp.path(), &ssh, &nested_cwd)
@@ -2390,7 +2390,7 @@ mod tests {
                 host_key_fingerprint: None,
                 working_directory: Some(PathBuf::from("/srv/codewhale")),
                 env_allowlist: Vec::new(),
-                codewhale_binary: Some("/usr/local/bin/codewhale".to_string()),
+                nestlone_binary: Some("/usr/local/bin/codewhale".to_string()),
             },
             trust_level: None,
             labels: BTreeMap::new(),

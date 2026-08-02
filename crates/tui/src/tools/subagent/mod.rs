@@ -845,7 +845,7 @@ impl SubAgentAssignment {
 /// [`migrate_legacy_role_token`] at deserialization / parse boundaries.
 ///
 /// This is the closed runtime role set. It is distinct from
-/// `codewhale_config::FleetRole`, which is the open config-side role
+/// `nestlone_config::FleetRole`, which is the open config-side role
 /// *declaration* (free-form name plus instruction overlay) carried by a
 /// Fleet profile.
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
@@ -1041,7 +1041,7 @@ pub struct SubAgentResult {
     pub worker_status: Option<AgentWorkerStatus>,
     /// Effective non-secret runtime posture for Fleet-backed workers.
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub runtime_permissions: Option<codewhale_protocol::fleet::FleetEffectivePermissions>,
+    pub runtime_permissions: Option<nestlone_protocol::fleet::FleetEffectivePermissions>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub parent_run_id: Option<String>,
     #[serde(default)]
@@ -2149,15 +2149,15 @@ impl Default for PersistedSubAgentState {
 /// Default cap on sub-agent recursion depth. Override via
 /// `[subagents] max_depth = N` in config.
 ///
-/// Sourced from [`codewhale_config::DEFAULT_SPAWN_DEPTH`] so standalone
+/// Sourced from [`nestlone_config::DEFAULT_SPAWN_DEPTH`] so standalone
 /// sub-agents and fleet workers share ONE recursion axis (no "two moving
 /// targets"). Configured/requested depths clamp to
-/// [`codewhale_config::MAX_SPAWN_DEPTH_CEILING`].
-pub const DEFAULT_MAX_SPAWN_DEPTH: u32 = codewhale_config::DEFAULT_SPAWN_DEPTH;
+/// [`nestlone_config::MAX_SPAWN_DEPTH_CEILING`].
+pub const DEFAULT_MAX_SPAWN_DEPTH: u32 = nestlone_config::DEFAULT_SPAWN_DEPTH;
 
 /// Resolve a child runtime's `max_spawn_depth` from its (already-incremented)
 /// `spawn_depth` and the model-supplied per-call `max_depth`, clamped to the
-/// absolute [`codewhale_config::MAX_SPAWN_DEPTH_CEILING`].
+/// absolute [`nestlone_config::MAX_SPAWN_DEPTH_CEILING`].
 ///
 /// Without the absolute clamp, `max_spawn_depth = spawn_depth + max_depth`
 /// makes the recursion gate (`spawn_depth + 1 > max_spawn_depth`) reduce to
@@ -2167,7 +2167,7 @@ pub const DEFAULT_MAX_SPAWN_DEPTH: u32 = codewhale_config::DEFAULT_SPAWN_DEPTH;
 fn clamp_child_max_spawn_depth(child_spawn_depth: u32, requested_max_depth: u32) -> u32 {
     child_spawn_depth
         .saturating_add(requested_max_depth)
-        .min(codewhale_config::MAX_SPAWN_DEPTH_CEILING)
+        .min(nestlone_config::MAX_SPAWN_DEPTH_CEILING)
 }
 
 /// Terminal-state notification emitted to the immediate parent's completion
@@ -7775,7 +7775,7 @@ fn apply_session_spawn_defaults(runtime: &mut SubAgentRuntime) {
 /// `identity` is stamped onto the returned spawn metadata so panel/history
 /// consumers can render workflow children without parsing prompt text (#4119).
 pub(crate) async fn spawn_workflow_task(
-    request: codewhale_workflow_js::TaskRequest,
+    request: nestlone_workflow_js::TaskRequest,
     manager: SharedSubAgentManager,
     mut runtime: SubAgentRuntime,
     identity: WorkflowTaskSpawnIdentity,
@@ -8035,7 +8035,7 @@ fn build_subagent_system_prompt_with_skills(
 /// forked children receive it at system precedence as well.
 fn subagent_skill_catalog(context: &ToolContext) -> String {
     let mode =
-        crate::skills::SkillDiscoveryMode::from_codewhale_only(context.skills_scan_codewhale_only);
+        crate::skills::SkillDiscoveryMode::from_nestlone_only(context.skills_scan_nestlone_only);
     let registry = context
         .skills_dir
         .as_deref()
@@ -10262,7 +10262,7 @@ fn parse_spawn_request(input: &Value) -> Result<SpawnRequest, ToolError> {
         .or_else(|| input.get("max_spawn_depth"))
         .and_then(Value::as_u64)
         .map(|depth| {
-            let ceiling = codewhale_config::MAX_SPAWN_DEPTH_CEILING;
+            let ceiling = nestlone_config::MAX_SPAWN_DEPTH_CEILING;
             u32::try_from(depth)
                 .map_err(|_| {
                     ToolError::invalid_input(format!("max_depth must be between 0 and {ceiling}"))
@@ -10863,7 +10863,7 @@ fn resolve_spawn_model_selection(
                 source: SpawnRouteSource::AgentProfileModel,
             });
         }
-        if member.profile.loadout == codewhale_config::FleetLoadout::Fast {
+        if member.profile.loadout == nestlone_config::FleetLoadout::Fast {
             return Ok(SpawnModelSelection {
                 model_route: ModelRoute::Faster,
                 source: SpawnRouteSource::AgentProfileLoadout,

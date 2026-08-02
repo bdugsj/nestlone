@@ -21,8 +21,8 @@
 #![allow(dead_code)]
 
 use anyhow::Result;
-use codewhale_config::FleetExecConfig;
-use codewhale_protocol::fleet::{FleetHostSpec, FleetTaskSpec, FleetWorkerEventPayload};
+use nestlone_config::FleetExecConfig;
+use nestlone_protocol::fleet::{FleetHostSpec, FleetTaskSpec, FleetWorkerEventPayload};
 
 use super::host::{FleetHostAdapter, FleetWorkerCommand};
 use super::profile::AgentProfile;
@@ -37,7 +37,7 @@ use crate::tools::subagent::AgentWorkerSpec;
 ///
 /// Kept here so every long-lived surface (CLI and Runtime API) launches the
 /// same configured worker binary instead of silently diverging.
-pub fn configured_codewhale_binary() -> String {
+pub fn configured_nestlone_binary() -> String {
     std::env::var("CODEWHALE_FLEET_CODEWHALE_BINARY")
         .ok()
         .map(|value| value.trim().to_string())
@@ -63,13 +63,13 @@ pub fn configured_codewhale_binary() -> String {
 /// that provider's credentials from its own env/config, so this invariant
 /// holds.
 pub fn build_worker_exec_command(
-    codewhale_binary: &str,
+    nestlone_binary: &str,
     task_spec: &FleetTaskSpec,
     exec_config: &FleetExecConfig,
     model: Option<&str>,
 ) -> FleetWorkerCommand {
     build_worker_exec_command_from_prompt(
-        codewhale_binary,
+        nestlone_binary,
         fleet_task_prompt(task_spec),
         exec_config,
         model,
@@ -90,7 +90,7 @@ pub fn build_worker_exec_command(
 /// run-level model and emit no `--provider`, so the worker keeps its own
 /// session default (today's behavior, unchanged).
 pub fn build_worker_exec_command_with_profiles(
-    codewhale_binary: &str,
+    nestlone_binary: &str,
     task_spec: &FleetTaskSpec,
     exec_config: &FleetExecConfig,
     model: Option<&str>,
@@ -100,7 +100,7 @@ pub fn build_worker_exec_command_with_profiles(
         fleet_worker_launch_route(task_spec, agent_profiles, model.unwrap_or_default());
     let worker_reasoning_effort = fleet_worker_launch_reasoning_effort(task_spec, agent_profiles);
     Ok(build_worker_exec_command_from_prompt(
-        codewhale_binary,
+        nestlone_binary,
         fleet_task_prompt_with_profiles(task_spec, agent_profiles)?,
         exec_config,
         Some(worker_model.as_str()),
@@ -115,7 +115,7 @@ pub fn build_worker_exec_command_with_profiles(
 /// uses the projected objective and carries a machine-readable outer authority
 /// envelope into the child process.
 pub fn build_worker_exec_command_with_launch_spec(
-    codewhale_binary: &str,
+    nestlone_binary: &str,
     task_spec: &FleetTaskSpec,
     launch_spec: &AgentWorkerSpec,
     exec_config: &FleetExecConfig,
@@ -127,7 +127,7 @@ pub fn build_worker_exec_command_with_launch_spec(
     let worker_reasoning_effort = fleet_worker_launch_reasoning_effort(task_spec, agent_profiles);
     let authority = authority_envelope_for_worker(launch_spec, task_spec)?;
     Ok(build_worker_exec_command_from_prompt(
-        codewhale_binary,
+        nestlone_binary,
         launch_spec.objective.clone(),
         exec_config,
         Some(worker_model.as_str()),
@@ -177,7 +177,7 @@ pub(crate) fn authority_envelope_for_worker(
 }
 
 fn build_worker_exec_command_from_prompt(
-    codewhale_binary: &str,
+    nestlone_binary: &str,
     task_prompt: String,
     exec_config: &FleetExecConfig,
     model: Option<&str>,
@@ -248,7 +248,7 @@ fn build_worker_exec_command_from_prompt(
     // The composed task prompt is the final positional argument.
     args.push(task_prompt);
 
-    FleetWorkerCommand::new(codewhale_binary.to_string(), args)
+    FleetWorkerCommand::new(nestlone_binary.to_string(), args)
 }
 
 /// Map one `codewhale exec` stream-json line into a fleet ledger event.
@@ -403,7 +403,7 @@ pub struct FleetExecutor {
 /// Durable lease identity owned by one concrete host process.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct FleetExecutorAttempt {
-    pub run_id: codewhale_protocol::fleet::FleetRunId,
+    pub run_id: nestlone_protocol::fleet::FleetRunId,
     pub task_id: String,
     pub attempt: u32,
 }
@@ -745,11 +745,11 @@ impl FleetExecutor {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use codewhale_config::{
+    use nestlone_config::{
         FleetDelegationHints, FleetLoadout, FleetProfile, FleetProfilePermissions, FleetRole,
         FleetSlot,
     };
-    use codewhale_protocol::fleet::{
+    use nestlone_protocol::fleet::{
         FleetHostSpec, FleetTaskSpec, FleetTaskWorkerProfile, FleetWorkerSpec,
         FleetWorkspaceRequirements,
     };
@@ -865,7 +865,7 @@ mod tests {
     }
 
     #[test]
-    fn worker_command_is_a_headless_codewhale_exec_run() {
+    fn worker_command_is_a_headless_nestlone_exec_run() {
         let exec = FleetExecConfig::default();
         let cmd = build_worker_exec_command("codewhale", &task("read the file"), &exec, None);
         assert_eq!(cmd.program, "codewhale");

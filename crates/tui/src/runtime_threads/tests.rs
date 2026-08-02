@@ -157,7 +157,7 @@ fn set_test_turn_route(
 
 #[test]
 fn runtime_compaction_uses_provider_route_context() {
-    let limits = codewhale_config::route::RouteLimits {
+    let limits = nestlone_config::route::RouteLimits {
         context_tokens: Some(272_000),
         input_tokens: None,
         output_tokens: None,

@@ -11,13 +11,13 @@
 
 use std::path::{Path, PathBuf};
 
-use codewhale_lane::control::{
+use nestlone_lane::control::{
     Availability, ControlContext, ControlDomain, ControlFailure, ControlFailureKind,
     ControlOperation, ControlReceipt, ControlSurface, DEFAULT_RUN_LIST_LIMIT, Known, RunListPage,
     RunRouteDto, RunSummaryDto, RunUsageDto, UnknownReason, parse_target, redact_path,
     sanitize_line,
 };
-use codewhale_protocol::fleet::{
+use nestlone_protocol::fleet::{
     FleetArtifactKind, FleetReceipt, FleetRun, FleetRunId, FleetRunStatus, FleetWorkerEventPayload,
     FleetWorkerStatus,
 };
@@ -676,7 +676,7 @@ pub fn execute_fleet_control_with(
             descriptor,
             surface,
             Availability::Unavailable {
-                reason: codewhale_lane::UnavailableReason::SurfaceNotSupported,
+                reason: nestlone_lane::UnavailableReason::SurfaceNotSupported,
                 hint: sanitize_line(descriptor.cli_invocation),
             },
         ),
@@ -686,8 +686,8 @@ pub fn execute_fleet_control_with(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use codewhale_lane::{ControlAuthority, LifecycleOutcome, PersistenceScope, UnavailableReason};
-    use codewhale_protocol::fleet::{FleetResolvedRoute, FleetTaskResult};
+    use nestlone_lane::{ControlAuthority, LifecycleOutcome, PersistenceScope, UnavailableReason};
+    use nestlone_protocol::fleet::{FleetResolvedRoute, FleetTaskResult};
     use std::collections::BTreeMap;
 
     fn run(id: &str) -> FleetRun {

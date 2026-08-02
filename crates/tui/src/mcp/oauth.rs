@@ -631,7 +631,7 @@ fn normalize_scopes(scopes_supported: Option<Vec<String>>) -> Option<Vec<String>
 }
 
 fn load_oauth_tokens(server_name: &str, url: &str) -> Result<Option<StoredMcpOAuthTokens>> {
-    let secrets = codewhale_secrets::Secrets::auto_detect();
+    let secrets = nestlone_secrets::Secrets::auto_detect();
     let key = store_key(server_name, url);
     let Some(serialized) = secrets
         .get(&key)
@@ -653,7 +653,7 @@ fn parse_stored_oauth_tokens(serialized: &str, server_name: &str) -> Result<Stor
 }
 
 fn save_oauth_tokens(tokens: &StoredMcpOAuthTokens) -> Result<()> {
-    let secrets = codewhale_secrets::Secrets::auto_detect();
+    let secrets = nestlone_secrets::Secrets::auto_detect();
     let key = store_key(&tokens.server_name, &tokens.url);
     let serialized = serde_json::to_string(tokens).context("serializing MCP OAuth token")?;
     secrets
@@ -662,7 +662,7 @@ fn save_oauth_tokens(tokens: &StoredMcpOAuthTokens) -> Result<()> {
 }
 
 fn delete_oauth_tokens(server_name: &str, url: &str) -> Result<bool> {
-    let secrets = codewhale_secrets::Secrets::auto_detect();
+    let secrets = nestlone_secrets::Secrets::auto_detect();
     let key = store_key(server_name, url);
     let existed = secrets
         .get(&key)

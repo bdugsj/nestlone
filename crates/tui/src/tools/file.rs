@@ -37,7 +37,7 @@ fn config_backup_path_for_credential_guard(config_path: &Path) -> PathBuf {
     let mut file_name = config_path
         .file_name()
         .map(std::ffi::OsString::from)
-        .unwrap_or_else(|| std::ffi::OsString::from(codewhale_config::CONFIG_FILE_NAME));
+        .unwrap_or_else(|| std::ffi::OsString::from(nestlone_config::CONFIG_FILE_NAME));
     file_name.push(".bak");
     config_path
         .parent()
@@ -59,21 +59,21 @@ fn is_config_or_backup(candidate: &Path, config_path: &Path) -> bool {
 /// secret-store directories. Other dotfiles remain readable. Model-bound
 /// redaction is still required because shell tools can read these files and
 /// arbitrary commands can print credentials without reading a file at all.
-fn is_codewhale_credential_path(path: &Path) -> bool {
+fn is_nestlone_credential_path(path: &Path) -> bool {
     let candidate = canonical_path_for_credential_guard(path);
 
-    if let Ok(active_config) = codewhale_config::resolve_config_path(None)
+    if let Ok(active_config) = nestlone_config::resolve_config_path(None)
         && is_config_or_backup(&candidate, &active_config)
     {
         return true;
     }
 
     let roots = [
-        codewhale_config::codewhale_home(),
-        codewhale_config::legacy_deepseek_home(),
+        nestlone_config::nestlone_home(),
+        nestlone_config::legacy_deepseek_home(),
     ];
     for root in roots.into_iter().flatten() {
-        if is_config_or_backup(&candidate, &root.join(codewhale_config::CONFIG_FILE_NAME)) {
+        if is_config_or_backup(&candidate, &root.join(nestlone_config::CONFIG_FILE_NAME)) {
             return true;
         }
 
@@ -139,7 +139,7 @@ impl ToolSpec for ReadFileTool {
     async fn execute(&self, input: Value, context: &ToolContext) -> Result<ToolResult, ToolError> {
         let path_str = required_str(&input, "path")?;
         let file_path = context.resolve_path(path_str)?;
-        if is_codewhale_credential_path(&file_path) {
+        if is_nestlone_credential_path(&file_path) {
             return Err(ToolError::permission_denied(
                 "read_file cannot expose CodeWhale configuration or credential-store files; use `codewhale config list` or `codewhale auth status` for safe inspection",
             ));
@@ -1482,10 +1482,10 @@ mod tests {
     // while awaiting the tool path.
     #[allow(clippy::await_holding_lock)]
     #[tokio::test]
-    async fn read_file_denies_codewhale_config_backups_and_secret_store() {
+    async fn read_file_denies_nestlone_config_backups_and_secret_store() {
         let _env_lock = crate::test_support::lock_test_env();
         let tmp = tempdir().expect("tempdir");
-        let _codewhale_home = crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", tmp.path());
+        let _nestlone_home = crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", tmp.path());
         let _config_path = crate::test_support::EnvVarGuard::remove("CODEWHALE_CONFIG_PATH");
         let _legacy_config_path = crate::test_support::EnvVarGuard::remove("DEEPSEEK_CONFIG_PATH");
 

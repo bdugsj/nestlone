@@ -30,7 +30,7 @@ fn spawn_codewhale(args: &[String]) -> std::io::Result<std::process::ExitStatus>
     // Prefer the dispatcher installed next to this shim. Falling back to PATH
     // first can silently run an older global `codewhale` after a fresh install.
     if let Ok(exe_path) = env::current_exe()
-        && let Some(sibling) = sibling_codewhale_path(&exe_path)
+        && let Some(sibling) = sibling_nestlone_path(&exe_path)
         && sibling.is_file()
     {
         return Command::new(sibling).args(args).status();
@@ -49,7 +49,7 @@ fn spawn_codewhale(args: &[String]) -> std::io::Result<std::process::ExitStatus>
     ))
 }
 
-fn sibling_codewhale_path(exe_path: &Path) -> Option<PathBuf> {
+fn sibling_nestlone_path(exe_path: &Path) -> Option<PathBuf> {
     exe_path
         .parent()
         .map(|dir| dir.join(format!("codewhale{}", std::env::consts::EXE_SUFFIX)))
@@ -57,13 +57,13 @@ fn sibling_codewhale_path(exe_path: &Path) -> Option<PathBuf> {
 
 #[cfg(test)]
 mod tests {
-    use super::sibling_codewhale_path;
+    use super::sibling_nestlone_path;
     use std::path::Path;
 
     #[test]
     fn sibling_dispatcher_uses_platform_executable_suffix() {
         let path = Path::new("/tmp/codewhale-bin/codew");
-        let sibling = sibling_codewhale_path(path).expect("sibling");
+        let sibling = sibling_nestlone_path(path).expect("sibling");
 
         assert_eq!(
             sibling,

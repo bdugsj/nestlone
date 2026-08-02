@@ -226,8 +226,8 @@ impl FleetSetupSnapshot {
             .fleet
             .as_ref()
             .map(|fleet| fleet.exec.max_spawn_depth)
-            .unwrap_or_else(|| codewhale_config::FleetExecConfig::default().max_spawn_depth)
-            .min(codewhale_config::MAX_SPAWN_DEPTH_CEILING);
+            .unwrap_or_else(|| nestlone_config::FleetExecConfig::default().max_spawn_depth)
+            .min(nestlone_config::MAX_SPAWN_DEPTH_CEILING);
         let roster_members =
             crate::fleet::roster::FleetRoster::load(&config.fleet_config(), &app.workspace)
                 .members()
@@ -1365,7 +1365,7 @@ impl FleetSetupView {
                 self.snapshot.max_admitted,
                 self.snapshot.subagent_spawn_depth,
                 self.snapshot.fleet_spawn_depth,
-                codewhale_config::MAX_SPAWN_DEPTH_CEILING,
+                nestlone_config::MAX_SPAWN_DEPTH_CEILING,
             ),
         );
         section(&mut lines, "Review policy", self.review_policy_summary());
@@ -2835,9 +2835,9 @@ mod tests {
             openai_codex: crate::config::ProviderConfig {
                 auth_mode: Some("oauth".to_string()),
                 external_credentials: Some(
-                    codewhale_config::ExternalCredentialConsentToml::read_only(
-                        codewhale_config::ProviderKind::OpenaiCodex,
-                        codewhale_config::ExternalCredentialSource::CodexCli,
+                    nestlone_config::ExternalCredentialConsentToml::read_only(
+                        nestlone_config::ProviderKind::OpenaiCodex,
+                        nestlone_config::ExternalCredentialSource::CodexCli,
                         codex_home.path().join("auth.json"),
                     ),
                 ),
@@ -2876,9 +2876,9 @@ mod tests {
             xai: crate::config::ProviderConfig {
                 auth_mode: Some("oauth".to_string()),
                 external_credentials: Some(
-                    codewhale_config::ExternalCredentialConsentToml::read_only(
-                        codewhale_config::ProviderKind::Xai,
-                        codewhale_config::ExternalCredentialSource::GrokCli,
+                    nestlone_config::ExternalCredentialConsentToml::read_only(
+                        nestlone_config::ProviderKind::Xai,
+                        nestlone_config::ExternalCredentialSource::GrokCli,
                         grok_home.path().join("grok-auth.json"),
                     ),
                 ),

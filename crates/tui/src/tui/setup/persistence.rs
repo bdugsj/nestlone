@@ -29,20 +29,20 @@ impl Default for SetupPersistenceFacts {
 }
 
 impl SetupPersistenceFacts {
-    pub(super) fn from_app_config(app: &App, config: &Config, codewhale_home: &Path) -> Self {
-        let home_source = if codewhale_config::codewhale_home_is_explicit() {
+    pub(super) fn from_app_config(app: &App, config: &Config, nestlone_home: &Path) -> Self {
+        let home_source = if nestlone_config::nestlone_home_is_explicit() {
             "explicit"
         } else {
             "default"
         };
-        let home_presence = dir_presence(codewhale_home);
-        let config_path = codewhale_config::resolve_config_path(app.config_path.clone())
-            .unwrap_or_else(|_| codewhale_home.join("config.toml"));
-        let state_path = codewhale_config::SetupState::path().unwrap_or_else(|_| {
-            codewhale_home.join(codewhale_config::setup_state::SETUP_STATE_FILE_NAME)
+        let home_presence = dir_presence(nestlone_home);
+        let config_path = nestlone_config::resolve_config_path(app.config_path.clone())
+            .unwrap_or_else(|_| nestlone_home.join("config.toml"));
+        let state_path = nestlone_config::SetupState::path().unwrap_or_else(|_| {
+            nestlone_home.join(nestlone_config::setup_state::SETUP_STATE_FILE_NAME)
         });
-        let constitution_path = codewhale_config::UserConstitution::path()
-            .unwrap_or_else(|_| codewhale_home.join("constitution.json"));
+        let constitution_path = nestlone_config::UserConstitution::path()
+            .unwrap_or_else(|_| nestlone_home.join("constitution.json"));
         let memory_path = config.memory_path();
         let notes_path = config.notes_path();
 
@@ -55,7 +55,7 @@ impl SetupPersistenceFacts {
         Self {
             home_result: format!(
                 "{home_source} CODEWHALE_HOME at {} ({home_presence})",
-                codewhale_home.display()
+                nestlone_home.display()
             ),
             config_result: path_result(&config_path, config_presence),
             state_result: path_result(&state_path, state_presence),

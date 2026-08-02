@@ -188,7 +188,7 @@ fn load_config_doc(path: &Path) -> anyhow::Result<Value> {
     toml::from_str(&raw).map_err(|_| {
         anyhow::anyhow!(
             "failed to parse config at {}; file contents were omitted",
-            codewhale_config::quote_os_path(path)
+            nestlone_config::quote_os_path(path)
         )
     })
 }

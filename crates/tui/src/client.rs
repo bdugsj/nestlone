@@ -16,13 +16,13 @@ use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 use tokio::sync::{Mutex as AsyncMutex, OwnedSemaphorePermit, Semaphore};
 
-use codewhale_config::catalog::{
+use nestlone_config::catalog::{
     CatalogOffering, CatalogRefreshError, CatalogSnapshot, CatalogSource, CatalogStatus,
     ProviderCatalogCache, ProviderCatalogDelta, base_url_fingerprint, now_unix,
 };
-use codewhale_config::provider::WireFormat;
-use codewhale_config::route::{LogicalModelRef, ReadyRouteCandidate, RouteRequest, RouteResolver};
-use codewhale_config::{auth_mode_disables_api_key, is_upstream_auth_header};
+use nestlone_config::provider::WireFormat;
+use nestlone_config::route::{LogicalModelRef, ReadyRouteCandidate, RouteRequest, RouteResolver};
+use nestlone_config::{auth_mode_disables_api_key, is_upstream_auth_header};
 
 use crate::config::{
     ApiProvider, Config, RetryPolicy, validate_route, wire_model_for_provider_route,
@@ -511,7 +511,7 @@ fn push_file_backed_model_bound_secrets(values: &mut Vec<String>) {
     // this file-only to avoid a burst of OS-keychain prompts for inactive
     // providers; the active credential is already supplied by the route
     // resolver.
-    let secrets = codewhale_secrets::Secrets::file_backed_read_only();
+    let secrets = nestlone_secrets::Secrets::file_backed_read_only();
     let mut slots = Vec::new();
     for provider in ApiProvider::all()
         .iter()
@@ -620,9 +620,9 @@ fn configured_model_bound_secret_values(config: &Config, active_api_key: &str) -
 fn redact_model_bound_text(text: &str, exact_secret_values: &[String]) -> String {
     let mut redacted = text.to_string();
     for secret in exact_secret_values {
-        redacted = redacted.replace(secret, codewhale_config::persistence::REDACTED);
+        redacted = redacted.replace(secret, nestlone_config::persistence::REDACTED);
     }
-    codewhale_config::persistence::redact_secrets(&redacted)
+    nestlone_config::persistence::redact_secrets(&redacted)
 }
 
 // === Helpers ===
@@ -1434,7 +1434,7 @@ fn provider_default_wire_format(api_provider: ApiProvider) -> WireFormat {
     api_provider
         .kind()
         .and_then(|kind| {
-            codewhale_config::provider::provider_for_kind(kind)
+            nestlone_config::provider::provider_for_kind(kind)
                 .wire_policy()
                 .fixed()
         })
@@ -2703,8 +2703,8 @@ fn telecomjs_catalog_offerings_from_body(
         return Err(CatalogRefreshError::EmptyList);
     }
 
-    let bundled = codewhale_config::catalog::bundled_catalog_offerings();
-    let default_model_id = codewhale_config::ProviderKind::Telecomjs
+    let bundled = nestlone_config::catalog::bundled_catalog_offerings();
+    let default_model_id = nestlone_config::ProviderKind::Telecomjs
         .provider()
         .default_model();
     Ok(models
@@ -2800,7 +2800,7 @@ fn openrouter_to_catalog_offering(
     base_url_fingerprint: &str,
     fetched_at: u64,
 ) -> CatalogOffering {
-    use codewhale_config::models_dev::{ModelsDevCost, ModelsDevLimit, ModelsDevModalities};
+    use nestlone_config::models_dev::{ModelsDevCost, ModelsDevLimit, ModelsDevModalities};
 
     let context_length = item
         .top_provider
@@ -3376,7 +3376,7 @@ mod tests {
     use crate::tools::apply_patch::ApplyPatchTool;
     use crate::tools::spec::ToolSpec;
     use crate::tools::{ToolContext, ToolRegistryBuilder};
-    use codewhale_protocol::runtime::DynamicToolSpec;
+    use nestlone_protocol::runtime::DynamicToolSpec;
     use serde_json::json;
     use wiremock::matchers::{header, method, path};
     use wiremock::{Mock, MockServer, ResponseTemplate};
@@ -3406,9 +3406,9 @@ mod tests {
 
         // A cache-write premium must actually reach the estimator: the same
         // tokens cost more when they are cache-creation rather than cache-read.
-        let pricing = codewhale_config::pricing::OfferingPricing::from_catalog_offering(&priced)
+        let pricing = nestlone_config::pricing::OfferingPricing::from_catalog_offering(&priced)
             .expect("priced offering");
-        let write = codewhale_config::pricing::TokenUsage {
+        let write = nestlone_config::pricing::TokenUsage {
             cache_write: 1_000_000,
             ..Default::default()
         };
@@ -3423,12 +3423,12 @@ mod tests {
             None
         );
         let unwritten =
-            codewhale_config::pricing::OfferingPricing::from_catalog_offering(&unwritten)
+            nestlone_config::pricing::OfferingPricing::from_catalog_offering(&unwritten)
                 .expect("priced offering");
         assert_eq!(unwritten.estimate_cost(&write), None);
         assert_eq!(
             unwritten.unpriced_used_classes(&write),
-            vec![codewhale_config::pricing::TokenClass::CacheWrite]
+            vec![nestlone_config::pricing::TokenClass::CacheWrite]
         );
     }
 
@@ -4955,9 +4955,9 @@ mod tests {
                 openai_codex: ProviderConfig {
                     auth_mode: Some("oauth".to_string()),
                     external_credentials: Some(
-                        codewhale_config::ExternalCredentialConsentToml::read_only(
-                            codewhale_config::ProviderKind::OpenaiCodex,
-                            codewhale_config::ExternalCredentialSource::CodexCli,
+                        nestlone_config::ExternalCredentialConsentToml::read_only(
+                            nestlone_config::ProviderKind::OpenaiCodex,
+                            nestlone_config::ExternalCredentialSource::CodexCli,
                             path.clone(),
                         ),
                     ),
@@ -5132,7 +5132,7 @@ mod tests {
         for secret in CONFIG_SECRET_SENTINELS {
             assert!(!content.contains(secret), "secret survived redaction");
         }
-        assert!(content.contains(codewhale_config::persistence::REDACTED));
+        assert!(content.contains(nestlone_config::persistence::REDACTED));
         assert!(content.contains("ordinary_setting"));
         assert!(content.contains("keep-me"));
     }
@@ -5146,11 +5146,11 @@ mod tests {
 
         let _env_lock = crate::test_support::lock_test_env();
         let tmp = tempfile::tempdir().expect("tempdir");
-        let codewhale_home = tmp.path().join("codewhale-home");
+        let nestlone_home = tmp.path().join("codewhale-home");
         let home = tmp.path().join("home");
         std::fs::create_dir_all(&home).expect("create isolated home");
-        let _codewhale_home =
-            crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", &codewhale_home);
+        let _nestlone_home =
+            crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", &nestlone_home);
         let _secret_backend =
             crate::test_support::EnvVarGuard::set("CODEWHALE_SECRET_BACKEND", "file");
         let _home = crate::test_support::EnvVarGuard::set("HOME", &home);
@@ -5164,7 +5164,7 @@ mod tests {
             crate::test_support::EnvVarGuard::set(builtin_env_name, BUILTIN_ENV_SECRET);
         let _custom_env = crate::test_support::EnvVarGuard::set(CUSTOM_ENV_NAME, CUSTOM_ENV_SECRET);
 
-        codewhale_secrets::Secrets::file_backed()
+        nestlone_secrets::Secrets::file_backed()
             .set("arcee", FILE_STORED_INACTIVE)
             .expect("write isolated inactive provider credential");
 
@@ -5200,7 +5200,7 @@ mod tests {
                 "inactive secret survived: {secret}"
             );
         }
-        assert!(content.contains(codewhale_config::persistence::REDACTED));
+        assert!(content.contains(nestlone_config::persistence::REDACTED));
         assert!(content.contains("ordinary output survives"));
     }
 
@@ -5224,7 +5224,7 @@ mod tests {
         let serialized = serde_json::to_string(&wire).expect("serialize chat wire messages");
 
         assert!(!serialized.contains(CONFIG_SECRET_SENTINELS[6]));
-        assert!(serialized.contains(codewhale_config::persistence::REDACTED));
+        assert!(serialized.contains(nestlone_config::persistence::REDACTED));
     }
 
     #[test]
@@ -5250,7 +5250,7 @@ mod tests {
                 "{route} body retained the configured credential"
             );
             assert!(
-                body.contains(codewhale_config::persistence::REDACTED),
+                body.contains(nestlone_config::persistence::REDACTED),
                 "{route} body lost the redaction marker"
             );
         }
@@ -5328,7 +5328,7 @@ mod tests {
         let wire = serde_json::to_string(&build_chat_messages_for_request(&prepared))
             .expect("serialize sanitized retrieval result");
         assert!(!wire.contains(CONFIG_SECRET_SENTINELS[6]));
-        assert!(wire.contains(codewhale_config::persistence::REDACTED));
+        assert!(wire.contains(nestlone_config::persistence::REDACTED));
     }
 
     #[test]
@@ -7002,7 +7002,7 @@ mod tests {
     }
 
     #[test]
-    fn moonshot_uses_codewhale_user_agent_not_kimi_cli_identity() {
+    fn moonshot_uses_nestlone_user_agent_not_kimi_cli_identity() {
         let user_agent = client_user_agent(ApiProvider::Moonshot);
 
         assert!(user_agent.contains("codewhale/"));
@@ -8027,7 +8027,7 @@ mod tests {
     #[tokio::test]
     async fn telecomjs_live_catalog_keeps_cross_provider_metadata_unknown() {
         let server = MockServer::start().await;
-        let ambiguous_id = codewhale_config::catalog::bundled_catalog_offerings()
+        let ambiguous_id = nestlone_config::catalog::bundled_catalog_offerings()
             .into_iter()
             .find(|offering| {
                 !offering.provider.eq_ignore_ascii_case("telecomjs")
@@ -8277,7 +8277,7 @@ mod tests {
             .filter(|entry| entry.is_fresh(now_unix()))
             .map(|entry| entry.offerings.clone())
             .unwrap_or_default();
-        let snapshot = codewhale_config::catalog::CatalogCompiler::new()
+        let snapshot = nestlone_config::catalog::CatalogCompiler::new()
             .with_bundled(vec![static_row])
             .with_live(fresh_live)
             .compile();

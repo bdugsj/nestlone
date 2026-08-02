@@ -24,7 +24,7 @@ fn resolve_with_config(config: &str, args: &[&str]) -> BTreeMap<String, String> 
     fs::create_dir_all(home.join(".codewhale")).expect("sealed config dir");
     fs::write(home.join(".codewhale").join("config.toml"), config).expect("seed config");
 
-    let mut command = Command::new(codewhale_binary());
+    let mut command = Command::new(nestlone_binary());
     command.arg("model").arg("resolve").args(args);
     let output = command
         .env_clear()
@@ -169,7 +169,7 @@ fn resolve_with_global_flags(
     fs::create_dir_all(home.join(".codewhale")).expect("sealed config dir");
     fs::write(home.join(".codewhale").join("config.toml"), config).expect("seed config");
 
-    let mut command = Command::new(codewhale_binary());
+    let mut command = Command::new(nestlone_binary());
     command.args(global).arg("model").arg("resolve").args(args);
     let output = command
         .env_clear()
@@ -278,7 +278,7 @@ fn an_unservable_model_on_the_selected_provider_is_reported_as_a_fallback() {
     );
 }
 
-fn codewhale_binary() -> PathBuf {
+fn nestlone_binary() -> PathBuf {
     if let Some(path) = option_env!("CARGO_BIN_EXE_codewhale") {
         return PathBuf::from(path);
     }

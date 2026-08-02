@@ -1,4 +1,4 @@
-//! Reader for the TUI's own `codewhale_tui::view_stack` trace records.
+//! Reader for the TUI's own `nestlone_tui::view_stack` trace records.
 //!
 //! Modal open/close coverage has an honesty problem: "the frame changed after
 //! I pressed F1" is not evidence that a modal opened, and "the frame changed
@@ -9,7 +9,7 @@
 //! one for tests.
 //!
 //! Enable it by spawning the binary with
-//! `RUST_LOG=warn,codewhale_tui::view_stack=debug` and a sealed `HOME`; the
+//! `RUST_LOG=warn,nestlone_tui::view_stack=debug` and a sealed `HOME`; the
 //! subscriber writes to `$HOME/.codewhale/logs/tui-<date>-<pid>.log`.
 
 use std::path::{Path, PathBuf};
@@ -17,7 +17,7 @@ use std::time::{Duration, Instant};
 
 use anyhow::{Context, Result, anyhow};
 
-pub const VIEW_STACK_RUST_LOG: &str = "warn,codewhale_tui::view_stack=debug";
+pub const VIEW_STACK_RUST_LOG: &str = "warn,nestlone_tui::view_stack=debug";
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ViewEvent {
@@ -137,7 +137,7 @@ where
 pub fn parse_events(contents: &str) -> Vec<ViewEvent> {
     contents
         .lines()
-        .filter(|line| line.contains("codewhale_tui::view_stack"))
+        .filter(|line| line.contains("nestlone_tui::view_stack"))
         .filter_map(parse_line)
         .collect()
 }
@@ -177,10 +177,10 @@ mod tests {
     use super::*;
 
     const SAMPLE: &str = concat!(
-        "2026-07-26T12:00:00.100000Z  WARN codewhale_tui::startup: unrelated line\n",
-        "2026-07-26T12:00:01.000000Z DEBUG codewhale_tui::view_stack: view pushed action=\"push\" kind=Help depth=1\n",
-        "2026-07-26T12:00:02.000000Z DEBUG codewhale_tui::view_stack: view pushed action=\"push_boxed\" kind=Pager depth=2\n",
-        "2026-07-26T12:00:03.000000Z DEBUG codewhale_tui::view_stack: view closed action=\"close\" kind=Pager depth=1\n",
+        "2026-07-26T12:00:00.100000Z  WARN nestlone_tui::startup: unrelated line\n",
+        "2026-07-26T12:00:01.000000Z DEBUG nestlone_tui::view_stack: view pushed action=\"push\" kind=Help depth=1\n",
+        "2026-07-26T12:00:02.000000Z DEBUG nestlone_tui::view_stack: view pushed action=\"push_boxed\" kind=Pager depth=2\n",
+        "2026-07-26T12:00:03.000000Z DEBUG nestlone_tui::view_stack: view closed action=\"close\" kind=Pager depth=1\n",
     );
 
     #[test]
@@ -199,7 +199,7 @@ mod tests {
     #[test]
     fn a_record_missing_its_fields_is_skipped_rather_than_guessed() {
         let events = parse_events(
-            "2026-07-26T12:00:01.000000Z DEBUG codewhale_tui::view_stack: view pushed depth=1\n",
+            "2026-07-26T12:00:01.000000Z DEBUG nestlone_tui::view_stack: view pushed depth=1\n",
         );
 
         assert!(events.is_empty());

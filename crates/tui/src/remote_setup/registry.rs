@@ -8,7 +8,7 @@
 //! - [`BridgeSpec`] — pure transport between a chat app and the local runtime.
 //! - [`CloudTarget`] — where the agent runs and where its secrets live.
 //! - The provider dimension is *not* duplicated here: it reads the existing
-//!   `codewhale_config::provider` registry (see [`super::bundle::ProviderInfo`]).
+//!   `nestlone_config::provider` registry (see [`super::bundle::ProviderInfo`]).
 
 /// Where a cloud target stores the runtime/provider secrets.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

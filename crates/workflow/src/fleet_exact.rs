@@ -1142,10 +1142,10 @@ reasoning = "auto"
 
         // A qualified origin is accepted verbatim; resolution happens in the
         // host that owns the search roots.
-        let qualified = NAMED_ROUTER_FLEET.replace("\"luna-low\"", "\"codewhale_home/luna-low\"");
+        let qualified = NAMED_ROUTER_FLEET.replace("\"luna-low\"", "\"nestlone_home/luna-low\"");
         assert!(matches!(
             ExactFleet::parse(&qualified).expect("parse").router_ref(),
-            Some(FleetRouterRef::Profile { ref name }) if name == "codewhale_home/luna-low"
+            Some(FleetRouterRef::Profile { ref name }) if name == "nestlone_home/luna-low"
         ));
     }
 

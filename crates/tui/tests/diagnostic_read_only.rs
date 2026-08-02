@@ -11,7 +11,7 @@ use axum::body::Bytes;
 use axum::http::HeaderMap;
 use axum::routing::post;
 use axum::{Json, Router};
-use codewhale_secrets::{FileKeyringStore, KeyringStore};
+use nestlone_secrets::{FileKeyringStore, KeyringStore};
 use tempfile::TempDir;
 
 #[test]
@@ -40,7 +40,7 @@ fn doctor_json_rejects_kimi_code_claude_alias_with_machine_readable_guidance() {
     let fixture = TempDir::new().expect("fixture root");
     let workspace = fixture.path().join("workspace");
     let home = fixture.path().join("home");
-    let codewhale_home = fixture.path().join("isolated-codewhale-home");
+    let nestlone_home = fixture.path().join("isolated-codewhale-home");
     fs::create_dir_all(&workspace).expect("workspace");
     let config = workspace.join("kimi-invalid.toml");
     let config_bytes = br#"provider = "moonshot"
@@ -60,7 +60,7 @@ model = "k3[1m]"
             "doctor",
             "--json",
         ])
-        .env("CODEWHALE_HOME", &codewhale_home);
+        .env("CODEWHALE_HOME", &nestlone_home);
     let output = command.output().expect("run invalid Kimi doctor json");
 
     assert!(
@@ -105,7 +105,7 @@ model = "k3[1m]"
     );
     assert!(!home.exists(), "doctor must not create HOME state");
     assert!(
-        !codewhale_home.exists(),
+        !nestlone_home.exists(),
         "doctor must not create CODEWHALE_HOME state"
     );
 }
@@ -115,7 +115,7 @@ fn doctor_json_reports_valid_kimi_code_k3_context_override_from_runtime_route() 
     let fixture = TempDir::new().expect("fixture root");
     let workspace = fixture.path().join("workspace");
     let home = fixture.path().join("home");
-    let codewhale_home = fixture.path().join("isolated-codewhale-home");
+    let nestlone_home = fixture.path().join("isolated-codewhale-home");
     fs::create_dir_all(&workspace).expect("workspace");
     let config = workspace.join("kimi-valid.toml");
     let config_bytes = br#"provider = "moonshot"
@@ -136,7 +136,7 @@ context_window = 1048576
             "doctor",
             "--json",
         ])
-        .env("CODEWHALE_HOME", &codewhale_home);
+        .env("CODEWHALE_HOME", &nestlone_home);
     let output = command.output().expect("run valid Kimi doctor json");
 
     assert!(
@@ -169,7 +169,7 @@ context_window = 1048576
     );
     assert!(!home.exists(), "doctor must not create HOME state");
     assert!(
-        !codewhale_home.exists(),
+        !nestlone_home.exists(),
         "doctor must not create CODEWHALE_HOME state"
     );
 }
@@ -278,7 +278,7 @@ fn doctor_json_does_not_inherit_an_ambient_legacy_secret_from_an_explicit_home()
     let fixture = TempDir::new().expect("fixture root");
     let workspace = fixture.path().join("workspace");
     let home = fixture.path().join("home");
-    let codewhale_home = fixture.path().join("isolated-codewhale-home");
+    let nestlone_home = fixture.path().join("isolated-codewhale-home");
     fs::create_dir_all(&workspace).expect("workspace");
     let legacy = home.join(".deepseek").join("secrets").join("secrets.json");
     FileKeyringStore::new(&legacy)
@@ -286,7 +286,7 @@ fn doctor_json_does_not_inherit_an_ambient_legacy_secret_from_an_explicit_home()
         .expect("seed ambient legacy secret");
     let legacy_before = fs::read(&legacy).expect("read legacy secret before doctor");
 
-    let mut command = Command::new(codewhale_tui_binary());
+    let mut command = Command::new(nestlone_tui_binary());
     command
         .current_dir(&workspace)
         .args(["doctor", "--json"])
@@ -294,7 +294,7 @@ fn doctor_json_does_not_inherit_an_ambient_legacy_secret_from_an_explicit_home()
         .env("PATH", std::env::var_os("PATH").expect("PATH"))
         .env("HOME", &home)
         .env("USERPROFILE", &home)
-        .env("CODEWHALE_HOME", &codewhale_home)
+        .env("CODEWHALE_HOME", &nestlone_home)
         .env("CODEWHALE_SECRET_BACKEND", "file")
         .env(
             "CODEWHALE_RELEASE_BASE_URL",
@@ -323,7 +323,7 @@ fn doctor_json_does_not_inherit_an_ambient_legacy_secret_from_an_explicit_home()
         "doctor must not rewrite the ambient legacy secret"
     );
     assert!(
-        !codewhale_home.exists(),
+        !nestlone_home.exists(),
         "doctor must not create an isolated Codewhale home or secret store"
     );
 }
@@ -486,11 +486,11 @@ fn setup_status_reads_a_legacy_key_without_migrating_it() {
 }
 
 #[test]
-fn doctor_json_stash_honors_an_explicit_codewhale_home() {
+fn doctor_json_stash_honors_an_explicit_nestlone_home() {
     let fixture = TempDir::new().expect("fixture root");
     let workspace = fixture.path().join("workspace");
     let home = fixture.path().join("home");
-    let codewhale_home = fixture.path().join("isolated-codewhale-home");
+    let nestlone_home = fixture.path().join("isolated-codewhale-home");
     fs::create_dir_all(&workspace).expect("workspace");
     let ambient_stash = home.join(".codewhale").join("composer_stash.jsonl");
     fs::create_dir_all(ambient_stash.parent().expect("ambient stash parent"))
@@ -505,7 +505,7 @@ fn doctor_json_stash_honors_an_explicit_codewhale_home() {
     let mut command = diagnostic_command(&workspace, &home);
     command
         .args(["doctor", "--json"])
-        .env("CODEWHALE_HOME", &codewhale_home);
+        .env("CODEWHALE_HOME", &nestlone_home);
     let output = command.output().expect("run isolated doctor json");
     assert!(
         output.status.success(),
@@ -517,7 +517,7 @@ fn doctor_json_stash_honors_an_explicit_codewhale_home() {
         serde_json::from_slice(&output.stdout).expect("machine-readable doctor report");
     assert_eq!(
         report["storage"]["stash"]["path"],
-        codewhale_home
+        nestlone_home
             .join("composer_stash.jsonl")
             .display()
             .to_string()
@@ -535,7 +535,7 @@ fn doctor_json_stash_honors_an_explicit_codewhale_home() {
         "doctor must not rewrite the ambient stash"
     );
     assert!(
-        !codewhale_home.exists(),
+        !nestlone_home.exists(),
         "a diagnostic must not create an explicit stash home"
     );
 }
@@ -544,10 +544,10 @@ fn run_sealed_diagnostic<const N: usize>(args: [&str; N]) -> Output {
     let fixture = TempDir::new().expect("fixture root");
     let workspace = fixture.path().join("workspace");
     let sealed_home = fixture.path().join("sealed-home");
-    let codewhale_home = fixture.path().join("sealed-codewhale-home");
+    let nestlone_home = fixture.path().join("sealed-codewhale-home");
     std::fs::create_dir_all(&workspace).expect("workspace");
 
-    let mut command = Command::new(codewhale_tui_binary());
+    let mut command = Command::new(nestlone_tui_binary());
     command
         .current_dir(&workspace)
         .args(args)
@@ -555,7 +555,7 @@ fn run_sealed_diagnostic<const N: usize>(args: [&str; N]) -> Output {
         .env("PATH", std::env::var_os("PATH").expect("PATH"))
         .env("HOME", &sealed_home)
         .env("USERPROFILE", &sealed_home)
-        .env("CODEWHALE_HOME", &codewhale_home)
+        .env("CODEWHALE_HOME", &nestlone_home)
         .env("CODEWHALE_SECRET_BACKEND", "file")
         // Keep the text doctor command offline: the release crate treats this
         // as a pinned mirror version and does not issue a metadata request.
@@ -580,15 +580,15 @@ fn run_sealed_diagnostic<const N: usize>(args: [&str; N]) -> Output {
         sealed_home.display()
     );
     assert!(
-        !codewhale_home.exists(),
+        !nestlone_home.exists(),
         "diagnostic {args:?} must not create CODEWHALE_HOME or a secrets store at {}",
-        codewhale_home.display()
+        nestlone_home.display()
     );
     output
 }
 
 fn diagnostic_command(workspace: &std::path::Path, home: &std::path::Path) -> Command {
-    let mut command = Command::new(codewhale_tui_binary());
+    let mut command = Command::new(nestlone_tui_binary());
     command
         .current_dir(workspace)
         .env_clear()
@@ -739,7 +739,7 @@ fn preserve_host_platform_runtime(_command: &mut Command) {
     }
 }
 
-fn codewhale_tui_binary() -> PathBuf {
+fn nestlone_tui_binary() -> PathBuf {
     if let Some(path) = option_env!("CARGO_BIN_EXE_codewhale-tui") {
         return PathBuf::from(path);
     }

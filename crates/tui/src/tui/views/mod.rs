@@ -645,7 +645,7 @@ pub enum ViewEvent {
         /// Lossy / arity-aware fingerprint, used to scope *approvals*.
         approval_grouping_key: String,
         /// Permission rules to append when the decision approves.
-        persistent_rules: Vec<codewhale_config::ToolAskRule>,
+        persistent_rules: Vec<nestlone_config::ToolAskRule>,
     },
     ElevationDecision {
         tool_id: String,
@@ -807,8 +807,8 @@ pub enum ViewEvent {
     /// read-only side-effect contract and the user explicitly confirmed it.
     ProviderPickerExternalConsentConfirmed {
         provider: crate::config::ApiProvider,
-        consent_provider: codewhale_config::ProviderKind,
-        source: codewhale_config::ExternalCredentialSource,
+        consent_provider: nestlone_config::ProviderKind,
+        source: nestlone_config::ExternalCredentialSource,
         path: std::path::PathBuf,
     },
     /// One-step revocation from a provider row that currently has consent.
@@ -837,20 +837,20 @@ pub enum ViewEvent {
     /// bindings. The host updates live config state; disk persistence is
     /// handled by the follow-up persistence slice.
     HotbarSetupSaved {
-        bindings: Vec<codewhale_config::HotbarBindingToml>,
+        bindings: Vec<nestlone_config::HotbarBindingToml>,
     },
     /// Emitted by the constitution-first setup shell when a staged setup-state
     /// record should be committed atomically to `$CODEWHALE_HOME/setup_state.json`.
     SetupStateCommitRequested {
-        state: codewhale_config::SetupState,
+        state: nestlone_config::SetupState,
         message: String,
     },
     /// Emitted by the constitution-first setup shell when accepting a guided
     /// structured user-global constitution. The host commits the constitution
     /// and matching setup-state record together.
     SetupConstitutionCommitRequested {
-        constitution: codewhale_config::UserConstitution,
-        state: codewhale_config::SetupState,
+        constitution: nestlone_config::UserConstitution,
+        state: nestlone_config::SetupState,
         message: String,
     },
     /// Emitted by the setup Constitution card (`A`, provider route ready) to
@@ -921,7 +921,7 @@ pub enum ViewEvent {
     /// and confirmed an explicit preset/config diff.
     SetupRuntimePresetApplyRequested {
         preset: crate::tui::setup::SetupRuntimePreset,
-        state: codewhale_config::SetupState,
+        state: nestlone_config::SetupState,
         message: String,
     },
     /// Emitted by the setup Provider/Model readiness card to hand off to the
@@ -1088,7 +1088,7 @@ impl ViewStack {
     pub fn push<V: ModalView + 'static>(&mut self, view: V) {
         let kind = view.kind();
         self.views.push(Box::new(view));
-        tracing::debug!(target: "codewhale_tui::view_stack", action = "push", kind = ?kind, depth = self.views.len(), "view pushed");
+        tracing::debug!(target: "nestlone_tui::view_stack", action = "push", kind = ?kind, depth = self.views.len(), "view pushed");
     }
 
     /// Push an already-boxed view back onto the stack. Used by call sites
@@ -1097,13 +1097,13 @@ impl ViewStack {
     pub fn push_boxed(&mut self, view: Box<dyn ModalView>) {
         let kind = view.kind();
         self.views.push(view);
-        tracing::debug!(target: "codewhale_tui::view_stack", action = "push_boxed", kind = ?kind, depth = self.views.len(), "view pushed");
+        tracing::debug!(target: "nestlone_tui::view_stack", action = "push_boxed", kind = ?kind, depth = self.views.len(), "view pushed");
     }
 
     pub fn pop(&mut self) -> Option<Box<dyn ModalView>> {
         let popped = self.views.pop();
         if let Some(view) = popped.as_ref() {
-            tracing::debug!(target: "codewhale_tui::view_stack", action = "pop", kind = ?view.kind(), depth = self.views.len(), "view popped");
+            tracing::debug!(target: "nestlone_tui::view_stack", action = "pop", kind = ?view.kind(), depth = self.views.len(), "view popped");
         }
         popped
     }
@@ -1188,7 +1188,7 @@ impl ViewStack {
             ViewAction::None => {}
             ViewAction::Close => {
                 if let Some(view) = self.views.pop() {
-                    tracing::debug!(target: "codewhale_tui::view_stack", action = "close", kind = ?view.kind(), depth = self.views.len(), "view closed via action");
+                    tracing::debug!(target: "nestlone_tui::view_stack", action = "close", kind = ?view.kind(), depth = self.views.len(), "view closed via action");
                 }
             }
             ViewAction::Emit(event) => {
@@ -1197,7 +1197,7 @@ impl ViewStack {
             ViewAction::EmitAndClose(event) => {
                 events.push(event);
                 if let Some(view) = self.views.pop() {
-                    tracing::debug!(target: "codewhale_tui::view_stack", action = "emit_and_close", kind = ?view.kind(), depth = self.views.len(), "view closed via action");
+                    tracing::debug!(target: "nestlone_tui::view_stack", action = "emit_and_close", kind = ?view.kind(), depth = self.views.len(), "view closed via action");
                 }
             }
         }
@@ -1972,7 +1972,7 @@ impl ConfigView {
                     .fleet
                     .as_ref()
                     .map(|fleet| fleet.exec.max_spawn_depth)
-                    .unwrap_or_else(|| codewhale_config::FleetExecConfig::default().max_spawn_depth)
+                    .unwrap_or_else(|| nestlone_config::FleetExecConfig::default().max_spawn_depth)
                     .to_string(),
                 editable: false,
                 scope: ConfigScope::Saved,
@@ -2023,20 +2023,20 @@ impl ConfigView {
                             .replace("{state}", &state);
                         let owner_path = tr(app.ui_locale, MessageId::ProviderExternalOwnerPath)
                             .replace("{owner}", status.owner)
-                            .replace("{path}", &codewhale_config::quote_os_path(&status.path));
+                            .replace("{path}", &nestlone_config::quote_os_path(&status.path));
                         let pinned_warning = status.ambient_path_changed.then(|| {
                             tr(app.ui_locale, MessageId::ProviderExternalPinnedPathWarning)
                                 .replace("{owner}", status.owner)
-                                .replace("{path}", &codewhale_config::quote_os_path(&status.path))
+                                .replace("{path}", &nestlone_config::quote_os_path(&status.path))
                         });
                         let semantics = match status.access {
-                            codewhale_config::ExternalCredentialAccess::Disabled => {
+                            nestlone_config::ExternalCredentialAccess::Disabled => {
                                 tr(app.ui_locale, MessageId::ProviderExternalDisabledDetail)
                             }
-                            codewhale_config::ExternalCredentialAccess::ReadOnly => {
+                            nestlone_config::ExternalCredentialAccess::ReadOnly => {
                                 tr(app.ui_locale, MessageId::ProviderExternalReadOnlySemantics)
                             }
-                            codewhale_config::ExternalCredentialAccess::Managed => {
+                            nestlone_config::ExternalCredentialAccess::Managed => {
                                 tr(app.ui_locale, MessageId::ProviderExternalManagedDetail)
                             }
                         };
@@ -5255,7 +5255,7 @@ consent_version = 1
         assert!(row.value.contains("remains pinned"), "{}", row.value);
         assert!(
             row.value
-                .contains(&codewhale_config::quote_os_path(&auth_path)),
+                .contains(&nestlone_config::quote_os_path(&auth_path)),
             "{}",
             row.value
         );
@@ -5863,7 +5863,7 @@ context_window = 262144
         app.config_path = Some(config_path);
         app.api_provider = crate::config::ApiProvider::Moonshot;
         app.model = "kimi-k3".to_string();
-        app.active_route_limits = Some(codewhale_config::route::RouteLimits {
+        app.active_route_limits = Some(nestlone_config::route::RouteLimits {
             context_tokens: Some(262_144),
             ..Default::default()
         });

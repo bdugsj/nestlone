@@ -297,7 +297,7 @@ fn write_trophy_card(app: &App, verdict: HuntVerdict) -> Result<std::path::PathB
     let date = now.format("%Y-%m-%d");
     let date_str = date.to_string();
     let now_str = now.to_string();
-    let dir = codewhale_config::ensure_state_dir("trophies")
+    let dir = nestlone_config::ensure_state_dir("trophies")
         .map_err(|err| format!("Could not resolve trophy directory: {err}"))?;
     // Include time in filename to avoid collisions on same-date hunts.
     let filename = format!("{date}-{time}-{slug}.md");
@@ -549,7 +549,7 @@ mod tests {
         // into a trophy path error (and so we never touch the real home).
         let _lock = crate::test_support::lock_test_env();
         let temp = tempfile::tempdir().expect("isolated CODEWHALE_HOME");
-        let _codewhale_home = crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", temp.path());
+        let _nestlone_home = crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", temp.path());
 
         let mut app = create_test_app();
         let _ = hunt(&mut app, Some("Freeze the timer on close"));

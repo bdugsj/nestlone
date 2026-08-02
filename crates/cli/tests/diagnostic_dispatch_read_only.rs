@@ -7,7 +7,7 @@ use std::os::unix::fs::PermissionsExt;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
-use codewhale_secrets::{FileKeyringStore, KeyringStore};
+use nestlone_secrets::{FileKeyringStore, KeyringStore};
 use tempfile::TempDir;
 
 #[test]
@@ -28,7 +28,7 @@ fn dispatcher_diagnostics_leave_legacy_secret_state_unchanged() {
     ] {
         let fixture = TempDir::new().expect("fixture root");
         let sealed_home = fixture.path().join("sealed-home");
-        let codewhale_home = fixture.path().join("sealed-codewhale-home");
+        let nestlone_home = fixture.path().join("sealed-codewhale-home");
         let primary_home = sealed_home.join(".codewhale");
         let legacy = sealed_home
             .join(".deepseek")
@@ -56,12 +56,12 @@ fn dispatcher_diagnostics_leave_legacy_secret_state_unchanged() {
         permissions.set_mode(0o700);
         fs::set_permissions(&fake_tui, permissions).expect("make fake TUI executable");
 
-        let output = Command::new(codewhale_binary())
+        let output = Command::new(nestlone_binary())
             .args(args)
             .env_clear()
             .env("HOME", &sealed_home)
             .env("USERPROFILE", &sealed_home)
-            .env("CODEWHALE_HOME", &codewhale_home)
+            .env("CODEWHALE_HOME", &nestlone_home)
             .env("CODEWHALE_SECRET_BACKEND", "file")
             .env("DEEPSEEK_TUI_BIN", &fake_tui)
             .env("DIAGNOSTIC_DISPATCH_RECEIPT", &receipt)
@@ -117,7 +117,7 @@ fn dispatcher_diagnostics_leave_legacy_secret_state_unchanged() {
             "dispatcher {args:?} must not create a primary Codewhale home or migrated state"
         );
         assert!(
-            !codewhale_home.exists(),
+            !nestlone_home.exists(),
             "dispatcher {args:?} must not create an explicit CODEWHALE_HOME"
         );
     }
@@ -146,7 +146,7 @@ fn collect_relative_paths(root: &Path, current: &Path, paths: &mut Vec<PathBuf>)
     }
 }
 
-fn codewhale_binary() -> PathBuf {
+fn nestlone_binary() -> PathBuf {
     if let Some(path) = option_env!("CARGO_BIN_EXE_codewhale") {
         return PathBuf::from(path);
     }

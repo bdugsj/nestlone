@@ -5,29 +5,29 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use anyhow::Result;
-use codewhale_agent::ModelRegistry;
-use codewhale_config::{CliRuntimeOverrides, ConfigToml, ProviderKind};
-use codewhale_execpolicy::{
+use nestlone_agent::ModelRegistry;
+use nestlone_config::{CliRuntimeOverrides, ConfigToml, ProviderKind};
+use nestlone_execpolicy::{
     AskForApproval, ExecApprovalRequirement, ExecPolicyContext, ExecPolicyDecision,
     ExecPolicyEngine,
 };
-use codewhale_hooks::{HookDispatcher, HookEvent};
-use codewhale_mcp::{
+use nestlone_hooks::{HookDispatcher, HookEvent};
+use nestlone_mcp::{
     McpManager, McpStartupCompleteEvent, McpStartupStatus as McpManagerStartupStatus,
 };
-use codewhale_protocol::{
+use nestlone_protocol::{
     AppResponse, EventFrame, ExecApprovalRequestEvent, PromptRequest, PromptResponse,
     ResponseChannel, ReviewDecision, Status, Thread, ThreadForkParams, ThreadGoal,
     ThreadGoalClearParams, ThreadGoalGetParams, ThreadGoalProgressParams, ThreadGoalSetParams,
     ThreadGoalStatus, ThreadListParams, ThreadReadParams, ThreadRequest, ThreadResponse,
     ThreadResumeParams, ThreadSetNameParams, ThreadStatus, ToolPayload, UserInputRequestEvent,
 };
-use codewhale_state::{
+use nestlone_state::{
     JobStateRecord, JobStateStatus, SessionSource, StateStore, ThreadGoalRecord,
     ThreadGoalStatus as PersistedThreadGoalStatus, ThreadListFilters, ThreadMetadata,
     ThreadStatus as PersistedThreadStatus,
 };
-use codewhale_tools::{ToolCall, ToolRegistry};
+use nestlone_tools::{ToolCall, ToolRegistry};
 use serde_json::{Value, json};
 use tokio::time;
 use uuid::Uuid;
@@ -193,8 +193,8 @@ pub struct JobRecord {
 #[must_use]
 pub fn job_record_to_agent_run(
     record: &JobRecord,
-) -> codewhale_protocol::agent_run::AgentRunSnapshot {
-    use codewhale_protocol::agent_run::{
+) -> nestlone_protocol::agent_run::AgentRunSnapshot {
+    use nestlone_protocol::agent_run::{
         AgentRunSnapshot, BudgetSummary, RunSource, RunState, TerminalOutcome, TerminalSummary,
     };
 
@@ -559,11 +559,11 @@ impl ThreadManager {
             cwd: cwd.clone(),
             cli_version: self.cli_version.clone(),
             source: match source {
-                SessionSource::Interactive => codewhale_protocol::SessionSource::Interactive,
-                SessionSource::Resume => codewhale_protocol::SessionSource::Resume,
-                SessionSource::Fork => codewhale_protocol::SessionSource::Fork,
-                SessionSource::Api => codewhale_protocol::SessionSource::Api,
-                SessionSource::Unknown => codewhale_protocol::SessionSource::Unknown,
+                SessionSource::Interactive => nestlone_protocol::SessionSource::Interactive,
+                SessionSource::Resume => nestlone_protocol::SessionSource::Resume,
+                SessionSource::Fork => nestlone_protocol::SessionSource::Fork,
+                SessionSource::Api => nestlone_protocol::SessionSource::Api,
+                SessionSource::Unknown => nestlone_protocol::SessionSource::Unknown,
             },
             name: None,
         };
@@ -1678,19 +1678,19 @@ impl Runtime {
         });
         for update in updates {
             let status = match update.status {
-                McpManagerStartupStatus::Starting => codewhale_protocol::McpStartupStatus::Starting,
-                McpManagerStartupStatus::Ready => codewhale_protocol::McpStartupStatus::Ready,
+                McpManagerStartupStatus::Starting => nestlone_protocol::McpStartupStatus::Starting,
+                McpManagerStartupStatus::Ready => nestlone_protocol::McpStartupStatus::Ready,
                 McpManagerStartupStatus::Failed { error } => {
-                    codewhale_protocol::McpStartupStatus::Failed { error }
+                    nestlone_protocol::McpStartupStatus::Failed { error }
                 }
                 McpManagerStartupStatus::Cancelled => {
-                    codewhale_protocol::McpStartupStatus::Cancelled
+                    nestlone_protocol::McpStartupStatus::Cancelled
                 }
             };
             self.hooks
                 .emit(HookEvent::GenericEventFrame {
                     frame: Box::new(EventFrame::McpStartupUpdate {
-                        update: codewhale_protocol::McpStartupUpdateEvent {
+                        update: nestlone_protocol::McpStartupUpdateEvent {
                             server_name: update.server_name,
                             status,
                         },
@@ -1701,12 +1701,12 @@ impl Runtime {
         self.hooks
             .emit(HookEvent::GenericEventFrame {
                 frame: Box::new(EventFrame::McpStartupComplete {
-                    summary: codewhale_protocol::McpStartupCompleteEvent {
+                    summary: nestlone_protocol::McpStartupCompleteEvent {
                         ready: summary.ready.clone(),
                         failed: summary
                             .failed
                             .iter()
-                            .map(|f| codewhale_protocol::McpStartupFailure {
+                            .map(|f| nestlone_protocol::McpStartupFailure {
                                 server_name: f.server_name.clone(),
                                 error: f.error.clone(),
                             })
@@ -1936,11 +1936,11 @@ fn to_protocol_thread(thread: ThreadMetadata) -> Thread {
         cwd: thread.cwd,
         cli_version: thread.cli_version,
         source: match thread.source {
-            SessionSource::Interactive => codewhale_protocol::SessionSource::Interactive,
-            SessionSource::Resume => codewhale_protocol::SessionSource::Resume,
-            SessionSource::Fork => codewhale_protocol::SessionSource::Fork,
-            SessionSource::Api => codewhale_protocol::SessionSource::Api,
-            SessionSource::Unknown => codewhale_protocol::SessionSource::Unknown,
+            SessionSource::Interactive => nestlone_protocol::SessionSource::Interactive,
+            SessionSource::Resume => nestlone_protocol::SessionSource::Resume,
+            SessionSource::Fork => nestlone_protocol::SessionSource::Fork,
+            SessionSource::Api => nestlone_protocol::SessionSource::Api,
+            SessionSource::Unknown => nestlone_protocol::SessionSource::Unknown,
         },
         name: thread.name,
     }
@@ -1983,13 +1983,13 @@ fn to_persisted_status(status: &ThreadStatus) -> PersistedThreadStatus {
     }
 }
 
-fn to_persisted_source(source: &codewhale_protocol::SessionSource) -> SessionSource {
+fn to_persisted_source(source: &nestlone_protocol::SessionSource) -> SessionSource {
     match source {
-        codewhale_protocol::SessionSource::Interactive => SessionSource::Interactive,
-        codewhale_protocol::SessionSource::Resume => SessionSource::Resume,
-        codewhale_protocol::SessionSource::Fork => SessionSource::Fork,
-        codewhale_protocol::SessionSource::Api => SessionSource::Api,
-        codewhale_protocol::SessionSource::Unknown => SessionSource::Unknown,
+        nestlone_protocol::SessionSource::Interactive => SessionSource::Interactive,
+        nestlone_protocol::SessionSource::Resume => SessionSource::Resume,
+        nestlone_protocol::SessionSource::Fork => SessionSource::Fork,
+        nestlone_protocol::SessionSource::Api => SessionSource::Api,
+        nestlone_protocol::SessionSource::Unknown => SessionSource::Unknown,
     }
 }
 
@@ -2137,7 +2137,7 @@ fn tool_payload_value(payload: &ToolPayload) -> Value {
     )
 }
 
-fn tool_output_value(output: &codewhale_protocol::ToolOutput) -> Value {
+fn tool_output_value(output: &nestlone_protocol::ToolOutput) -> Value {
     serde_json::to_value(output).unwrap_or_else(
         |_| json!({"type":"serialization_error","message":"tool output unavailable"}),
     )
@@ -2281,8 +2281,8 @@ fn job_state_status_to_runtime(status: JobStateStatus) -> JobStatus {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use codewhale_protocol::ThreadResumeParams;
-    use codewhale_tools::ToolCallSource;
+    use nestlone_protocol::ThreadResumeParams;
+    use nestlone_tools::ToolCallSource;
 
     fn temp_core_state(name: &str) -> StateStore {
         let dir =
@@ -2362,7 +2362,7 @@ mod tests {
         let call = ToolCall {
             name: "exec_shell".to_string(),
             payload: ToolPayload::LocalShell {
-                params: codewhale_protocol::LocalShellParams {
+                params: nestlone_protocol::LocalShellParams {
                     command: "cargo test".to_string(),
                     cwd: None,
                     timeout_ms: None,
@@ -2972,7 +2972,7 @@ mod tests {
 
     #[test]
     fn job_record_to_agent_run_maps_non_terminal_states() {
-        use codewhale_protocol::agent_run::RunState;
+        use nestlone_protocol::agent_run::RunState;
 
         for (status, expected) in [
             (JobStatus::Queued, RunState::Queued),
@@ -2985,21 +2985,21 @@ mod tests {
             assert_eq!(snapshot.parent, None);
             assert_eq!(
                 snapshot.source,
-                codewhale_protocol::agent_run::RunSource::CoreJob
+                nestlone_protocol::agent_run::RunSource::CoreJob
             );
             assert_eq!(snapshot.state, expected);
             assert!(snapshot.terminal.is_none());
             assert!(snapshot.refs.is_empty());
             assert_eq!(
                 snapshot.budget,
-                codewhale_protocol::agent_run::BudgetSummary::default()
+                nestlone_protocol::agent_run::BudgetSummary::default()
             );
         }
     }
 
     #[test]
     fn job_record_to_agent_run_maps_terminal_states_without_fabricating_fields() {
-        use codewhale_protocol::agent_run::{RunState, TerminalOutcome};
+        use nestlone_protocol::agent_run::{RunState, TerminalOutcome};
 
         let cases = [
             (
@@ -3021,7 +3021,7 @@ mod tests {
             assert_eq!(terminal.detail, None);
             assert_eq!(
                 snapshot.budget,
-                codewhale_protocol::agent_run::BudgetSummary::default()
+                nestlone_protocol::agent_run::BudgetSummary::default()
             );
             assert!(snapshot.refs.is_empty());
             assert_eq!(snapshot.parent, None);
@@ -3105,13 +3105,13 @@ mod tests {
     #[tokio::test]
     async fn invoke_tool_returns_timeout_status_for_slow_tools() {
         use async_trait::async_trait;
-        use codewhale_agent::ModelRegistry;
-        use codewhale_config::ConfigToml;
-        use codewhale_execpolicy::{AskForApproval, ExecPolicyEngine};
-        use codewhale_hooks::HookDispatcher;
-        use codewhale_mcp::McpManager;
-        use codewhale_protocol::{ToolKind, ToolOutput, ToolPayload};
-        use codewhale_tools::{FunctionCallError, ToolDescriptor, ToolHandler, ToolInvocation};
+        use nestlone_agent::ModelRegistry;
+        use nestlone_config::ConfigToml;
+        use nestlone_execpolicy::{AskForApproval, ExecPolicyEngine};
+        use nestlone_hooks::HookDispatcher;
+        use nestlone_mcp::McpManager;
+        use nestlone_protocol::{ToolKind, ToolOutput, ToolPayload};
+        use nestlone_tools::{FunctionCallError, ToolDescriptor, ToolHandler, ToolInvocation};
 
         struct SlowTool;
         #[async_trait]

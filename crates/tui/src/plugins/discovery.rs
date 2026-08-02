@@ -43,7 +43,7 @@ impl DiscoveryConfig {
 
 #[must_use]
 pub fn default_user_plugins_dir() -> PathBuf {
-    codewhale_config::codewhale_home()
+    nestlone_config::nestlone_home()
         .map(|path| path.join("plugins"))
         .unwrap_or_else(|error| {
             // Never fall back to a shared, predictable temporary directory:

@@ -15,7 +15,7 @@ use std::collections::BTreeMap;
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::{Arc, RwLock};
 
-use codewhale_config::catalog::{CatalogOffering, CatalogSnapshot, bundled_catalog_offerings};
+use nestlone_config::catalog::{CatalogOffering, CatalogSnapshot, bundled_catalog_offerings};
 
 use crate::codex_model_cache;
 use crate::config::{
@@ -449,7 +449,7 @@ pub fn all_catalog_providers() -> Vec<ApiProvider> {
 mod tests {
     use super::*;
     use crate::config::{DEFAULT_TOGETHER_FLASH_MODEL, DEFAULT_TOGETHER_MODEL};
-    use codewhale_config::catalog::CatalogSource;
+    use nestlone_config::catalog::CatalogSource;
     use std::sync::{Mutex, MutexGuard, OnceLock};
 
     /// Serialize tests that mutate the process-wide live snapshot.
@@ -552,7 +552,7 @@ mod tests {
     /// #4188: CodeWhale-only / local providers keep defaults via the legacy
     /// fallback when Models.dev (live or bundled) has no rows for them.
     #[test]
-    fn codewhale_only_providers_keep_legacy_defaults() {
+    fn nestlone_only_providers_keep_legacy_defaults() {
         let _env = crate::test_support::lock_test_env();
         let codex_home = tempfile::tempdir().expect("temporary CODEX_HOME");
         let _codex_home = crate::test_support::EnvVarGuard::set("CODEX_HOME", codex_home.path());
@@ -879,8 +879,8 @@ mod tests {
           }
         }"#;
         let catalog =
-            codewhale_config::models_dev::ModelsDevCatalog::parse_json(body).expect("parse");
-        let live_rows = codewhale_config::catalog::live_offerings_from_models_dev(
+            nestlone_config::models_dev::ModelsDevCatalog::parse_json(body).expect("parse");
+        let live_rows = nestlone_config::catalog::live_offerings_from_models_dev(
             &catalog,
             "alias-fp",
             1_700_000_000,

@@ -1851,7 +1851,7 @@ mod tests {
         std::fs::create_dir_all(owned_path.parent().expect("owned credential parent"))
             .expect("create owned credential directory");
         #[cfg(windows)]
-        crate::external_credentials::secure_codewhale_owned_windows_path(
+        crate::external_credentials::secure_nestlone_owned_windows_path(
             owned_path.parent().expect("owned credential parent"),
             true,
         )
@@ -1879,7 +1879,7 @@ mod tests {
                 .expect("secure owned credential file");
         }
         #[cfg(windows)]
-        crate::external_credentials::secure_codewhale_owned_windows_path(&owned_path, false)
+        crate::external_credentials::secure_nestlone_owned_windows_path(&owned_path, false)
             .expect("secure owned credential file");
         let oauth = config_with(
             ApiProvider::Xai,

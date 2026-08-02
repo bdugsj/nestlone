@@ -510,15 +510,15 @@ fn v091_real_pty_visual_matrix_preserves_control_grammar() -> anyhow::Result<()>
 
     for (cols, rows, theme, ascii_safe) in cases {
         let ws = make_sealed_workspace()?;
-        let codewhale_home = ws.home().join(".codewhale");
+        let nestlone_home = ws.home().join(".codewhale");
         let codex_home = ws.home().join(".codex");
         std::fs::create_dir_all(&codex_home)?;
         std::fs::write(
-            codewhale_home.join("config.toml"),
+            nestlone_home.join("config.toml"),
             "reasoning_effort = \"low\"\n\n[update]\ncheck_for_updates = false\n\n[notifications]\nmethod = \"off\"\ncompletion_sound = \"off\"\n",
         )?;
         std::fs::write(
-            codewhale_home.join("settings.toml"),
+            nestlone_home.join("settings.toml"),
             format!(
                 "theme = \"{theme}\"\nlocale = \"en\"\ndefault_mode = \"agent\"\npermission_posture = \"ask\"\nlow_motion = false\nfancy_animations = true\ncomposer_border = true\n"
             ),
@@ -535,10 +535,10 @@ fn v091_real_pty_visual_matrix_preserves_control_grammar() -> anyhow::Result<()>
             .cwd(ws.workspace())
             .clear_env()
             .seal_home(ws.home())
-            .env("CODEWHALE_HOME", codewhale_home.to_string_lossy())
+            .env("CODEWHALE_HOME", nestlone_home.to_string_lossy())
             .env(
                 "DEEPSEEK_CONFIG_PATH",
-                codewhale_home.join("config.toml").to_string_lossy(),
+                nestlone_home.join("config.toml").to_string_lossy(),
             )
             .env("CODEX_HOME", codex_home.to_string_lossy())
             .env("DEEPSEEK_API_KEY", "ci-test-key-not-real")
@@ -744,33 +744,33 @@ model = "k3"
     // This is a returning user who has already settled the independent setup
     // checkpoint. Keep that checkpoint out of the scenario so the assertion is
     // about missing-key recovery rather than a constitution-update modal.
-    let mut setup_state = codewhale_config::SetupState::default();
+    let mut setup_state = nestlone_config::SetupState::default();
     for step in [
-        codewhale_config::SetupStep::Language,
-        codewhale_config::SetupStep::TrustSandbox,
-        codewhale_config::SetupStep::Constitution,
+        nestlone_config::SetupStep::Language,
+        nestlone_config::SetupStep::TrustSandbox,
+        nestlone_config::SetupStep::Constitution,
     ] {
         setup_state.set_step(
             step,
-            codewhale_config::StepEntry::new(
-                codewhale_config::StepStatus::Verified,
+            nestlone_config::StepEntry::new(
+                nestlone_config::StepStatus::Verified,
                 true,
                 "0.8.67",
             ),
         );
     }
     setup_state.set_step(
-        codewhale_config::SetupStep::ProviderModel,
-        codewhale_config::StepEntry::new(codewhale_config::StepStatus::NeedsAction, true, "0.8.67"),
+        nestlone_config::SetupStep::ProviderModel,
+        nestlone_config::StepEntry::new(nestlone_config::StepStatus::NeedsAction, true, "0.8.67"),
     );
-    setup_state.runtime_posture_source = codewhale_config::RuntimePostureSource::Confirmed;
+    setup_state.runtime_posture_source = nestlone_config::RuntimePostureSource::Confirmed;
     setup_state
-        .complete_constitution_checkpoint("0.8.67", codewhale_config::ConstitutionChoice::Bundled);
-    setup_state.constitution_source = codewhale_config::ConstitutionSource::Bundled;
+        .complete_constitution_checkpoint("0.8.67", nestlone_config::ConstitutionChoice::Bundled);
+    setup_state.constitution_source = nestlone_config::ConstitutionSource::Bundled;
     setup_state.save_to(
         &ws.home()
             .join(".codewhale")
-            .join(codewhale_config::setup_state::SETUP_STATE_FILE_NAME),
+            .join(nestlone_config::setup_state::SETUP_STATE_FILE_NAME),
     )?;
     std::fs::create_dir_all(ws.workspace().join(".deepseek"))?;
     std::fs::write(ws.workspace().join(".deepseek").join("trusted"), "")?;
@@ -1394,15 +1394,15 @@ fn work_and_permission_are_visible_at_release_terminal_sizes() -> anyhow::Result
 
     for (cols, rows) in [(120_u16, 32_u16), (100, 30), (80, 24), (60, 16), (40, 12)] {
         let ws = make_sealed_workspace()?;
-        let codewhale_home = ws.home().join(".codewhale");
+        let nestlone_home = ws.home().join(".codewhale");
         let codex_home = ws.home().join(".codex");
         std::fs::create_dir_all(&codex_home)?;
         std::fs::write(
-            codewhale_home.join("config.toml"),
+            nestlone_home.join("config.toml"),
             "allow_shell = true\nreasoning_effort = \"low\"\n\n[notifications]\nmethod = \"off\"\ncompletion_sound = \"off\"\n",
         )?;
         std::fs::write(
-            codewhale_home.join("settings.toml"),
+            nestlone_home.join("settings.toml"),
             "permission_posture = \"full-access\"\n",
         )?;
         std::fs::write(
@@ -1457,10 +1457,10 @@ fn work_and_permission_are_visible_at_release_terminal_sizes() -> anyhow::Result
             .cwd(ws.workspace())
             .clear_env()
             .seal_home(ws.home())
-            .env("CODEWHALE_HOME", codewhale_home.to_string_lossy())
+            .env("CODEWHALE_HOME", nestlone_home.to_string_lossy())
             .env(
                 "DEEPSEEK_CONFIG_PATH",
-                codewhale_home.join("config.toml").to_string_lossy(),
+                nestlone_home.join("config.toml").to_string_lossy(),
             )
             .env("CODEX_HOME", codex_home.to_string_lossy())
             .env("DEEPSEEK_API_KEY", "ci-test-key-not-real")
@@ -1535,15 +1535,15 @@ fn work_and_permission_are_visible_at_release_terminal_sizes() -> anyhow::Result
 fn legacy_work_ctrl_t_save_export_and_restart_are_consistent() -> anyhow::Result<()> {
     let _guard = qa_pty_test_lock();
     let ws = make_sealed_workspace()?;
-    let codewhale_home = ws.home().join(".codewhale");
+    let nestlone_home = ws.home().join(".codewhale");
     let codex_home = ws.home().join(".codex");
     std::fs::create_dir_all(&codex_home)?;
     std::fs::write(
-        codewhale_home.join("config.toml"),
+        nestlone_home.join("config.toml"),
         "allow_shell = true\nreasoning_effort = \"low\"\n\n[notifications]\nmethod = \"off\"\ncompletion_sound = \"off\"\n",
     )?;
     std::fs::write(
-        codewhale_home.join("settings.toml"),
+        nestlone_home.join("settings.toml"),
         "permission_posture = \"full-access\"\n",
     )?;
     std::fs::write(
@@ -1597,10 +1597,10 @@ fn legacy_work_ctrl_t_save_export_and_restart_are_consistent() -> anyhow::Result
             .cwd(ws.workspace())
             .clear_env()
             .seal_home(ws.home())
-            .env("CODEWHALE_HOME", codewhale_home.to_string_lossy())
+            .env("CODEWHALE_HOME", nestlone_home.to_string_lossy())
             .env(
                 "DEEPSEEK_CONFIG_PATH",
-                codewhale_home.join("config.toml").to_string_lossy(),
+                nestlone_home.join("config.toml").to_string_lossy(),
             )
             .env("CODEX_HOME", codex_home.to_string_lossy())
             .env("DEEPSEEK_API_KEY", "ci-test-key-not-real")
@@ -2498,16 +2498,16 @@ fn spawn_file_mutation_harness(
     cols: u16,
     ascii_safe: bool,
 ) -> anyhow::Result<Harness> {
-    let codewhale_home = ws.home().join(".codewhale");
+    let nestlone_home = ws.home().join(".codewhale");
     let codex_home = ws.home().join(".codex");
     let mut builder = Harness::builder(Harness::cargo_bin("codewhale-tui"))
         .cwd(ws.workspace())
         .clear_env()
         .seal_home(ws.home())
-        .env("CODEWHALE_HOME", codewhale_home.to_string_lossy())
+        .env("CODEWHALE_HOME", nestlone_home.to_string_lossy())
         .env(
             "DEEPSEEK_CONFIG_PATH",
-            codewhale_home.join("config.toml").to_string_lossy(),
+            nestlone_home.join("config.toml").to_string_lossy(),
         )
         .env("CODEX_HOME", codex_home.to_string_lossy())
         .env("CODEWHALE_PROVIDER", "deepseek")
@@ -2573,11 +2573,11 @@ fn work_surface_file_mutation_modes_are_truthful_in_real_pty_frames() -> anyhow:
     ) in cases
     {
         let ws = make_sealed_workspace()?;
-        let codewhale_home = ws.home().join(".codewhale");
+        let nestlone_home = ws.home().join(".codewhale");
         let codex_home = ws.home().join(".codex");
         std::fs::create_dir_all(&codex_home)?;
         std::fs::write(
-            codewhale_home.join("config.toml"),
+            nestlone_home.join("config.toml"),
             "reasoning_effort = \"low\"\n\n[retry]\nenabled = false\n\n[update]\ncheck_for_updates = false\n\n[notifications]\nmethod = \"off\"\ncompletion_sound = \"off\"\n",
         )?;
         let initial_mode = if persist_through_restart {
@@ -2586,7 +2586,7 @@ fn work_surface_file_mutation_modes_are_truthful_in_real_pty_frames() -> anyhow:
             mode
         };
         std::fs::write(
-            codewhale_home.join("settings.toml"),
+            nestlone_home.join("settings.toml"),
             format!(
                 "theme = \"{theme}\"\nlocale = \"en\"\ndefault_mode = \"agent\"\npermission_posture = \"{permission_posture}\"\ninline_diffs = \"{initial_mode}\"\nlow_motion = true\nfancy_animations = false\ncomposer_border = true\n"
             ),
@@ -2611,7 +2611,7 @@ fn work_surface_file_mutation_modes_are_truthful_in_real_pty_frames() -> anyhow:
             setup.send(keys::key::enter())?;
             setup.wait_for_text("inline_diffs = off (saved)", KEY_TIMEOUT)?;
             let _ = setup.shutdown();
-            let persisted = std::fs::read_to_string(codewhale_home.join("settings.toml"))?;
+            let persisted = std::fs::read_to_string(nestlone_home.join("settings.toml"))?;
             anyhow::ensure!(
                 persisted.contains("inline_diffs = \"off\""),
                 "off mode did not persist before restart: {persisted}"
@@ -3556,15 +3556,15 @@ fn real_tool_lifecycle_crosses_work_status_resize_and_scroll_in_a_unix_pty() -> 
         spawn_tool_lifecycle_screen_fixture(RELEASE_SIGNAL, answer_lines.join("\n"))?;
 
     let ws = make_sealed_workspace()?;
-    let codewhale_home = ws.home().join(".codewhale");
+    let nestlone_home = ws.home().join(".codewhale");
     let codex_home = ws.home().join(".codex");
     std::fs::create_dir_all(&codex_home)?;
     std::fs::write(
-        codewhale_home.join("config.toml"),
+        nestlone_home.join("config.toml"),
         "allow_shell = true\nreasoning_effort = \"low\"\n\n[retry]\nenabled = false\n\n[update]\ncheck_for_updates = false\n\n[notifications]\nmethod = \"off\"\ncompletion_sound = \"off\"\n",
     )?;
     std::fs::write(
-        codewhale_home.join("settings.toml"),
+        nestlone_home.join("settings.toml"),
         "theme = \"dark\"\nlocale = \"en\"\ndefault_mode = \"agent\"\npermission_posture = \"full-access\"\nlow_motion = false\nfancy_animations = true\ncomposer_border = true\n",
     )?;
     std::fs::write(
@@ -3579,10 +3579,10 @@ fn real_tool_lifecycle_crosses_work_status_resize_and_scroll_in_a_unix_pty() -> 
         .cwd(ws.workspace())
         .clear_env()
         .seal_home(ws.home())
-        .env("CODEWHALE_HOME", codewhale_home.to_string_lossy())
+        .env("CODEWHALE_HOME", nestlone_home.to_string_lossy())
         .env(
             "DEEPSEEK_CONFIG_PATH",
-            codewhale_home.join("config.toml").to_string_lossy(),
+            nestlone_home.join("config.toml").to_string_lossy(),
         )
         .env("CODEX_HOME", codex_home.to_string_lossy())
         .env("CODEWHALE_PROVIDER", "deepseek")
@@ -4029,15 +4029,15 @@ fn semantic_activity_motion_crosses_reasoning_reading_and_tool_use_in_a_real_uni
             BASH_RELEASE,
         )?;
 
-        let codewhale_home = ws.home().join(".codewhale");
+        let nestlone_home = ws.home().join(".codewhale");
         let codex_home = ws.home().join(".codex");
         std::fs::create_dir_all(&codex_home)?;
         std::fs::write(
-            codewhale_home.join("config.toml"),
+            nestlone_home.join("config.toml"),
             "allow_shell = true\nreasoning_effort = \"low\"\n\n[retry]\nenabled = false\n\n[update]\ncheck_for_updates = false\n\n[notifications]\nmethod = \"off\"\ncompletion_sound = \"off\"\n",
         )?;
         std::fs::write(
-            codewhale_home.join("settings.toml"),
+            nestlone_home.join("settings.toml"),
             format!(
                 "theme = \"{}\"\nlocale = \"en\"\ndefault_mode = \"agent\"\npermission_posture = \"full-access\"\nshow_thinking = false\nlow_motion = {}\nfancy_animations = {}\ncomposer_border = true\n",
                 case.theme, case.reduced_motion, case.fancy_animations,
@@ -4055,10 +4055,10 @@ fn semantic_activity_motion_crosses_reasoning_reading_and_tool_use_in_a_real_uni
             .cwd(ws.workspace())
             .clear_env()
             .seal_home(ws.home())
-            .env("CODEWHALE_HOME", codewhale_home.to_string_lossy())
+            .env("CODEWHALE_HOME", nestlone_home.to_string_lossy())
             .env(
                 "DEEPSEEK_CONFIG_PATH",
-                codewhale_home.join("config.toml").to_string_lossy(),
+                nestlone_home.join("config.toml").to_string_lossy(),
             )
             .env("CODEX_HOME", codex_home.to_string_lossy())
             .env("CODEWHALE_PROVIDER", "deepseek")

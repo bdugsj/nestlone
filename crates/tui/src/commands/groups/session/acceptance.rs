@@ -329,7 +329,7 @@ fn exported_markdown_contains_active_transcript(world: &mut SessionCommandWorld)
 }
 
 #[then("CodeWhale should defer the session-loaded receipt to the event loop")]
-fn codewhale_defers_session_loaded_receipt(world: &mut SessionCommandWorld) {
+fn nestlone_defers_session_loaded_receipt(world: &mut SessionCommandWorld) {
     assert_eq!(
         world.last_message, None,
         "the command layer must not report success before the event loop applies the load action"
@@ -379,7 +379,7 @@ fn active_session_is_forked_session(world: &mut SessionCommandWorld) {
 }
 
 #[then("CodeWhale should reject the fork because there are no messages")]
-fn codewhale_rejects_empty_fork(world: &mut SessionCommandWorld) {
+fn nestlone_rejects_empty_fork(world: &mut SessionCommandWorld) {
     assert_eq!(
         world.last_result_is_error,
         Some(true),
@@ -490,7 +490,7 @@ fn session_picker_should_be_open(world: &mut SessionCommandWorld) {
 }
 
 #[then("CodeWhale should report that one session was pruned")]
-fn codewhale_reports_one_session_pruned(world: &mut SessionCommandWorld) {
+fn nestlone_reports_one_session_pruned(world: &mut SessionCommandWorld) {
     let message = world
         .last_message
         .as_deref()
@@ -527,7 +527,7 @@ fn stale_session_no_longer_loadable(world: &mut SessionCommandWorld) {
 }
 
 #[then("CodeWhale should trigger context compaction")]
-fn codewhale_triggers_context_compaction(world: &mut SessionCommandWorld) {
+fn nestlone_triggers_context_compaction(world: &mut SessionCommandWorld) {
     assert_eq!(
         world.last_result_is_error,
         Some(false),
@@ -544,7 +544,7 @@ fn codewhale_triggers_context_compaction(world: &mut SessionCommandWorld) {
 }
 
 #[then("CodeWhale should trigger context purge")]
-fn codewhale_triggers_context_purge(world: &mut SessionCommandWorld) {
+fn nestlone_triggers_context_purge(world: &mut SessionCommandWorld) {
     assert_eq!(
         world.last_result_is_error,
         Some(false),
@@ -561,7 +561,7 @@ fn codewhale_triggers_context_purge(world: &mut SessionCommandWorld) {
 }
 
 #[then(regex = r#"^CodeWhale should send a session relay instruction focused on "([^"]+)"$"#)]
-fn codewhale_sends_session_relay_instruction_focused_on(
+fn nestlone_sends_session_relay_instruction_focused_on(
     world: &mut SessionCommandWorld,
     focus: String,
 ) {
@@ -588,7 +588,7 @@ fn codewhale_sends_session_relay_instruction_focused_on(
 }
 
 #[then("CodeWhale should reject the unknown session command")]
-fn codewhale_rejects_unknown_session_command(world: &mut SessionCommandWorld) {
+fn nestlone_rejects_unknown_session_command(world: &mut SessionCommandWorld) {
     assert_eq!(
         world.last_result_is_error,
         Some(true),
@@ -702,7 +702,7 @@ fn execute_isolated(world: &mut SessionCommandWorld, command: &str) -> CommandRe
 
     let _lock = lock_test_env();
     let _home = EnvVarGuard::set("HOME", &home);
-    let _codewhale_home = EnvVarGuard::set("CODEWHALE_HOME", home.join(".codewhale"));
+    let _nestlone_home = EnvVarGuard::set("CODEWHALE_HOME", home.join(".codewhale"));
 
     let app = world.app.as_deref_mut().expect("app should exist");
     commands::user_registry::reload(Some(&app.workspace));
@@ -740,7 +740,7 @@ fn persist_active_session(world: &SessionCommandWorld) {
 
     let _lock = lock_test_env();
     let _home = EnvVarGuard::set("HOME", &home);
-    let _codewhale_home = EnvVarGuard::set("CODEWHALE_HOME", home.join(".codewhale"));
+    let _nestlone_home = EnvVarGuard::set("CODEWHALE_HOME", home.join(".codewhale"));
     let manager = SessionManager::default_location().expect("open isolated session manager");
 
     manager
@@ -773,7 +773,7 @@ fn persist_session_with_age(world: &SessionCommandWorld, session_id: &str, title
 
     let _lock = lock_test_env();
     let _home = EnvVarGuard::set("HOME", &home);
-    let _codewhale_home = EnvVarGuard::set("CODEWHALE_HOME", home.join(".codewhale"));
+    let _nestlone_home = EnvVarGuard::set("CODEWHALE_HOME", home.join(".codewhale"));
     let manager = SessionManager::default_location().expect("open isolated session manager");
 
     manager.save_session(&session).expect("persist session");
@@ -797,7 +797,7 @@ fn try_load_saved_session(
 
     let _lock = lock_test_env();
     let _home = EnvVarGuard::set("HOME", &home);
-    let _codewhale_home = EnvVarGuard::set("CODEWHALE_HOME", home.join(".codewhale"));
+    let _nestlone_home = EnvVarGuard::set("CODEWHALE_HOME", home.join(".codewhale"));
     let manager = SessionManager::default_location().expect("open isolated session manager");
 
     manager.load_session(session_id)

@@ -1002,7 +1002,7 @@ mod tests {
     }
 
     #[test]
-    fn whale_pair_uses_codewhale_semantic_grammar() {
+    fn whale_pair_uses_nestlone_semantic_grammar() {
         assert_eq!(UI_THEME.accent_primary, WHALE_ACTION);
         assert_eq!(UI_THEME.status_working, WHALE_LIVE);
         assert_eq!(UI_THEME.accent_action, WHALE_HUMAN);

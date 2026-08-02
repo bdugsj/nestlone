@@ -66,7 +66,7 @@ fn default_path() -> Option<PathBuf> {
 
     #[cfg(not(test))]
     {
-        codewhale_config::codewhale_home()
+        nestlone_config::nestlone_home()
             .ok()
             .map(|home| home.join("file-frecency.jsonl"))
     }

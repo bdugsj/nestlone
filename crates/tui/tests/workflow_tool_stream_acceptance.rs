@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 use std::process::{Command, Output};
 
-fn codewhale_tui_binary() -> PathBuf {
+fn nestlone_tui_binary() -> PathBuf {
     if let Some(path) = option_env!("CARGO_BIN_EXE_codewhale-tui") {
         return PathBuf::from(path);
     }
@@ -50,7 +50,7 @@ fn assert_terminal_stream_error(output: Output, expected_fragment: &str) {
 
 #[test]
 fn invalid_workflow_input_is_terminal_ndjson() {
-    let output = Command::new(codewhale_tui_binary())
+    let output = Command::new(nestlone_tui_binary())
         .args([
             "workflow-tool",
             "--approval-source",
@@ -68,7 +68,7 @@ fn missing_profile_is_terminal_ndjson() {
     let dir = tempfile::tempdir().expect("tempdir");
     let config = dir.path().join("config.toml");
     std::fs::write(&config, "provider = \"vllm\"\n").expect("write config");
-    let output = Command::new(codewhale_tui_binary())
+    let output = Command::new(nestlone_tui_binary())
         .arg("--config")
         .arg(&config)
         .args([
@@ -103,7 +103,7 @@ provider = "anthropic"
 "#,
     )
     .expect("write profile config");
-    let output = Command::new(codewhale_tui_binary())
+    let output = Command::new(nestlone_tui_binary())
         .arg("--config")
         .arg(&config)
         .args([

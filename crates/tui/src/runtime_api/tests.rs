@@ -559,12 +559,12 @@ fn url_query_component_percent_encodes_token() {
 fn token_from_cookie_header_decodes_percent_encoded_token() {
     assert_eq!(
         token_from_cookie_header(Some(
-            "theme=dark; codewhale_runtime_token=abc%20ABC%2B%2F%3F%3A%3D%26%25"
+            "theme=dark; nestlone_runtime_token=abc%20ABC%2B%2F%3F%3A%3D%26%25"
         )),
         Some("abc ABC+/?:=&%".to_string())
     );
     assert_eq!(
-        token_from_cookie_header(Some("codewhale_runtime_token=bad%ZZ")),
+        token_from_cookie_header(Some("nestlone_runtime_token=bad%ZZ")),
         None
     );
 }
@@ -646,7 +646,7 @@ async fn spawn_test_server_with_root_token_mobile_workspace(
 #[derive(Default)]
 struct TestServerOverrides {
     sub_agent_manager: Option<SharedSubAgentManager>,
-    fleet_codewhale_binary: Option<String>,
+    fleet_nestlone_binary: Option<String>,
     config_path: Option<PathBuf>,
     config_profile: Option<String>,
     web: Option<web::RuntimeWebState>,
@@ -661,7 +661,7 @@ async fn spawn_test_server_with_root_token_mobile_workspace_and_subagents(
     mobile_enabled: bool,
     workspace: PathBuf,
     sub_agent_manager: Option<SharedSubAgentManager>,
-    fleet_codewhale_binary: Option<String>,
+    fleet_nestlone_binary: Option<String>,
 ) -> Result<
     Option<(
         SocketAddr,
@@ -677,7 +677,7 @@ async fn spawn_test_server_with_root_token_mobile_workspace_and_subagents(
         workspace,
         TestServerOverrides {
             sub_agent_manager,
-            fleet_codewhale_binary,
+            fleet_nestlone_binary,
             ..TestServerOverrides::default()
         },
     )
@@ -771,9 +771,9 @@ async fn spawn_test_server_with_root_token_mobile_workspace_and_overrides(
         bind_port: addr.port(),
         mobile_enabled,
         web: overrides.web,
-        fleet_codewhale_binary: overrides
-            .fleet_codewhale_binary
-            .unwrap_or_else(configured_codewhale_binary),
+        fleet_nestlone_binary: overrides
+            .fleet_nestlone_binary
+            .unwrap_or_else(configured_nestlone_binary),
         compat_stream_test_hook: overrides.compat_stream_test_hook,
     };
     let app = build_router(state);
@@ -958,7 +958,7 @@ fn write_fake_fleet_binary(root: &Path, marker: &Path) -> Result<PathBuf> {
     let rustc = std::env::var_os("RUSTC").unwrap_or_else(|| "rustc".into());
     let output = std::process::Command::new(rustc)
         .arg("--edition=2024")
-        .arg("--crate-name=codewhale_fleet_test_helper")
+        .arg("--crate-name=nestlone_fleet_test_helper")
         .arg(&source)
         .arg("-o")
         .arg(&binary)
@@ -1229,20 +1229,20 @@ async fn runtime_token_guard_protects_v1_routes() -> Result<()> {
         .get(format!("http://{addr}/v1/threads/summary"))
         .header(
             header::COOKIE,
-            format!("codewhale_runtime_token={}", url_query_component(&token)),
+            format!("nestlone_runtime_token={}", url_query_component(&token)),
         )
         .send()
         .await?
         .error_for_status()?;
     assert_eq!(cookie_token.status(), StatusCode::OK);
 
-    let codewhale_header = client
+    let nestlone_header = client
         .get(format!("http://{addr}/v1/threads/summary"))
         .header("x-codewhale-runtime-token", &token)
         .send()
         .await?
         .error_for_status()?;
-    assert_eq!(codewhale_header.status(), StatusCode::OK);
+    assert_eq!(nestlone_header.status(), StatusCode::OK);
 
     let deepseek_header = client
         .get(format!("http://{addr}/v1/threads/summary"))
@@ -1323,7 +1323,7 @@ async fn web_bootstrap_sets_strict_cookie_once_and_preserves_v1_auth() -> Result
         .and_then(|value| value.to_str().ok())
         .context("missing bootstrap Set-Cookie")?
         .to_string();
-    assert!(set_cookie.starts_with("codewhale_web_session=cwws_"));
+    assert!(set_cookie.starts_with("nestlone_web_session=cwws_"));
     assert!(set_cookie.ends_with("; HttpOnly; SameSite=Strict; Path=/"));
     assert!(!set_cookie.contains(&token));
 
@@ -1648,13 +1648,13 @@ async fn fleet_status_runtime_api_exposes_state_and_actions() -> Result<()> {
     let manager = FleetManager::open(&workspace)?
         .with_sub_agent_manager(sub_agent_manager.clone())
         .with_session_model(DEFAULT_TEXT_MODEL);
-    let task = codewhale_protocol::fleet::FleetTaskSpec {
+    let task = nestlone_protocol::fleet::FleetTaskSpec {
         id: "task-a".to_string(),
         name: "Task A".to_string(),
         description: None,
         objective: Some("Inspect fleet status through Runtime API".to_string()),
         instructions: "Stay running for inspection.".to_string(),
-        worker: Some(codewhale_protocol::fleet::FleetTaskWorkerProfile {
+        worker: Some(nestlone_protocol::fleet::FleetTaskWorkerProfile {
             agent_profile: None,
             role: Some("reviewer".to_string()),
             loadout: None,
@@ -4862,7 +4862,7 @@ async fn runtime_info_reports_bind_state() -> Result<()> {
         .await?;
     assert_eq!(info["service"], "codewhale-runtime-api");
     assert_eq!(info["runtime_api_version"], "1.0");
-    assert_eq!(info["codewhale_version"], info["version"]);
+    assert_eq!(info["nestlone_version"], info["version"]);
     assert_eq!(info["bind_host"], "127.0.0.1");
     assert_eq!(info["auth_required"], false);
     assert!(info["version"].is_string());
@@ -5422,40 +5422,40 @@ fn resolve_skills_dir_finds_workspace_local_skills_fallback() {
 }
 
 #[test]
-fn resolve_skills_dir_respects_codewhale_only_scan() {
+fn resolve_skills_dir_respects_nestlone_only_scan() {
     let tmp = tempfile::tempdir().expect("tempdir");
     let workspace = tmp.path();
     let agents_skills = workspace.join(".agents").join("skills");
-    let codewhale_skills = workspace.join(".codewhale").join("skills");
+    let nestlone_skills = workspace.join(".codewhale").join("skills");
     fs::create_dir_all(&agents_skills).expect("create agents skills dir");
-    fs::create_dir_all(&codewhale_skills).expect("create codewhale skills dir");
+    fs::create_dir_all(&nestlone_skills).expect("create codewhale skills dir");
 
     let config = Config {
         skills: Some(crate::config::SkillsConfig {
-            scan_codewhale_only: Some(true),
+            scan_nestlone_only: Some(true),
             ..Default::default()
         }),
         ..Default::default()
     };
     let resolved = resolve_skills_dir(&config, workspace);
 
-    let expected = fs::canonicalize(&codewhale_skills).expect("canonical codewhale skills");
+    let expected = fs::canonicalize(&nestlone_skills).expect("canonical codewhale skills");
     assert_eq!(resolved, expected);
 }
 
 #[test]
-fn resolve_skills_dir_preserves_explicit_dir_in_codewhale_only_scan() {
+fn resolve_skills_dir_preserves_explicit_dir_in_nestlone_only_scan() {
     let tmp = tempfile::tempdir().expect("tempdir");
     let workspace = tmp.path().join("workspace");
-    let codewhale_skills = workspace.join(".codewhale").join("skills");
+    let nestlone_skills = workspace.join(".codewhale").join("skills");
     let configured_skills = tmp.path().join("configured-skills");
-    fs::create_dir_all(&codewhale_skills).expect("create codewhale skills dir");
+    fs::create_dir_all(&nestlone_skills).expect("create codewhale skills dir");
     fs::create_dir_all(&configured_skills).expect("create configured skills dir");
 
     let config = Config {
         skills_dir: Some(configured_skills.to_string_lossy().into_owned()),
         skills: Some(crate::config::SkillsConfig {
-            scan_codewhale_only: Some(true),
+            scan_nestlone_only: Some(true),
             ..Default::default()
         }),
         ..Default::default()
@@ -5581,7 +5581,7 @@ fn resolve_skills_dir_rejects_symlink_escaping_workspace() {
 
 #[cfg(unix)]
 #[test]
-fn resolve_skills_dir_rejects_codewhale_only_symlink_escaping_workspace() {
+fn resolve_skills_dir_rejects_nestlone_only_symlink_escaping_workspace() {
     let tmp = tempfile::tempdir().expect("tempdir");
     let _env_lock = crate::test_support::lock_test_env();
     let _home = crate::test_support::EnvVarGuard::set("HOME", tmp.path());
@@ -5598,7 +5598,7 @@ fn resolve_skills_dir_rejects_codewhale_only_symlink_escaping_workspace() {
 
     let config = Config {
         skills: Some(crate::config::SkillsConfig {
-            scan_codewhale_only: Some(true),
+            scan_nestlone_only: Some(true),
             ..Default::default()
         }),
         ..Default::default()
@@ -5786,7 +5786,7 @@ async fn set_config_with_config_path_writes_to_specified_file() -> Result<()> {
 
     // Persist a subagents_max_depth value above the ceiling to also verify
     // clamping (Fix #1).
-    let over_ceiling = u64::from(codewhale_config::MAX_SPAWN_DEPTH_CEILING) + 10;
+    let over_ceiling = u64::from(nestlone_config::MAX_SPAWN_DEPTH_CEILING) + 10;
     let (status, body) = post_set_config(
         &client,
         &addr,
@@ -5815,7 +5815,7 @@ async fn set_config_with_config_path_writes_to_specified_file() -> Result<()> {
     // The value should be clamped to MAX_SPAWN_DEPTH_CEILING.
     let expected = format!(
         "max_depth = {}",
-        u64::from(codewhale_config::MAX_SPAWN_DEPTH_CEILING)
+        u64::from(nestlone_config::MAX_SPAWN_DEPTH_CEILING)
     );
     assert!(
         contents.contains(&expected),
@@ -6090,7 +6090,7 @@ async fn reload_config_reads_from_config_path_and_updates_in_memory_state() -> R
         .expect("subagents_max_depth should be a number");
     assert_eq!(
         initial_depth,
-        u64::from(codewhale_config::DEFAULT_SPAWN_DEPTH),
+        u64::from(nestlone_config::DEFAULT_SPAWN_DEPTH),
         "initial subagents_max_depth should be DEFAULT_SPAWN_DEPTH"
     );
 
@@ -6789,7 +6789,7 @@ async fn set_config_subagents_max_depth_below_ceiling_not_clamped() -> Result<()
     let client = crate::tls::reqwest_client();
 
     // Test a value at the ceiling (should not be clamped).
-    let ceiling = u64::from(codewhale_config::MAX_SPAWN_DEPTH_CEILING);
+    let ceiling = u64::from(nestlone_config::MAX_SPAWN_DEPTH_CEILING);
     let (status, body) = post_set_config(
         &client,
         &addr,

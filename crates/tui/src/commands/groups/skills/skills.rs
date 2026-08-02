@@ -24,7 +24,7 @@ fn discover_visible_skills(app: &App) -> SkillRegistry {
     crate::skills::discover_for_workspace_and_dir_with_mode_and_plugins(
         &app.workspace,
         &app.skills_dir,
-        crate::skills::SkillDiscoveryMode::from_codewhale_only(app.skills_scan_codewhale_only),
+        crate::skills::SkillDiscoveryMode::from_nestlone_only(app.skills_scan_nestlone_only),
         Some(app.plugin_registry.as_ref()),
     )
     .into_enabled()
@@ -33,7 +33,7 @@ fn discover_visible_skills(app: &App) -> SkillRegistry {
 #[cfg(test)]
 fn discover_visible_skills(app: &App) -> SkillRegistry {
     let mode =
-        crate::skills::SkillDiscoveryMode::from_codewhale_only(app.skills_scan_codewhale_only);
+        crate::skills::SkillDiscoveryMode::from_nestlone_only(app.skills_scan_nestlone_only);
     TEST_HOME_DIR
         .with(|home| {
             if let Some(home) = home.borrow().as_deref() {
@@ -70,7 +70,7 @@ fn render_skill_warnings(registry: &SkillRegistry) -> String {
 }
 
 fn skill_discovery_mode(app: &App) -> crate::skills::SkillDiscoveryMode {
-    crate::skills::SkillDiscoveryMode::from_codewhale_only(app.skills_scan_codewhale_only)
+    crate::skills::SkillDiscoveryMode::from_nestlone_only(app.skills_scan_nestlone_only)
 }
 
 fn skill_discovery_mode_label(mode: crate::skills::SkillDiscoveryMode) -> &'static str {
@@ -1367,7 +1367,7 @@ mod tests {
     }
 
     #[test]
-    fn test_list_skills_respects_codewhale_only_scan() {
+    fn test_list_skills_respects_nestlone_only_scan() {
         let tmpdir = TempDir::new().unwrap();
         let _home = IsolatedHome::new(&tmpdir);
         let claude_skill_dir = tmpdir
@@ -1381,21 +1381,21 @@ mod tests {
             "---\nname: claude-skill\ndescription: Claude skill\n---\nbody",
         )
         .unwrap();
-        let codewhale_skill_dir = tmpdir
+        let nestlone_skill_dir = tmpdir
             .path()
             .join(".codewhale")
             .join("skills")
             .join("codewhale-skill");
-        std::fs::create_dir_all(&codewhale_skill_dir).unwrap();
+        std::fs::create_dir_all(&nestlone_skill_dir).unwrap();
         std::fs::write(
-            codewhale_skill_dir.join("SKILL.md"),
+            nestlone_skill_dir.join("SKILL.md"),
             "---\nname: codewhale-skill\ndescription: CodeWhale skill\n---\nbody",
         )
         .unwrap();
 
         let mut app = create_test_app_with_tmpdir(&tmpdir);
         app.skills_dir = tmpdir.path().join(".codewhale").join("skills");
-        app.skills_scan_codewhale_only = true;
+        app.skills_scan_nestlone_only = true;
         let result = list_skills(&mut app, Some(""));
         let msg = result.message.unwrap();
 
@@ -1404,7 +1404,7 @@ mod tests {
     }
 
     #[test]
-    fn test_skills_inspect_reports_codewhale_only_scan_mode() {
+    fn test_skills_inspect_reports_nestlone_only_scan_mode() {
         let tmpdir = TempDir::new().unwrap();
         let _home = IsolatedHome::new(&tmpdir);
         let claude_skill_dir = tmpdir
@@ -1418,21 +1418,21 @@ mod tests {
             "---\nname: claude-skill\ndescription: Claude skill\n---\nbody",
         )
         .unwrap();
-        let codewhale_skill_dir = tmpdir
+        let nestlone_skill_dir = tmpdir
             .path()
             .join(".codewhale")
             .join("skills")
             .join("codewhale-skill");
-        std::fs::create_dir_all(&codewhale_skill_dir).unwrap();
+        std::fs::create_dir_all(&nestlone_skill_dir).unwrap();
         std::fs::write(
-            codewhale_skill_dir.join("SKILL.md"),
+            nestlone_skill_dir.join("SKILL.md"),
             "---\nname: codewhale-skill\ndescription: CodeWhale skill\n---\nbody",
         )
         .unwrap();
 
         let mut app = create_test_app_with_tmpdir(&tmpdir);
         app.skills_dir = tmpdir.path().join(".codewhale").join("skills");
-        app.skills_scan_codewhale_only = true;
+        app.skills_scan_nestlone_only = true;
         let result = list_skills(&mut app, Some("--inspect"));
         let msg = result.message.expect("inspect should return a message");
 

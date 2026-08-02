@@ -31,11 +31,11 @@ use crate::fleet_snapshot::QualifiedFleetId;
 /// One labelled place fleet files are looked up.
 ///
 /// The label is what makes a Fleet identity *qualified*: `workspace/glm-pair`
-/// and `codewhale_home/glm-pair` are different Fleets, and the loader refuses
+/// and `nestlone_home/glm-pair` are different Fleets, and the loader refuses
 /// to guess between them for exact definitions.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct FleetSearchRoot {
-    /// Non-secret origin label, e.g. `workspace` or `codewhale_home`.
+    /// Non-secret origin label, e.g. `workspace` or `nestlone_home`.
     pub origin: String,
     /// Directory that contains a `fleets/` subdirectory.
     pub root: PathBuf,

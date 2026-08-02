@@ -82,7 +82,7 @@ async fn mount_models(server: &MockServer) {
 struct Fixture {
     _root: TempDir,
     home: PathBuf,
-    codewhale_home: PathBuf,
+    nestlone_home: PathBuf,
     workspace: PathBuf,
     config_path: PathBuf,
     mcp_config_path: PathBuf,
@@ -94,9 +94,9 @@ impl Fixture {
     fn new(base_url: &str) -> Self {
         let root = TempDir::new().expect("fixture root");
         let home = root.path().join("home");
-        let codewhale_home = root.path().join("codewhale-home");
+        let nestlone_home = root.path().join("codewhale-home");
         let workspace = root.path().join("workspace");
-        for dir in [&home, &codewhale_home, &workspace] {
+        for dir in [&home, &nestlone_home, &workspace] {
             std::fs::create_dir_all(dir).expect("create fixture dir");
         }
 
@@ -119,7 +119,7 @@ impl Fixture {
         Fixture {
             _root: root,
             home,
-            codewhale_home,
+            nestlone_home,
             workspace,
             config_path,
             mcp_config_path,
@@ -160,7 +160,7 @@ impl Fixture {
             "sentinel secret must never appear in argv"
         );
 
-        let mut command = Command::new(codewhale_tui_binary());
+        let mut command = Command::new(nestlone_tui_binary());
         preserve_host_env(&mut command);
         command
             .current_dir(&self.workspace)
@@ -170,7 +170,7 @@ impl Fixture {
             .env("XDG_CONFIG_HOME", self.home.join(".config"))
             .env("XDG_DATA_HOME", self.home.join(".local").join("share"))
             .env("XDG_CACHE_HOME", self.home.join(".cache"))
-            .env("CODEWHALE_HOME", &self.codewhale_home)
+            .env("CODEWHALE_HOME", &self.nestlone_home)
             .env("CODEWHALE_SECRET_BACKEND", "file")
             .env("CODEWHALE_MEMORY", "false")
             .env("CODEWHALE_TELEMETRY", "false")
@@ -189,7 +189,7 @@ impl Fixture {
     /// Every regular file under the sealed roots, for secret-leak scanning.
     fn written_files(&self) -> Vec<PathBuf> {
         let mut out = Vec::new();
-        for base in [&self.home, &self.codewhale_home, &self.workspace] {
+        for base in [&self.home, &self.nestlone_home, &self.workspace] {
             collect_files(base, &mut out);
         }
         out.push(self.config_path.clone());
@@ -283,7 +283,7 @@ fn preserve_host_env(command: &mut Command) {
     }
 }
 
-fn codewhale_tui_binary() -> PathBuf {
+fn nestlone_tui_binary() -> PathBuf {
     if let Some(path) = option_env!("CARGO_BIN_EXE_codewhale-tui") {
         return PathBuf::from(path);
     }

@@ -61,7 +61,7 @@ fn workspace_dotenv_cannot_redirect_config_or_spawn_mcp() {
     )
     .expect("write malicious dotenv");
 
-    let output = Command::new(codewhale_tui_binary())
+    let output = Command::new(nestlone_tui_binary())
         .current_dir(&workspace)
         .args(["--workspace", workspace.to_str().expect("UTF-8 workspace")])
         .args(["mcp", "connect", "attacker"])
@@ -104,7 +104,7 @@ fn malicious_mcp_helper() {
     std::fs::write(marker, b"spawned").expect("write attack marker");
 }
 
-fn codewhale_tui_binary() -> PathBuf {
+fn nestlone_tui_binary() -> PathBuf {
     if let Some(path) = option_env!("CARGO_BIN_EXE_codewhale-tui") {
         return PathBuf::from(path);
     }

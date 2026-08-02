@@ -33,8 +33,8 @@ use crate::tools::apply_patch::{NormalizedApplyPatchInput, normalize_apply_patch
 use crate::tools::canonical_action::canonical_action_alias;
 use crate::tui::views::{ModalKind, ModalView, ViewAction, ViewEvent};
 use crate::tui::widgets::{ApprovalWidget, ElevationWidget, Renderable};
-use codewhale_config::ToolAskRule;
-use codewhale_execpolicy::PermissionAction;
+use nestlone_config::ToolAskRule;
+use nestlone_execpolicy::PermissionAction;
 use crossterm::event::{KeyCode, KeyEvent, MouseButton, MouseEvent, MouseEventKind};
 use ratatui::layout::Rect;
 use serde_json::Value;
@@ -345,7 +345,7 @@ impl ApprovalRequest {
         if self.persistent_ask_rules.is_empty() {
             return None;
         }
-        let permissions = codewhale_config::PermissionsToml {
+        let permissions = nestlone_config::PermissionsToml {
             rules: self.persistent_ask_rules.clone(),
         };
         toml::to_string_pretty(&permissions).ok()
@@ -478,7 +478,7 @@ fn build_persistent_allow_rules(
     }
 
     let workspace = workspace.to_string_lossy();
-    let Some(workspace) = codewhale_execpolicy::normalize_workspace_scope(workspace.as_ref())
+    let Some(workspace) = nestlone_execpolicy::normalize_workspace_scope(workspace.as_ref())
     else {
         return Vec::new();
     };
@@ -524,7 +524,7 @@ fn build_file_write_ask_rules(
     // preview stay disabled.
     let workspace = workspace.to_string_lossy();
     let Some(relative) =
-        codewhale_execpolicy::normalize_workspace_relative_path(path, workspace.as_ref())
+        nestlone_execpolicy::normalize_workspace_relative_path(path, workspace.as_ref())
             .filter(|relative| !relative.is_empty())
     else {
         return Vec::new();
@@ -542,7 +542,7 @@ fn build_apply_patch_ask_rules(params: &Value, workspace: &Path) -> Vec<ToolAskR
 
     for path in preflight.touched_files {
         let Some(relative) =
-            codewhale_execpolicy::normalize_workspace_relative_path(&path, workspace.as_ref())
+            nestlone_execpolicy::normalize_workspace_relative_path(&path, workspace.as_ref())
                 .filter(|relative| !relative.is_empty())
         else {
             return Vec::new();

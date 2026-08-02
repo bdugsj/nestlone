@@ -7,7 +7,7 @@ use serde_json::json;
 
 use super::RuntimeApiState;
 
-const RUNTIME_TOKEN_COOKIE: &str = "codewhale_runtime_token";
+const RUNTIME_TOKEN_COOKIE: &str = "nestlone_runtime_token";
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(super) struct ResolvedRuntimeAuth {

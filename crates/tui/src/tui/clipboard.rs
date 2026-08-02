@@ -889,7 +889,7 @@ mod tests {
     }
 
     #[test]
-    fn clipboard_images_dir_uses_codewhale_home_directory() {
+    fn clipboard_images_dir_uses_nestlone_home_directory() {
         let home = tempfile::tempdir().unwrap();
         let workspace = tempfile::tempdir().unwrap();
 

@@ -10,7 +10,7 @@ use crate::route_runtime::ResolvedRuntimeRoute;
 use crate::tools::goal::GoalStatus;
 use crate::tui::app::AppMode;
 use crate::tui::approval::ApprovalMode;
-use codewhale_protocol::runtime::DynamicToolSpec;
+use nestlone_protocol::runtime::DynamicToolSpec;
 use std::path::PathBuf;
 
 /// Prefix used for tool-call ids created by local composer shell shortcuts.
@@ -216,7 +216,7 @@ pub enum Op {
     SetModel {
         model: String,
         mode: AppMode,
-        route_limits: Option<codewhale_config::route::RouteLimits>,
+        route_limits: Option<nestlone_config::route::RouteLimits>,
     },
 
     /// Update auto-compaction settings
@@ -225,7 +225,7 @@ pub enum Op {
     /// Replace the live user permission rules without clearing session-only
     /// approvals.
     SetPermissionRuleset {
-        ruleset: codewhale_execpolicy::Ruleset,
+        ruleset: nestlone_execpolicy::Ruleset,
     },
 
     /// Update the SSE idle timeout used for subsequent streamed turns.

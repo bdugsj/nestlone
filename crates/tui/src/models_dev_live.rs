@@ -19,11 +19,11 @@ use std::path::{Path, PathBuf};
 use std::sync::RwLock;
 use std::time::Duration;
 
-use codewhale_config::catalog::{
+use nestlone_config::catalog::{
     CatalogSnapshot, base_url_fingerprint, live_offerings_from_models_dev, now_unix,
 };
-use codewhale_config::models_dev::{MODELS_DEV_CATALOG_URL, ModelsDevCatalog};
-use codewhale_config::persistence::atomic_write;
+use nestlone_config::models_dev::{MODELS_DEV_CATALOG_URL, ModelsDevCatalog};
+use nestlone_config::persistence::atomic_write;
 use serde::{Deserialize, Serialize};
 
 /// Default TTL for a live Models.dev snapshot (24h, #4187 / #4114).
@@ -120,7 +120,7 @@ impl std::fmt::Display for ModelsDevRefreshError {
 /// Resolve the on-disk cache path under the CodeWhale `catalog` state dir.
 #[must_use]
 pub fn cache_path() -> Option<PathBuf> {
-    codewhale_config::resolve_state_dir("catalog")
+    nestlone_config::resolve_state_dir("catalog")
         .ok()
         .map(|dir| dir.join(CACHE_FILE))
 }
@@ -410,7 +410,7 @@ fn save_cache_file(
 #[cfg(test)]
 pub(crate) fn offerings_from_json_for_test(
     body: &str,
-) -> Result<Vec<codewhale_config::catalog::CatalogOffering>, String> {
+) -> Result<Vec<nestlone_config::catalog::CatalogOffering>, String> {
     let catalog = ModelsDevCatalog::parse_json(body).map_err(|e| e.to_string())?;
     Ok(live_offerings_from_models_dev(
         &catalog,
@@ -425,7 +425,7 @@ mod tests {
     use crate::config::ApiProvider;
     use crate::provider_lake::{all_catalog_models_for_provider, clear_live_snapshot};
     use crate::test_support::{EnvVarGuard, lock_test_env};
-    use codewhale_config::catalog::CatalogSource;
+    use nestlone_config::catalog::CatalogSource;
 
     const FIXTURE: &str = r#"{
       "models": {},

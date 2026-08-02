@@ -15,8 +15,8 @@ use std::sync::{Arc, Mutex as StdMutex};
 use std::time::{Duration, Instant, SystemTime};
 
 use anyhow::Result;
-use codewhale_execpolicy::{AskForApproval, ExecPolicyContext};
-use codewhale_protocol::runtime::DynamicToolSpec;
+use nestlone_execpolicy::{AskForApproval, ExecPolicyContext};
+use nestlone_protocol::runtime::DynamicToolSpec;
 use futures_util::StreamExt;
 use futures_util::stream::FuturesUnordered;
 use serde_json::{Value, json};
@@ -211,7 +211,7 @@ pub struct EngineConfig {
     pub model: String,
     /// Route/offering limits for the active provider+model, when the runtime
     /// route resolver had concrete catalog facts.
-    pub active_route_limits: Option<codewhale_config::route::RouteLimits>,
+    pub active_route_limits: Option<nestlone_config::route::RouteLimits>,
     /// Workspace root for tool execution and file operations.
     pub workspace: PathBuf,
     /// Allow shell tool execution when true.
@@ -226,7 +226,7 @@ pub struct EngineConfig {
     pub skills_dir: PathBuf,
     /// Restrict skill discovery to CodeWhale-owned roots plus explicit
     /// `skills_dir` configuration.
-    pub skills_scan_codewhale_only: bool,
+    pub skills_scan_nestlone_only: bool,
     /// Immutable plugin authority snapshot scoped to `workspace`. Normal App
     /// hosts provide this explicitly; headless/embed callers that leave it
     /// unset receive a fresh workspace-specific snapshot in [`Engine::new`].
@@ -380,7 +380,7 @@ pub struct EngineConfig {
     /// `workspace_follow_symlinks` setting.
     pub workspace_follow_symlinks: bool,
     /// Ask-only permission rules loaded from sibling `permissions.toml`.
-    pub exec_policy_engine: codewhale_execpolicy::ExecPolicyEngine,
+    pub exec_policy_engine: nestlone_execpolicy::ExecPolicyEngine,
     /// Whether turn startup may write terminal title/taskbar OSC sequences.
     /// Interactive TUI sessions enable this; headless and machine-readable
     /// hosts disable it so stdout remains protocol-clean.
@@ -398,7 +398,7 @@ impl Default for EngineConfig {
             notes_path: PathBuf::from("notes.txt"),
             mcp_config_path: PathBuf::from("mcp.json"),
             skills_dir: crate::skills::default_skills_dir(),
-            skills_scan_codewhale_only: false,
+            skills_scan_nestlone_only: false,
             plugin_registry: None,
             instructions: Vec::new(),
             project_context_pack_enabled: false,
@@ -461,7 +461,7 @@ impl Default for EngineConfig {
             verbosity: None,
             tools: None,
             workspace_follow_symlinks: false,
-            exec_policy_engine: codewhale_execpolicy::ExecPolicyEngine::new(Vec::new(), Vec::new()),
+            exec_policy_engine: nestlone_execpolicy::ExecPolicyEngine::new(Vec::new(), Vec::new()),
             terminal_chrome_enabled: true,
         }
     }
@@ -568,8 +568,8 @@ pub struct Engine {
     /// Additive exact provider id. `None` preserves the legacy root-literal
     /// custom route across snapshots and config reloads.
     api_provider_id: Option<String>,
-    active_route_limits: Option<codewhale_config::route::RouteLimits>,
-    active_route_capabilities: codewhale_config::route::RouteCapabilities,
+    active_route_limits: Option<nestlone_config::route::RouteLimits>,
+    active_route_capabilities: nestlone_config::route::RouteCapabilities,
     rx_op: mpsc::Receiver<Op>,
     /// Clone of the op-channel sender, so the engine can self-dispatch ops
     /// (e.g. a goal-continuation `SendMessage` after a turn completes).
@@ -1084,7 +1084,7 @@ impl Engine {
                     ),
                     show_thinking: config.show_thinking,
                     verbosity: config.verbosity.as_deref(),
-                    skills_scan_codewhale_only: config.skills_scan_codewhale_only,
+                    skills_scan_nestlone_only: config.skills_scan_nestlone_only,
                     plugin_registry: Some(plugin_registry.as_ref()),
                     // Matches `current_mode`'s initial value below; a later
                     // `/mode` switch re-runs `refresh_system_prompt`.
@@ -1171,7 +1171,7 @@ impl Engine {
             api_provider_identity,
             api_provider_id,
             active_route_limits,
-            active_route_capabilities: codewhale_config::route::RouteCapabilities::default(),
+            active_route_capabilities: nestlone_config::route::RouteCapabilities::default(),
             rx_op,
             tx_op: tx_op.clone(),
             scheduled_goal_continuation: None,
@@ -1609,7 +1609,7 @@ impl Engine {
         // exact configured-secret redactor when available; that helper also
         // applies the config persistence redactor as a universal backstop.
         let detail = self.deepseek_client.as_ref().map_or_else(
-            || codewhale_config::persistence::redact_secrets(detail),
+            || nestlone_config::persistence::redact_secrets(detail),
             |client| client.redact_model_bound_text(detail),
         );
         Some(crate::utils::truncate_with_ellipsis(
@@ -2123,7 +2123,7 @@ impl Engine {
                         // route candidate, so old provider/model capability
                         // facts must not bleed into the new model.
                         self.active_route_capabilities =
-                            codewhale_config::route::RouteCapabilities::default();
+                            nestlone_config::route::RouteCapabilities::default();
                         self.refresh_system_prompt();
                         self.emit_session_updated().await;
                         let _ = self
@@ -2171,7 +2171,7 @@ impl Engine {
                         self.config.launch_concurrency =
                             launch_concurrency.clamp(1, self.config.max_subagents);
                         self.config.max_spawn_depth =
-                            max_spawn_depth.min(codewhale_config::MAX_SPAWN_DEPTH_CEILING);
+                            max_spawn_depth.min(nestlone_config::MAX_SPAWN_DEPTH_CEILING);
                         self.config.subagent_api_timeout = Duration::from_secs(api_timeout_secs);
                         self.config.subagent_heartbeat_timeout =
                             Duration::from_secs(heartbeat_timeout_secs);
@@ -2320,7 +2320,7 @@ impl Engine {
                     }
                     Op::ReloadMcp { config_path, tx } => {
                         let result = self.reload_mcp_pool(config_path).await.map_err(|error| {
-                            codewhale_config::persistence::redact_secrets(&format!("{error:#}"))
+                            nestlone_config::persistence::redact_secrets(&format!("{error:#}"))
                         });
                         if let Some(tx) = tx.lock().ok().and_then(|mut guard| guard.take()) {
                             let _ = tx.send(result);
@@ -4600,7 +4600,7 @@ impl Engine {
         .with_runtime_services(self.config.runtime_services.clone())
         .with_skills_config(
             self.config.skills_dir.clone(),
-            self.config.skills_scan_codewhale_only,
+            self.config.skills_scan_nestlone_only,
         )
         .with_plugin_registry(Arc::clone(&self.plugin_registry))
         .with_session_objects(crate::rlm::session::SessionObjectSnapshot::new(
@@ -4906,7 +4906,7 @@ impl Engine {
                 )),
                 show_thinking: context.show_thinking,
                 verbosity: context.verbosity.as_deref(),
-                skills_scan_codewhale_only: self.config.skills_scan_codewhale_only,
+                skills_scan_nestlone_only: self.config.skills_scan_nestlone_only,
                 plugin_registry: Some(self.plugin_registry.as_ref()),
                 mode: context.mode,
             },
@@ -5025,7 +5025,7 @@ fn strip_active_operation_reanchor(prompt: Option<&SystemPrompt>) -> Option<Syst
 }
 
 fn default_plugin_tools_dir() -> PathBuf {
-    codewhale_config::codewhale_home()
+    nestlone_config::nestlone_home()
         .unwrap_or_else(|_| {
             crate::config::effective_home_dir()
                 .map_or_else(|| PathBuf::from(".codewhale"), |h| h.join(".codewhale"))
@@ -5326,7 +5326,7 @@ fn tool_ask_rule_decision_for_context(
         Some(ToolAskRuleDecision::Block(decision.reason().to_string()))
     } else if decision.requires_approval {
         Some(ToolAskRuleDecision::Prompt(decision.reason().to_string()))
-    } else if decision.matched_action == Some(codewhale_execpolicy::PermissionAction::Allow) {
+    } else if decision.matched_action == Some(nestlone_execpolicy::PermissionAction::Allow) {
         Some(ToolAskRuleDecision::Allow)
     } else {
         None
@@ -5518,7 +5518,7 @@ pub(crate) struct TurnMetadataSnapshot<'a> {
 pub(crate) struct NextTurnPromptContext {
     pub(crate) provider: ApiProvider,
     pub(crate) model: String,
-    pub(crate) route_limits: Option<codewhale_config::route::RouteLimits>,
+    pub(crate) route_limits: Option<nestlone_config::route::RouteLimits>,
     pub(crate) mode: AppMode,
     pub(crate) goal_objective: Option<String>,
     pub(crate) goal_token_budget: Option<u32>,
@@ -5532,7 +5532,7 @@ impl NextTurnPromptContext {
     pub(crate) fn for_planned_turn(
         provider: ApiProvider,
         model: String,
-        route_limits: Option<codewhale_config::route::RouteLimits>,
+        route_limits: Option<nestlone_config::route::RouteLimits>,
         mode: AppMode,
         goal_objective: Option<String>,
         goal_status: GoalStatus,
@@ -5623,8 +5623,8 @@ pub(crate) struct TurnToolBuild {
 pub(crate) struct TurnRouteContext {
     pub(crate) provider: ApiProvider,
     pub(crate) model: String,
-    pub(crate) capabilities: codewhale_config::route::RouteCapabilities,
-    pub(crate) limits: Option<codewhale_config::route::RouteLimits>,
+    pub(crate) capabilities: nestlone_config::route::RouteCapabilities,
+    pub(crate) limits: Option<nestlone_config::route::RouteLimits>,
     /// Client for this exact route. Tool contexts use it only for
     /// provider-native helper capabilities; previews pass their throw-away
     /// planned client instead of inheriting the installed session client.

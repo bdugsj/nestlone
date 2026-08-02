@@ -175,7 +175,7 @@ fn durable_path(name: &str, workspace: &Path) -> Result<PathBuf, String> {
     #[cfg(test)]
     let state_dir = workspace.join(".codewhale-test-terminal-sessions");
     #[cfg(not(test))]
-    let state_dir = codewhale_config::ensure_state_dir("terminal-sessions")
+    let state_dir = nestlone_config::ensure_state_dir("terminal-sessions")
         .map_err(|error| format!("failed to resolve terminal session state directory: {error}"))?;
     std::fs::create_dir_all(&state_dir)
         .map_err(|error| format!("failed to create terminal session state directory: {error}"))?;

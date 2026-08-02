@@ -4,7 +4,7 @@
 //!
 //! No live provider calls: the router's response is a fixture string.
 
-use codewhale_workflow::{
+use nestlone_workflow::{
     CapturedReasoningRouter, CredentialReadiness, EffectiveReasoning, EffectiveReasoningSource,
     EndpointIdentity, FleetDocument, FleetSearchRoot, FleetSnapshot, NamedFleetError,
     PermissionCeiling, PreflightedRoute, ProviderEffectiveReasoning, QualifiedFleetId,
@@ -253,7 +253,7 @@ fn a_router_defined_in_two_origins_is_ambiguous_until_qualified() {
     .expect("workspace");
 
     let roots = vec![
-        FleetSearchRoot::new("codewhale_home", &home),
+        FleetSearchRoot::new("nestlone_home", &home),
         FleetSearchRoot::new("workspace", &workspace),
     ];
 
@@ -272,7 +272,7 @@ fn a_router_defined_in_two_origins_is_ambiguous_until_qualified() {
         "gpt-5.6-luna"
     );
     assert_eq!(
-        ReasoningRouterProfile::load_by_name("codewhale_home/luna-low", &roots)
+        ReasoningRouterProfile::load_by_name("nestlone_home/luna-low", &roots)
             .expect("qualified")
             .0
             .model,
@@ -410,10 +410,10 @@ fn member_ceilings_clamp_against_a_read_only_session_posture() {
 fn the_routing_summary_is_transmitted_once_and_disclosed_without_content() {
     let payload = bounded_routing_payload("refactor the parser in /Users/hunter/app");
     let disclosure = payload.disclosure().clone();
-    let input = codewhale_workflow::RouterCallInput {
+    let input = nestlone_workflow::RouterCallInput {
         fleet: "workspace/glm-pair".to_string(),
         member_id: "implementer".to_string(),
-        frozen: codewhale_workflow::FrozenRoute {
+        frozen: nestlone_workflow::FrozenRoute {
             provider: "zai".to_string(),
             model: "glm-5".to_string(),
         },
@@ -474,7 +474,7 @@ fn an_exact_fleet_defined_in_two_origins_is_ambiguous_until_qualified() {
     std::fs::write(workspace.join("fleets/glm-pair.toml"), GLM_FLEET).expect("workspace fleet");
 
     let roots = vec![
-        FleetSearchRoot::new("codewhale_home", &home),
+        FleetSearchRoot::new("nestlone_home", &home),
         FleetSearchRoot::new("workspace", &workspace),
     ];
 
@@ -499,8 +499,8 @@ fn an_exact_fleet_defined_in_two_origins_is_ambiguous_until_qualified() {
     );
 
     let (home_document, home_id) =
-        FleetDocument::load_by_name("codewhale_home/glm-pair", &roots).expect("qualified load");
-    assert_eq!(home_id.qualified(), "codewhale_home/glm-pair");
+        FleetDocument::load_by_name("nestlone_home/glm-pair", &roots).expect("qualified load");
+    assert_eq!(home_id.qualified(), "nestlone_home/glm-pair");
     assert_eq!(
         home_document
             .exact()
@@ -536,14 +536,14 @@ fn legacy_fleets_in_two_origins_keep_first_hit_wins() {
     let (document, id) = FleetDocument::load_by_name(
         "pair",
         &[
-            FleetSearchRoot::new("codewhale_home", &home),
+            FleetSearchRoot::new("nestlone_home", &home),
             FleetSearchRoot::new("workspace", &workspace),
         ],
     )
     .expect("legacy collisions stay resolvable");
 
     assert!(document.is_legacy());
-    assert_eq!(id.origin, "codewhale_home");
+    assert_eq!(id.origin, "nestlone_home");
     assert_eq!(
         document.legacy().expect("legacy").resolve("scout").unwrap(),
         "home-scout"
@@ -574,13 +574,13 @@ fn a_malformed_shadowed_sibling_does_not_regress_legacy_first_hit() {
     let (document, id) = FleetDocument::load_by_name(
         "pair",
         &[
-            FleetSearchRoot::new("codewhale_home", &home),
+            FleetSearchRoot::new("nestlone_home", &home),
             FleetSearchRoot::new("workspace", &workspace),
         ],
     )
     .expect("a broken shadowed sibling must not break first-hit-wins");
 
-    assert_eq!(id.origin, "codewhale_home");
+    assert_eq!(id.origin, "nestlone_home");
     assert_eq!(
         document.legacy().expect("legacy").resolve("scout").unwrap(),
         "home-scout"
@@ -614,7 +614,7 @@ fn a_legacy_inline_router_still_works_and_normalizes() {
     );
     let document = FleetDocument::parse(&inline).expect("legacy inline parses");
     let exact = document.exact().expect("exact");
-    let captured = codewhale_workflow::captured_legacy_inline_router(exact).expect("inline router");
+    let captured = nestlone_workflow::captured_legacy_inline_router(exact).expect("inline router");
 
     assert!(captured.legacy_inline);
     assert_eq!(captured.service_kind, REASONING_ROUTER_SERVICE_KIND);

@@ -3,7 +3,7 @@
 use std::fmt::Write as _;
 use std::path::PathBuf;
 
-use codewhale_config::{
+use nestlone_config::{
     ConstitutionChoice, ConstitutionSource, ConstitutionValidity, RuntimePostureSource, SetupState,
     SetupStep, UserConstitution, UserConstitutionLoad,
 };
@@ -256,16 +256,16 @@ fn ratify_text(locale: Locale, ids: &[String]) -> String {
 
 /// Explicit schema migration with a receipt (#4782). A rejection writes nothing.
 fn migrate_text(locale: Locale) -> String {
-    let path = match codewhale_config::UserConstitution::path() {
+    let path = match nestlone_config::UserConstitution::path() {
         Ok(path) => path,
         Err(err) => return path_error_preview_text(locale, &err.to_string()),
     };
-    match codewhale_config::UserConstitution::migrate_file(&path) {
+    match nestlone_config::UserConstitution::migrate_file(&path) {
         Err(err) => match locale {
             Locale::ZhHans => format!("迁移失败，文件未更改：{err:#}"),
             _ => format!("Migration failed; the file is unchanged: {err:#}"),
         },
-        Ok(codewhale_config::MigrationOutcome::AlreadyCurrent {
+        Ok(nestlone_config::MigrationOutcome::AlreadyCurrent {
             preserved_unknown_keys,
             ..
         }) => {
@@ -279,7 +279,7 @@ fn migrate_text(locale: Locale) -> String {
                 ),
             }
         }
-        Ok(codewhale_config::MigrationOutcome::Migrated { receipt, .. }) => {
+        Ok(nestlone_config::MigrationOutcome::Migrated { receipt, .. }) => {
             let preserved = format_preserved(&receipt.preserved_unknown_keys, locale);
             let backup = receipt
                 .backup_path
@@ -313,7 +313,7 @@ fn migrate_text(locale: Locale) -> String {
                 ),
             }
         }
-        Ok(codewhale_config::MigrationOutcome::Rejected(rejection)) => match locale {
+        Ok(nestlone_config::MigrationOutcome::Rejected(rejection)) => match locale {
             Locale::ZhHans => format!(
                 "未迁移，文件保持原样。\n{}\n请手动修正后重试，或用 /constitution bundled 改用内置准则。",
                 rejection.receipt()
@@ -327,11 +327,11 @@ fn migrate_text(locale: Locale) -> String {
 }
 
 fn rollback_text(locale: Locale) -> String {
-    let path = match codewhale_config::UserConstitution::path() {
+    let path = match nestlone_config::UserConstitution::path() {
         Ok(path) => path,
         Err(err) => return path_error_preview_text(locale, &err.to_string()),
     };
-    match codewhale_config::UserConstitution::rollback_file(&path) {
+    match nestlone_config::UserConstitution::rollback_file(&path) {
         Ok(backup) => match locale {
             Locale::ZhHans => format!("已从 {} 恢复迁移前的内容。备份已消耗。", backup.display()),
             _ => format!(
@@ -580,7 +580,7 @@ enum UserConstitutionStatus {
     },
     Loaded {
         path: PathBuf,
-        constitution: Box<codewhale_config::UserConstitution>,
+        constitution: Box<nestlone_config::UserConstitution>,
     },
     PathError {
         error: String,
@@ -1352,7 +1352,7 @@ mod tests {
 
         assert!(result.message.is_none());
         let body = pop_pager_body(&mut app);
-        assert!(body.contains("<codewhale_user_constitution"));
+        assert!(body.contains("<nestlone_user_constitution"));
         assert!(body.contains("Maintains release lanes."));
     }
 
@@ -1375,8 +1375,8 @@ mod tests {
             about: Some("Maintains release lanes.".to_string()),
             ..UserConstitution::default()
         }
-        .with_recommendation(&codewhale_config::ConstitutionRecommendation {
-            clauses: vec![codewhale_config::ConstitutionClause::suggested(
+        .with_recommendation(&nestlone_config::ConstitutionRecommendation {
+            clauses: vec![nestlone_config::ConstitutionClause::suggested(
                 "c1",
                 "Always run the focused suite before claiming green.",
             )],
@@ -1413,7 +1413,7 @@ mod tests {
         // The same clause must be absent from the injected preview.
         ConstitutionCmd::execute(&mut app, Some("preview"));
         let preview = pop_pager_body(&mut app);
-        assert!(preview.contains("<codewhale_user_constitution"));
+        assert!(preview.contains("<nestlone_user_constitution"));
         assert!(
             !preview.contains("focused suite"),
             "unratified advice reached the model-facing block: {preview}"

@@ -1,5 +1,5 @@
 [package]
-name = "codewhale-tools"
+name = "nestlone-tools"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
@@ -10,7 +10,7 @@ description = "Tool invocation lifecycle, schema validation, and scheduler paral
 [dependencies]
 anyhow.workspace = true
 async-trait.workspace = true
-codewhale-protocol = { path = "../protocol", version = "0.0.2" }
+nestlone-protocol = { path = "../protocol", version = "0.0.2" }
 serde.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true

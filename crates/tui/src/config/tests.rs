@@ -82,13 +82,13 @@ fn malformed_config_error_omits_secret_contents_and_keys() {
 fn api_provider_metadata_helpers_follow_config_provider_metadata() {
     let sorted = ApiProvider::sorted_for_display();
     let expected_sorted: Vec<ApiProvider> =
-        codewhale_config::provider::providers_sorted_for_display()
+        nestlone_config::provider::providers_sorted_for_display()
             .iter()
             .map(|provider| ApiProvider::from_kind(provider.kind()))
             .collect();
     assert_eq!(sorted, expected_sorted);
 
-    for kind in codewhale_config::ProviderKind::ALL {
+    for kind in nestlone_config::ProviderKind::ALL {
         let provider = ApiProvider::from_kind(kind);
         let metadata = provider.metadata().expect("metadata-backed provider");
         assert_eq!(metadata.kind(), kind);
@@ -102,7 +102,7 @@ fn api_provider_metadata_helpers_follow_config_provider_metadata() {
     assert_eq!(ApiProvider::DeepseekCN.metadata().map(|p| p.kind()), None);
     assert_eq!(
         ApiProvider::DeepseekCN.env_vars(),
-        codewhale_config::ProviderKind::Deepseek
+        nestlone_config::ProviderKind::Deepseek
             .provider()
             .env_vars()
     );
@@ -114,9 +114,9 @@ fn api_provider_metadata_helpers_follow_config_provider_metadata() {
 
 #[test]
 fn provider_config_key_follows_config_provider_metadata() {
-    for kind in codewhale_config::ProviderKind::ALL
+    for kind in nestlone_config::ProviderKind::ALL
         .into_iter()
-        .filter(|kind| *kind != codewhale_config::ProviderKind::Deepseek)
+        .filter(|kind| *kind != nestlone_config::ProviderKind::Deepseek)
     {
         let provider = ApiProvider::from_kind(kind);
         assert_eq!(
@@ -443,7 +443,7 @@ fn config_loads_sibling_permissions_into_exec_policy_engine() {
     let config_path = dir.path().join("config.toml");
     fs::write(&config_path, "model = \"deepseek-v4-pro\"\n").expect("write config");
     fs::write(
-        dir.path().join(codewhale_config::PERMISSIONS_FILE_NAME),
+        dir.path().join(nestlone_config::PERMISSIONS_FILE_NAME),
         r#"
 [[rules]]
 tool = "exec_shell"
@@ -455,12 +455,12 @@ command = "cargo test"
     let config = Config::load(Some(config_path), None).expect("load config");
     let decision = config
         .exec_policy_engine
-        .check(codewhale_execpolicy::ExecPolicyContext {
+        .check(nestlone_execpolicy::ExecPolicyContext {
             command: "cargo test --workspace",
             cwd: dir.path().to_string_lossy().as_ref(),
             tool: Some("exec_shell"),
             path: None,
-            ask_for_approval: codewhale_execpolicy::AskForApproval::OnFailure,
+            ask_for_approval: nestlone_execpolicy::AskForApproval::OnFailure,
             sandbox_mode: None,
         })
         .expect("check permission");
@@ -478,7 +478,7 @@ fn config_loads_sibling_permissions_when_config_file_is_absent() {
     let dir = tempfile::tempdir().expect("tempdir");
     let config_path = dir.path().join("config.toml");
     fs::write(
-        dir.path().join(codewhale_config::PERMISSIONS_FILE_NAME),
+        dir.path().join(nestlone_config::PERMISSIONS_FILE_NAME),
         r#"
 [[rules]]
 tool = "exec_shell"
@@ -490,12 +490,12 @@ command = "npm test"
     let config = Config::load(Some(config_path), None).expect("load config");
     let decision = config
         .exec_policy_engine
-        .check(codewhale_execpolicy::ExecPolicyContext {
+        .check(nestlone_execpolicy::ExecPolicyContext {
             command: "npm test -- --runInBand",
             cwd: dir.path().to_string_lossy().as_ref(),
             tool: Some("exec_shell"),
             path: None,
-            ask_for_approval: codewhale_execpolicy::AskForApproval::OnFailure,
+            ask_for_approval: nestlone_execpolicy::AskForApproval::OnFailure,
             sandbox_mode: None,
         })
         .expect("check permission");
@@ -528,17 +528,17 @@ fn warns_when_allow_shell_nested_under_general_section() {
 }
 
 #[test]
-fn load_honors_codewhale_home_for_primary_config_path() -> Result<()> {
+fn load_honors_nestlone_home_for_primary_config_path() -> Result<()> {
     let _lock = lock_test_env();
     let dir = tempfile::tempdir()?;
-    let codewhale_home = dir.path().join("isolated-codewhale");
-    fs::create_dir_all(&codewhale_home)?;
-    fs::write(codewhale_home.join("config.toml"), "provider = \"zai\"\n")?;
-    let _codewhale_home = EnvVarGuard::set("CODEWHALE_HOME", codewhale_home.as_os_str());
-    let _codewhale_config = EnvVarGuard::remove("CODEWHALE_CONFIG_PATH");
+    let nestlone_home = dir.path().join("isolated-codewhale");
+    fs::create_dir_all(&nestlone_home)?;
+    fs::write(nestlone_home.join("config.toml"), "provider = \"zai\"\n")?;
+    let _nestlone_home = EnvVarGuard::set("CODEWHALE_HOME", nestlone_home.as_os_str());
+    let _nestlone_config = EnvVarGuard::remove("CODEWHALE_CONFIG_PATH");
     let _deepseek_config = EnvVarGuard::remove("DEEPSEEK_CONFIG_PATH");
 
-    let expected = codewhale_home.join("config.toml");
+    let expected = nestlone_home.join("config.toml");
     assert_eq!(default_config_path().as_deref(), Some(expected.as_path()));
     let config = Config::load(None, None)?;
 
@@ -550,10 +550,10 @@ fn load_honors_codewhale_home_for_primary_config_path() -> Result<()> {
 fn load_accepts_dispatcher_written_camel_case_config_shape() -> Result<()> {
     let _lock = lock_test_env();
     let dir = tempfile::tempdir()?;
-    let codewhale_home = dir.path().join("isolated-codewhale");
-    fs::create_dir_all(&codewhale_home)?;
+    let nestlone_home = dir.path().join("isolated-codewhale");
+    fs::create_dir_all(&nestlone_home)?;
     fs::write(
-        codewhale_home.join("config.toml"),
+        nestlone_home.join("config.toml"),
         r#"
 provider = "zai"
 fallbackProviders = []
@@ -576,8 +576,8 @@ subagents = true
 web_search = true
 "#,
     )?;
-    let _codewhale_home = EnvVarGuard::set("CODEWHALE_HOME", codewhale_home.as_os_str());
-    let _codewhale_config = EnvVarGuard::remove("CODEWHALE_CONFIG_PATH");
+    let _nestlone_home = EnvVarGuard::set("CODEWHALE_HOME", nestlone_home.as_os_str());
+    let _nestlone_config = EnvVarGuard::remove("CODEWHALE_CONFIG_PATH");
     let _deepseek_config = EnvVarGuard::remove("DEEPSEEK_CONFIG_PATH");
 
     let config = Config::load(None, None)?;
@@ -654,7 +654,7 @@ fn profile_hotbar_override_replaces_entire_user_list() {
     profiles.insert(
         "compact".to_string(),
         Config {
-            hotbar: Some(vec![codewhale_config::HotbarBindingToml {
+            hotbar: Some(vec![nestlone_config::HotbarBindingToml {
                 slot: 2,
                 action: "session.compact".to_string(),
                 label: Some("Compact".to_string()),
@@ -664,7 +664,7 @@ fn profile_hotbar_override_replaces_entire_user_list() {
     );
     let config = ConfigFile {
         base: Config {
-            hotbar: Some(vec![codewhale_config::HotbarBindingToml {
+            hotbar: Some(vec![nestlone_config::HotbarBindingToml {
                 slot: 1,
                 action: "mode.plan".to_string(),
                 label: Some("Plan".to_string()),
@@ -678,7 +678,7 @@ fn profile_hotbar_override_replaces_entire_user_list() {
 
     assert_eq!(
         merged.hotbar,
-        Some(vec![codewhale_config::HotbarBindingToml {
+        Some(vec![nestlone_config::HotbarBindingToml {
             slot: 2,
             action: "session.compact".to_string(),
             label: Some("Compact".to_string()),
@@ -692,7 +692,7 @@ fn profile_without_hotbar_keeps_base_hotbar() {
     profiles.insert("work".to_string(), Config::default());
     let config = ConfigFile {
         base: Config {
-            hotbar: Some(vec![codewhale_config::HotbarBindingToml {
+            hotbar: Some(vec![nestlone_config::HotbarBindingToml {
                 slot: 1,
                 action: "mode.plan".to_string(),
                 label: None,
@@ -706,7 +706,7 @@ fn profile_without_hotbar_keeps_base_hotbar() {
 
     assert_eq!(
         merged.hotbar,
-        Some(vec![codewhale_config::HotbarBindingToml {
+        Some(vec![nestlone_config::HotbarBindingToml {
             slot: 1,
             action: "mode.plan".to_string(),
             label: None,
@@ -776,21 +776,21 @@ fn verifier_config_parses_hunt_policy_and_merges_overrides() {
     assert!(verifier.enabled);
     assert_eq!(
         verifier.verdict_policy,
-        codewhale_config::VerifierVerdictPolicy::Hunt
+        nestlone_config::VerifierVerdictPolicy::Hunt
     );
 
     let merged = merge_config(
         Config {
-            verifier: Some(codewhale_config::VerifierConfigToml {
+            verifier: Some(nestlone_config::VerifierConfigToml {
                 enabled: false,
-                verdict_policy: codewhale_config::VerifierVerdictPolicy::Hunt,
+                verdict_policy: nestlone_config::VerifierVerdictPolicy::Hunt,
             }),
             ..Config::default()
         },
         Config {
-            verifier: Some(codewhale_config::VerifierConfigToml {
+            verifier: Some(nestlone_config::VerifierConfigToml {
                 enabled: true,
-                verdict_policy: codewhale_config::VerifierVerdictPolicy::Hunt,
+                verdict_policy: nestlone_config::VerifierVerdictPolicy::Hunt,
             }),
             ..Config::default()
         },
@@ -807,7 +807,7 @@ fn workflow_config_defaults_when_omitted_and_overrides_round_trip() {
     assert!(omitted.workflow.is_none());
     assert_eq!(
         omitted.workflow_config(),
-        codewhale_config::WorkflowConfigToml::default()
+        nestlone_config::WorkflowConfigToml::default()
     );
 
     let config: Config = toml::from_str(
@@ -841,14 +841,14 @@ fn workflow_config_defaults_when_omitted_and_overrides_round_trip() {
     assert_eq!(config.workflow_config(), workflow);
 
     let serialized = toml::to_string_pretty(&workflow).expect("serialize workflow");
-    let round_tripped: codewhale_config::WorkflowConfigToml =
+    let round_tripped: nestlone_config::WorkflowConfigToml =
         toml::from_str(&serialized).expect("round-trip parse");
     assert_eq!(round_tripped, workflow);
 
     // Profile/project overlays replace the whole table when present.
     let merged = merge_config(
         Config {
-            workflow: Some(codewhale_config::WorkflowConfigToml::default()),
+            workflow: Some(nestlone_config::WorkflowConfigToml::default()),
             ..Config::default()
         },
         Config {
@@ -1149,7 +1149,7 @@ fn apply_env_overrides_sets_search_base_url() {
 }
 
 #[test]
-fn codewhale_search_base_url_env_wins_over_legacy_alias() {
+fn nestlone_search_base_url_env_wins_over_legacy_alias() {
     let _guard = lock_test_env();
     let prev_codewhale = env::var_os("CODEWHALE_SEARCH_BASE_URL");
     let prev_deepseek = env::var_os("DEEPSEEK_SEARCH_BASE_URL");
@@ -1200,10 +1200,10 @@ fn search_provider_resolution_ignores_invalid_env_override() {
 struct EnvGuard {
     home: Option<OsString>,
     userprofile: Option<OsString>,
-    codewhale_home: Option<OsString>,
-    codewhale_config_path: Option<OsString>,
+    nestlone_home: Option<OsString>,
+    nestlone_config_path: Option<OsString>,
     deepseek_config_path: Option<OsString>,
-    codewhale_secret_backend: Option<OsString>,
+    nestlone_secret_backend: Option<OsString>,
     deepseek_secret_backend: Option<OsString>,
     deepseek_provider: Option<OsString>,
     deepseek_api_key: Option<OsString>,
@@ -1211,9 +1211,9 @@ struct EnvGuard {
     deepseek_http_headers: Option<OsString>,
     deepseek_model: Option<OsString>,
     deepseek_default_text_model: Option<OsString>,
-    codewhale_provider: Option<OsString>,
-    codewhale_model: Option<OsString>,
-    codewhale_base_url: Option<OsString>,
+    nestlone_provider: Option<OsString>,
+    nestlone_model: Option<OsString>,
+    nestlone_base_url: Option<OsString>,
     nvidia_api_key: Option<OsString>,
     nvidia_nim_api_key: Option<OsString>,
     nim_base_url: Option<OsString>,
@@ -1302,10 +1302,10 @@ impl EnvGuard {
         let config_str = OsString::from(config_path.as_os_str());
         let home_prev = env::var_os("HOME");
         let userprofile_prev = env::var_os("USERPROFILE");
-        let codewhale_home_prev = env::var_os("CODEWHALE_HOME");
-        let codewhale_config_prev = env::var_os("CODEWHALE_CONFIG_PATH");
+        let nestlone_home_prev = env::var_os("CODEWHALE_HOME");
+        let nestlone_config_prev = env::var_os("CODEWHALE_CONFIG_PATH");
         let deepseek_config_prev = env::var_os("DEEPSEEK_CONFIG_PATH");
-        let codewhale_secret_backend_prev = env::var_os("CODEWHALE_SECRET_BACKEND");
+        let nestlone_secret_backend_prev = env::var_os("CODEWHALE_SECRET_BACKEND");
         let deepseek_secret_backend_prev = env::var_os("DEEPSEEK_SECRET_BACKEND");
         let deepseek_provider_prev = env::var_os("DEEPSEEK_PROVIDER");
         let api_key_prev = env::var_os("DEEPSEEK_API_KEY");
@@ -1313,9 +1313,9 @@ impl EnvGuard {
         let http_headers_prev = env::var_os("DEEPSEEK_HTTP_HEADERS");
         let model_prev = env::var_os("DEEPSEEK_MODEL");
         let default_text_model_prev = env::var_os("DEEPSEEK_DEFAULT_TEXT_MODEL");
-        let codewhale_provider_prev = env::var_os("CODEWHALE_PROVIDER");
-        let codewhale_model_prev = env::var_os("CODEWHALE_MODEL");
-        let codewhale_base_url_prev = env::var_os("CODEWHALE_BASE_URL");
+        let nestlone_provider_prev = env::var_os("CODEWHALE_PROVIDER");
+        let nestlone_model_prev = env::var_os("CODEWHALE_MODEL");
+        let nestlone_base_url_prev = env::var_os("CODEWHALE_BASE_URL");
         let nvidia_api_key_prev = env::var_os("NVIDIA_API_KEY");
         let nvidia_nim_api_key_prev = env::var_os("NVIDIA_NIM_API_KEY");
         let nim_base_url_prev = env::var_os("NIM_BASE_URL");
@@ -1496,10 +1496,10 @@ impl EnvGuard {
         Self {
             home: home_prev,
             userprofile: userprofile_prev,
-            codewhale_home: codewhale_home_prev,
-            codewhale_config_path: codewhale_config_prev,
+            nestlone_home: nestlone_home_prev,
+            nestlone_config_path: nestlone_config_prev,
             deepseek_config_path: deepseek_config_prev,
-            codewhale_secret_backend: codewhale_secret_backend_prev,
+            nestlone_secret_backend: nestlone_secret_backend_prev,
             deepseek_secret_backend: deepseek_secret_backend_prev,
             deepseek_provider: deepseek_provider_prev,
             deepseek_api_key: api_key_prev,
@@ -1507,9 +1507,9 @@ impl EnvGuard {
             deepseek_http_headers: http_headers_prev,
             deepseek_model: model_prev,
             deepseek_default_text_model: default_text_model_prev,
-            codewhale_provider: codewhale_provider_prev,
-            codewhale_model: codewhale_model_prev,
-            codewhale_base_url: codewhale_base_url_prev,
+            nestlone_provider: nestlone_provider_prev,
+            nestlone_model: nestlone_model_prev,
+            nestlone_base_url: nestlone_base_url_prev,
             nvidia_api_key: nvidia_api_key_prev,
             nvidia_nim_api_key: nvidia_nim_api_key_prev,
             nim_base_url: nim_base_url_prev,
@@ -1599,12 +1599,12 @@ impl Drop for EnvGuard {
         unsafe {
             Self::restore_var("HOME", self.home.take());
             Self::restore_var("USERPROFILE", self.userprofile.take());
-            Self::restore_var("CODEWHALE_HOME", self.codewhale_home.take());
-            Self::restore_var("CODEWHALE_CONFIG_PATH", self.codewhale_config_path.take());
+            Self::restore_var("CODEWHALE_HOME", self.nestlone_home.take());
+            Self::restore_var("CODEWHALE_CONFIG_PATH", self.nestlone_config_path.take());
             Self::restore_var("DEEPSEEK_CONFIG_PATH", self.deepseek_config_path.take());
             Self::restore_var(
                 "CODEWHALE_SECRET_BACKEND",
-                self.codewhale_secret_backend.take(),
+                self.nestlone_secret_backend.take(),
             );
             Self::restore_var(
                 "DEEPSEEK_SECRET_BACKEND",
@@ -1619,9 +1619,9 @@ impl Drop for EnvGuard {
                 "DEEPSEEK_DEFAULT_TEXT_MODEL",
                 self.deepseek_default_text_model.take(),
             );
-            Self::restore_var("CODEWHALE_PROVIDER", self.codewhale_provider.take());
-            Self::restore_var("CODEWHALE_MODEL", self.codewhale_model.take());
-            Self::restore_var("CODEWHALE_BASE_URL", self.codewhale_base_url.take());
+            Self::restore_var("CODEWHALE_PROVIDER", self.nestlone_provider.take());
+            Self::restore_var("CODEWHALE_MODEL", self.nestlone_model.take());
+            Self::restore_var("CODEWHALE_BASE_URL", self.nestlone_base_url.take());
             Self::restore_var("NVIDIA_API_KEY", self.nvidia_api_key.take());
             Self::restore_var("NVIDIA_NIM_API_KEY", self.nvidia_nim_api_key.take());
             Self::restore_var("NIM_BASE_URL", self.nim_base_url.take());
@@ -2164,7 +2164,7 @@ fn subagents_enabled_reports_disable_precedence() {
 fn subagent_max_spawn_depth_defaults_allows_zero_and_clamps() {
     assert_eq!(
         Config::default().subagent_max_spawn_depth(),
-        codewhale_config::DEFAULT_SPAWN_DEPTH
+        nestlone_config::DEFAULT_SPAWN_DEPTH
     );
 
     let disabled = Config {
@@ -2178,14 +2178,14 @@ fn subagent_max_spawn_depth_defaults_allows_zero_and_clamps() {
 
     let high = Config {
         subagents: Some(SubagentsConfig {
-            max_depth: Some(codewhale_config::MAX_SPAWN_DEPTH_CEILING + 10),
+            max_depth: Some(nestlone_config::MAX_SPAWN_DEPTH_CEILING + 10),
             ..SubagentsConfig::default()
         }),
         ..Config::default()
     };
     assert_eq!(
         high.subagent_max_spawn_depth(),
-        codewhale_config::MAX_SPAWN_DEPTH_CEILING
+        nestlone_config::MAX_SPAWN_DEPTH_CEILING
     );
 }
 
@@ -2636,9 +2636,9 @@ fn save_deepseek_key_uses_isolated_file_store_without_plaintext_config() -> Resu
     let _lock = lock_test_env();
     let temp_root = tempfile::tempdir()?;
     let _guard = EnvGuard::new(temp_root.path());
-    let codewhale_home = temp_root.path().join("codewhale-home");
-    let config_path = codewhale_home.join("config.toml");
-    let _codewhale_home = EnvVarGuard::set("CODEWHALE_HOME", codewhale_home.as_os_str());
+    let nestlone_home = temp_root.path().join("codewhale-home");
+    let config_path = nestlone_home.join("config.toml");
+    let _nestlone_home = EnvVarGuard::set("CODEWHALE_HOME", nestlone_home.as_os_str());
     let _config_path = EnvVarGuard::set("CODEWHALE_CONFIG_PATH", config_path.as_os_str());
     let _backend = EnvVarGuard::set("CODEWHALE_SECRET_BACKEND", "file");
 
@@ -2657,7 +2657,7 @@ fn save_deepseek_key_uses_isolated_file_store_without_plaintext_config() -> Resu
     );
     assert!(config.contains("auth_mode = \"api_key\""));
     assert_eq!(
-        codewhale_secrets::Secrets::auto_detect().get("deepseek")?,
+        nestlone_secrets::Secrets::auto_detect().get("deepseek")?,
         Some("deepseek-test-credential".to_string())
     );
     Ok(())
@@ -2668,9 +2668,9 @@ fn save_non_deepseek_key_uses_isolated_file_store_without_plaintext_config() -> 
     let _lock = lock_test_env();
     let temp_root = tempfile::tempdir()?;
     let _guard = EnvGuard::new(temp_root.path());
-    let codewhale_home = temp_root.path().join("codewhale-home");
-    let config_path = codewhale_home.join("config.toml");
-    let _codewhale_home = EnvVarGuard::set("CODEWHALE_HOME", codewhale_home.as_os_str());
+    let nestlone_home = temp_root.path().join("codewhale-home");
+    let config_path = nestlone_home.join("config.toml");
+    let _nestlone_home = EnvVarGuard::set("CODEWHALE_HOME", nestlone_home.as_os_str());
     let _config_path = EnvVarGuard::set("CODEWHALE_CONFIG_PATH", config_path.as_os_str());
     let _backend = EnvVarGuard::set("CODEWHALE_SECRET_BACKEND", "file");
 
@@ -2689,7 +2689,7 @@ fn save_non_deepseek_key_uses_isolated_file_store_without_plaintext_config() -> 
         Some("api_key")
     );
     assert_eq!(
-        codewhale_secrets::Secrets::auto_detect().get("openrouter")?,
+        nestlone_secrets::Secrets::auto_detect().get("openrouter")?,
         Some("openrouter-test-credential".to_string())
     );
     Ok(())
@@ -2701,18 +2701,18 @@ fn provider_api_key_config_failure_restores_secret_and_keeps_external_route() ->
     for prior in [None, Some("prior-xai-secret")] {
         let temp_root = tempfile::tempdir()?;
         let _guard = EnvGuard::new(temp_root.path());
-        let codewhale_home = temp_root.path().canonicalize()?.join("codewhale-home");
-        fs::create_dir_all(&codewhale_home)?;
-        let config_path = codewhale_home.join("config.toml");
+        let nestlone_home = temp_root.path().canonicalize()?.join("codewhale-home");
+        fs::create_dir_all(&nestlone_home)?;
+        let config_path = nestlone_home.join("config.toml");
         fs::create_dir(&config_path)?;
-        let _codewhale_home = EnvVarGuard::set("CODEWHALE_HOME", &codewhale_home);
+        let _nestlone_home = EnvVarGuard::set("CODEWHALE_HOME", &nestlone_home);
         let _config_path = EnvVarGuard::set("CODEWHALE_CONFIG_PATH", &config_path);
         let _backend = EnvVarGuard::set("CODEWHALE_SECRET_BACKEND", "file");
         let generation = "xai-auth-0123456789abcdef0123456789abcdef.json";
-        codewhale_config::with_xai_oauth_lifecycle_lock(|store| {
+        nestlone_config::with_xai_oauth_lifecycle_lock(|store| {
             store.write(generation, b"prior-owned-epoch", false)
         })?;
-        let secrets = codewhale_secrets::Secrets::auto_detect();
+        let secrets = nestlone_secrets::Secrets::auto_detect();
         if let Some(prior) = prior {
             secrets.set("xai", prior)?;
         }
@@ -2724,9 +2724,9 @@ fn provider_api_key_config_failure_restores_secret_and_keeps_external_route() ->
                     auth_mode: Some("oauth".to_string()),
                     oauth_credential_generation: Some(generation.to_string()),
                     external_credentials: Some(
-                        codewhale_config::ExternalCredentialConsentToml::read_only(
-                            codewhale_config::ProviderKind::Xai,
-                            codewhale_config::ExternalCredentialSource::GrokCli,
+                        nestlone_config::ExternalCredentialConsentToml::read_only(
+                            nestlone_config::ProviderKind::Xai,
+                            nestlone_config::ExternalCredentialSource::GrokCli,
                             external_path,
                         ),
                     ),
@@ -2752,7 +2752,7 @@ fn provider_api_key_config_failure_restores_secret_and_keeps_external_route() ->
         assert!(xai.external_credentials.is_some());
         assert!(config_path.is_dir());
         assert_eq!(
-            fs::read(codewhale_home.join("credentials").join(generation))?,
+            fs::read(nestlone_home.join("credentials").join(generation))?,
             b"prior-owned-epoch",
             "failed API-key mode switch must restore the prior OAuth epoch"
         );
@@ -2766,14 +2766,14 @@ fn root_api_key_config_failure_restores_absent_and_existing_secret_state() -> Re
     for prior in [None, Some("prior-deepseek-secret")] {
         let temp_root = tempfile::tempdir()?;
         let _guard = EnvGuard::new(temp_root.path());
-        let codewhale_home = temp_root.path().join("codewhale-home");
-        fs::create_dir_all(&codewhale_home)?;
-        let config_path = codewhale_home.join("config.toml");
+        let nestlone_home = temp_root.path().join("codewhale-home");
+        fs::create_dir_all(&nestlone_home)?;
+        let config_path = nestlone_home.join("config.toml");
         fs::create_dir(&config_path)?;
-        let _codewhale_home = EnvVarGuard::set("CODEWHALE_HOME", &codewhale_home);
+        let _nestlone_home = EnvVarGuard::set("CODEWHALE_HOME", &nestlone_home);
         let _config_path = EnvVarGuard::set("CODEWHALE_CONFIG_PATH", &config_path);
         let _backend = EnvVarGuard::set("CODEWHALE_SECRET_BACKEND", "file");
-        let secrets = codewhale_secrets::Secrets::auto_detect();
+        let secrets = nestlone_secrets::Secrets::auto_detect();
         if let Some(prior) = prior {
             secrets.set("deepseek", prior)?;
         }
@@ -2792,19 +2792,19 @@ fn save_key_falls_back_to_config_when_isolated_file_store_is_unwritable() -> Res
     let _lock = lock_test_env();
     let temp_root = tempfile::tempdir()?;
     let _guard = EnvGuard::new(temp_root.path());
-    let codewhale_home = temp_root.path().join("codewhale-home");
-    let config_path = codewhale_home.join("config.toml");
-    fs::create_dir_all(codewhale_home.join("secrets"))?;
+    let nestlone_home = temp_root.path().join("codewhale-home");
+    let config_path = nestlone_home.join("config.toml");
+    fs::create_dir_all(nestlone_home.join("secrets"))?;
     fs::write(
-        codewhale_home.join("secrets/secrets.json"),
+        nestlone_home.join("secrets/secrets.json"),
         "not valid json",
     )?;
     #[cfg(unix)]
     fs::set_permissions(
-        codewhale_home.join("secrets/secrets.json"),
+        nestlone_home.join("secrets/secrets.json"),
         fs::Permissions::from_mode(0o600),
     )?;
-    let _codewhale_home = EnvVarGuard::set("CODEWHALE_HOME", codewhale_home.as_os_str());
+    let _nestlone_home = EnvVarGuard::set("CODEWHALE_HOME", nestlone_home.as_os_str());
     let _config_path = EnvVarGuard::set("CODEWHALE_CONFIG_PATH", config_path.as_os_str());
     let _backend = EnvVarGuard::set("CODEWHALE_SECRET_BACKEND", "file");
 
@@ -3587,13 +3587,13 @@ fn standalone_tui_reads_saved_secret_before_ambient_env() -> Result<()> {
     let _lock = lock_test_env();
     let temp_root = tempfile::tempdir()?;
     let _guard = EnvGuard::new(temp_root.path());
-    let codewhale_home = temp_root.path().join("isolated-codewhale");
-    fs::create_dir_all(&codewhale_home)?;
-    let _codewhale_home = EnvVarGuard::set("CODEWHALE_HOME", codewhale_home.as_os_str());
+    let nestlone_home = temp_root.path().join("isolated-codewhale");
+    fs::create_dir_all(&nestlone_home)?;
+    let _nestlone_home = EnvVarGuard::set("CODEWHALE_HOME", nestlone_home.as_os_str());
     let _backend = EnvVarGuard::set("CODEWHALE_SECRET_BACKEND", "file");
     let _ambient_key = EnvVarGuard::set("DEEPSEEK_API_KEY", "stale-env-key");
 
-    let secrets = codewhale_secrets::Secrets::auto_detect();
+    let secrets = nestlone_secrets::Secrets::auto_detect();
     secrets.set("deepseek", "saved-secret-key")?;
 
     let config = Config::default();
@@ -3614,13 +3614,13 @@ fn authenticated_local_provider_reads_saved_secret() -> Result<()> {
     let _lock = lock_test_env();
     let temp_root = tempfile::tempdir()?;
     let _guard = EnvGuard::new(temp_root.path());
-    let codewhale_home = temp_root.path().join("isolated-codewhale");
-    fs::create_dir_all(&codewhale_home)?;
-    let _codewhale_home = EnvVarGuard::set("CODEWHALE_HOME", codewhale_home.as_os_str());
+    let nestlone_home = temp_root.path().join("isolated-codewhale");
+    fs::create_dir_all(&nestlone_home)?;
+    let _nestlone_home = EnvVarGuard::set("CODEWHALE_HOME", nestlone_home.as_os_str());
     let _backend = EnvVarGuard::set("CODEWHALE_SECRET_BACKEND", "file");
     let _ambient_key = EnvVarGuard::remove("VLLM_API_KEY");
 
-    codewhale_secrets::Secrets::auto_detect().set("vllm", "saved-local-secret")?;
+    nestlone_secrets::Secrets::auto_detect().set("vllm", "saved-local-secret")?;
 
     let mut providers = ProvidersConfig::default();
     providers.vllm.base_url = Some("http://127.0.0.1:8000/v1".to_string());
@@ -3642,12 +3642,12 @@ fn named_custom_provider_never_reuses_generic_custom_secret() -> Result<()> {
     let _lock = lock_test_env();
     let temp_root = tempfile::tempdir()?;
     let _guard = EnvGuard::new(temp_root.path());
-    let codewhale_home = temp_root.path().join("isolated-codewhale");
-    fs::create_dir_all(&codewhale_home)?;
-    let _codewhale_home = EnvVarGuard::set("CODEWHALE_HOME", codewhale_home.as_os_str());
+    let nestlone_home = temp_root.path().join("isolated-codewhale");
+    fs::create_dir_all(&nestlone_home)?;
+    let _nestlone_home = EnvVarGuard::set("CODEWHALE_HOME", nestlone_home.as_os_str());
     let _backend = EnvVarGuard::set("CODEWHALE_SECRET_BACKEND", "file");
 
-    codewhale_secrets::Secrets::auto_detect().set("custom", "endpoint-a-secret")?;
+    nestlone_secrets::Secrets::auto_detect().set("custom", "endpoint-a-secret")?;
 
     let mut providers = ProvidersConfig::default();
     providers.custom.insert(
@@ -3679,12 +3679,12 @@ fn built_in_provider_custom_endpoint_never_reuses_global_credentials() -> Result
     let _lock = lock_test_env();
     let temp_root = tempfile::tempdir()?;
     let _guard = EnvGuard::new(temp_root.path());
-    let codewhale_home = temp_root.path().join("isolated-codewhale");
-    fs::create_dir_all(&codewhale_home)?;
-    let _codewhale_home = EnvVarGuard::set("CODEWHALE_HOME", codewhale_home.as_os_str());
+    let nestlone_home = temp_root.path().join("isolated-codewhale");
+    fs::create_dir_all(&nestlone_home)?;
+    let _nestlone_home = EnvVarGuard::set("CODEWHALE_HOME", nestlone_home.as_os_str());
     let _backend = EnvVarGuard::set("CODEWHALE_SECRET_BACKEND", "file");
     let _ambient = EnvVarGuard::set("OPENROUTER_API_KEY", "ambient-official-key");
-    codewhale_secrets::Secrets::auto_detect().set("openrouter", "saved-official-key")?;
+    nestlone_secrets::Secrets::auto_detect().set("openrouter", "saved-official-key")?;
 
     let mut providers = ProvidersConfig::default();
     providers.openrouter.base_url = Some("https://gateway.example.test/v1".to_string());
@@ -3906,7 +3906,7 @@ fn generic_base_url_override_never_reaches_pinned_child_routes() -> Result<()> {
         // An unknown/custom identity fails closed on the loopback placeholder
         // instead of borrowing the DeepSeek session route.
         let custom_placeholder = normalize_base_url(
-            codewhale_config::ProviderKind::Custom
+            nestlone_config::ProviderKind::Custom
                 .provider()
                 .default_base_url(),
         );
@@ -4139,7 +4139,7 @@ consent_version = 1
         .expect("managed disabled tombstone");
     assert_eq!(
         effective.access,
-        codewhale_config::ExternalCredentialAccess::Disabled
+        nestlone_config::ExternalCredentialAccess::Disabled
     );
     assert!(!has_api_key_for(&config, ApiProvider::OpenaiCodex));
     assert_eq!(
@@ -4245,15 +4245,15 @@ fn auth_mode_none_suppresses_config_env_secret_and_oauth_credentials() -> Result
     let _lock = lock_test_env();
     let temp_root = tempfile::tempdir()?;
     let _guard = EnvGuard::new(temp_root.path());
-    let codewhale_home = temp_root.path().join("isolated-codewhale");
-    fs::create_dir_all(&codewhale_home)?;
-    let _codewhale_home = EnvVarGuard::set("CODEWHALE_HOME", codewhale_home.as_os_str());
+    let nestlone_home = temp_root.path().join("isolated-codewhale");
+    fs::create_dir_all(&nestlone_home)?;
+    let _nestlone_home = EnvVarGuard::set("CODEWHALE_HOME", nestlone_home.as_os_str());
     let _backend = EnvVarGuard::set("CODEWHALE_SECRET_BACKEND", "file");
     let _ambient = EnvVarGuard::set("XAI_API_KEY", "ambient-xai-key");
     let oauth_path = temp_root.path().join("grok-auth.json");
     fs::write(&oauth_path, r#"{"access_token":"oauth-token"}"#)?;
     let _oauth_path = EnvVarGuard::set("GROK_AUTH_PATH", oauth_path.as_os_str());
-    codewhale_secrets::Secrets::auto_detect().set("xai", "saved-xai-key")?;
+    nestlone_secrets::Secrets::auto_detect().set("xai", "saved-xai-key")?;
 
     let mut providers = ProvidersConfig::default();
     providers.xai.auth_mode = Some("none".to_string());
@@ -4377,7 +4377,7 @@ fn deepseek_api_key_ignores_sentinel_placeholder() -> Result<()> {
 }
 
 #[test]
-fn default_user_paths_use_codewhale_home_for_fresh_installs() -> Result<()> {
+fn default_user_paths_use_nestlone_home_for_fresh_installs() -> Result<()> {
     let _lock = lock_test_env();
     let nanos = SystemTime::now()
         .duration_since(UNIX_EPOCH)
@@ -4454,7 +4454,7 @@ fn default_user_paths_preserve_existing_legacy_files() -> Result<()> {
 }
 
 #[test]
-fn codewhale_config_path_env_wins_over_legacy_env() -> Result<()> {
+fn nestlone_config_path_env_wins_over_legacy_env() -> Result<()> {
     let _lock = lock_test_env();
     let prev_codewhale = env::var_os("CODEWHALE_CONFIG_PATH");
     let prev_deepseek = env::var_os("DEEPSEEK_CONFIG_PATH");
@@ -4515,17 +4515,17 @@ fn test_tilde_expansion_in_paths() -> Result<()> {
 }
 
 #[test]
-fn skills_scan_codewhale_only_defaults_false_and_parses_true() -> Result<()> {
-    assert!(!Config::default().skills_config().scan_codewhale_only());
+fn skills_scan_nestlone_only_defaults_false_and_parses_true() -> Result<()> {
+    assert!(!Config::default().skills_config().scan_nestlone_only());
 
     let config: Config = toml::from_str(
         r#"
 [skills]
-scan_codewhale_only = true
+scan_nestlone_only = true
 "#,
     )?;
 
-    assert!(config.skills_config().scan_codewhale_only());
+    assert!(config.skills_config().scan_nestlone_only());
     Ok(())
 }
 
@@ -5596,7 +5596,7 @@ fn profile_skills_config_merges_individual_fields() {
         "strict".to_string(),
         Config {
             skills: Some(SkillsConfig {
-                scan_codewhale_only: Some(true),
+                scan_nestlone_only: Some(true),
                 ..Default::default()
             }),
             ..Default::default()
@@ -5621,7 +5621,7 @@ fn profile_skills_config_merges_individual_fields() {
         Some("https://registry.example/skills.json")
     );
     assert_eq!(skills.max_install_size_bytes, Some(1234));
-    assert_eq!(skills.scan_codewhale_only, Some(true));
+    assert_eq!(skills.scan_nestlone_only, Some(true));
 }
 
 #[test]
@@ -7952,12 +7952,12 @@ fn codex_external_credentials_are_disabled_by_default_and_managed_fails_before_i
         (0, 0)
     );
 
-    let mut managed_consent = codewhale_config::ExternalCredentialConsentToml::read_only(
-        codewhale_config::ProviderKind::OpenaiCodex,
-        codewhale_config::ExternalCredentialSource::CodexCli,
+    let mut managed_consent = nestlone_config::ExternalCredentialConsentToml::read_only(
+        nestlone_config::ProviderKind::OpenaiCodex,
+        nestlone_config::ExternalCredentialSource::CodexCli,
         auth_path.clone(),
     );
-    managed_consent.access = codewhale_config::ExternalCredentialAccess::Managed;
+    managed_consent.access = nestlone_config::ExternalCredentialAccess::Managed;
     let managed = Config {
         provider: Some(ApiProvider::OpenaiCodex.as_str().to_string()),
         providers: Some(ProvidersConfig {
@@ -8017,9 +8017,9 @@ fn codex_read_only_consent_reads_exact_file_without_mutation() -> Result<()> {
             openai_codex: ProviderConfig {
                 auth_mode: Some("oauth".to_string()),
                 external_credentials: Some(
-                    codewhale_config::ExternalCredentialConsentToml::read_only(
-                        codewhale_config::ProviderKind::OpenaiCodex,
-                        codewhale_config::ExternalCredentialSource::CodexCli,
+                    nestlone_config::ExternalCredentialConsentToml::read_only(
+                        nestlone_config::ProviderKind::OpenaiCodex,
+                        nestlone_config::ExternalCredentialSource::CodexCli,
                         auth_path.clone(),
                     ),
                 ),
@@ -8035,12 +8035,12 @@ fn codex_read_only_consent_reads_exact_file_without_mutation() -> Result<()> {
     crate::external_credentials::reset_side_effect_trap();
     assert!(inactive.external_credential_read_consent_configured(
         ApiProvider::OpenaiCodex,
-        codewhale_config::ExternalCredentialSource::CodexCli,
+        nestlone_config::ExternalCredentialSource::CodexCli,
     ));
     let dormant_error = inactive
         .external_credential_read_grant(
             ApiProvider::OpenaiCodex,
-            codewhale_config::ExternalCredentialSource::CodexCli,
+            nestlone_config::ExternalCredentialSource::CodexCli,
             &ambient_decoy,
         )
         .expect_err("inactive providers cannot mint external read capabilities");
@@ -8052,7 +8052,7 @@ fn codex_read_only_consent_reads_exact_file_without_mutation() -> Result<()> {
 
     let active_grant = config.external_credential_read_grant(
         ApiProvider::OpenaiCodex,
-        codewhale_config::ExternalCredentialSource::CodexCli,
+        nestlone_config::ExternalCredentialSource::CodexCli,
         &ambient_decoy,
     )?;
     assert_eq!(
@@ -8272,7 +8272,7 @@ base_url = "https://api.kimi.com/coding/v1"
 /// (or `codewhale --provider moonshot`, which also resolves through
 /// this code path internally).
 #[test]
-fn moonshot_kimi_code_model_resolves_via_codewhale_provider_env() -> Result<()> {
+fn moonshot_kimi_code_model_resolves_via_nestlone_provider_env() -> Result<()> {
     let _lock = lock_test_env();
     let nanos = SystemTime::now()
         .duration_since(UNIX_EPOCH)
@@ -8312,7 +8312,7 @@ base_url = "https://api.kimi.com/coding/v1"
 /// `DEEPSEEK_PROVIDER` are set, so a user adding the new alias to their
 /// shell isn't surprised by a stale legacy export.
 #[test]
-fn codewhale_provider_env_takes_precedence_over_deepseek_provider() -> Result<()> {
+fn nestlone_provider_env_takes_precedence_over_deepseek_provider() -> Result<()> {
     let _lock = lock_test_env();
     let nanos = SystemTime::now()
         .duration_since(UNIX_EPOCH)
@@ -8484,8 +8484,8 @@ fn provider_auth_source_metadata_is_not_a_runtime_credential() -> Result<()> {
     let temp_root = tempfile::tempdir()?;
     let _guard = EnvGuard::new(temp_root.path());
     let mut providers = ProvidersConfig::default();
-    providers.openai.auth = Some(codewhale_config::ProviderAuthSourceToml {
-        source: codewhale_config::AuthSourceKind::Command,
+    providers.openai.auth = Some(nestlone_config::ProviderAuthSourceToml {
+        source: nestlone_config::AuthSourceKind::Command,
         command: vec!["secret-tool".to_string(), "lookup".to_string()],
         timeout_ms: Some(2000),
         secret_id: None,
@@ -8558,9 +8558,9 @@ fn xai_invalid_owned_generation_blocks_external_and_uses_api_key_fallback() -> R
     providers.xai.auth_mode = Some("oauth".to_string());
     providers.xai.oauth_credential_generation = Some("../unsafe.json".to_string());
     providers.xai.external_credentials =
-        Some(codewhale_config::ExternalCredentialConsentToml::read_only(
-            codewhale_config::ProviderKind::Xai,
-            codewhale_config::ExternalCredentialSource::GrokCli,
+        Some(nestlone_config::ExternalCredentialConsentToml::read_only(
+            nestlone_config::ProviderKind::Xai,
+            nestlone_config::ExternalCredentialSource::GrokCli,
             external_path.clone(),
         ));
     let config = Config {
@@ -9014,8 +9014,8 @@ fn provider_capability_openai_codex_uses_responses_payload() {
 #[test]
 fn invalid_provider_auth_source_is_not_explicit_configuration() {
     let entry = ProviderConfig {
-        auth: Some(codewhale_config::ProviderAuthSourceToml {
-            source: codewhale_config::AuthSourceKind::Command,
+        auth: Some(nestlone_config::ProviderAuthSourceToml {
+            source: nestlone_config::AuthSourceKind::Command,
             command: Vec::new(),
             timeout_ms: None,
             secret_id: None,
@@ -10327,8 +10327,8 @@ fn picker_consent_persists_only_confirmed_exact_scope_and_revoke_is_one_step() {
         Some(&config_path),
         &mut live,
         ApiProvider::OpenaiCodex,
-        codewhale_config::ProviderKind::OpenaiCodex,
-        codewhale_config::ExternalCredentialSource::CodexCli,
+        nestlone_config::ProviderKind::OpenaiCodex,
+        nestlone_config::ExternalCredentialSource::CodexCli,
         &external_path,
     )
     .expect("persist confirmed consent");
@@ -10523,7 +10523,7 @@ fn no_managed_config(root: &std::path::Path) -> EnvVarGuard {
 
 fn custom_placeholder_base_url() -> String {
     normalize_base_url(
-        codewhale_config::ProviderKind::Custom
+        nestlone_config::ProviderKind::Custom
             .provider()
             .default_base_url(),
     )

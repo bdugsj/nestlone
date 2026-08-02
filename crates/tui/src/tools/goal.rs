@@ -488,7 +488,7 @@ impl GoalSnapshot {
     }
 
     #[must_use]
-    pub fn from_thread_goal(goal: &codewhale_protocol::ThreadGoal) -> Self {
+    pub fn from_thread_goal(goal: &nestlone_protocol::ThreadGoal) -> Self {
         let (status, pause_reason) = thread_goal_status_projection(goal.status.clone());
         Self {
             objective: Some(goal.objective.clone()),
@@ -513,19 +513,19 @@ impl GoalSnapshot {
 
 #[must_use]
 pub fn thread_goal_status_projection(
-    status: codewhale_protocol::ThreadGoalStatus,
+    status: nestlone_protocol::ThreadGoalStatus,
 ) -> (GoalStatus, Option<GoalPauseReason>) {
     match status {
-        codewhale_protocol::ThreadGoalStatus::Active => (GoalStatus::Active, None),
-        codewhale_protocol::ThreadGoalStatus::Paused => {
+        nestlone_protocol::ThreadGoalStatus::Active => (GoalStatus::Active, None),
+        nestlone_protocol::ThreadGoalStatus::Paused => {
             (GoalStatus::Paused, Some(GoalPauseReason::User))
         }
-        codewhale_protocol::ThreadGoalStatus::Complete => (GoalStatus::Complete, None),
-        codewhale_protocol::ThreadGoalStatus::Blocked => (GoalStatus::Blocked, None),
-        codewhale_protocol::ThreadGoalStatus::UsageLimited => {
+        nestlone_protocol::ThreadGoalStatus::Complete => (GoalStatus::Complete, None),
+        nestlone_protocol::ThreadGoalStatus::Blocked => (GoalStatus::Blocked, None),
+        nestlone_protocol::ThreadGoalStatus::UsageLimited => {
             (GoalStatus::Paused, Some(GoalPauseReason::UsageLimit))
         }
-        codewhale_protocol::ThreadGoalStatus::BudgetLimited => {
+        nestlone_protocol::ThreadGoalStatus::BudgetLimited => {
             (GoalStatus::Paused, Some(GoalPauseReason::BudgetLimit))
         }
     }
@@ -1536,11 +1536,11 @@ mod tests {
 
     #[test]
     fn protocol_thread_goal_converts_to_runtime_snapshot() {
-        let snapshot = GoalSnapshot::from_thread_goal(&codewhale_protocol::ThreadGoal {
+        let snapshot = GoalSnapshot::from_thread_goal(&nestlone_protocol::ThreadGoal {
             thread_id: "thread-1".to_string(),
             goal_id: "goal-1".to_string(),
             objective: "Bridge the goal models".to_string(),
-            status: codewhale_protocol::ThreadGoalStatus::Active,
+            status: nestlone_protocol::ThreadGoalStatus::Active,
             token_budget: Some(2_000),
             tokens_used: 750,
             time_used_seconds: 44,
@@ -1564,11 +1564,11 @@ mod tests {
     fn protocol_limit_statuses_keep_distinct_pause_reasons() {
         for (status, reason) in [
             (
-                codewhale_protocol::ThreadGoalStatus::UsageLimited,
+                nestlone_protocol::ThreadGoalStatus::UsageLimited,
                 GoalPauseReason::UsageLimit,
             ),
             (
-                codewhale_protocol::ThreadGoalStatus::BudgetLimited,
+                nestlone_protocol::ThreadGoalStatus::BudgetLimited,
                 GoalPauseReason::BudgetLimit,
             ),
         ] {

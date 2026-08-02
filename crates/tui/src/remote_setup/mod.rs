@@ -7,7 +7,7 @@
 //!
 //! Design mirrors the table-driven provider registry in
 //! `crates/config/src/lib.rs`: the wizard iterates [`registry::CLOUD_TARGETS`],
-//! [`registry::BRIDGES`], and the existing `codewhale_config::provider` registry
+//! [`registry::BRIDGES`], and the existing `nestlone_config::provider` registry
 //! rather than hard-coding the matrix.
 
 pub mod bundle;
@@ -187,18 +187,18 @@ fn resolve_provider(args: &RemoteSetupArgs) -> Result<ProviderInfo> {
         return ProviderInfo::from_slug(slug).ok_or_else(|| {
             anyhow::anyhow!(
                 "unknown provider '{slug}'. Known: {}",
-                codewhale_config::ProviderKind::names_hint()
+                nestlone_config::ProviderKind::names_hint()
             )
         });
     }
     if args.non_interactive {
         bail!(
             "--provider is required in --non-interactive mode. Known: {}",
-            codewhale_config::ProviderKind::names_hint()
+            nestlone_config::ProviderKind::names_hint()
         );
     }
     // List providers by their canonical names from the existing registry.
-    let providers: Vec<ProviderInfo> = codewhale_config::ProviderKind::all()
+    let providers: Vec<ProviderInfo> = nestlone_config::ProviderKind::all()
         .iter()
         .filter_map(|kind| ProviderInfo::from_slug(kind.as_str()))
         .collect();

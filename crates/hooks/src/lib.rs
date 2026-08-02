@@ -4,7 +4,7 @@ use std::sync::Arc;
 use anyhow::{Context, Result};
 use async_trait::async_trait;
 use chrono::Utc;
-use codewhale_protocol::EventFrame;
+use nestlone_protocol::EventFrame;
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 use tokio::io::AsyncWriteExt;
@@ -206,11 +206,11 @@ impl WebhookHookSink {
     pub fn new(url: String) -> Self {
         Self {
             url,
-            client: codewhale_release::platform_http_client_builder()
+            client: nestlone_release::platform_http_client_builder()
                 .timeout(std::time::Duration::from_secs(10))
                 .build()
                 .unwrap_or_else(|_| {
-                    codewhale_release::platform_http_client_builder()
+                    nestlone_release::platform_http_client_builder()
                         .build()
                         .expect("build fallback HTTP client")
                 }),

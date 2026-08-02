@@ -7,7 +7,7 @@ use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result, bail};
 use chrono::{SecondsFormat, Utc};
-use codewhale_protocol::fleet::*;
+use nestlone_protocol::fleet::*;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};

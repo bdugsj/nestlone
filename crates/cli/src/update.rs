@@ -14,7 +14,7 @@ use std::ffi::OsStr;
 use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result, anyhow, bail};
-use codewhale_release::{
+use nestlone_release::{
     CHECKSUM_MANIFEST_ASSET, ReleaseChannel, ReleaseQuery, UPDATE_USER_AGENT,
     compare_release_versions, is_beta_tag, mirror_asset_url, resolve_release_query,
     update_is_needed, update_network_fallback_hint,
@@ -850,7 +850,7 @@ pub(crate) fn validate_and_build_proxy(proxy_str: &str) -> Result<Proxy> {
 }
 
 fn update_http_client(proxy: Option<&Proxy>) -> Result<reqwest::blocking::Client> {
-    let mut builder = codewhale_release::platform_blocking_http_client_builder();
+    let mut builder = nestlone_release::platform_blocking_http_client_builder();
     if let Some(proxy) = proxy {
         builder = builder.proxy(proxy.clone());
     }
@@ -2010,7 +2010,7 @@ mod tests {
     }
 
     #[test]
-    fn legacy_dispatcher_update_targets_canonical_codewhale_pair() {
+    fn legacy_dispatcher_update_targets_canonical_nestlone_pair() {
         let dir = tempfile::TempDir::new().unwrap();
         let dispatcher = dir
             .path()
@@ -2246,7 +2246,7 @@ mod tests {
     }
 
     #[test]
-    fn glibc_compatibility_message_is_codewhale_branded_and_actionable() {
+    fn glibc_compatibility_message_is_nestlone_branded_and_actionable() {
         let message = glibc_compatibility_message(
             "codewhale-linux-x64",
             GlibcVersion::new(2, 39, 0),
@@ -2548,11 +2548,11 @@ E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855  *codewhale-win
     #[test]
     fn cnb_release_base_url_includes_tag_directory() {
         assert_eq!(
-            codewhale_release::cnb_release_base_url("0.8.47"),
+            nestlone_release::cnb_release_base_url("0.8.47"),
             "https://cnb.cool/bdugsj/nestlone/-/releases/v0.8.47"
         );
         assert_eq!(
-            codewhale_release::cnb_release_base_url("v0.8.47"),
+            nestlone_release::cnb_release_base_url("v0.8.47"),
             "https://cnb.cool/bdugsj/nestlone/-/releases/v0.8.47"
         );
     }
@@ -2581,11 +2581,11 @@ E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855  *codewhale-win
     #[test]
     fn parse_release_version_accepts_tags_and_build_suffixes() {
         assert_eq!(
-            codewhale_release::parse_release_version("v0.9.0-beta.1").unwrap(),
+            nestlone_release::parse_release_version("v0.9.0-beta.1").unwrap(),
             semver::Version::parse("0.9.0-beta.1").unwrap()
         );
         assert_eq!(
-            codewhale_release::parse_release_version("0.8.45 (abcdef123456)").unwrap(),
+            nestlone_release::parse_release_version("0.8.45 (abcdef123456)").unwrap(),
             semver::Version::parse("0.8.45").unwrap()
         );
     }
@@ -2617,13 +2617,13 @@ E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855  *codewhale-win
     fn update_fallback_hint_points_china_users_to_cnb_and_asset_mirrors() {
         let hint = update_network_fallback_hint();
 
-        assert!(hint.contains(codewhale_release::CNB_REPO_URL), "{hint}");
+        assert!(hint.contains(nestlone_release::CNB_REPO_URL), "{hint}");
         assert!(
-            hint.contains(codewhale_release::RELEASE_BASE_URL_ENV),
+            hint.contains(nestlone_release::RELEASE_BASE_URL_ENV),
             "{hint}"
         );
         assert!(
-            hint.contains(codewhale_release::UPDATE_VERSION_ENV),
+            hint.contains(nestlone_release::UPDATE_VERSION_ENV),
             "{hint}"
         );
         assert!(hint.contains("codewhale-cli"), "{hint}");

@@ -88,7 +88,7 @@ fn default_stash_path() -> Option<PathBuf> {
 /// and must not cause doctor to inspect an ambient `$HOME/.codewhale` or
 /// `$HOME/.deepseek` stash.
 pub(crate) fn diagnostic_stash_report() -> DiagnosticStashReport {
-    let primary = match codewhale_config::codewhale_home() {
+    let primary = match nestlone_config::nestlone_home() {
         Ok(home) => home.join(STASH_FILE_NAME),
         Err(error) => {
             return DiagnosticStashReport {
@@ -102,11 +102,11 @@ pub(crate) fn diagnostic_stash_report() -> DiagnosticStashReport {
         }
     };
 
-    let explicit_home = codewhale_config::codewhale_home_is_explicit();
+    let explicit_home = nestlone_config::nestlone_home_is_explicit();
     let legacy = if explicit_home {
         None
     } else {
-        match codewhale_config::legacy_deepseek_home() {
+        match nestlone_config::legacy_deepseek_home() {
             Ok(home) => Some(home.join(STASH_FILE_NAME)),
             Err(error) => {
                 return DiagnosticStashReport {

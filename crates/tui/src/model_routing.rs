@@ -1299,7 +1299,7 @@ mod tests {
             "flattened tool-result secret leaked"
         );
         assert!(
-            prompt.contains(codewhale_config::persistence::REDACTED),
+            prompt.contains(nestlone_config::persistence::REDACTED),
             "secret should be visibly redacted"
         );
         assert!(prompt.contains("continue the investigation"));

@@ -1,5 +1,5 @@
 [package]
-name = "codewhale-cli"
+name = "nestlone-cli"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
@@ -20,16 +20,16 @@ path = "src/bin/codew.rs"
 anyhow.workspace = true
 clap.workspace = true
 clap_complete.workspace = true
-codewhale-agent = { path = "../agent", version = "0.0.2" }
-codewhale-app-server = { path = "../app-server", version = "0.0.2" }
-codewhale-config = { path = "../config", version = "0.0.2" }
-codewhale-lane = { path = "../lane", version = "0.0.2" }
-codewhale-workflow = { path = "../workflow", version = "0.0.2" }
-codewhale-execpolicy = { path = "../execpolicy", version = "0.0.2" }
-codewhale-mcp = { path = "../mcp", version = "0.0.2" }
-codewhale-release = { path = "../release", version = "0.0.2" }
-codewhale-secrets = { path = "../secrets", version = "0.0.2" }
-codewhale-state = { path = "../state", version = "0.0.2" }
+nestlone-agent = { path = "../agent", version = "0.0.2" }
+nestlone-app-server = { path = "../app-server", version = "0.0.2" }
+nestlone-config = { path = "../config", version = "0.0.2" }
+nestlone-lane = { path = "../lane", version = "0.0.2" }
+nestlone-workflow = { path = "../workflow", version = "0.0.2" }
+nestlone-execpolicy = { path = "../execpolicy", version = "0.0.2" }
+nestlone-mcp = { path = "../mcp", version = "0.0.2" }
+nestlone-release = { path = "../release", version = "0.0.2" }
+nestlone-secrets = { path = "../secrets", version = "0.0.2" }
+nestlone-state = { path = "../state", version = "0.0.2" }
 chrono.workspace = true
 dirs.workspace = true
 serde.workspace = true
@@ -44,7 +44,7 @@ tempfile.workspace = true
 tracing.workspace = true
 
 [build-dependencies]
-codewhale-build-support = { path = "../build-support", version = "0.0.2" }
+nestlone-build-support = { path = "../build-support", version = "0.0.2" }
 
 # Parent-death cleanup for delegated server children (#3259): on Linux the
 # dispatcher sets PR_SET_PDEATHSIG so the child is signalled if the dispatcher

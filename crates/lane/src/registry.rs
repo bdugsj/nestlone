@@ -118,7 +118,7 @@ impl LaneRecord {
 
 /// Registry root: `$CODEWHALE_HOME/lanes`.
 pub fn lanes_dir() -> Result<PathBuf> {
-    codewhale_config::ensure_state_dir(LANES_SUBDIR)
+    nestlone_config::ensure_state_dir(LANES_SUBDIR)
 }
 
 /// Where the Lane registry *would* live, without creating it.
@@ -128,7 +128,7 @@ pub fn lanes_dir() -> Result<PathBuf> {
 /// status surface must not conjure the store it is reporting on. Availability
 /// probing goes through this instead (see [`crate::control::ControlContext`]).
 pub fn lane_registry_root() -> Result<PathBuf> {
-    Ok(codewhale_config::codewhale_home()?.join(LANES_SUBDIR))
+    Ok(nestlone_config::nestlone_home()?.join(LANES_SUBDIR))
 }
 
 /// Persist and load lane records.

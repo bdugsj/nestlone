@@ -51,7 +51,7 @@ use thiserror::Error;
 use crate::network_policy::{Decision, NetworkPolicy, host_from_url};
 
 fn reqwest_client() -> reqwest::Client {
-    codewhale_release::platform_http_client_builder()
+    nestlone_release::platform_http_client_builder()
         .build()
         .expect("build platform HTTP client")
 }

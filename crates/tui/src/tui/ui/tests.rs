@@ -1009,9 +1009,9 @@ struct SettingsHomeGuard {
     _tmp: TempDir,
     previous_home: Option<OsString>,
     previous_userprofile: Option<OsString>,
-    previous_codewhale_home: Option<OsString>,
+    previous_nestlone_home: Option<OsString>,
     previous_deepseek_config_path: Option<OsString>,
-    previous_codewhale_provider: Option<OsString>,
+    previous_nestlone_provider: Option<OsString>,
     previous_deepseek_provider: Option<OsString>,
     previous_xdg_config_home: Option<OsString>,
     previous_appdata: Option<OsString>,
@@ -1025,20 +1025,20 @@ impl SettingsHomeGuard {
         let tmp = TempDir::new().expect("settings tempdir");
         let previous_home = std::env::var_os("HOME");
         let previous_userprofile = std::env::var_os("USERPROFILE");
-        let previous_codewhale_home = std::env::var_os("CODEWHALE_HOME");
+        let previous_nestlone_home = std::env::var_os("CODEWHALE_HOME");
         let previous_deepseek_config_path = std::env::var_os("DEEPSEEK_CONFIG_PATH");
-        let previous_codewhale_provider = std::env::var_os("CODEWHALE_PROVIDER");
+        let previous_nestlone_provider = std::env::var_os("CODEWHALE_PROVIDER");
         let previous_deepseek_provider = std::env::var_os("DEEPSEEK_PROVIDER");
         let previous_xdg_config_home = std::env::var_os("XDG_CONFIG_HOME");
         let previous_appdata = std::env::var_os("APPDATA");
         let previous_localappdata = std::env::var_os("LOCALAPPDATA");
-        let codewhale_home = tmp.path().join(".codewhale");
+        let nestlone_home = tmp.path().join(".codewhale");
         // Safety: test-only environment mutation guarded by a global mutex.
         unsafe {
             std::env::set_var("HOME", tmp.path());
             std::env::set_var("USERPROFILE", tmp.path());
-            std::env::set_var("CODEWHALE_HOME", &codewhale_home);
-            std::env::set_var("DEEPSEEK_CONFIG_PATH", codewhale_home.join("config.toml"));
+            std::env::set_var("CODEWHALE_HOME", &nestlone_home);
+            std::env::set_var("DEEPSEEK_CONFIG_PATH", nestlone_home.join("config.toml"));
             std::env::remove_var("CODEWHALE_PROVIDER");
             std::env::remove_var("DEEPSEEK_PROVIDER");
             std::env::set_var("XDG_CONFIG_HOME", tmp.path().join("xdg-config"));
@@ -1049,9 +1049,9 @@ impl SettingsHomeGuard {
             _tmp: tmp,
             previous_home,
             previous_userprofile,
-            previous_codewhale_home,
+            previous_nestlone_home,
             previous_deepseek_config_path,
-            previous_codewhale_provider,
+            previous_nestlone_provider,
             previous_deepseek_provider,
             previous_xdg_config_home,
             previous_appdata,
@@ -1075,14 +1075,14 @@ impl Drop for SettingsHomeGuard {
 
         restore("HOME", self.previous_home.take());
         restore("USERPROFILE", self.previous_userprofile.take());
-        restore("CODEWHALE_HOME", self.previous_codewhale_home.take());
+        restore("CODEWHALE_HOME", self.previous_nestlone_home.take());
         restore(
             "DEEPSEEK_CONFIG_PATH",
             self.previous_deepseek_config_path.take(),
         );
         restore(
             "CODEWHALE_PROVIDER",
-            self.previous_codewhale_provider.take(),
+            self.previous_nestlone_provider.take(),
         );
         restore("DEEPSEEK_PROVIDER", self.previous_deepseek_provider.take());
         restore("XDG_CONFIG_HOME", self.previous_xdg_config_home.take());
@@ -2954,7 +2954,7 @@ api_key = "test-key"
     let mut app = create_test_app();
     app.config_path = Some(config_path.clone());
     let mut config = Config::load(Some(config_path.clone()), None).expect("load config");
-    let bindings = vec![codewhale_config::HotbarBindingToml {
+    let bindings = vec![nestlone_config::HotbarBindingToml {
         slot: 1,
         action: "mode.agent".to_string(),
         label: Some("Agent".to_string()),
@@ -2977,7 +2977,7 @@ api_key = "test-key"
         "provider section lost: {body}"
     );
     assert!(body.contains("[[hotbar]]"), "hotbar table missing: {body}");
-    let parsed: codewhale_config::ConfigToml =
+    let parsed: nestlone_config::ConfigToml =
         toml::from_str(&body).expect("saved config should parse");
     assert_eq!(parsed.hotbar, Some(bindings));
 }
@@ -2991,7 +2991,7 @@ fn hotbar_setup_save_error_leaves_live_config_and_file_unchanged() {
 
     let mut app = create_test_app();
     app.config_path = Some(config_path.clone());
-    let original_bindings = vec![codewhale_config::HotbarBindingToml {
+    let original_bindings = vec![nestlone_config::HotbarBindingToml {
         slot: 2,
         action: "mode.plan".to_string(),
         label: None,
@@ -3000,7 +3000,7 @@ fn hotbar_setup_save_error_leaves_live_config_and_file_unchanged() {
         hotbar: Some(original_bindings.clone()),
         ..Default::default()
     };
-    let attempted_bindings = vec![codewhale_config::HotbarBindingToml {
+    let attempted_bindings = vec![nestlone_config::HotbarBindingToml {
         slot: 1,
         action: "mode.agent".to_string(),
         label: None,
@@ -3725,7 +3725,7 @@ fn setup_checkpoint_waits_for_onboarding_and_skip_flag() {
     app.onboarding = OnboardingState::None;
     assert!(!open_setup_checkpoint_if_due(&mut app, &config, true));
     assert!(app.view_stack.is_empty());
-    let state = codewhale_config::SetupState::load()
+    let state = nestlone_config::SetupState::load()
         .expect("load setup state")
         .expect("setup state");
     assert_eq!(
@@ -3734,11 +3734,11 @@ fn setup_checkpoint_waits_for_onboarding_and_skip_flag() {
     );
     assert_eq!(
         state.constitution_choice,
-        codewhale_config::ConstitutionChoice::Deferred
+        nestlone_config::ConstitutionChoice::Deferred
     );
     assert_eq!(
-        state.status(codewhale_config::SetupStep::Constitution),
-        codewhale_config::StepStatus::Deferred
+        state.status(nestlone_config::SetupStep::Constitution),
+        nestlone_config::StepStatus::Deferred
     );
     assert!(
         !open_setup_checkpoint_if_due(&mut app, &config, false),
@@ -3762,14 +3762,14 @@ fn setup_runtime_preset_apply_persists_settings_config_and_state() {
     app.config_path = Some(config_path.clone());
     let mut config = Config::default();
     let preset = crate::tui::setup::SetupRuntimePreset::AskFirst;
-    let mut state = codewhale_config::SetupState {
-        runtime_posture_source: codewhale_config::RuntimePostureSource::Confirmed,
+    let mut state = nestlone_config::SetupState {
+        runtime_posture_source: nestlone_config::RuntimePostureSource::Confirmed,
         ..Default::default()
     };
     state.set_step(
-        codewhale_config::SetupStep::TrustSandbox,
-        codewhale_config::StepEntry::new(
-            codewhale_config::StepStatus::Verified,
+        nestlone_config::SetupStep::TrustSandbox,
+        nestlone_config::StepEntry::new(
+            nestlone_config::StepStatus::Verified,
             true,
             crate::tui::setup::CONSTITUTION_CHECKPOINT_VERSION,
         )
@@ -3800,16 +3800,16 @@ fn setup_runtime_preset_apply_persists_settings_config_and_state() {
     assert!(body.contains("allow_shell = false"));
     assert!(body.contains("sandbox_mode = \"read-only\""));
 
-    let saved_state = codewhale_config::SetupState::load()
+    let saved_state = nestlone_config::SetupState::load()
         .expect("load setup state")
         .expect("setup state exists");
     assert_eq!(
-        saved_state.status(codewhale_config::SetupStep::TrustSandbox),
-        codewhale_config::StepStatus::Verified
+        saved_state.status(nestlone_config::SetupStep::TrustSandbox),
+        nestlone_config::StepStatus::Verified
     );
     assert_eq!(
         saved_state.runtime_posture_source,
-        codewhale_config::RuntimePostureSource::Confirmed
+        nestlone_config::RuntimePostureSource::Confirmed
     );
 }
 
@@ -3860,13 +3860,13 @@ fn setup_runtime_preset_rolls_back_durable_and_live_state_when_state_save_fails(
 
     // SetupState::save is atomic; an existing directory at the destination
     // forces the final persist to fail after config and settings were staged.
-    let state_path = codewhale_config::SetupState::path().expect("state path");
+    let state_path = nestlone_config::SetupState::path().expect("state path");
     std::fs::create_dir_all(&state_path).expect("state path directory");
     let error = apply_setup_runtime_preset(
         &mut app,
         &mut config,
         crate::tui::setup::SetupRuntimePreset::AskFirst,
-        codewhale_config::SetupState::default(),
+        nestlone_config::SetupState::default(),
     )
     .expect_err("state persistence must fail");
 
@@ -3922,7 +3922,7 @@ fn setup_high_trust_persists_full_access_without_legacy_yolo_mode() {
         &mut app,
         &mut config,
         preset,
-        codewhale_config::SetupState::default(),
+        nestlone_config::SetupState::default(),
     )
     .expect("apply high trust");
 
@@ -3967,7 +3967,7 @@ fn setup_high_trust_cannot_override_project_approval_policy() {
         .and_then(std::path::Path::parent)
         .expect("temporary home")
         .join("project");
-    let project_dir = workspace.join(codewhale_config::CODEWHALE_APP_DIR);
+    let project_dir = workspace.join(nestlone_config::CODEWHALE_APP_DIR);
     std::fs::create_dir_all(&project_dir).expect("project config dir");
     std::fs::write(
         project_dir.join("config.toml"),
@@ -3987,7 +3987,7 @@ fn setup_high_trust_cannot_override_project_approval_policy() {
         &mut app,
         &mut config,
         crate::tui::setup::SetupRuntimePreset::HighTrustLocal,
-        codewhale_config::SetupState::default(),
+        nestlone_config::SetupState::default(),
     )
     .expect_err("project policy must control the live session");
 
@@ -4019,7 +4019,7 @@ fn project_runtime_provenance_only_blocks_values_startup_would_accept() {
         .parent()
         .expect("temporary home")
         .join("project");
-    let project_dir = workspace.join(codewhale_config::CODEWHALE_APP_DIR);
+    let project_dir = workspace.join(nestlone_config::CODEWHALE_APP_DIR);
     std::fs::create_dir_all(&project_dir).expect("project config dir");
     let project_path = project_dir.join("config.toml");
     std::fs::write(
@@ -4083,7 +4083,7 @@ fn saved_full_access_baseline_allows_project_approval_tightening() {
         .parent()
         .expect("temporary home")
         .join("project");
-    let project_dir = workspace.join(codewhale_config::CODEWHALE_APP_DIR);
+    let project_dir = workspace.join(nestlone_config::CODEWHALE_APP_DIR);
     std::fs::create_dir_all(&project_dir).expect("project config dir");
     std::fs::write(
         project_dir.join("config.toml"),
@@ -4136,7 +4136,7 @@ fn setup_presets_cannot_override_managed_runtime_requirements() {
             &mut app,
             &mut config,
             preset,
-            codewhale_config::SetupState::default(),
+            nestlone_config::SetupState::default(),
         )
         .expect_err("managed requirements must win");
         assert!(
@@ -5811,16 +5811,16 @@ async fn provider_switch_model_override_updates_target_provider_model_slot() {
         Some("mimo-v2.5-pro")
     );
 
-    let state = codewhale_config::SetupState::load()
+    let state = nestlone_config::SetupState::load()
         .expect("load setup state")
         .expect("setup state");
     assert_eq!(
-        state.status(codewhale_config::SetupStep::ProviderModel),
-        codewhale_config::StepStatus::Verified
+        state.status(nestlone_config::SetupStep::ProviderModel),
+        nestlone_config::StepStatus::Verified
     );
     let provider_model_result = state
         .steps
-        .get(&codewhale_config::SetupStep::ProviderModel)
+        .get(&nestlone_config::SetupStep::ProviderModel)
         .and_then(|entry| entry.result.as_deref())
         .expect("provider/model result");
     assert!(provider_model_result.contains("provider=deepseek"));
@@ -5870,7 +5870,7 @@ async fn provider_switch_skips_setup_receipt_when_route_persistence_fails() {
             .is_some_and(|message| message.contains("not fully persisted"))
     );
     assert!(
-        codewhale_config::SetupState::load()
+        nestlone_config::SetupState::load()
             .expect("load setup state")
             .is_none(),
         "failed route persistence must not create a ProviderModel setup receipt"
@@ -6593,7 +6593,7 @@ fn auto_routed_turn_compaction_uses_selected_route_not_stale_app_route() {
     app.auto_model = true;
     app.model = "auto".to_string();
     app.api_provider = ApiProvider::Deepseek;
-    app.active_route_limits = Some(codewhale_config::route::RouteLimits {
+    app.active_route_limits = Some(nestlone_config::route::RouteLimits {
         context_tokens: Some(32_000),
         ..Default::default()
     });
@@ -8461,7 +8461,7 @@ fn hotbar_dispatches_bound_slot_and_ignores_empty_slot() {
     // #3807: a fresh config has no bindings, so opt in with the default slots
     // (slot 4 = mode.agent) to exercise dispatch of a bound slot.
     let config = Config {
-        hotbar: Some(codewhale_config::default_hotbar_bindings_toml()),
+        hotbar: Some(nestlone_config::default_hotbar_bindings_toml()),
         ..Config::default()
     };
     app.onboarding = OnboardingState::None;
@@ -8496,7 +8496,7 @@ fn hotbar_dispatches_slash_command_slot() {
     let mut app = create_test_app();
     app.onboarding = OnboardingState::None;
     let config = Config {
-        hotbar: Some(vec![codewhale_config::HotbarBindingToml {
+        hotbar: Some(vec![nestlone_config::HotbarBindingToml {
             slot: 1,
             label: Some("mode".to_string()),
             action: "slash.mode".to_string(),
@@ -8530,7 +8530,7 @@ fn hotbar_dispatches_route_switch_slot() {
     let provider = ApiProvider::parse(provider_key).expect("provider key parses");
     let model = model.to_string();
     let config = Config {
-        hotbar: Some(vec![codewhale_config::HotbarBindingToml {
+        hotbar: Some(vec![nestlone_config::HotbarBindingToml {
             slot: 1,
             label: Some(route_metadata.compact_label),
             action: route_id,
@@ -8555,7 +8555,7 @@ fn hotbar_bound_reasoning_action_updates_auto_model_preference() {
     app.reasoning_effort = ReasoningEffort::Off;
     app.needs_redraw = false;
     let config = Config {
-        hotbar: Some(vec![codewhale_config::HotbarBindingToml {
+        hotbar: Some(vec![nestlone_config::HotbarBindingToml {
             slot: 1,
             label: Some("reason".to_string()),
             action: "reasoning.cycle".to_string(),
@@ -15387,16 +15387,16 @@ async fn model_picker_persists_model_and_reasoning_effort() {
     assert!(!app.auto_model);
     assert_eq!(app.reasoning_effort, ReasoningEffort::High);
 
-    let state = codewhale_config::SetupState::load()
+    let state = nestlone_config::SetupState::load()
         .expect("load setup state")
         .expect("setup state");
     assert_eq!(
-        state.status(codewhale_config::SetupStep::ProviderModel),
-        codewhale_config::StepStatus::Verified
+        state.status(nestlone_config::SetupStep::ProviderModel),
+        nestlone_config::StepStatus::Verified
     );
     let provider_model_result = state
         .steps
-        .get(&codewhale_config::SetupStep::ProviderModel)
+        .get(&nestlone_config::SetupStep::ProviderModel)
         .and_then(|entry| entry.result.as_deref())
         .expect("provider/model result");
     assert!(provider_model_result.contains("provider=deepseek"));
@@ -15531,7 +15531,7 @@ async fn reselecting_live_model_and_thinking_persists_startup_defaults() {
         ..Default::default()
     };
     assert!(
-        codewhale_config::SetupState::load()
+        nestlone_config::SetupState::load()
             .ok()
             .flatten()
             .is_none(),
@@ -15559,13 +15559,13 @@ async fn reselecting_live_model_and_thinking_persists_startup_defaults() {
             .as_deref()
             .is_some_and(|message| message.contains("saved as startup default"))
     );
-    let state = codewhale_config::SetupState::load()
+    let state = nestlone_config::SetupState::load()
         .expect("read setup state")
         .expect("a persisted concrete model selection must record setup progress");
     assert!(
         state
             .steps
-            .contains_key(&codewhale_config::SetupStep::ProviderModel),
+            .contains_key(&nestlone_config::SetupStep::ProviderModel),
         "the provider/model setup step must be recorded even when the model was already live"
     );
 }
@@ -15751,11 +15751,11 @@ async fn model_picker_skips_setup_receipt_when_settings_persistence_fails() {
     std::fs::write(&bad_home, "not a directory").expect("bad home file");
     let _home = crate::test_support::EnvVarGuard::set("HOME", tmp.path().as_os_str());
     let _userprofile = crate::test_support::EnvVarGuard::set("USERPROFILE", tmp.path().as_os_str());
-    let _codewhale_home =
+    let _nestlone_home =
         crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", bad_home.as_os_str());
     let _deepseek_config_path = crate::test_support::EnvVarGuard::remove("DEEPSEEK_CONFIG_PATH");
-    let _codewhale_config_path = crate::test_support::EnvVarGuard::remove("CODEWHALE_CONFIG_PATH");
-    let _codewhale_provider = crate::test_support::EnvVarGuard::remove("CODEWHALE_PROVIDER");
+    let _nestlone_config_path = crate::test_support::EnvVarGuard::remove("CODEWHALE_CONFIG_PATH");
+    let _nestlone_provider = crate::test_support::EnvVarGuard::remove("CODEWHALE_PROVIDER");
     let _deepseek_provider = crate::test_support::EnvVarGuard::remove("DEEPSEEK_PROVIDER");
 
     let mut app = create_test_app();
@@ -15786,7 +15786,7 @@ async fn model_picker_skips_setup_receipt_when_settings_persistence_fails() {
             .is_some_and(|message| message.contains("not persisted"))
     );
     assert!(
-        codewhale_config::SetupState::load()
+        nestlone_config::SetupState::load()
             .expect("load setup state")
             .is_none(),
         "failed model persistence must not create a ProviderModel setup receipt"
@@ -17103,7 +17103,7 @@ async fn approval_decision_persists_ask_rules_to_permissions_file() {
     app.config_path = Some(config_path.clone());
     let mut config = Config::default();
     let mut engine = mock_engine_handle();
-    let rule = codewhale_config::ToolAskRule::exec_shell("cargo test");
+    let rule = nestlone_config::ToolAskRule::exec_shell("cargo test");
 
     apply_approval_decision(
         &mut app,
@@ -17127,7 +17127,7 @@ async fn approval_decision_persists_ask_rules_to_permissions_file() {
             id: "tool-1".to_string()
         })
     );
-    let store = codewhale_config::ConfigStore::load(Some(config_path)).expect("load config store");
+    let store = nestlone_config::ConfigStore::load(Some(config_path)).expect("load config store");
     assert_eq!(store.permissions().rules, vec![rule]);
     assert!(
         app.status_message
@@ -17137,12 +17137,12 @@ async fn approval_decision_persists_ask_rules_to_permissions_file() {
 
     let decision = config
         .exec_policy_engine
-        .check(codewhale_execpolicy::ExecPolicyContext {
+        .check(nestlone_execpolicy::ExecPolicyContext {
             command: "cargo test --workspace",
             cwd: tmp.path().to_string_lossy().as_ref(),
             tool: Some("exec_shell"),
             path: None,
-            ask_for_approval: codewhale_execpolicy::AskForApproval::OnFailure,
+            ask_for_approval: nestlone_execpolicy::AskForApproval::OnFailure,
             sandbox_mode: None,
         })
         .expect("check persisted runtime policy");
@@ -17158,7 +17158,7 @@ async fn approval_decision_persists_exact_workspace_allow_rule() {
     app.config_path = Some(config_path.clone());
     let mut config = Config::default();
     let mut engine = mock_engine_handle();
-    let rule = codewhale_config::ToolAskRule::exec_shell("cargo test")
+    let rule = nestlone_config::ToolAskRule::exec_shell("cargo test")
         .into_exact_workspace_allow(tmp.path().to_string_lossy());
 
     apply_approval_decision(
@@ -17183,7 +17183,7 @@ async fn approval_decision_persists_exact_workspace_allow_rule() {
             id: "tool-allow".to_string()
         })
     );
-    let store = codewhale_config::ConfigStore::load(Some(config_path)).expect("load config store");
+    let store = nestlone_config::ConfigStore::load(Some(config_path)).expect("load config store");
     assert_eq!(store.permissions().rules, vec![rule]);
     assert!(
         app.status_message
@@ -17193,29 +17193,29 @@ async fn approval_decision_persists_exact_workspace_allow_rule() {
 
     let exact = config
         .exec_policy_engine
-        .check(codewhale_execpolicy::ExecPolicyContext {
+        .check(nestlone_execpolicy::ExecPolicyContext {
             command: "cargo test",
             cwd: tmp.path().to_string_lossy().as_ref(),
             tool: Some("exec_shell"),
             path: None,
-            ask_for_approval: codewhale_execpolicy::AskForApproval::OnRequest,
+            ask_for_approval: nestlone_execpolicy::AskForApproval::OnRequest,
             sandbox_mode: None,
         })
         .expect("check persisted allow");
     assert_eq!(
         exact.matched_action,
-        Some(codewhale_execpolicy::PermissionAction::Allow)
+        Some(nestlone_execpolicy::PermissionAction::Allow)
     );
     assert!(!exact.requires_approval);
 
     let expanded = config
         .exec_policy_engine
-        .check(codewhale_execpolicy::ExecPolicyContext {
+        .check(nestlone_execpolicy::ExecPolicyContext {
             command: "cargo test --workspace",
             cwd: tmp.path().to_string_lossy().as_ref(),
             tool: Some("exec_shell"),
             path: None,
-            ask_for_approval: codewhale_execpolicy::AskForApproval::OnRequest,
+            ask_for_approval: nestlone_execpolicy::AskForApproval::OnRequest,
             sandbox_mode: None,
         })
         .expect("check expanded command");
@@ -17415,9 +17415,9 @@ fn recoverable_provider_error_advances_fallback_chain() {
 
     let mut app = create_test_app();
     app.api_provider = ApiProvider::Deepseek;
-    app.provider_chain = Some(codewhale_config::ProviderChain::new(
-        codewhale_config::ProviderKind::Deepseek,
-        &[codewhale_config::ProviderKind::Openrouter],
+    app.provider_chain = Some(nestlone_config::ProviderChain::new(
+        nestlone_config::ProviderKind::Deepseek,
+        &[nestlone_config::ProviderKind::Openrouter],
     ));
 
     apply_engine_error_to_app(
@@ -17461,9 +17461,9 @@ fn auth_error_does_not_trigger_provider_fallback() {
     // Not env-only, so we exercise the category gate rather than the env-key
     // onboarding early-return.
     app.api_key_env_only = false;
-    app.provider_chain = Some(codewhale_config::ProviderChain::new(
-        codewhale_config::ProviderKind::Deepseek,
-        &[codewhale_config::ProviderKind::Openrouter],
+    app.provider_chain = Some(nestlone_config::ProviderChain::new(
+        nestlone_config::ProviderKind::Deepseek,
+        &[nestlone_config::ProviderKind::Openrouter],
     ));
 
     apply_engine_error_to_app(
@@ -17501,9 +17501,9 @@ fn fallback_switch_status_shows_one_based_position_and_reason() {
 
     let mut app = create_test_app();
     app.api_provider = ApiProvider::Deepseek;
-    app.provider_chain = Some(codewhale_config::ProviderChain::new(
-        codewhale_config::ProviderKind::Deepseek,
-        &[codewhale_config::ProviderKind::Openrouter],
+    app.provider_chain = Some(nestlone_config::ProviderChain::new(
+        nestlone_config::ProviderKind::Deepseek,
+        &[nestlone_config::ProviderKind::Openrouter],
     ));
 
     apply_engine_error_to_app(
@@ -17677,16 +17677,16 @@ async fn provider_switch_auth_error_restores_previous_provider_and_model() {
         Some("deepseek-v4-pro")
     );
     assert_eq!(settings.default_model.as_deref(), Some("deepseek-v4-pro"));
-    let state = codewhale_config::SetupState::load()
+    let state = nestlone_config::SetupState::load()
         .expect("load setup state")
         .expect("setup state");
     assert_eq!(
-        state.status(codewhale_config::SetupStep::ProviderModel),
-        codewhale_config::StepStatus::Verified
+        state.status(nestlone_config::SetupStep::ProviderModel),
+        nestlone_config::StepStatus::Verified
     );
     let provider_model_result = state
         .steps
-        .get(&codewhale_config::SetupStep::ProviderModel)
+        .get(&nestlone_config::SetupStep::ProviderModel)
         .and_then(|entry| entry.result.as_deref())
         .expect("provider/model result");
     assert!(provider_model_result.contains("provider=deepseek"));
@@ -17747,12 +17747,12 @@ async fn provider_switch_rollback_corrects_setup_receipt_when_persistence_fails(
         Some("kimi-k2.6".to_string()),
     )
     .await;
-    let target_state = codewhale_config::SetupState::load()
+    let target_state = nestlone_config::SetupState::load()
         .expect("load target setup state")
         .expect("target setup state");
     let target_result = target_state
         .steps
-        .get(&codewhale_config::SetupStep::ProviderModel)
+        .get(&nestlone_config::SetupStep::ProviderModel)
         .and_then(|entry| entry.result.as_deref())
         .expect("target provider/model result");
     assert!(target_result.contains("provider=moonshot"));
@@ -17772,12 +17772,12 @@ async fn provider_switch_rollback_corrects_setup_receipt_when_persistence_fails(
         rollback_status.contains("not fully persisted"),
         "{rollback_status}"
     );
-    let state = codewhale_config::SetupState::load()
+    let state = nestlone_config::SetupState::load()
         .expect("load setup state")
         .expect("setup state");
     let provider_model_result = state
         .steps
-        .get(&codewhale_config::SetupStep::ProviderModel)
+        .get(&nestlone_config::SetupStep::ProviderModel)
         .and_then(|entry| entry.result.as_deref())
         .expect("provider/model result");
     assert!(provider_model_result.contains("provider=deepseek"));
@@ -19969,7 +19969,7 @@ fn six_worker_progress_storm_keeps_input_render_and_cancel_live() {
 }
 
 #[test]
-fn terminal_input_child_pause_drains_codewhale_events_before_editor_handoff() {
+fn terminal_input_child_pause_drains_nestlone_events_before_editor_handoff() {
     let (tx, rx) = std::sync::mpsc::channel();
     tx.send(TerminalInputMessage::Event(Event::Key(KeyEvent::new(
         KeyCode::Char('x'),

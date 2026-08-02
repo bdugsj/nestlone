@@ -263,7 +263,7 @@ impl SlopLedger {
     /// (with one-time legacy migration) so loads and saves never perpetuate
     /// `~/.deepseek` (#3240).
     pub fn default_path() -> io::Result<PathBuf> {
-        codewhale_config::ensure_state_dir("slop_ledger")
+        nestlone_config::ensure_state_dir("slop_ledger")
             .map(|p| p.join("slop_ledger.json"))
             .map_err(io::Error::other)
     }

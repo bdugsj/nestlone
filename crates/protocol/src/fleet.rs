@@ -342,7 +342,7 @@ pub enum FleetHostSpec {
         #[serde(skip_serializing_if = "Vec::is_empty")]
         env_allowlist: Vec<String>,
         #[serde(skip_serializing_if = "Option::is_none")]
-        codewhale_binary: Option<String>,
+        nestlone_binary: Option<String>,
     },
     #[serde(alias = "container")]
     #[serde(alias = "Container")]
@@ -1270,7 +1270,7 @@ mod tests {
                 host_key_fingerprint,
                 working_directory,
                 env_allowlist,
-                codewhale_binary,
+                nestlone_binary,
             } => {
                 assert_eq!(host, "builder.example.test");
                 assert_eq!(port, None);
@@ -1280,7 +1280,7 @@ mod tests {
                 assert_eq!(host_key_fingerprint, None);
                 assert_eq!(working_directory, None);
                 assert!(env_allowlist.is_empty());
-                assert_eq!(codewhale_binary, None);
+                assert_eq!(nestlone_binary, None);
             }
             other => panic!("expected ssh host spec, got {other:?}"),
         }
@@ -1401,12 +1401,12 @@ mod tests {
             host: "builder.trusted.example.com".to_string(),
             port: Some(22),
             user: Some("codewhale".to_string()),
-            identity: Some(PathBuf::from("~/.ssh/codewhale_fleet")),
+            identity: Some(PathBuf::from("~/.ssh/nestlone_fleet")),
             known_hosts: Some(PathBuf::from("~/.ssh/known_hosts")),
             host_key_fingerprint: Some("SHA256:aLGqZo1M6c...".to_string()),
             working_directory: Some(PathBuf::from("/srv/codewhale/work")),
             env_allowlist: vec!["CODEWHALE_PROFILE".to_string()],
-            codewhale_binary: Some("/usr/local/bin/codewhale".to_string()),
+            nestlone_binary: Some("/usr/local/bin/codewhale".to_string()),
         };
         let json = serde_json::to_string_pretty(&spec).unwrap();
         assert!(json.contains("\"known_hosts\""));
