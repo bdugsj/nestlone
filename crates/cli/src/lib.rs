@@ -1,9 +1,8 @@
 #![allow(clippy::uninlined_format_args)]
 
 mod metrics;
-// mod update; — disabled: self-update not applicable for Docker-based deployment.
-// See .claude/projects/.../memory/self-update-plan.md for re-enable instructions.
 #[cfg(not(target_env = "ohos"))]
+mod update;
 
 use std::io::{self, Read, Write};
 use std::net::SocketAddr;
@@ -411,7 +410,8 @@ The command prints the completion script to stdout; redirect it to a path your s
     },
     /// Print a usage rollup from the audit log and session store.
     Metrics(MetricsArgs),
-    // Update(UpdateArgs), — disabled: self-update not applicable for Docker deployment
+    /// Self-update the `codewhale` binary from GitHub Releases.
+    Update(UpdateArgs),
 }
 
 fn command_accepts_raw_provider(command: Option<&Commands>) -> bool {
@@ -471,8 +471,6 @@ fn prepare_raw_provider_tui_dispatch(
     Ok(Some((resolved_runtime, passthrough)))
 }
 
-// UpdateArgs struct — disabled with update command. See self-update-plan.md.
-/*
 #[derive(Debug, Args)]
 struct UpdateArgs {
     /// Update to the latest beta release instead of the latest stable release.
@@ -485,7 +483,6 @@ struct UpdateArgs {
     #[arg(long, value_name = "URL")]
     proxy: Option<String>,
 }
-*/
 
 #[derive(Debug, Args)]
 struct MetricsArgs {
@@ -1834,9 +1831,17 @@ fn run() -> Result<()> {
             Ok(())
         }
         Some(Commands::Metrics(args)) => run_metrics_command(args),
-        // Update command disabled — self-update not applicable for Docker deployment.
-        // See self-update-plan.md for re-enable instructions.
-        // Some(Commands::Update(args)) => { ... }
+        Some(Commands::Update(args)) => {
+            #[cfg(not(target_env = "ohos"))]
+            {
+                update::run_update(args.beta, args.check, args.proxy)
+            }
+            #[cfg(target_env = "ohos")]
+            {
+                let _ = args;
+                bail!("self-update is not supported on HarmonyOS/OpenHarmony yet");
+            }
+        }
         None => {
             let resolved_runtime = resolve_runtime_for_dispatch(&mut store, &runtime_overrides);
             let forwarded = root_tui_passthrough(&cli)?;
@@ -4893,8 +4898,6 @@ mod tests {
         ));
     }
 
-    // Update command tests disabled — see self-update-plan.md.
-    /*
     #[test]
     fn parses_update_beta_flag() {
         let cli = parse_ok(&["codewhale", "update"]);
@@ -4935,7 +4938,6 @@ mod tests {
         assert!(!args.check);
         assert_eq!(args.proxy.as_deref(), Some("socks5://127.0.0.1:1080"));
     }
-    */
 
     #[test]
     fn parses_model_command_matrix() {

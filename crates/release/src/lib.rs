@@ -17,8 +17,8 @@ pub const LATEST_RELEASE_URL: &str =
 pub const RELEASES_URL: &str =
     "https://api.github.com/repos/bdugsj/nestlone/releases?per_page=100";
 
-/// Base URL of the CodeWhale repository on the CNB mirror platform.
-pub const CNB_REPO_URL: &str = "https://cnb.cool/codewhale.net/codewhale";
+/// Base URL of the Nestlone repository on the CNB mirror platform.
+pub const CNB_REPO_URL: &str = "https://cnb.cool/bdugsj/nestlone";
 
 /// Environment variable that overrides the base URL for release asset downloads.
 pub const RELEASE_BASE_URL_ENV: &str = "CODEWHALE_RELEASE_BASE_URL";

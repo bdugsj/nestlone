@@ -257,12 +257,46 @@ if [ "$MODE" = "native" ] || [ "$MODE" = "both" ]; then
         pip3 install $PIP_MIRROR mcp 2>&1 | tail -1
     log "MCP SDK ready"
 
-    # Build
-    info "Compiling Nestlone (10-20 min)..."
-    cd CodeWhale
-    cargo build --release -p codewhale-cli -p codewhale-tui
-    cd "$SCRIPT_DIR"
-    log "Native build complete"
+    # ── Try pre-built binary from GitHub Releases ──────────────────
+    PREBUILT_OK=false
+    if [ "$USE_MIRRORS" != "true" ] && [ -z "${NESTLONE_NO_PREBUILT:-}" ]; then
+        info "Checking GitHub Releases for a pre-built binary..."
+        case "$(uname -m)" in
+            x86_64) PREBUILT_ASSET="nestlone-x86_64-unknown-linux-gnu.tar.gz" ;;
+            aarch64|arm64) PREBUILT_ASSET="nestlone-aarch64-unknown-linux-gnu.tar.gz" ;;
+            *) PREBUILT_ASSET="" ;;
+        esac
+        if [ -n "$PREBUILT_ASSET" ]; then
+            RELEASE_VER="${NESTLONE_VERSION:-latest}"
+            PREBUILT_URL="https://github.com/bdugsj/nestlone/releases/download/$RELEASE_VER/$PREBUILT_ASSET"
+            TMP_TAR="$(mktemp -d)"
+            if curl -fL --connect-timeout 10 --max-time 300 "$PREBUILT_URL" -o "$TMP_TAR/nestlone.tar.gz"; then
+                if tar -xzf "$TMP_TAR/nestlone.tar.gz" -C "$TMP_TAR" && \
+                   [ -f "$TMP_TAR/nestlone" ] && [ -f "$TMP_TAR/codewhale" ]; then
+                    mkdir -p CodeWhale/target/release
+                    cp -f "$TMP_TAR/nestlone" CodeWhale/target/release/nestlone
+                    cp -f "$TMP_TAR/codewhale" CodeWhale/target/release/codewhale
+                    chmod +x CodeWhale/target/release/nestlone CodeWhale/target/release/codewhale
+                    PREBUILT_OK=true
+                    log "Pre-built binary downloaded ($RELEASE_VER)"
+                else
+                    warn "Downloaded archive missing binaries — falling back to compile"
+                fi
+            else
+                warn "Pre-built download failed — falling back to compile"
+            fi
+            rm -rf "$TMP_TAR"
+        fi
+    fi
+
+    # Build from source only if no pre-built binary is available
+    if [ "$PREBUILT_OK" != "true" ]; then
+        info "Compiling Nestlone from source (10-20 min)..."
+        cd CodeWhale
+        cargo build --release -p codewhale-cli -p codewhale-tui
+        cd "$SCRIPT_DIR"
+        log "Native build complete"
+    fi
 
     # Install binaries to PATH
     install_to_path

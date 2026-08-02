@@ -2217,7 +2217,7 @@ pub struct UpdateConfig {
 impl Default for UpdateConfig {
     fn default() -> Self {
         Self {
-            check_for_updates: false,
+            check_for_updates: true,
             update_uri: None,
         }
     }
