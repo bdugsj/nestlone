@@ -218,6 +218,27 @@ if [ "$MODE" = "native" ] || [ "$MODE" = "both" ]; then
                 sudo sed -i "s|URIs: http[s]*://[^/]*/kali|URIs: http://$MIRROR_APT/kali|g" "$src"
             done
         fi
+        # ── Passwordless sudo for the agent ─────────────────────
+        # The agent's Bash tool runs as the current user and cannot type a
+        # password, so root-requiring commands (apt, nmap -sS, etc.) need
+        # passwordless sudo. Disable with NESTLONE_NOPASSWD_SUDO=0.
+        if [ "${NESTLONE_NOPASSWD_SUDO:-1}" = "1" ]; then
+            CUR_USER="$(whoami)"
+            if [ "$CUR_USER" != "root" ]; then
+                info "Configuring passwordless sudo for '$CUR_USER' (agent root capability)..."
+                TMP_SUDOERS="$(mktemp)"
+                echo "$CUR_USER ALL=(ALL) NOPASSWD:ALL" > "$TMP_SUDOERS"
+                if sudo visudo -cf "$TMP_SUDOERS" >/dev/null 2>&1; then
+                    sudo install -m 0440 -o root -g root "$TMP_SUDOERS" /etc/sudoers.d/99-nestlone
+                    log "Passwordless sudo enabled — agent can run 'sudo <cmd>'"
+                else
+                    warn "sudoers syntax check failed — passwordless sudo skipped"
+                fi
+                rm -f "$TMP_SUDOERS"
+            else
+                log "Running as root — no sudo config needed"
+            fi
+        fi
         info "Installing system packages..."
         # Unset proxy vars that interfere with apt
         unset http_proxy https_proxy HTTP_PROXY HTTPS_PROXY all_proxy ALL_PROXY 2>/dev/null || true
