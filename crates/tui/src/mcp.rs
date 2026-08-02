@@ -591,7 +591,7 @@ pub struct McpServerConfig {
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub bearer_token_env_var: Option<String>,
-    /// OAuth scopes requested during `codewhale mcp login`.
+    /// OAuth scopes requested during `nestlone mcp login`.
     #[serde(default)]
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub scopes: Vec<String>,
@@ -815,7 +815,7 @@ impl ReviewedStdioLaunch {
             .context("reviewed plugin executable is absent from its byte inventory")?;
         let mut file = open_reviewed_launch_file(path)?;
         let mut hasher = sha2::Sha256::new();
-        hasher.update(b"codewhale-plugin-file-bytes-v1\0");
+        hasher.update(b"nestlone-plugin-file-bytes-v1\0");
         let mut buffer = [0_u8; 64 * 1024];
         loop {
             let read = file
@@ -1979,7 +1979,7 @@ impl McpConnection {
             "params": {
                 "protocolVersion": "2024-11-05",
                 "clientInfo": {
-                    "name": "codewhale-tui",
+                    "name": "nestlone-tui",
                     "version": env!("CARGO_PKG_VERSION")
                 },
                 "capabilities": {

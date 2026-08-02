@@ -1,4 +1,4 @@
-//! Configuration loading and defaults for codewhale.
+//! Configuration loading and defaults for nestlone.
 
 use std::collections::HashMap;
 use std::fs;
@@ -2334,7 +2334,7 @@ pub struct Config {
     #[serde(default)]
     pub hooks: Option<HooksConfig>,
 
-    /// Provider-specific credentials and defaults shared with the `codewhale` facade.
+    /// Provider-specific credentials and defaults shared with the `nestlone` facade.
     #[serde(default)]
     pub providers: Option<ProvidersConfig>,
 
@@ -2426,7 +2426,7 @@ pub struct Config {
     #[serde(default)]
     pub subagents: Option<SubagentsConfig>,
 
-    /// Runtime API server tuning (`codewhale serve --http`). Currently only
+    /// Runtime API server tuning (`nestlone serve --http`). Currently only
     /// hosts the CORS allow-list extension (whalescale#255 / #561). When the
     /// table is absent, the daemon ships with localhost:3000 / localhost:1420
     /// / tauri://localhost as the only allowed dev origins.
@@ -5285,7 +5285,7 @@ impl Config {
             .and_then(|entry| entry.external_credentials.as_ref())
             .with_context(|| {
                 format!(
-                    "External credentials owned by {} are disabled for {}. To allow read-only access to this exact file, run:\n  codewhale auth external-consent --provider {} --mode read-only --path {}",
+                    "External credentials owned by {} are disabled for {}. To allow read-only access to this exact file, run:\n  nestlone auth external-consent --provider {} --mode read-only --path {}",
                     source.as_str(),
                     provider.display_name(),
                     kind.as_str(),
@@ -5423,7 +5423,7 @@ impl Config {
         // intentional override must win over the saved root key. This is
         // essential for DeepSeek-compatible subscription endpoints where the
         // user runs something like:
-        //   codewhale --provider deepseek --api-key ark-... --base-url ... --model auto
+        //   nestlone --provider deepseek --api-key ark-... --base-url ... --model auto
         if matches!(provider, ApiProvider::Deepseek | ApiProvider::DeepseekCN)
             && std::env::var("DEEPSEEK_API_KEY_SOURCE").as_deref() == Ok("cli")
             && let Some(env_key) = explicit_cli_key
@@ -5497,7 +5497,7 @@ impl Config {
         }
 
         // 1. Config file (provider-scoped slot). This intentionally wins
-        // over ambient env so `codewhale auth set` fixes stale shell exports.
+        // over ambient env so `nestlone auth set` fixes stale shell exports.
         if self.config_credentials_are_bound_to_provider_endpoint(provider)
             && let Some(configured) = self
                 .provider_config_string_with_runtime_fallback(provider, |entry| {
@@ -5526,7 +5526,7 @@ impl Config {
         }
 
         // 2. The dispatcher resolves this same provider slot before launching
-        // the TUI. Standalone `codewhale-tui` launches must see the identical
+        // the TUI. Standalone `nestlone-tui` launches must see the identical
         // durable credential. Auto-detection is file-backed and prompt-free by
         // default; the OS keyring is queried only when the user explicitly
         // selects the system backend.
@@ -5580,7 +5580,7 @@ impl Config {
                  \n\
                  1. Get a key:  https://platform.deepseek.com/api_keys\n\
                  2. Save it (works in every folder, no OS prompts):\n\
-                        codewhale auth set --provider deepseek\n\
+                        nestlone auth set --provider deepseek\n\
                  \n\
                  Alternatives:\n\
                    • export DEEPSEEK_API_KEY=<your-key>      (current shell only;\n\
@@ -5589,7 +5589,7 @@ impl Config {
                    • api_key = \"<your-key>\"  in ~/.codewhale/config.toml"
             ),
             ApiProvider::SiliconflowCn => anyhow::bail!(
-                "SiliconFlow China API key not found. Get a key: {}. Run 'codewhale auth set --provider siliconflow-CN', \
+                "SiliconFlow China API key not found. Get a key: {}. Run 'nestlone auth set --provider siliconflow-CN', \
                  set {}, or add [{}] api_key in ~/.codewhale/config.toml. \
                  [providers.siliconflow] remains a fallback when the CN table omits api_key.",
                 provider
@@ -5603,7 +5603,7 @@ impl Config {
                     credential_help_for_provider_route(provider, &self.deepseek_base_url());
                 if moonshot_base_url_is_exact_kimi_code(&self.deepseek_base_url()) {
                     anyhow::bail!(
-                        "Kimi Code membership-plan API key not found. Get a plan key: {}. This route uses api.kimi.com/coding/v1 and does not import Kimi CLI credentials. Run 'codewhale auth set --provider moonshot', set {}, or add [{}] api_key.",
+                        "Kimi Code membership-plan API key not found. Get a plan key: {}. This route uses api.kimi.com/coding/v1 and does not import Kimi CLI credentials. Run 'nestlone auth set --provider moonshot', set {}, or add [{}] api_key.",
                         credential_help
                             .credential_url
                             .unwrap_or(KIMI_CODE_MEMBERSHIP_PLAN_CONSOLE_URL),
@@ -5612,7 +5612,7 @@ impl Config {
                     );
                 }
                 anyhow::bail!(
-                    "Moonshot/Kimi API key not found. Get a key: {}. Run 'codewhale auth set --provider moonshot', \
+                    "Moonshot/Kimi API key not found. Get a key: {}. Run 'nestlone auth set --provider moonshot', \
                      set {}, or add [{}] api_key. \
                      For a Kimi Code plan key, set [providers.moonshot] base_url = \
                      \"https://api.kimi.com/coding/v1\" and model = \"kimi-for-coding\".",
@@ -5642,9 +5642,9 @@ impl Config {
                 }
                 anyhow::bail!(
                     "xAI API key not found. Get a key: https://console.x.ai/\n\
-                     Run 'codewhale auth set --provider xai', set XAI_API_KEY, or add \
+                     Run 'nestlone auth set --provider xai', set XAI_API_KEY, or add \
                      [providers.xai] api_key.\n\
-                     OAuth alternative: run `codewhale auth xai-device` for \
+                     OAuth alternative: run `nestlone auth xai-device` for \
                      Codewhale-owned storage and set [providers.xai] auth_mode = \"oauth\"."
                 );
             }
@@ -6430,7 +6430,7 @@ fn resolve_default_load_config_path() -> Option<PathBuf> {
 
 /// Create an inspectable config file on first interactive launch.
 ///
-/// The file intentionally omits `api_key`; onboarding or `codewhale auth set`
+/// The file intentionally omits `api_key`; onboarding or `nestlone auth set`
 /// writes that field after the user supplies a key.
 pub fn ensure_config_file_exists(path: Option<PathBuf>) -> Result<Option<PathBuf>> {
     let config_path = path
@@ -6443,9 +6443,9 @@ pub fn ensure_config_file_exists(path: Option<PathBuf>) -> Result<Option<PathBuf
 
     ensure_parent_dir(&config_path)?;
     let content = format!(
-        r#"# codewhale Configuration
+        r#"# nestlone Configuration
 # Get your API key from https://platform.deepseek.com
-# Save it with: codewhale auth set --provider deepseek
+# Save it with: nestlone auth set --provider deepseek
 
 # Base URL (default: https://api.deepseek.com/beta)
 # Set https://api.deepseek.com to opt out of beta features.
@@ -6462,7 +6462,7 @@ reasoning_effort = "auto"
 # Startup update check
 [update]
 check_for_updates = true
-# update_uri = "https://internal.mirror.example/codewhale/releases/latest"
+# update_uri = "https://internal.mirror.example/nestlone/releases/latest"
 "#
     );
     write_config_file_secure(&config_path, &content)
@@ -8250,7 +8250,7 @@ pub(crate) fn moonshot_k3_route_display_name(base_url: &str, model: &str) -> Opt
 /// Credential help for a concrete provider route.
 ///
 /// `ProviderKind::Moonshot` intentionally retains its generic direct-API
-/// metadata in `codewhale-config`: that remains correct for Moonshot's own
+/// metadata in `nestlone-config`: that remains correct for Moonshot's own
 /// platform route. The Kimi Code membership endpoint is a distinct route and
 /// must not send its users to the generic API console or imply CLI credential
 /// import support.
@@ -8987,7 +8987,7 @@ pub fn ensure_parent_dir(path: &Path) -> Result<()> {
                     perms.set_mode(mode & !0o077);
                     if let Err(err) = fs::set_permissions(parent, perms) {
                         tracing::warn!(
-                            target: "codewhale::config",
+                            target: "nestlone::config",
                             path = %parent.display(),
                             error = %err,
                             "could not tighten parent dir permissions; \
@@ -9202,7 +9202,7 @@ fn save_api_key_to_config_file(api_key: &str) -> Result<PathBuf> {
     } else {
         // Create new minimal config
         let content = format!(
-            r#"# codewhale Configuration
+            r#"# nestlone Configuration
 # Set provider credentials in this file or via environment variables.
 # See /links in the TUI for provider-specific credential pages.
 
@@ -9612,7 +9612,7 @@ fn save_api_key_for_identity_unlocked(
     let provider = identity.provider;
     if provider == ApiProvider::OpenaiCodex {
         anyhow::bail!(
-            "OpenAI Codex uses OAuth. Run `codex login`, then grant exact read-only access with `codewhale auth external-consent --provider openai-codex --mode read-only`, or set OPENAI_CODEX_ACCESS_TOKEN for this process; Codewhale does not store an API key for this provider."
+            "OpenAI Codex uses OAuth. Run `codex login`, then grant exact read-only access with `nestlone auth external-consent --provider openai-codex --mode read-only`, or set OPENAI_CODEX_ACCESS_TOKEN for this process; Codewhale does not store an API key for this provider."
         );
     }
     let is_legacy_literal_custom = provider == ApiProvider::Custom
@@ -10139,7 +10139,7 @@ fn provider_secret_store_api_key_with_mode(
 
 /// The model this launch was explicitly asked for, if any.
 ///
-/// The `codewhale` dispatcher forwards `--model` to this binary as
+/// The `nestlone` dispatcher forwards `--model` to this binary as
 /// `CODEWHALE_MODEL` (with the legacy `DEEPSEEK_MODEL` alias), so an explicit
 /// flag and an explicit shell export are the same signal here: *the user named
 /// a model for this run*. That has to outrank the remembered per-provider
@@ -10169,7 +10169,7 @@ fn missing_provider_api_key_message(provider: ApiProvider) -> Result<String> {
         .map(|url| format!(" Get a key: {url}."))
         .unwrap_or_default();
     Ok(format!(
-        "{} API key not found.{} Run 'codewhale auth set --provider {}', set {}, or add [{}] api_key in ~/.codewhale/config.toml.",
+        "{} API key not found.{} Run 'nestlone auth set --provider {}', set {}, or add [{}] api_key in ~/.codewhale/config.toml.",
         provider.display_name(),
         credential_hint,
         provider.as_str(),

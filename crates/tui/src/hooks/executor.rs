@@ -3128,7 +3128,7 @@ NOEQUAL line dropped
     fn turn_end_payload_contains_post_turn_observer_fields() {
         let context = HookContext::new()
             .with_session_id("sess_test")
-            .with_workspace(PathBuf::from("/tmp/codewhale"))
+            .with_workspace(PathBuf::from("/tmp/nestlone"))
             .with_mode("agent")
             .with_model("deepseek-v4")
             .with_tokens(125);
@@ -3167,7 +3167,7 @@ NOEQUAL line dropped
 
         assert_eq!(payload["event"], "turn_end");
         assert_eq!(payload["session_id"], "sess_test");
-        assert_eq!(payload["workspace"], "/tmp/codewhale");
+        assert_eq!(payload["workspace"], "/tmp/nestlone");
         assert_eq!(payload["mode"], "agent");
         assert_eq!(payload["created_at"], "2026-07-12T10:30:00+00:00");
         assert_eq!(payload["model_backed"], true);

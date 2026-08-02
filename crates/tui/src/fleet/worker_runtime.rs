@@ -838,7 +838,7 @@ pub(crate) fn explicit_fleet_provider_id(agent_profile: Option<&AgentProfile>) -
 ///
 /// `pub(crate)` so the interactive-TUI in-process spawn path
 /// (`tools::subagent`) resolves the pinned provider from the SAME
-/// explicit-only source as the headless `codewhale exec` launch route (#4193),
+/// explicit-only source as the headless `nestlone exec` launch route (#4193),
 /// instead of re-deriving it and risking a second, divergent policy. User-named
 /// custom providers intentionally return `None` here; launch paths that can
 /// carry strings should use [`explicit_fleet_provider_id`].
@@ -884,7 +884,7 @@ pub(crate) fn fleet_worker_launch_reasoning_effort(
 }
 
 /// The route (model selector + optional explicit provider id) that a fleet
-/// worker's actual `codewhale exec` subprocess should launch on (#4093 AC #4).
+/// worker's actual `nestlone exec` subprocess should launch on (#4093 AC #4).
 ///
 /// This is the launch-side twin of [`resolve_fleet_route`] (the receipt): both
 /// read the worker's model from the same task/profile/run precedence
@@ -900,7 +900,7 @@ pub(crate) fn fleet_worker_launch_reasoning_effort(
 ///   caller omits `--provider` and the worker keeps its own session default,
 ///   preserving today's behavior for profile-less workers. Built-ins use their
 ///   canonical ids; user-named custom providers preserve the profile's id so
-///   `codewhale exec --provider <id>` can resolve `[providers.<id>]`.
+///   `nestlone exec --provider <id>` can resolve `[providers.<id>]`.
 pub(crate) fn fleet_worker_launch_route(
     task_spec: &FleetTaskSpec,
     agent_profiles: &[AgentProfile],
@@ -2702,7 +2702,7 @@ mod tests {
         );
 
         // 1b) User-named OpenAI-compatible providers are launchable too: keep
-        //     the exact provider id so `codewhale exec --provider lm-studio`
+        //     the exact provider id so `nestlone exec --provider lm-studio`
         //     can resolve `[providers.lm-studio]` from config (#3965).
         let mut custom = agent_profile(
             "local",

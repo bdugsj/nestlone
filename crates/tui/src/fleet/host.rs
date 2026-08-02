@@ -236,7 +236,7 @@ impl LocalProcessFleetHostAdapter {
         }
 
         // Fleet owns the complete worker tree, not only the dispatcher PID.
-        // `codewhale` spawns `codewhale-tui`, which can in turn spawn tool
+        // `nestlone` spawns `nestlone-tui`, which can in turn spawn tool
         // processes; isolating the root prevents a stop from signalling the
         // operator's own process group.
         #[cfg(unix)]
@@ -483,7 +483,7 @@ impl SshFleetHostConfig {
             host_key_fingerprint: None,
             working_directory: working_directory.into(),
             env_allowlist: BTreeSet::new(),
-            nestlone_binary: "codewhale".to_string(),
+            nestlone_binary: "nestlone".to_string(),
             ssh_binary: "ssh".to_string(),
             connect_timeout_seconds: DEFAULT_CONNECT_TIMEOUT_SECONDS,
         }
@@ -532,7 +532,7 @@ impl SshFleetHostConfig {
         }
         if self.nestlone_binary.trim().is_empty() {
             return Err(FleetHostError::configuration(
-                "SSH fleet host requires an explicit codewhale binary path",
+                "SSH fleet host requires an explicit nestlone binary path",
             ));
         }
         if self.working_directory.as_os_str().is_empty() {
@@ -1966,16 +1966,16 @@ mod tests {
     #[test]
     fn fleet_host_ssh_command_uses_sendenv_without_argv_secret_values() {
         let tmp = TempDir::new().unwrap();
-        let mut config = SshFleetHostConfig::new("builder.example.test", "/srv/codewhale");
+        let mut config = SshFleetHostConfig::new("builder.example.test", "/srv/nestlone");
         config.user = Some("fleet".to_string());
         config.port = Some(2222);
         config.identity = Some(PathBuf::from("/tmp/fleet_id"));
-        config.nestlone_binary = "/usr/local/bin/codewhale".to_string();
+        config.nestlone_binary = "/usr/local/bin/nestlone".to_string();
         config.env_allowlist = BTreeSet::from(["FLEET_PROFILE".to_string()]);
         let adapter = SshFleetHostAdapter::new(tmp.path(), config).unwrap();
         let mut request = FleetWorkerStartRequest::new(
             "ssh-1",
-            FleetWorkerCommand::new("codewhale", ["fleet-worker", "noop"]),
+            FleetWorkerCommand::new("nestlone", ["fleet-worker", "noop"]),
         );
         request.env.insert(
             "FLEET_PROFILE".to_string(),
@@ -1989,7 +1989,7 @@ mod tests {
         assert!(argv.contains("BatchMode=yes"));
         assert!(argv.contains("SendEnv=FLEET_PROFILE"));
         assert!(argv.contains("fleet@builder.example.test"));
-        assert!(argv.contains("/usr/local/bin/codewhale"));
+        assert!(argv.contains("/usr/local/bin/nestlone"));
         assert!(argv.contains("fleet-worker"));
         assert!(!argv.contains("super-secret-profile-value"));
     }
@@ -1997,7 +1997,7 @@ mod tests {
     #[test]
     fn fleet_host_ssh_config_requires_explicit_safe_fields() {
         let tmp = TempDir::new().unwrap();
-        let mut config = SshFleetHostConfig::new("", "/srv/codewhale");
+        let mut config = SshFleetHostConfig::new("", "/srv/nestlone");
         config.env_allowlist = BTreeSet::from(["SAFE_FLAG".to_string()]);
 
         let err = SshFleetHostAdapter::new(tmp.path(), config).unwrap_err();
@@ -2015,9 +2015,9 @@ mod tests {
             identity: Some(PathBuf::from("/tmp/fleet_id")),
             known_hosts: None,
             host_key_fingerprint: None,
-            working_directory: Some(PathBuf::from("/srv/codewhale")),
+            working_directory: Some(PathBuf::from("/srv/nestlone")),
             env_allowlist: vec!["FLEET_PROFILE".to_string()],
-            nestlone_binary: Some("/usr/local/bin/codewhale".to_string()),
+            nestlone_binary: Some("/usr/local/bin/nestlone".to_string()),
         };
 
         let config = SshFleetHostConfig::from_host_spec(&spec).unwrap();
@@ -2025,8 +2025,8 @@ mod tests {
         assert_eq!(config.host, "builder.example.test");
         assert_eq!(config.port, Some(2222));
         assert_eq!(config.user.as_deref(), Some("fleet"));
-        assert_eq!(config.working_directory, PathBuf::from("/srv/codewhale"));
+        assert_eq!(config.working_directory, PathBuf::from("/srv/nestlone"));
         assert!(config.env_allowlist.contains("FLEET_PROFILE"));
-        assert_eq!(config.nestlone_binary, "/usr/local/bin/codewhale");
+        assert_eq!(config.nestlone_binary, "/usr/local/bin/nestlone");
     }
 }

@@ -3040,7 +3040,7 @@ mod tests {
     fn table_pipes_inside_inline_code_stay_in_the_cell() {
         let src = "| Check | Result |\n\
                    |---|---|\n\
-                   | `strings ~/.cargo/bin/codewhale-tui | grep -c \"legacy marker\"` | 0 matches |\n";
+                   | `strings ~/.cargo/bin/nestlone-tui | grep -c \"legacy marker\"` | 0 matches |\n";
         let parsed = parse(src);
 
         let rows: Vec<&Vec<String>> = parsed
@@ -3056,7 +3056,7 @@ mod tests {
         assert_eq!(
             rows[1],
             &vec![
-                "`strings ~/.cargo/bin/codewhale-tui | grep -c \"legacy marker\"`".to_string(),
+                "`strings ~/.cargo/bin/nestlone-tui | grep -c \"legacy marker\"`".to_string(),
                 "0 matches".to_string(),
             ]
         );
@@ -3069,7 +3069,7 @@ mod tests {
         );
         let data_line = rendered_lines
             .iter()
-            .find(|line| line.contains("strings ~/.cargo/bin/codewhale-tui"))
+            .find(|line| line.contains("strings ~/.cargo/bin/nestlone-tui"))
             .expect("data row should render");
         assert_eq!(
             data_line.matches('│').count(),

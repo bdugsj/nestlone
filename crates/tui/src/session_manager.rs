@@ -181,7 +181,7 @@ fn is_not_archived(archived: &bool) -> bool {
 ///
 /// A static registry rather than a field on `RuntimeApiState` because the
 /// embedded Runtime API runs inside the TUI process; a standalone
-/// `codewhale web` has an empty registry and is therefore never blocked, which
+/// `nestlone web` has an empty registry and is therefore never blocked, which
 /// is exactly right — there is no TUI holding anything.
 static LIVE_SESSIONS: std::sync::OnceLock<std::sync::RwLock<std::collections::HashSet<String>>> =
     std::sync::OnceLock::new();
@@ -2012,7 +2012,7 @@ mod tests {
                 content: vec![ContentBlock::ToolUse {
                     id: "call-big".to_string(),
                     name: "exec_shell".to_string(),
-                    input: serde_json::json!({"command": "cargo test -p codewhale-tui"}),
+                    input: serde_json::json!({"command": "cargo test -p nestlone-tui"}),
                     caller: None,
                 }],
             },
@@ -2208,7 +2208,7 @@ mod tests {
         let _lock = crate::test_support::lock_test_env();
         let tmp = tempdir().expect("tempdir");
         let home = tmp.path().join("home");
-        let explicit_home = tmp.path().join("explicit-codewhale");
+        let explicit_home = tmp.path().join("explicit-nestlone");
         let _home = crate::test_support::EnvVarGuard::set("HOME", &home);
         let _nestlone_home =
             crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", &explicit_home);

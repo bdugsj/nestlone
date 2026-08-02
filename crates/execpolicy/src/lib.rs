@@ -2419,7 +2419,7 @@ mod tests {
         let decision = engine
             .check(ExecPolicyContext {
                 command: "cargo test",
-                cwd: "c:/repo/codewhale",
+                cwd: "c:/repo/nestlone",
                 tool: Some("exec_shell"),
                 path: None,
                 ask_for_approval: OnRequest,
@@ -2430,7 +2430,7 @@ mod tests {
         assert_eq!(decision.matched_action, Some(PermissionAction::Allow));
         assert_eq!(
             normalize_workspace_scope(r"C:\Repo\CodeWhale"),
-            Some("c:/repo/codewhale".to_string())
+            Some("c:/repo/nestlone".to_string())
         );
         assert_eq!(normalize_workspace_scope("relative/repo"), None);
         assert_eq!(normalize_workspace_scope("/"), None);
@@ -2444,7 +2444,7 @@ mod tests {
         );
         assert_ne!(
             normalize_workspace_scope("/Workspace/CodeWhale"),
-            normalize_workspace_scope("/workspace/codewhale")
+            normalize_workspace_scope("/workspace/nestlone")
         );
         assert_eq!(normalize_workspace_scope("/workspace/../other"), None);
     }

@@ -1760,7 +1760,7 @@ mod tests {
                 duration_secs: Some(0.8),
             },
             assistant_cell("I will start with the locked test suite.", false),
-            exec_tool_cell("cargo test -p codewhale-tui --bins --locked"),
+            exec_tool_cell("cargo test -p nestlone-tui --bins --locked"),
             durable_work_cell(),
             assistant_cell("The focused checks passed.", false),
             user_cell("Proceed to the final verification."),

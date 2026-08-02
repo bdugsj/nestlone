@@ -51,7 +51,7 @@ impl BehavioralTip {
             Self::PlanningMode => template.replace("{key}", "Tab"),
             Self::BackgroundJobReceipt => template.replace("{key}", "Enter"),
             Self::ClearedInputRestore => template.replace("{chord}", "Ctrl+Z"),
-            Self::McpValidation => template.replace("{command}", "codewhale mcp validate"),
+            Self::McpValidation => template.replace("{command}", "nestlone mcp validate"),
             Self::RepeatedCommandHotbar => template.replace("{command}", "/hotbar"),
         }
     }
@@ -259,7 +259,7 @@ mod tests {
         );
         assert_eq!(
             BehavioralTip::McpValidation.message(Locale::En),
-            "codewhale mcp validate starts servers and shows why"
+            "nestlone mcp validate starts servers and shows why"
         );
         assert_eq!(
             BehavioralTip::RepeatedCommandHotbar.message(Locale::En),

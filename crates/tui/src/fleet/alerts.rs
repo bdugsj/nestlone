@@ -246,9 +246,9 @@ impl FleetAlertEvent {
     }
 
     pub fn inspection_commands(&self) -> Vec<String> {
-        let mut commands = vec!["codewhale fleet status".to_string()];
+        let mut commands = vec!["nestlone fleet status".to_string()];
         if let Some(worker_id) = &self.worker_id {
-            commands.push(format!("codewhale fleet inspect {worker_id}"));
+            commands.push(format!("nestlone fleet inspect {worker_id}"));
         }
         commands
     }
@@ -290,7 +290,7 @@ fn prepare_alert(
             secret_env,
         } => {
             let body = json!({
-                "source": "codewhale",
+                "source": "nestlone",
                 "event": safe_event,
             });
             let redacted_payload = json!({
@@ -452,7 +452,7 @@ fn pagerduty_body(event: &FleetAlertEvent, severity: &str, routing_key: String) 
         "payload": {
             "summary": format!("Codewhale fleet {}: {}", alert_class_label(event.class), short_reason(&event.reason)),
             "severity": severity,
-            "source": "codewhale",
+            "source": "nestlone",
             "custom_details": safe_event_payload(event),
         }
     })
@@ -643,7 +643,7 @@ mod tests {
 
         assert!(payload.contains("<redacted:env:FLEET_PD_ROUTING_KEY>"));
         assert!(!payload.contains("real-routing-key-secret"));
-        assert!(payload.contains("codewhale fleet inspect worker-1"));
+        assert!(payload.contains("nestlone fleet inspect worker-1"));
     }
 
     #[test]
@@ -691,8 +691,8 @@ mod tests {
         assert_eq!(
             alert.inspection_commands(),
             vec![
-                "codewhale fleet status".to_string(),
-                "codewhale fleet inspect worker-1".to_string()
+                "nestlone fleet status".to_string(),
+                "nestlone fleet inspect worker-1".to_string()
             ]
         );
     }

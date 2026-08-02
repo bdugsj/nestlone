@@ -1310,7 +1310,7 @@ mod tests {
     fn constitution_repair_explains_invalid_file_and_opens_setup() {
         let _env_guard = crate::test_support::lock_test_env();
         let tmp = tempdir().expect("tempdir");
-        let home = tmp.path().join("codewhale-home");
+        let home = tmp.path().join("nestlone-home");
         std::fs::create_dir_all(&home).expect("home");
         std::fs::write(home.join("constitution.json"), "{not valid json").expect("invalid file");
         let _home = crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", home.as_os_str());
@@ -1338,7 +1338,7 @@ mod tests {
     fn constitution_preview_renders_structured_block() {
         let _env_guard = crate::test_support::lock_test_env();
         let tmp = tempdir().expect("tempdir");
-        let home = tmp.path().join("codewhale-home");
+        let home = tmp.path().join("nestlone-home");
         std::fs::create_dir_all(&home).expect("home");
         let _home = crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", home.as_os_str());
         let constitution = UserConstitution {
@@ -1361,7 +1361,7 @@ mod tests {
         tmp: &tempfile::TempDir,
         constitution: &UserConstitution,
     ) -> crate::test_support::EnvVarGuard {
-        let home = tmp.path().join("codewhale-home");
+        let home = tmp.path().join("nestlone-home");
         std::fs::create_dir_all(&home).expect("home");
         let guard = crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", home.as_os_str());
         constitution
@@ -1453,7 +1453,7 @@ mod tests {
     fn migrate_reports_a_receipt_and_rollback_restores() {
         let _env_guard = crate::test_support::lock_test_env();
         let tmp = tempdir().expect("tempdir");
-        let home = tmp.path().join("codewhale-home");
+        let home = tmp.path().join("nestlone-home");
         std::fs::create_dir_all(&home).expect("home");
         let _home_guard = crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", home.as_os_str());
         let path = home.join("constitution.json");
@@ -1486,7 +1486,7 @@ mod tests {
     fn migrate_rejects_a_runtime_policy_key_and_changes_nothing() {
         let _env_guard = crate::test_support::lock_test_env();
         let tmp = tempdir().expect("tempdir");
-        let home = tmp.path().join("codewhale-home");
+        let home = tmp.path().join("nestlone-home");
         std::fs::create_dir_all(&home).expect("home");
         let _home_guard = crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", home.as_os_str());
         let path = home.join("constitution.json");
@@ -1527,7 +1527,7 @@ mod tests {
     fn constitution_manager_uses_zh_hans_copy() {
         let _env_guard = crate::test_support::lock_test_env();
         let tmp = tempdir().expect("tempdir");
-        let home = tmp.path().join("codewhale-home");
+        let home = tmp.path().join("nestlone-home");
         std::fs::create_dir_all(&home).expect("home");
         let _home = crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", home.as_os_str());
         let mut app = test_app();
@@ -1549,7 +1549,7 @@ mod tests {
     fn constitution_preview_missing_uses_zh_hans_copy() {
         let _env_guard = crate::test_support::lock_test_env();
         let tmp = tempdir().expect("tempdir");
-        let home = tmp.path().join("codewhale-home");
+        let home = tmp.path().join("nestlone-home");
         std::fs::create_dir_all(&home).expect("home");
         let _home = crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", home.as_os_str());
         let mut app = test_app();

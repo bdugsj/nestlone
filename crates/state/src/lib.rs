@@ -1571,7 +1571,7 @@ impl StateStore {
     ///
     /// The lock is an adjacent `.lock` file rather than the index itself, so
     /// compaction's rename cannot pull the lock out from under a waiter. This
-    /// mirrors the discipline `codewhale-config` uses for `config.toml`.
+    /// mirrors the discipline `nestlone-config` uses for `config.toml`.
     fn with_session_index_lock<T>(&self, operation: impl FnOnce() -> Result<T>) -> Result<T> {
         if let Some(parent) = self.session_index_path.parent() {
             fs::create_dir_all(parent).with_context(|| {
@@ -1993,7 +1993,7 @@ mod tests {
             .expect("system time")
             .as_nanos();
         let dir = std::env::temp_dir().join(format!(
-            "codewhale-state-{name}-{}-{suffix}",
+            "nestlone-state-{name}-{}-{suffix}",
             std::process::id()
         ));
         fs::create_dir_all(&dir).expect("create temp state dir");
@@ -2011,7 +2011,7 @@ mod tests {
             updated_at: 10,
             status: ThreadStatus::Running,
             path: None,
-            cwd: PathBuf::from("/tmp/codewhale"),
+            cwd: PathBuf::from("/tmp/nestlone"),
             cli_version: "0.0.0-test".to_string(),
             source: SessionSource::Interactive,
             name: None,
@@ -2199,7 +2199,7 @@ mod tests {
             .expect("system time")
             .as_nanos();
         let dir = std::env::temp_dir().join(format!(
-            "codewhale-state-concurrent-write-{}-{suffix}",
+            "nestlone-state-concurrent-write-{}-{suffix}",
             std::process::id()
         ));
         fs::create_dir_all(&dir).expect("create temp state dir");

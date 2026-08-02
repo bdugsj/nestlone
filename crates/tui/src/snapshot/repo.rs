@@ -293,7 +293,7 @@ impl SnapshotRepo {
             let _ = run_git(
                 &git_dir,
                 &work_tree,
-                &["config", "user.email", "snapshots@codewhale.local"],
+                &["config", "user.email", "snapshots@nestlone.local"],
             );
             // Don't auto-gc on every commit; we manage pruning ourselves.
             let _ = run_git(&git_dir, &work_tree, &["config", "gc.auto", "0"]);

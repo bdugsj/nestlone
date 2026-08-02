@@ -947,7 +947,7 @@ fn harden_plugin_state_file(_path: &Path) -> Result<(), String> {
 
 fn runtime_stage_path(state_path: &Path, id: &PluginId, content_hash: &str) -> PathBuf {
     let mut hasher = Sha256::new();
-    hasher.update(b"codewhale-plugin-stage-v2\0");
+    hasher.update(b"nestlone-plugin-stage-v2\0");
     hasher.update(id.as_str().as_bytes());
     let key = hasher
         .finalize()

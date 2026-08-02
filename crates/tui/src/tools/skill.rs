@@ -603,7 +603,7 @@ mod tests {
         let nestlone_dir = workspace.join(".codewhale").join("skills");
         write_skill(
             &nestlone_dir,
-            "codewhale-only",
+            "nestlone-only",
             "CodeWhale skill",
             "Body content marker.",
         );
@@ -612,7 +612,7 @@ mod tests {
         let tool = LoadSkillTool;
 
         let result = tool
-            .execute(json!({"name": "codewhale-only"}), &context)
+            .execute(json!({"name": "nestlone-only"}), &context)
             .await
             .expect("CodeWhale skill should load");
         assert!(result.success);
@@ -623,7 +623,7 @@ mod tests {
             .expect_err("Claude skill should be hidden in CodeWhale-only mode");
         let msg = err.to_string();
         assert!(
-            msg.contains("claude-only") && msg.contains("codewhale-only"),
+            msg.contains("claude-only") && msg.contains("nestlone-only"),
             "error should name the missing skill and available strict catalog: {msg}"
         );
     }

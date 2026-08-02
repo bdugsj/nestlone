@@ -2397,8 +2397,8 @@ pub fn lsp_command(app: &mut App, arg: Option<&str>) -> CommandResult {
 /// Logout - clear all saved API keys and return to onboarding.
 /// This is NOT provider-scoped — it clears keys for every saved provider.
 /// For single-provider key replacement, use
-/// `codewhale auth clear --provider <id>` and
-/// `codewhale auth set --provider <id>`.
+/// `nestlone auth clear --provider <id>` and
+/// `nestlone auth set --provider <id>`.
 pub fn logout(app: &mut App) -> CommandResult {
     let provider_name = app.provider_identity_for_persistence().to_string();
     match clear_active_provider_api_key(&provider_name) {
@@ -2409,7 +2409,7 @@ pub fn logout(app: &mut App) -> CommandResult {
             app.api_key_cursor = 0;
             CommandResult::message(format!(
                 "Cleared API key for {provider_name}. \
-                 Use `codewhale auth clear --provider <id>` to clear a different provider."
+                 Use `nestlone auth clear --provider <id>` to clear a different provider."
             ))
         }
         Err(e) => CommandResult::error(format!("Failed to clear API key for {provider_name}: {e}")),
@@ -3055,7 +3055,7 @@ mod tests {
     #[test]
     fn config_default_model_cannot_replace_a_non_deepseek_live_route() {
         let temp_root = env::temp_dir().join(format!(
-            "codewhale-tui-provider-scoped-default-model-test-{}",
+            "nestlone-tui-provider-scoped-default-model-test-{}",
             std::process::id()
         ));
         fs::create_dir_all(&temp_root).unwrap();
@@ -3098,7 +3098,7 @@ mod tests {
     #[test]
     fn config_reasoning_effort_uses_codex_provider_labels() {
         let temp_root = env::temp_dir().join(format!(
-            "codewhale-tui-codex-effort-config-test-{}",
+            "nestlone-tui-codex-effort-config-test-{}",
             std::process::id()
         ));
         fs::create_dir_all(&temp_root).unwrap();
@@ -3128,7 +3128,7 @@ mod tests {
     #[test]
     fn config_fancy_animations_keeps_ghostty_frame_cap_without_disabling_motion() {
         let temp_root = env::temp_dir().join(format!(
-            "codewhale-tui-ghostty-fancy-config-test-{}",
+            "nestlone-tui-ghostty-fancy-config-test-{}",
             std::process::id()
         ));
         fs::create_dir_all(&temp_root).unwrap();
@@ -3190,7 +3190,7 @@ mod tests {
             .unwrap()
             .as_nanos();
         let temp_root = env::temp_dir().join(format!(
-            "codewhale-tui-default-mode-test-{}-{}",
+            "nestlone-tui-default-mode-test-{}-{}",
             std::process::id(),
             nanos
         ));
@@ -3215,7 +3215,7 @@ mod tests {
             .unwrap()
             .as_nanos();
         let temp_root = env::temp_dir().join(format!(
-            "codewhale-tui-cost-currency-test-{}-{}",
+            "nestlone-tui-cost-currency-test-{}-{}",
             std::process::id(),
             nanos
         ));
@@ -3351,7 +3351,7 @@ mod tests {
     #[test]
     fn config_command_cannot_bypass_project_shell_constraint() {
         let temp_root = env::temp_dir().join(format!(
-            "codewhale-project-shell-control-test-{}",
+            "nestlone-project-shell-control-test-{}",
             std::process::id()
         ));
         fs::create_dir_all(temp_root.join(".deepseek")).unwrap();
@@ -3392,7 +3392,7 @@ mod tests {
     #[test]
     fn config_command_cannot_bypass_environment_shell_constraint() {
         let temp_root = env::temp_dir().join(format!(
-            "codewhale-env-shell-control-test-{}",
+            "nestlone-env-shell-control-test-{}",
             std::process::id()
         ));
         fs::create_dir_all(temp_root.join(".deepseek")).unwrap();
@@ -3422,7 +3422,7 @@ mod tests {
     #[test]
     fn config_command_cannot_bypass_project_or_environment_approval() {
         let temp_root = env::temp_dir().join(format!(
-            "codewhale-external-approval-control-test-{}",
+            "nestlone-external-approval-control-test-{}",
             std::process::id()
         ));
         fs::create_dir_all(temp_root.join(".deepseek")).unwrap();
@@ -3483,7 +3483,7 @@ mod tests {
     #[test]
     fn config_command_subagents_off_save_persists_and_updates_runtime() {
         let temp_root = env::temp_dir().join(format!(
-            "codewhale-subagents-off-save-test-{}",
+            "nestlone-subagents-off-save-test-{}",
             std::process::id()
         ));
         fs::create_dir_all(&temp_root).unwrap();
@@ -3511,7 +3511,7 @@ mod tests {
     #[test]
     fn config_command_subagents_depth_save_clamps_to_ceiling() {
         let temp_root = env::temp_dir().join(format!(
-            "codewhale-subagents-depth-save-test-{}",
+            "nestlone-subagents-depth-save-test-{}",
             std::process::id()
         ));
         fs::create_dir_all(&temp_root).unwrap();
@@ -3541,7 +3541,7 @@ mod tests {
     #[test]
     fn config_command_subagents_status_shows_raw_and_resolved_values() {
         let temp_root = env::temp_dir().join(format!(
-            "codewhale-subagents-status-test-{}",
+            "nestlone-subagents-status-test-{}",
             std::process::id()
         ));
         fs::create_dir_all(&temp_root).unwrap();
@@ -3588,7 +3588,7 @@ heartbeat_timeout_secs = 1
     #[test]
     fn config_command_audit_lists_editability_and_current_values() {
         let temp_root = env::temp_dir().join(format!(
-            "codewhale-config-audit-test-{}",
+            "nestlone-config-audit-test-{}",
             std::process::id()
         ));
         fs::create_dir_all(&temp_root).unwrap();
@@ -3647,7 +3647,7 @@ max_concurrent = 4
     #[test]
     fn config_context_window_query_shows_override_and_effective_source() {
         let temp_root = env::temp_dir().join(format!(
-            "codewhale-context-window-query-test-{}",
+            "nestlone-context-window-query-test-{}",
             std::process::id()
         ));
         fs::create_dir_all(&temp_root).unwrap();
@@ -3805,7 +3805,7 @@ context_window = 262144
             .unwrap()
             .as_nanos();
         let temp_root = env::temp_dir().join(format!(
-            "codewhale-tui-stream-timeout-test-{}-{}",
+            "nestlone-tui-stream-timeout-test-{}-{}",
             std::process::id(),
             nanos
         ));
@@ -3887,7 +3887,7 @@ context_window = 262144
     #[test]
     fn config_command_provider_url_token_plan_persists_provider_base_url() {
         let temp_root = env::temp_dir().join(format!(
-            "codewhale-provider-url-save-app-path-test-{}",
+            "nestlone-provider-url-save-app-path-test-{}",
             std::process::id()
         ));
         fs::create_dir_all(&temp_root).unwrap();
@@ -3935,7 +3935,7 @@ context_window = 262144
             .unwrap()
             .as_nanos();
         let temp_root = env::temp_dir().join(format!(
-            "codewhale-tui-theme-command-test-{}-{}",
+            "nestlone-tui-theme-command-test-{}-{}",
             std::process::id(),
             nanos
         ));
@@ -3954,7 +3954,7 @@ context_window = 262144
     #[test]
     fn explicit_default_background_override_survives_theme_preview() {
         let temp_root = env::temp_dir().join(format!(
-            "codewhale-tui-background-override-test-{}-{}",
+            "nestlone-tui-background-override-test-{}-{}",
             std::process::id(),
             SystemTime::now()
                 .duration_since(UNIX_EPOCH)
@@ -3988,7 +3988,7 @@ context_window = 262144
     #[test]
     fn session_only_background_override_survives_theme_preview() {
         let temp_root = env::temp_dir().join(format!(
-            "codewhale-tui-session-background-test-{}-{}",
+            "nestlone-tui-session-background-test-{}-{}",
             std::process::id(),
             SystemTime::now()
                 .duration_since(UNIX_EPOCH)
@@ -4043,7 +4043,7 @@ context_window = 262144
             .unwrap()
             .as_nanos();
         let temp_root = env::temp_dir().join(format!(
-            "codewhale-tui-theme-save-test-{}-{}",
+            "nestlone-tui-theme-save-test-{}-{}",
             std::process::id(),
             nanos
         ));
@@ -4065,7 +4065,7 @@ context_window = 262144
     #[test]
     fn unrelated_save_does_not_persist_no_animations_runtime_overlay() {
         let temp_root = env::temp_dir().join(format!(
-            "codewhale-no-animations-save-test-{}-{}",
+            "nestlone-no-animations-save-test-{}-{}",
             std::process::id(),
             SystemTime::now()
                 .duration_since(UNIX_EPOCH)
@@ -4110,7 +4110,7 @@ context_window = 262144
     #[test]
     fn preset_save_does_not_persist_runtime_environment_overlays() {
         let temp_root = env::temp_dir().join(format!(
-            "codewhale-preset-env-overlay-test-{}-{}",
+            "nestlone-preset-env-overlay-test-{}-{}",
             std::process::id(),
             SystemTime::now()
                 .duration_since(UNIX_EPOCH)
@@ -4173,7 +4173,7 @@ context_window = 262144
     #[test]
     fn config_approval_mode_save_persists_top_level_policy() {
         let temp_root = env::temp_dir().join(format!(
-            "codewhale-approval-policy-save-test-{}",
+            "nestlone-approval-policy-save-test-{}",
             std::process::id()
         ));
         fs::create_dir_all(&temp_root).unwrap();
@@ -4220,7 +4220,7 @@ context_window = 262144
     #[test]
     fn config_approval_policy_can_return_to_saved_tui_permission_default() {
         let temp_root = env::temp_dir().join(format!(
-            "codewhale-approval-policy-tui-default-test-{}",
+            "nestlone-approval-policy-tui-default-test-{}",
             std::process::id()
         ));
         fs::create_dir_all(temp_root.join(".deepseek")).unwrap();
@@ -4253,7 +4253,7 @@ context_window = 262144
     #[test]
     fn config_approval_policy_full_access_adopts_tui_posture_and_releases_root_override() {
         let temp_root = env::temp_dir().join(format!(
-            "codewhale-approval-policy-full-access-test-{}",
+            "nestlone-approval-policy-full-access-test-{}",
             std::process::id()
         ));
         fs::create_dir_all(temp_root.join(".deepseek")).unwrap();
@@ -4389,7 +4389,7 @@ context_window = 262144
             .unwrap()
             .as_nanos();
         let temp_root = env::temp_dir().join(format!(
-            "codewhale-tui-logout-test-{}-{}",
+            "nestlone-tui-logout-test-{}-{}",
             std::process::id(),
             nanos
         ));
@@ -4419,7 +4419,7 @@ context_window = 262144
             .unwrap()
             .as_nanos();
         let temp_root = env::temp_dir().join(format!(
-            "codewhale-custom-logout-test-{}-{}",
+            "nestlone-custom-logout-test-{}-{}",
             std::process::id(),
             nanos
         ));

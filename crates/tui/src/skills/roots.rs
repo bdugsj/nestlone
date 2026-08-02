@@ -213,7 +213,7 @@ impl SkillRootCatalog {
             project_owned,
             true,
             true,
-            "project-codewhale",
+            "project-nestlone",
             true, // include even if missing — owned target may be created later
         );
 
@@ -264,7 +264,7 @@ impl SkillRootCatalog {
                 global_owned,
                 true,
                 true,
-                "global-codewhale",
+                "global-nestlone",
                 true,
             );
 
@@ -315,10 +315,10 @@ impl SkillRootCatalog {
                 SkillRootKind::CodeWhaleGlobal,
                 SkillRootAccess::WritableOwned,
                 SkillScope::Global,
-                PathBuf::from("/tmp/codewhale/skills"),
+                PathBuf::from("/tmp/nestlone/skills"),
                 true,
                 true,
-                "global-codewhale-fallback",
+                "global-nestlone-fallback",
                 true,
             );
         }

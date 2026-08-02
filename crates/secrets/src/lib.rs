@@ -1293,7 +1293,7 @@ mod tests {
         let _lock = env_lock();
         clear_known_envs();
         let tmp = tempfile::tempdir().unwrap();
-        let nestlone_home = tmp.path().join("isolated-codewhale-home");
+        let nestlone_home = tmp.path().join("isolated-nestlone-home");
         let _home = EnvVarGuard::set("HOME", tmp.path());
         let _userprofile = EnvVarGuard::set("USERPROFILE", tmp.path());
         let _nestlone_home = EnvVarGuard::set("CODEWHALE_HOME", &nestlone_home);
@@ -1337,7 +1337,7 @@ mod tests {
         let _lock = env_lock();
         clear_known_envs();
         let tmp = tempfile::tempdir().unwrap();
-        let nestlone_home = tmp.path().join("isolated-codewhale-home");
+        let nestlone_home = tmp.path().join("isolated-nestlone-home");
         let _home = EnvVarGuard::set("HOME", tmp.path());
         let _userprofile = EnvVarGuard::set("USERPROFILE", tmp.path());
         let _nestlone_home = EnvVarGuard::set("CODEWHALE_HOME", &nestlone_home);
@@ -1394,7 +1394,7 @@ mod tests {
         let _lock = env_lock();
         clear_known_envs();
         let tmp = tempfile::tempdir().unwrap();
-        let custom = tmp.path().join("custom-codewhale");
+        let custom = tmp.path().join("custom-nestlone");
         let _home = EnvVarGuard::set("HOME", tmp.path());
         let _userprofile = EnvVarGuard::set("USERPROFILE", tmp.path());
         let _nestlone_home = EnvVarGuard::set("CODEWHALE_HOME", &custom);
@@ -1405,7 +1405,7 @@ mod tests {
     }
 
     #[test]
-    fn file_default_path_migrates_legacy_entries_to_codewhale() {
+    fn file_default_path_migrates_legacy_entries_to_nestlone() {
         let _lock = env_lock();
         clear_known_envs();
         let tmp = tempfile::tempdir().unwrap();
@@ -2029,7 +2029,7 @@ mod tests {
         let _lock = env_lock();
         clear_known_envs();
         let tmp = tempfile::tempdir().unwrap();
-        let nestlone_home = tmp.path().join("isolated-codewhale-home");
+        let nestlone_home = tmp.path().join("isolated-nestlone-home");
         let _home = EnvVarGuard::set("HOME", tmp.path());
         let _userprofile = EnvVarGuard::set("USERPROFILE", tmp.path());
         let _nestlone_home = EnvVarGuard::set("CODEWHALE_HOME", &nestlone_home);

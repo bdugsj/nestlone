@@ -702,10 +702,10 @@ pub fn build_router(state: RuntimeApiState) -> Router {
 
     Router::new()
         .route("/", get(web::web_page))
-        .route("/assets/codewhale-web.css", get(web::web_styles))
-        .route("/assets/codewhale-web.js", get(web::web_script))
+        .route("/assets/nestlone-web.css", get(web::web_styles))
+        .route("/assets/nestlone-web.js", get(web::web_script))
         .route(
-            "/__codewhale/bootstrap/{nonce}",
+            "/__nestlone/bootstrap/{nonce}",
             get(web::exchange_bootstrap),
         )
         .route("/health", get(health))
@@ -721,7 +721,7 @@ async fn mobile_page(State(state): State<RuntimeApiState>, req: Request) -> Resp
     if !state.mobile_enabled {
         return (
             StatusCode::NOT_FOUND,
-            "mobile control is disabled; start with `codewhale serve --mobile`",
+            "mobile control is disabled; start with `nestlone serve --mobile`",
         )
             .into_response();
     }
@@ -800,7 +800,7 @@ fn detect_lan_ip() -> Option<String> {
 async fn health() -> Json<HealthResponse> {
     Json(HealthResponse {
         status: "ok",
-        service: "codewhale-runtime-api",
+        service: "nestlone-runtime-api",
         mode: "local",
     })
 }
@@ -1573,7 +1573,7 @@ async fn submit_user_input(
 async fn runtime_info(State(state): State<RuntimeApiState>) -> Json<RuntimeInfoResponse> {
     let version = env!("CARGO_PKG_VERSION");
     Json(RuntimeInfoResponse {
-        service: "codewhale-runtime-api",
+        service: "nestlone-runtime-api",
         runtime_api_version: RUNTIME_API_VERSION,
         nestlone_version: version,
         bind_host: state.bind_host.clone(),
@@ -3837,7 +3837,7 @@ fn cors_layer(extra_origins: &[String]) -> CorsLayer {
             header::AUTHORIZATION,
             header::CONTENT_TYPE,
             header::ACCEPT,
-            HeaderName::from_static("x-codewhale-runtime-token"),
+            HeaderName::from_static("x-nestlone-runtime-token"),
             HeaderName::from_static("x-deepseek-runtime-token"),
         ])
 }

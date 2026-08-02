@@ -112,7 +112,7 @@ async fn user_asks(world: &mut ToolLifecycleWorld, prompt: String) {
     world.stderr = String::from_utf8_lossy(&output.stderr).into_owned();
     assert!(
         output.status.success(),
-        "codewhale-tui exec failed\nstdout:\n{}\nstderr:\n{}",
+        "nestlone-tui exec failed\nstdout:\n{}\nstderr:\n{}",
         world.stdout,
         world.stderr
     );
@@ -585,18 +585,18 @@ fn run_nestlone_exec(
         .stdout(Stdio::piped())
         .stderr(Stdio::piped());
 
-    std::fs::create_dir_all(home.join(".codewhale")).expect("create codewhale home config dir");
+    std::fs::create_dir_all(home.join(".codewhale")).expect("create nestlone home config dir");
     std::fs::create_dir_all(home.join(".deepseek")).expect("create deepseek home config dir");
 
     run_with_timeout(command, Duration::from_secs(45))
 }
 
 fn run_with_timeout(mut command: Command, timeout: Duration) -> std::process::Output {
-    let mut child = command.spawn().expect("spawn codewhale-tui exec");
+    let mut child = command.spawn().expect("spawn nestlone-tui exec");
     let stdout_reader = read_pipe_in_background(child.stdout.take().expect("stdout pipe"));
     let stderr_reader = read_pipe_in_background(child.stderr.take().expect("stderr pipe"));
 
-    let status = match child.wait_timeout(timeout).expect("wait for codewhale-tui") {
+    let status = match child.wait_timeout(timeout).expect("wait for nestlone-tui") {
         Some(status) => status,
         None => {
             let _ = child.kill();
@@ -604,7 +604,7 @@ fn run_with_timeout(mut command: Command, timeout: Duration) -> std::process::Ou
             let stdout = join_pipe_reader(stdout_reader, "stdout");
             let stderr = join_pipe_reader(stderr_reader, "stderr");
             panic!(
-                "codewhale-tui exec timed out after {timeout:?}\nstdout:\n{}\nstderr:\n{}",
+                "nestlone-tui exec timed out after {timeout:?}\nstdout:\n{}\nstderr:\n{}",
                 String::from_utf8_lossy(&stdout),
                 String::from_utf8_lossy(&stderr)
             );
@@ -930,10 +930,10 @@ fn row_value(row: &[(String, String)], header: &str) -> String {
 }
 
 fn nestlone_tui_binary() -> PathBuf {
-    if let Some(path) = option_env!("CARGO_BIN_EXE_codewhale-tui") {
+    if let Some(path) = option_env!("CARGO_BIN_EXE_nestlone-tui") {
         return PathBuf::from(path);
     }
-    if let Ok(path) = std::env::var("CARGO_BIN_EXE_codewhale-tui") {
+    if let Ok(path) = std::env::var("CARGO_BIN_EXE_nestlone-tui") {
         return PathBuf::from(path);
     }
 
@@ -942,6 +942,6 @@ fn nestlone_tui_binary() -> PathBuf {
     if path.ends_with("deps") {
         path.pop();
     }
-    path.push(format!("codewhale-tui{}", std::env::consts::EXE_SUFFIX));
+    path.push(format!("nestlone-tui{}", std::env::consts::EXE_SUFFIX));
     path
 }

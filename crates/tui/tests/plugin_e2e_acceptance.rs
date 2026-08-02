@@ -368,18 +368,18 @@ async fn plugin_module_does_not_break_binary_load() {
     let output = Command::new(nestlone_tui_binary())
         .arg("--version")
         .output()
-        .expect("codewhale-tui --version should start");
+        .expect("nestlone-tui --version should start");
 
     assert!(
         output.status.success(),
-        "codewhale-tui --version failed\nstderr:\n{}",
+        "nestlone-tui --version failed\nstderr:\n{}",
         String::from_utf8_lossy(&output.stderr)
     );
 
     let version = String::from_utf8_lossy(&output.stdout);
     assert!(
-        version.contains("codewhale"),
-        "version output should mention codewhale, got: {version}"
+        version.contains("nestlone"),
+        "version output should mention nestlone, got: {version}"
     );
 }
 
@@ -695,7 +695,7 @@ async fn plugin_toml_binary_lifecycle_skill_and_stdio_mcp_acceptance() {
     let bundle = write_reviewed_bundle_fixture(workspace.workspace());
     let mcp_log = workspace.home().join(".codewhale/plugin-acceptance.log");
     let (base_url, shutdown_tx, model_thread) = spawn_hermetic_model_server();
-    let mut tui = Harness::builder(Harness::cargo_bin("codewhale-tui"))
+    let mut tui = Harness::builder(Harness::cargo_bin("nestlone-tui"))
         .cwd(workspace.workspace())
         .clear_env()
         .seal_home(workspace.home())
@@ -827,10 +827,10 @@ async fn run_scenario(name: &'static str, expected_steps: usize) {
 // ---------------------------------------------------------------------------
 
 fn nestlone_tui_binary() -> PathBuf {
-    if let Some(path) = option_env!("CARGO_BIN_EXE_codewhale-tui") {
+    if let Some(path) = option_env!("CARGO_BIN_EXE_nestlone-tui") {
         return PathBuf::from(path);
     }
-    if let Ok(path) = std::env::var("CARGO_BIN_EXE_codewhale-tui") {
+    if let Ok(path) = std::env::var("CARGO_BIN_EXE_nestlone-tui") {
         return PathBuf::from(path);
     }
 
@@ -839,6 +839,6 @@ fn nestlone_tui_binary() -> PathBuf {
     if path.ends_with("deps") {
         path.pop();
     }
-    path.push(format!("codewhale-tui{}", std::env::consts::EXE_SUFFIX));
+    path.push(format!("nestlone-tui{}", std::env::consts::EXE_SUFFIX));
     path
 }

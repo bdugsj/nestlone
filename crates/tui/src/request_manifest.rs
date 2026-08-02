@@ -1152,7 +1152,7 @@ pub(crate) mod test_support {
             allowed_tool_gate_count: None,
             disallowed_tool_gate_count: None,
             base_prompt: BasePromptProvenance {
-                origin: "bundled in this codewhale-tui build".to_string(),
+                origin: "bundled in this nestlone-tui build".to_string(),
                 bytes: 11,
                 sha256: crate::hashing::sha256_hex(b"BASE PROMPT"),
             },

@@ -2340,9 +2340,9 @@ mod tests {
             identity: None,
             known_hosts: None,
             host_key_fingerprint: None,
-            working_directory: Some(PathBuf::from("/srv/codewhale")),
+            working_directory: Some(PathBuf::from("/srv/nestlone")),
             env_allowlist: Vec::new(),
-            nestlone_binary: Some("/usr/local/bin/codewhale".to_string()),
+            nestlone_binary: Some("/usr/local/bin/nestlone".to_string()),
         };
 
         let error = validate_task_cwd_for_host(tmp.path(), &ssh, &nested_cwd)
@@ -2388,9 +2388,9 @@ mod tests {
                 identity: None,
                 known_hosts: None,
                 host_key_fingerprint: None,
-                working_directory: Some(PathBuf::from("/srv/codewhale")),
+                working_directory: Some(PathBuf::from("/srv/nestlone")),
                 env_allowlist: Vec::new(),
-                nestlone_binary: Some("/usr/local/bin/codewhale".to_string()),
+                nestlone_binary: Some("/usr/local/bin/nestlone".to_string()),
             },
             trust_level: None,
             labels: BTreeMap::new(),
@@ -2540,10 +2540,10 @@ mod tests {
 
         let mut executor = FleetExecutor::new(tmp.path());
         manager
-            .drive_executor_tick(&report.run_id, &mut executor, "unused-codewhale", None)
+            .drive_executor_tick(&report.run_id, &mut executor, "unused-nestlone", None)
             .expect("missing restored launch state must become a durable task failure");
         manager
-            .drive_executor_tick(&report.run_id, &mut executor, "unused-codewhale", None)
+            .drive_executor_tick(&report.run_id, &mut executor, "unused-nestlone", None)
             .expect("the next scheduler tick must not remain poisoned");
 
         let state = manager.rebuild_state().unwrap();
@@ -2657,10 +2657,10 @@ mod tests {
     }
 
     #[cfg(unix)]
-    fn fake_codewhale(dir: &TempDir, body: &str) -> PathBuf {
+    fn fake_nestlone(dir: &TempDir, body: &str) -> PathBuf {
         use std::os::unix::fs::PermissionsExt;
 
-        let path = dir.path().join("fake-codewhale");
+        let path = dir.path().join("fake-nestlone");
         std::fs::write(&path, body).unwrap();
         let mut permissions = std::fs::metadata(&path).unwrap().permissions();
         permissions.set_mode(0o755);
@@ -2669,7 +2669,7 @@ mod tests {
     }
 
     #[cfg(unix)]
-    fn complete_with_fake_codewhale(
+    fn complete_with_fake_nestlone(
         manager: &FleetManager,
         run_id: &FleetRunId,
         max_workers: usize,
@@ -3129,7 +3129,7 @@ mod tests {
         let pid_path = tmp.path().join("live-worker.pid");
         let first_worker_marker = tmp.path().join("first-worker-started");
         let stopped_marker = tmp.path().join("first-worker-stopped");
-        let fake = fake_codewhale(
+        let fake = fake_nestlone(
             &tmp,
             &format!(
                 r#"#!/bin/sh
@@ -3222,7 +3222,7 @@ sleep 30
         let path = task_spec_file(&tmp, vec![task("task-a")]);
         let first_worker_marker = tmp.path().join("first-attempt-started");
         let stopped_marker = tmp.path().join("first-attempt-stopped");
-        let fake = fake_codewhale(
+        let fake = fake_nestlone(
             &tmp,
             &format!(
                 r#"#!/bin/sh
@@ -3333,7 +3333,7 @@ while :; do sleep 1; done
             .with_sub_agent_manager(coordination.clone());
         let path = task_spec_file(&tmp, vec![task("task-a")]);
         let marker = tmp.path().join("replacement-attempt-ran");
-        let fake = fake_codewhale(
+        let fake = fake_nestlone(
             &tmp,
             &format!(
                 r#"#!/bin/sh
@@ -3530,7 +3530,7 @@ exit 0
         let report = manager.create_run_from_task_spec_path(&path, 1).unwrap();
         let worker_id = report.worker_ids[0].clone();
         let marker = tmp.path().join("resumed-attempt-ran");
-        let fake = fake_codewhale(
+        let fake = fake_nestlone(
             &tmp,
             &format!(
                 r#"#!/bin/sh
@@ -3575,7 +3575,7 @@ exit 0
             2
         );
 
-        let status = complete_with_fake_codewhale(&reloaded, &report.run_id, 1, &fake);
+        let status = complete_with_fake_nestlone(&reloaded, &report.run_id, 1, &fake);
         assert!(marker.is_file(), "the recovered replacement never launched");
         assert_eq!(status.completed, 1);
         assert_eq!(status.restarted, 1);
@@ -3594,7 +3594,7 @@ exit 0
         let standby = FleetManager::open(tmp.path()).unwrap();
         let path = task_spec_file(&tmp, vec![task("task-a")]);
         let starts = tmp.path().join("worker-starts");
-        let fake = fake_codewhale(
+        let fake = fake_nestlone(
             &tmp,
             &format!(
                 r#"#!/bin/sh
@@ -3654,7 +3654,7 @@ exit 0
         let tmp = TempDir::new().unwrap();
         let manager = FleetManager::open(tmp.path()).unwrap();
         let path = task_spec_file(&tmp, vec![task("task-a"), task("task-b"), task("task-c")]);
-        let fake = fake_codewhale(
+        let fake = fake_nestlone(
             &tmp,
             r#"#!/bin/sh
 printf '{"type":"tool_use","name":"read_file","id":"fake","input":{}}\n'
@@ -3667,7 +3667,7 @@ exit 0
 
         assert_eq!(report.leased, 1);
         assert_eq!(report.queued, 2);
-        let status = complete_with_fake_codewhale(&manager, &report.run_id, 1, &fake);
+        let status = complete_with_fake_nestlone(&manager, &report.run_id, 1, &fake);
         assert_eq!(status.completed, 3);
         assert_eq!(status.running, 0);
         let state = manager.ledger.rebuild_state().unwrap();
@@ -3719,7 +3719,7 @@ exit 0
         let mut completed = task("task-a");
         completed.scorer = Some(FleetScorerSpec::ExitCode);
         let path = task_spec_file(&tmp, vec![completed]);
-        let fake = fake_codewhale(
+        let fake = fake_nestlone(
             &tmp,
             r#"#!/bin/sh
 printf '{"type":"done"}\n'
@@ -3728,7 +3728,7 @@ exit 0
         );
 
         let report = manager.create_run_from_task_spec_path(&path, 1).unwrap();
-        let status = complete_with_fake_codewhale(&manager, &report.run_id, 1, &fake);
+        let status = complete_with_fake_nestlone(&manager, &report.run_id, 1, &fake);
 
         assert_eq!(status.completed, 1);
         assert_eq!(status.failed, 0);
@@ -3756,7 +3756,7 @@ exit 0
         let tmp = TempDir::new().unwrap();
         let manager = FleetManager::open(tmp.path()).unwrap();
         let path = task_spec_file(&tmp, vec![task("task-a")]);
-        let fake = fake_codewhale(
+        let fake = fake_nestlone(
             &tmp,
             r#"#!/bin/sh
 printf '{"type":"done"}\n'
@@ -3766,7 +3766,7 @@ exit 0
 
         let report = manager.create_run_from_task_spec_path(&path, 1).unwrap();
         let worker_id = report.worker_ids[0].clone();
-        let status = complete_with_fake_codewhale(&manager, &report.run_id, 1, &fake);
+        let status = complete_with_fake_nestlone(&manager, &report.run_id, 1, &fake);
 
         assert_eq!(status.completed, 1);
         assert_eq!(status.partial, 1);
@@ -3801,7 +3801,7 @@ exit 0
         let tmp = TempDir::new().unwrap();
         let manager = FleetManager::open(tmp.path()).unwrap();
         let path = task_spec_file(&tmp, vec![task("task-a")]);
-        let fake = fake_codewhale(
+        let fake = fake_nestlone(
             &tmp,
             r#"#!/bin/sh
 printf '{"type":"error","error":"tool failed"}\n'
@@ -3810,7 +3810,7 @@ exit 7
         );
 
         let report = manager.create_run_from_task_spec_path(&path, 1).unwrap();
-        let status = complete_with_fake_codewhale(&manager, &report.run_id, 1, &fake);
+        let status = complete_with_fake_nestlone(&manager, &report.run_id, 1, &fake);
 
         assert_eq!(status.completed, 0);
         assert_eq!(status.partial, 0);
@@ -3837,7 +3837,7 @@ exit 7
             path: PathBuf::from("missing.log"),
             pattern: "[".to_string(),
         });
-        let fake = fake_codewhale(
+        let fake = fake_nestlone(
             &tmp,
             r#"#!/bin/sh
 case "$*" in
@@ -3876,7 +3876,7 @@ esac
         };
 
         let report = manager.create_run(doc, 3).unwrap();
-        let status = complete_with_fake_codewhale(&manager, &report.run_id, 3, &fake);
+        let status = complete_with_fake_nestlone(&manager, &report.run_id, 3, &fake);
 
         assert_eq!(status.failed, 3);
         assert_eq!(status.transport_failed, 1);
@@ -3910,7 +3910,7 @@ esac
             .unwrap()
             .with_session_model("manager-model-y")
             .with_route_config(manager_config);
-        let fake = fake_codewhale(
+        let fake = fake_nestlone(
             &tmp,
             r#"#!/bin/sh
 printf '%s\n' '{"type":"metadata","meta":{"receipt_kind":"terminal","provider":"custom","provider_id":"remote-x","model":"worker-model-x","base_url":"https://remote-x.invalid/v1","api_key":"sk-remote-x-must-not-leak"}}'
@@ -3930,7 +3930,7 @@ printf '%s\n' '{"type":"done"}'
             )
             .unwrap();
 
-        let status = complete_with_fake_codewhale(&manager, &report.run_id, 1, &fake);
+        let status = complete_with_fake_nestlone(&manager, &report.run_id, 1, &fake);
         assert_eq!(status.completed, 1);
         let state = manager.ledger.rebuild_state().unwrap();
         let receipt = &state.receipts[&format!("{}:route-drift", report.run_id.0)];
@@ -3987,7 +3987,7 @@ printf '%s\n' '{"type":"done"}'
                 }),
                 ..Default::default()
             });
-        let fake = fake_codewhale(
+        let fake = fake_nestlone(
             &tmp,
             r#"#!/bin/sh
 printf '%s\n' '{"type":"metadata","meta":{"receipt_kind":"terminal","provider":"deepseek","provider_id":"custom-x","model":"deepseek-v4-pro"}}'
@@ -4007,7 +4007,7 @@ printf '%s\n' '{"type":"done"}'
             )
             .unwrap();
 
-        let status = complete_with_fake_codewhale(&manager, &report.run_id, 1, &fake);
+        let status = complete_with_fake_nestlone(&manager, &report.run_id, 1, &fake);
         assert_eq!(status.completed, 1);
         let state = manager.ledger.rebuild_state().unwrap();
         let receipt = &state.receipts[&format!("{}:invalid-route", report.run_id.0)];
@@ -4023,7 +4023,7 @@ printf '%s\n' '{"type":"done"}'
     fn fleet_smoke_runs_three_roles_ten_tasks_with_receipts_and_failure() {
         let tmp = TempDir::new().unwrap();
         let manager = FleetManager::open(tmp.path()).unwrap();
-        let fake = fake_codewhale(
+        let fake = fake_nestlone(
             &tmp,
             r#"#!/bin/sh
 case "$*" in
@@ -4141,7 +4141,7 @@ esac
         assert_eq!(report.leased, 3);
         assert_eq!(report.queued, 7);
 
-        let status = complete_with_fake_codewhale(&manager, &report.run_id, 3, &fake);
+        let status = complete_with_fake_nestlone(&manager, &report.run_id, 3, &fake);
         assert_eq!(status.completed, 9);
         assert_eq!(status.failed, 1);
         assert_eq!(status.task_failed, 1);

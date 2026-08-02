@@ -1,4 +1,4 @@
-//! Self-update for the `codewhale` binary.
+//! Self-update for the `nestlone` binary.
 //!
 //! The `update` subcommand fetches the latest release from
 //! `github.com/bdugsj/nestlone/releases/latest`, downloads the
@@ -61,7 +61,7 @@ pub fn run_update(beta: bool, check_only: bool, proxy_arg: Option<String>) -> Re
             .with_context(update_network_fallback_hint)?;
         println!("Latest {} release: {latest_tag}", channel.label());
         if update_is_needed(channel, current_version, &latest_tag)? {
-            println!("Update available. Run `codewhale update` to install {latest_tag}.");
+            println!("Update available. Run `nestlone update` to install {latest_tag}.");
         } else {
             match compare_release_versions(current_version, &latest_tag)? {
                 Ordering::Greater => {
@@ -603,8 +603,8 @@ fn legacy_binary_message(current_exe: &Path) -> String {
         "\
 this binary ({exe}) is using the legacy deepseek/deepseek-tui command name.
 
-The package has been renamed to `codewhale`. This update will install canonical
-Codewhale binaries (`codewhale` and, when present, `codewhale-tui`) beside the
+The package has been renamed to `nestlone`. This update will install canonical
+Codewhale binaries (`nestlone` and, when present, `nestlone-tui`) beside the
 legacy command when the install directory is writable. DeepSeek provider support
 is unchanged.
 
@@ -613,22 +613,22 @@ original install method:
 
   npm:
     npm uninstall -g deepseek-tui
-    npm install -g codewhale
+    npm install -g nestlone
 
   Cargo:
     cargo uninstall deepseek-tui-cli 2>/dev/null || true
     cargo uninstall deepseek-tui 2>/dev/null || true
-    cargo install codewhale-cli --locked
-    cargo install codewhale-tui --locked
+    cargo install nestlone-cli --locked
+    cargo install nestlone-tui --locked
 
   Homebrew:
     brew upgrade deepseek-tui
 
   Manual binary:
-    download the matched codewhale and codewhale-tui assets from
+    download the matched nestlone and nestlone-tui assets from
     https://github.com/bdugsj/nestlone/releases/latest
 
-Once `codewhale` is on your PATH, run `codewhale update` for future updates.",
+Once `nestlone` is on your PATH, run `nestlone update` for future updates.",
         exe = current_exe.display(),
     )
 }
@@ -637,20 +637,23 @@ pub(crate) fn binary_prefix_for_exe(current_exe: &Path) -> &'static str {
     let exe_name = current_exe
         .file_name()
         .and_then(|name| name.to_str())
-        .unwrap_or("codewhale")
+        .unwrap_or("nestlone")
         .to_ascii_lowercase();
-    if exe_name.contains("codewhale-tui") || exe_name.contains("deepseek-tui") {
-        "codewhale-tui"
+    if exe_name.contains("nestlone-tui")
+        || exe_name.contains("codewhale-tui")
+        || exe_name.contains("deepseek-tui")
+    {
+        "nestlone-tui"
     } else {
-        "codewhale"
+        "nestlone"
     }
 }
 
 fn sibling_prefix_for(prefix: &str) -> &'static str {
-    if prefix == "codewhale-tui" {
-        "codewhale"
+    if prefix == "nestlone-tui" {
+        "nestlone"
     } else {
-        "codewhale-tui"
+        "nestlone-tui"
     }
 }
 
@@ -667,7 +670,7 @@ fn canonical_binary_path_for_prefix(current_exe: &Path, prefix: &str) -> PathBuf
 }
 
 fn legacy_binary_name_for_prefix(prefix: &str) -> &'static str {
-    if prefix == "codewhale-tui" {
+    if prefix == "nestlone-tui" {
         "deepseek-tui"
     } else {
         "deepseek"
@@ -929,7 +932,7 @@ fn release_from_asset_base_url(
         browser_download_url: mirror_asset_url(base_url, CHECKSUM_MANIFEST_ASSET),
     }];
 
-    for prefix in ["codewhale", "codewhale-tui"] {
+    for prefix in ["nestlone", "nestlone-tui"] {
         let name = release_asset_name_for_prefix(prefix, os, rust_arch);
         assets.push(Asset {
             browser_download_url: mirror_asset_url(base_url, &name),
@@ -1315,8 +1318,8 @@ Official Linux release binaries are GNU libc builds. Ubuntu 22.04 ships glibc
 
 Install from source on this host instead:
 
-  cargo install codewhale-cli --locked
-  cargo install codewhale-tui --locked
+  cargo install nestlone-cli --locked
+  cargo install nestlone-tui --locked
 
 Release engineering follow-up: build Linux GNU assets against an older glibc
 baseline, or add a musl/static Linux asset. Set CODEWHALE_SKIP_GLIBC_CHECK=1 to
@@ -1493,7 +1496,7 @@ mod tests {
     #[test]
     fn android_loaded_image_resolves_agreed_mapping() {
         let dir = tempfile::TempDir::new().unwrap();
-        let executable = dir.path().join("codewhale");
+        let executable = dir.path().join("nestlone");
         write_test_executable(&executable);
         let maps = test_android_mapping_line(&executable, "r-xp");
 
@@ -1515,9 +1518,9 @@ mod tests {
         let install_dir = dir.path().join("install");
         std::fs::create_dir(&canonical_dir).unwrap();
         std::fs::create_dir(&install_dir).unwrap();
-        let canonical_dispatcher = canonical_dir.join("codewhale");
-        let canonical_tui = canonical_dir.join("codewhale-tui");
-        let invoked = install_dir.join("codewhale");
+        let canonical_dispatcher = canonical_dir.join("nestlone");
+        let canonical_tui = canonical_dir.join("nestlone-tui");
+        let invoked = install_dir.join("nestlone");
         write_test_executable(&canonical_dispatcher);
         write_test_executable(&canonical_tui);
         symlink(&canonical_dispatcher, &invoked).unwrap();
@@ -1544,7 +1547,7 @@ mod tests {
     #[test]
     fn android_loaded_image_requires_marker_mapping() {
         let dir = tempfile::TempDir::new().unwrap();
-        let executable = dir.path().join("codewhale");
+        let executable = dir.path().join("nestlone");
         write_test_executable(&executable);
         let maps = test_android_mapping_line(&executable, "r-xp");
 
@@ -1561,7 +1564,7 @@ mod tests {
     #[test]
     fn android_loaded_image_requires_executable_mapping() {
         let dir = tempfile::TempDir::new().unwrap();
-        let executable = dir.path().join("codewhale");
+        let executable = dir.path().join("nestlone");
         write_test_executable(&executable);
         let maps = test_android_mapping_line(&executable, "rw-p");
 
@@ -1581,7 +1584,7 @@ mod tests {
     #[test]
     fn android_loaded_image_rejects_anonymous_mapping() {
         let dir = tempfile::TempDir::new().unwrap();
-        let executable = dir.path().join("codewhale");
+        let executable = dir.path().join("nestlone");
         write_test_executable(&executable);
         let maps = "1000-2000 r-xp 00000000 00:00 0\n";
 
@@ -1599,13 +1602,13 @@ mod tests {
     #[test]
     fn android_loaded_image_rejects_relative_or_deleted_paths() {
         let dir = tempfile::TempDir::new().unwrap();
-        let executable = dir.path().join("codewhale");
+        let executable = dir.path().join("nestlone");
         write_test_executable(&executable);
         let metadata = std::fs::metadata(&executable).unwrap();
         use std::os::unix::fs::MetadataExt;
         let (device_major, device_minor) = android_device_parts(metadata.dev());
         let relative_maps = format!(
-            "1000-2000 r-xp 00000000 {:x}:{:x} {} codewhale\n",
+            "1000-2000 r-xp 00000000 {:x}:{:x} {} nestlone\n",
             device_major,
             device_minor,
             metadata.ino()
@@ -1636,7 +1639,7 @@ mod tests {
 
         let dir = tempfile::TempDir::new().unwrap();
         let runtime_linker = dir.path().join("linker64");
-        let invoked = dir.path().join("codewhale");
+        let invoked = dir.path().join("nestlone");
         write_test_executable(&runtime_linker);
         symlink(&runtime_linker, &invoked).unwrap();
         let maps = test_android_mapping_line(&invoked, "r-xp");
@@ -1683,15 +1686,15 @@ mod tests {
                 "{name} must never become an updater target"
             );
         }
-        assert!(!is_android_linker_name(Path::new("codewhale")));
+        assert!(!is_android_linker_name(Path::new("nestlone")));
     }
 
     #[cfg(unix)]
     #[test]
     fn android_loaded_image_rejects_authority_disagreement() {
         let dir = tempfile::TempDir::new().unwrap();
-        let mapped = dir.path().join("mapped-codewhale");
-        let dladdr = dir.path().join("dladdr-codewhale");
+        let mapped = dir.path().join("mapped-nestlone");
+        let dladdr = dir.path().join("dladdr-nestlone");
         write_test_executable(&mapped);
         write_test_executable(&dladdr);
         let maps = test_android_mapping_line(&mapped, "r-xp");
@@ -1709,7 +1712,7 @@ mod tests {
     #[test]
     fn android_loaded_image_rejects_non_executable_file() {
         let dir = tempfile::TempDir::new().unwrap();
-        let executable = dir.path().join("codewhale");
+        let executable = dir.path().join("nestlone");
         std::fs::write(&executable, b"not executable").unwrap();
         let maps = test_android_mapping_line(&executable, "r-xp");
 
@@ -1727,7 +1730,7 @@ mod tests {
     #[test]
     fn android_loaded_image_rejects_device_inode_mismatch() {
         let dir = tempfile::TempDir::new().unwrap();
-        let executable = dir.path().join("codewhale");
+        let executable = dir.path().join("nestlone");
         write_test_executable(&executable);
         let metadata = std::fs::metadata(&executable).unwrap();
         use std::os::unix::fs::MetadataExt;
@@ -1754,7 +1757,7 @@ mod tests {
     #[test]
     fn android_loaded_image_recheck_detects_pre_replace_swap() {
         let dir = tempfile::TempDir::new().unwrap();
-        let candidate = dir.path().join("codewhale");
+        let candidate = dir.path().join("nestlone");
         let replacement = dir.path().join("replacement");
         write_test_executable(&candidate);
         let maps = test_android_mapping_line(&candidate, "r-xp");
@@ -1775,8 +1778,8 @@ mod tests {
     #[test]
     fn android_identity_preflight_prevents_all_paired_replacements() {
         let dir = tempfile::TempDir::new().unwrap();
-        let primary = dir.path().join("codewhale");
-        let sibling = dir.path().join("codewhale-tui");
+        let primary = dir.path().join("nestlone");
+        let sibling = dir.path().join("nestlone-tui");
         let swapped_primary = dir.path().join("swapped-primary");
 
         write_test_executable(&primary);
@@ -1791,12 +1794,12 @@ mod tests {
         let downloads = vec![
             (
                 primary.clone(),
-                "codewhale-android-arm64".to_string(),
+                "nestlone-android-arm64".to_string(),
                 b"downloaded primary".to_vec(),
             ),
             (
                 sibling.clone(),
-                "codewhale-tui-android-arm64".to_string(),
+                "nestlone-tui-android-arm64".to_string(),
                 b"downloaded sibling".to_vec(),
             ),
         ];
@@ -1823,8 +1826,8 @@ mod tests {
         use std::cell::Cell;
 
         let dir = tempfile::TempDir::new().unwrap();
-        let primary = dir.path().join("codewhale");
-        let sibling = dir.path().join("codewhale-tui");
+        let primary = dir.path().join("nestlone");
+        let sibling = dir.path().join("nestlone-tui");
         let swapped_primary = dir.path().join("swapped-primary");
         write_test_executable(&primary);
         std::fs::write(&primary, b"original running primary").unwrap();
@@ -1837,12 +1840,12 @@ mod tests {
         let downloads = vec![
             (
                 primary.clone(),
-                "codewhale-android-arm64".to_string(),
+                "nestlone-android-arm64".to_string(),
                 b"downloaded primary".to_vec(),
             ),
             (
                 sibling.clone(),
-                "codewhale-tui-android-arm64".to_string(),
+                "nestlone-tui-android-arm64".to_string(),
                 b"downloaded sibling".to_vec(),
             ),
         ];
@@ -1877,7 +1880,7 @@ mod tests {
         use std::cell::Cell;
 
         let dir = tempfile::TempDir::new().unwrap();
-        let primary = dir.path().join("codewhale");
+        let primary = dir.path().join("nestlone");
         let swapped_primary = dir.path().join("swapped-primary");
         write_test_executable(&primary);
         std::fs::write(&primary, b"original running primary").unwrap();
@@ -1887,7 +1890,7 @@ mod tests {
 
         let downloads = vec![(
             primary.clone(),
-            "codewhale-android-arm64".to_string(),
+            "nestlone-android-arm64".to_string(),
             b"downloaded primary".to_vec(),
         )];
         let validation_calls = Cell::new(0);
@@ -1927,55 +1930,55 @@ mod tests {
     /// Verify binary prefix detection for dispatcher vs TUI binary.
     #[test]
     fn test_binary_prefix_detection() {
-        // TUI binary should use codewhale-tui prefix
+        // TUI binary should use nestlone-tui prefix
         assert_eq!(
-            binary_prefix_for_exe(Path::new("codewhale-tui")),
-            "codewhale-tui"
+            binary_prefix_for_exe(Path::new("nestlone-tui")),
+            "nestlone-tui"
         );
         assert_eq!(
-            binary_prefix_for_exe(Path::new("codewhale-tui.exe")),
-            "codewhale-tui"
+            binary_prefix_for_exe(Path::new("nestlone-tui.exe")),
+            "nestlone-tui"
         );
         assert_eq!(
             binary_prefix_for_exe(Path::new("CodeWhale-TUI.exe")),
-            "codewhale-tui"
+            "nestlone-tui"
         );
         assert_eq!(
-            binary_prefix_for_exe(Path::new("/usr/local/bin/codewhale-tui")),
-            "codewhale-tui"
+            binary_prefix_for_exe(Path::new("/usr/local/bin/nestlone-tui")),
+            "nestlone-tui"
         );
 
-        // Dispatcher binary should use codewhale prefix
-        assert_eq!(binary_prefix_for_exe(Path::new("codewhale")), "codewhale");
+        // Dispatcher binary should use nestlone prefix
+        assert_eq!(binary_prefix_for_exe(Path::new("nestlone")), "nestlone");
         assert_eq!(
-            binary_prefix_for_exe(Path::new("codewhale.exe")),
-            "codewhale"
+            binary_prefix_for_exe(Path::new("nestlone.exe")),
+            "nestlone"
         );
         assert_eq!(
-            binary_prefix_for_exe(Path::new("/usr/local/bin/codewhale")),
-            "codewhale"
+            binary_prefix_for_exe(Path::new("/usr/local/bin/nestlone")),
+            "nestlone"
         );
 
         // Fallback for unknown names
         assert_eq!(
             binary_prefix_for_exe(Path::new("other-binary")),
-            "codewhale"
+            "nestlone"
         );
 
         // Legacy names still map to the canonical update asset prefixes.
         assert_eq!(
             binary_prefix_for_exe(Path::new("deepseek-tui")),
-            "codewhale-tui"
+            "nestlone-tui"
         );
         assert_eq!(
             binary_prefix_for_exe(Path::new("/usr/local/bin/deepseek-tui")),
-            "codewhale-tui"
+            "nestlone-tui"
         );
         assert_eq!(
             binary_prefix_for_exe(Path::new("DeepSeek-TUI.exe")),
-            "codewhale-tui"
+            "nestlone-tui"
         );
-        assert_eq!(binary_prefix_for_exe(Path::new("deepseek")), "codewhale");
+        assert_eq!(binary_prefix_for_exe(Path::new("deepseek")), "nestlone");
     }
 
     #[test]
@@ -1986,8 +1989,8 @@ mod tests {
         assert!(is_legacy_binary(Path::new("/usr/local/bin/deepseek-tui")));
         assert!(is_legacy_binary(Path::new("DeepSeek.exe")));
         assert!(is_legacy_binary(Path::new("DeepSeek-TUI.exe")));
-        assert!(!is_legacy_binary(Path::new("codewhale")));
-        assert!(!is_legacy_binary(Path::new("codewhale-tui")));
+        assert!(!is_legacy_binary(Path::new("nestlone")));
+        assert!(!is_legacy_binary(Path::new("nestlone-tui")));
         assert!(!is_legacy_binary(Path::new("codew")));
     }
 
@@ -2000,11 +2003,11 @@ mod tests {
         assert!(message.contains("DeepSeek provider support"));
         assert!(message.contains("is unchanged"));
         assert!(message.contains("npm uninstall -g deepseek-tui"));
-        assert!(message.contains("npm install -g codewhale"));
+        assert!(message.contains("npm install -g nestlone"));
         assert!(message.contains("cargo uninstall deepseek-tui-cli 2>/dev/null || true"));
         assert!(message.contains("cargo uninstall deepseek-tui 2>/dev/null || true"));
-        assert!(message.contains("cargo install codewhale-cli --locked"));
-        assert!(message.contains("cargo install codewhale-tui --locked"));
+        assert!(message.contains("cargo install nestlone-cli --locked"));
+        assert!(message.contains("cargo install nestlone-tui --locked"));
         assert!(message.contains("brew upgrade deepseek-tui"));
         assert!(message.contains("https://github.com/bdugsj/nestlone/releases/latest"));
     }
@@ -2031,13 +2034,13 @@ mod tests {
             paths,
             vec![
                 dir.path()
-                    .join(format!("codewhale{}", std::env::consts::EXE_SUFFIX)),
+                    .join(format!("nestlone{}", std::env::consts::EXE_SUFFIX)),
                 dir.path()
-                    .join(format!("codewhale-tui{}", std::env::consts::EXE_SUFFIX))
+                    .join(format!("nestlone-tui{}", std::env::consts::EXE_SUFFIX))
             ]
         );
-        assert!(targets[0].asset_stem.starts_with("codewhale-"));
-        assert!(targets[1].asset_stem.starts_with("codewhale-tui-"));
+        assert!(targets[0].asset_stem.starts_with("nestlone-"));
+        assert!(targets[1].asset_stem.starts_with("nestlone-tui-"));
     }
 
     #[test]
@@ -2062,34 +2065,34 @@ mod tests {
             paths,
             vec![
                 dir.path()
-                    .join(format!("codewhale-tui{}", std::env::consts::EXE_SUFFIX)),
+                    .join(format!("nestlone-tui{}", std::env::consts::EXE_SUFFIX)),
                 dir.path()
-                    .join(format!("codewhale{}", std::env::consts::EXE_SUFFIX))
+                    .join(format!("nestlone{}", std::env::consts::EXE_SUFFIX))
             ]
         );
-        assert!(targets[0].asset_stem.starts_with("codewhale-tui-"));
-        assert!(targets[1].asset_stem.starts_with("codewhale-"));
+        assert!(targets[0].asset_stem.starts_with("nestlone-tui-"));
+        assert!(targets[1].asset_stem.starts_with("nestlone-"));
     }
 
     #[test]
     fn test_release_asset_stem_for_supported_platforms() {
         let cases = [
-            ("codewhale", "macos", "aarch64", "codewhale-macos-arm64"),
-            ("codewhale", "macos", "x86_64", "codewhale-macos-x64"),
-            ("codewhale", "linux", "x86_64", "codewhale-linux-x64"),
-            ("codewhale", "windows", "x86_64", "codewhale-windows-x64"),
-            ("codewhale", "windows", "aarch64", "codewhale-windows-arm64"),
+            ("nestlone", "macos", "aarch64", "nestlone-macos-arm64"),
+            ("nestlone", "macos", "x86_64", "nestlone-macos-x64"),
+            ("nestlone", "linux", "x86_64", "nestlone-linux-x64"),
+            ("nestlone", "windows", "x86_64", "nestlone-windows-x64"),
+            ("nestlone", "windows", "aarch64", "nestlone-windows-arm64"),
             (
-                "codewhale-tui",
+                "nestlone-tui",
                 "macos",
                 "aarch64",
-                "codewhale-tui-macos-arm64",
+                "nestlone-tui-macos-arm64",
             ),
             (
-                "codewhale-tui",
+                "nestlone-tui",
                 "linux",
                 "x86_64",
-                "codewhale-tui-linux-x64",
+                "nestlone-tui-linux-x64",
             ),
         ];
 
@@ -2103,10 +2106,10 @@ mod tests {
         let dir = tempfile::TempDir::new().unwrap();
         let dispatcher = dir
             .path()
-            .join(format!("codewhale{}", std::env::consts::EXE_SUFFIX));
+            .join(format!("nestlone{}", std::env::consts::EXE_SUFFIX));
         let tui = dir
             .path()
-            .join(format!("codewhale-tui{}", std::env::consts::EXE_SUFFIX));
+            .join(format!("nestlone-tui{}", std::env::consts::EXE_SUFFIX));
         std::fs::write(&dispatcher, b"dispatcher").unwrap();
         std::fs::write(&tui, b"tui").unwrap();
 
@@ -2117,8 +2120,8 @@ mod tests {
             .collect::<Vec<_>>();
 
         assert_eq!(paths, vec![dispatcher.as_path(), tui.as_path()]);
-        assert!(targets[0].asset_stem.starts_with("codewhale-"));
-        assert!(targets[1].asset_stem.starts_with("codewhale-tui-"));
+        assert!(targets[0].asset_stem.starts_with("nestlone-"));
+        assert!(targets[1].asset_stem.starts_with("nestlone-tui-"));
     }
 
     #[test]
@@ -2126,37 +2129,37 @@ mod tests {
         let dir = tempfile::TempDir::new().unwrap();
         let dispatcher = dir
             .path()
-            .join(format!("codewhale{}", std::env::consts::EXE_SUFFIX));
+            .join(format!("nestlone{}", std::env::consts::EXE_SUFFIX));
         std::fs::write(&dispatcher, b"dispatcher").unwrap();
 
         let targets = update_targets_for_exe(&dispatcher);
 
         assert_eq!(targets.len(), 1);
         assert_eq!(targets[0].path, dispatcher);
-        assert!(targets[0].asset_stem.starts_with("codewhale-"));
+        assert!(targets[0].asset_stem.starts_with("nestlone-"));
     }
 
     #[test]
     fn test_asset_matching_accepts_binary_assets_and_rejects_checksums() {
         assert!(asset_matches_platform(
-            "codewhale-macos-arm64",
-            "codewhale-macos-arm64"
+            "nestlone-macos-arm64",
+            "nestlone-macos-arm64"
         ));
         assert!(asset_matches_platform(
-            "codewhale-macos-arm64.tar.gz",
-            "codewhale-macos-arm64"
+            "nestlone-macos-arm64.tar.gz",
+            "nestlone-macos-arm64"
         ));
         assert!(asset_matches_platform(
-            "codewhale-tui-windows-x64.exe",
-            "codewhale-tui-windows-x64"
+            "nestlone-tui-windows-x64.exe",
+            "nestlone-tui-windows-x64"
         ));
         assert!(!asset_matches_platform(
-            "codewhale-tui-windows-x64.exe.sha256",
-            "codewhale-tui-windows-x64"
+            "nestlone-tui-windows-x64.exe.sha256",
+            "nestlone-tui-windows-x64"
         ));
         assert!(!asset_matches_platform(
-            "codewhale-macos-aarch64.tar.gz",
-            "codewhale-macos-arm64"
+            "nestlone-macos-aarch64.tar.gz",
+            "nestlone-macos-arm64"
         ));
     }
 
@@ -2167,22 +2170,22 @@ mod tests {
             prerelease: false,
             assets: vec![
                 Asset {
-                    name: "codewhale-macos-arm64.tar.gz".to_string(),
-                    browser_download_url: "https://example.invalid/codewhale-macos-arm64.tar.gz"
+                    name: "nestlone-macos-arm64.tar.gz".to_string(),
+                    browser_download_url: "https://example.invalid/nestlone-macos-arm64.tar.gz"
                         .to_string(),
                 },
                 Asset {
-                    name: "codewhale-macos-arm64".to_string(),
-                    browser_download_url: "https://example.invalid/codewhale-macos-arm64"
+                    name: "nestlone-macos-arm64".to_string(),
+                    browser_download_url: "https://example.invalid/nestlone-macos-arm64"
                         .to_string(),
                 },
             ],
         };
 
         let asset =
-            select_platform_asset(&release, "codewhale-macos-arm64").expect("platform asset");
+            select_platform_asset(&release, "nestlone-macos-arm64").expect("platform asset");
 
-        assert_eq!(asset.name, "codewhale-macos-arm64");
+        assert_eq!(asset.name, "nestlone-macos-arm64");
     }
 
     #[test]
@@ -2191,16 +2194,16 @@ mod tests {
             tag_name: "v0.8.8".to_string(),
             prerelease: false,
             assets: vec![Asset {
-                name: "codewhale-macos-arm64.tar.gz".to_string(),
-                browser_download_url: "https://example.invalid/codewhale-macos-arm64.tar.gz"
+                name: "nestlone-macos-arm64.tar.gz".to_string(),
+                browser_download_url: "https://example.invalid/nestlone-macos-arm64.tar.gz"
                     .to_string(),
             }],
         };
 
         let asset =
-            select_platform_asset(&release, "codewhale-macos-arm64").expect("platform asset");
+            select_platform_asset(&release, "nestlone-macos-arm64").expect("platform asset");
 
-        assert_eq!(asset.name, "codewhale-macos-arm64.tar.gz");
+        assert_eq!(asset.name, "nestlone-macos-arm64.tar.gz");
     }
 
     #[test]
@@ -2248,33 +2251,33 @@ mod tests {
     #[test]
     fn glibc_compatibility_message_is_nestlone_branded_and_actionable() {
         let message = glibc_compatibility_message(
-            "codewhale-linux-x64",
+            "nestlone-linux-x64",
             GlibcVersion::new(2, 39, 0),
             Some(GlibcVersion::new(2, 35, 0)),
         );
 
-        assert!(message.contains("Prebuilt Codewhale asset `codewhale-linux-x64`"));
+        assert!(message.contains("Prebuilt Codewhale asset `nestlone-linux-x64`"));
         assert!(message.contains("requires GLIBC_2.39"));
         assert!(message.contains("this system has glibc 2.35"));
-        assert!(message.contains("cargo install codewhale-cli --locked"));
+        assert!(message.contains("cargo install nestlone-cli --locked"));
         assert!(message.contains("build Linux GNU assets against an older glibc"));
     }
 
     #[test]
     fn parse_checksum_manifest_accepts_sha256sum_format() {
         let manifest = "\
-2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824  codewhale-macos-arm64
-E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855  *codewhale-windows-x64.exe
+2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824  nestlone-macos-arm64
+E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855  *nestlone-windows-x64.exe
 ";
         let checksums = parse_checksum_manifest(manifest).expect("valid manifest");
 
         assert_eq!(
-            checksums.get("codewhale-macos-arm64").map(String::as_str),
+            checksums.get("nestlone-macos-arm64").map(String::as_str),
             Some("2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824")
         );
         assert_eq!(
             checksums
-                .get("codewhale-windows-x64.exe")
+                .get("nestlone-windows-x64.exe")
                 .map(String::as_str),
             Some("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855")
         );
@@ -2282,7 +2285,7 @@ E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855  *codewhale-win
 
     #[test]
     fn parse_checksum_manifest_rejects_malformed_lines() {
-        let err = parse_checksum_manifest("not-a-hash  codewhale-macos-arm64")
+        let err = parse_checksum_manifest("not-a-hash  nestlone-macos-arm64")
             .expect_err("invalid manifest line should fail");
         assert!(
             err.to_string().contains("invalid SHA256 manifest line"),
@@ -2294,11 +2297,11 @@ E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855  *codewhale-win
     fn expected_sha256_from_manifest_requires_matching_asset() {
         let manifest =
             "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824  other-asset\n";
-        let err = expected_sha256_from_manifest(manifest, "codewhale-macos-arm64")
+        let err = expected_sha256_from_manifest(manifest, "nestlone-macos-arm64")
             .expect_err("missing asset should fail");
         assert!(
             err.to_string()
-                .contains("checksum manifest is missing codewhale-macos-arm64"),
+                .contains("checksum manifest is missing nestlone-macos-arm64"),
             "unexpected error: {err:#}"
         );
     }
@@ -2306,7 +2309,7 @@ E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855  *codewhale-win
     #[test]
     fn test_replace_binary_creates_and_replaces() {
         let dir = tempfile::TempDir::new().unwrap();
-        let target = dir.path().join("codewhale-test");
+        let target = dir.path().join("nestlone-test");
         // Write initial content
         std::fs::write(&target, b"old binary").unwrap();
 
@@ -2318,32 +2321,32 @@ E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855  *codewhale-win
     #[test]
     fn test_replace_binary_creates_new_file() {
         let dir = tempfile::TempDir::new().unwrap();
-        let target = dir.path().join("codewhale-new-test");
+        let target = dir.path().join("nestlone-new-test");
 
         replace_binary(&target, b"fresh binary").unwrap();
         let content = std::fs::read_to_string(&target).unwrap();
         assert_eq!(content, "fresh binary");
     }
 
-    /// Mocked GitHub release payload covering both the dispatcher (`codewhale`)
-    /// and the legacy TUI (`codewhale-tui`) binaries across our published
+    /// Mocked GitHub release payload covering both the dispatcher (`nestlone`)
+    /// and the legacy TUI (`nestlone-tui`) binaries across our published
     /// platform/arch matrix, plus a checksum sibling that must never be picked
     /// as the primary binary.
     fn mocked_release() -> Release {
         let json = r#"{
           "tag_name": "v0.8.8",
           "assets": [
-            { "name": "codewhale-linux-x64",          "browser_download_url": "https://example.invalid/codewhale-linux-x64" },
-            { "name": "codewhale-macos-x64",          "browser_download_url": "https://example.invalid/codewhale-macos-x64" },
-            { "name": "codewhale-macos-arm64",        "browser_download_url": "https://example.invalid/codewhale-macos-arm64" },
-            { "name": "codewhale-windows-x64.exe",    "browser_download_url": "https://example.invalid/codewhale-windows-x64.exe" },
-            { "name": "codewhale-windows-x64.exe.sha256", "browser_download_url": "https://example.invalid/codewhale-windows-x64.exe.sha256" },
-            { "name": "codewhale-windows-arm64.exe",  "browser_download_url": "https://example.invalid/codewhale-windows-arm64.exe" },
-            { "name": "codewhale-tui-linux-x64",      "browser_download_url": "https://example.invalid/codewhale-tui-linux-x64" },
-            { "name": "codewhale-tui-macos-x64",      "browser_download_url": "https://example.invalid/codewhale-tui-macos-x64" },
-            { "name": "codewhale-tui-macos-arm64",    "browser_download_url": "https://example.invalid/codewhale-tui-macos-arm64" },
-            { "name": "codewhale-tui-windows-x64.exe","browser_download_url": "https://example.invalid/codewhale-tui-windows-x64.exe" },
-            { "name": "codewhale-tui-windows-arm64.exe","browser_download_url": "https://example.invalid/codewhale-tui-windows-arm64.exe" }
+            { "name": "nestlone-linux-x64",          "browser_download_url": "https://example.invalid/nestlone-linux-x64" },
+            { "name": "nestlone-macos-x64",          "browser_download_url": "https://example.invalid/nestlone-macos-x64" },
+            { "name": "nestlone-macos-arm64",        "browser_download_url": "https://example.invalid/nestlone-macos-arm64" },
+            { "name": "nestlone-windows-x64.exe",    "browser_download_url": "https://example.invalid/nestlone-windows-x64.exe" },
+            { "name": "nestlone-windows-x64.exe.sha256", "browser_download_url": "https://example.invalid/nestlone-windows-x64.exe.sha256" },
+            { "name": "nestlone-windows-arm64.exe",  "browser_download_url": "https://example.invalid/nestlone-windows-arm64.exe" },
+            { "name": "nestlone-tui-linux-x64",      "browser_download_url": "https://example.invalid/nestlone-tui-linux-x64" },
+            { "name": "nestlone-tui-macos-x64",      "browser_download_url": "https://example.invalid/nestlone-tui-macos-x64" },
+            { "name": "nestlone-tui-macos-arm64",    "browser_download_url": "https://example.invalid/nestlone-tui-macos-arm64" },
+            { "name": "nestlone-tui-windows-x64.exe","browser_download_url": "https://example.invalid/nestlone-tui-windows-x64.exe" },
+            { "name": "nestlone-tui-windows-arm64.exe","browser_download_url": "https://example.invalid/nestlone-tui-windows-arm64.exe" }
           ]
         }"#;
         serde_json::from_str(json).expect("mock release JSON")
@@ -2353,15 +2356,15 @@ E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855  *codewhale-win
     fn mocked_release_selects_dispatcher_asset_for_supported_platforms() {
         let release = mocked_release();
         let cases = [
-            ("macos", "aarch64", "codewhale-macos-arm64"),
-            ("macos", "x86_64", "codewhale-macos-x64"),
-            ("linux", "x86_64", "codewhale-linux-x64"),
-            ("windows", "x86_64", "codewhale-windows-x64.exe"),
-            ("windows", "aarch64", "codewhale-windows-arm64.exe"),
+            ("macos", "aarch64", "nestlone-macos-arm64"),
+            ("macos", "x86_64", "nestlone-macos-x64"),
+            ("linux", "x86_64", "nestlone-linux-x64"),
+            ("windows", "x86_64", "nestlone-windows-x64.exe"),
+            ("windows", "aarch64", "nestlone-windows-arm64.exe"),
         ];
 
         for (os, arch, expected) in cases {
-            let stem = release_asset_stem_for(Path::new("/usr/local/bin/codewhale"), os, arch);
+            let stem = release_asset_stem_for(Path::new("/usr/local/bin/nestlone"), os, arch);
             let asset = select_platform_asset(&release, &stem)
                 .unwrap_or_else(|| panic!("no asset for {os}/{arch} (stem {stem})"));
             assert_eq!(asset.name, expected, "{os}/{arch}");
@@ -2372,33 +2375,33 @@ E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855  *codewhale-win
     fn mocked_release_selects_tui_asset_when_tui_binary_invokes_update() {
         let release = mocked_release();
         let stem = release_asset_stem_for(
-            Path::new("/usr/local/bin/codewhale-tui"),
+            Path::new("/usr/local/bin/nestlone-tui"),
             "macos",
             "aarch64",
         );
         let asset = select_platform_asset(&release, &stem).expect("TUI platform asset");
-        assert_eq!(asset.name, "codewhale-tui-macos-arm64");
+        assert_eq!(asset.name, "nestlone-tui-macos-arm64");
 
         let windows_stem =
-            release_asset_stem_for(Path::new("C:\\codewhale-tui.exe"), "windows", "aarch64");
+            release_asset_stem_for(Path::new("C:\\nestlone-tui.exe"), "windows", "aarch64");
         let windows_asset =
             select_platform_asset(&release, &windows_stem).expect("Windows ARM64 TUI asset");
-        assert_eq!(windows_asset.name, "codewhale-tui-windows-arm64.exe");
+        assert_eq!(windows_asset.name, "nestlone-tui-windows-arm64.exe");
     }
 
     #[test]
     fn android_arm64_maps_to_android_release_assets() {
         // The generic format!("{prefix}-{os}-{arch}") path naturally produces
         // Android asset stems. Verify the full stem for both dispatcher and TUI
-        // binaries so `codewhale update` on Termux requests Android assets, not
+        // binaries so `nestlone update` on Termux requests Android assets, not
         // linux-arm64 (#4241).
         assert_eq!(
-            release_asset_stem_for_prefix("codewhale", "android", "aarch64"),
-            "codewhale-android-arm64"
+            release_asset_stem_for_prefix("nestlone", "android", "aarch64"),
+            "nestlone-android-arm64"
         );
         assert_eq!(
-            release_asset_stem_for_prefix("codewhale-tui", "android", "aarch64"),
-            "codewhale-tui-android-arm64"
+            release_asset_stem_for_prefix("nestlone-tui", "android", "aarch64"),
+            "nestlone-tui-android-arm64"
         );
         assert_eq!(
             release_asset_stem_for_prefix("codew", "android", "aarch64"),
@@ -2415,7 +2418,7 @@ E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855  *codewhale-win
     #[test]
     fn android_release_assets_never_select_linux_arm64() {
         // Sanity: the stem formatter must never produce a linux-* stem for android.
-        let stem = release_asset_stem_for_prefix("codewhale", "android", "aarch64");
+        let stem = release_asset_stem_for_prefix("nestlone", "android", "aarch64");
         assert!(
             !stem.contains("linux"),
             "android stem must not contain linux: {stem}"
@@ -2435,19 +2438,19 @@ E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855  *codewhale-win
         assert_eq!(release.assets[0].name, CHECKSUM_MANIFEST_ASSET);
         assert_eq!(
             release.assets[0].browser_download_url,
-            "https://mirror.example/releases/v0.8.36/codewhale-artifacts-sha256.txt"
+            "https://mirror.example/releases/v0.8.36/nestlone-artifacts-sha256.txt"
         );
 
         let dispatcher =
-            select_platform_asset(&release, "codewhale-linux-x64").expect("dispatcher asset");
+            select_platform_asset(&release, "nestlone-linux-x64").expect("dispatcher asset");
         assert_eq!(
             dispatcher.browser_download_url,
-            "https://mirror.example/releases/v0.8.36/codewhale-linux-x64"
+            "https://mirror.example/releases/v0.8.36/nestlone-linux-x64"
         );
-        let tui = select_platform_asset(&release, "codewhale-tui-linux-x64").expect("tui asset");
+        let tui = select_platform_asset(&release, "nestlone-tui-linux-x64").expect("tui asset");
         assert_eq!(
             tui.browser_download_url,
-            "https://mirror.example/releases/v0.8.36/codewhale-tui-linux-x64"
+            "https://mirror.example/releases/v0.8.36/nestlone-tui-linux-x64"
         );
     }
 
@@ -2462,12 +2465,12 @@ E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855  *codewhale-win
 
         assert_eq!(release.tag_name, "v0.8.36");
         assert!(
-            select_platform_asset(&release, "codewhale-windows-x64")
-                .is_some_and(|asset| asset.name == "codewhale-windows-x64.exe")
+            select_platform_asset(&release, "nestlone-windows-x64")
+                .is_some_and(|asset| asset.name == "nestlone-windows-x64.exe")
         );
         assert!(
-            select_platform_asset(&release, "codewhale-tui-windows-x64")
-                .is_some_and(|asset| asset.name == "codewhale-tui-windows-x64.exe")
+            select_platform_asset(&release, "nestlone-tui-windows-x64")
+                .is_some_and(|asset| asset.name == "nestlone-tui-windows-x64.exe")
         );
 
         let arm_release = release_from_mirror_base_url(
@@ -2477,8 +2480,8 @@ E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855  *codewhale-win
             "aarch64",
         );
         assert!(
-            select_platform_asset(&arm_release, "codewhale-windows-arm64")
-                .is_some_and(|asset| asset.name == "codewhale-windows-arm64.exe")
+            select_platform_asset(&arm_release, "nestlone-windows-arm64")
+                .is_some_and(|asset| asset.name == "nestlone-windows-arm64.exe")
         );
     }
 
@@ -2500,18 +2503,18 @@ E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855  *codewhale-win
         assert_eq!(release.tag_name, "v0.8.61");
         assert_eq!(
             release.assets[0].browser_download_url,
-            "https://github.com/bdugsj/nestlone/releases/download/v0.8.61/codewhale-artifacts-sha256.txt"
+            "https://github.com/bdugsj/nestlone/releases/download/v0.8.61/nestlone-artifacts-sha256.txt"
         );
         let dispatcher =
-            select_platform_asset(&release, "codewhale-macos-arm64").expect("dispatcher asset");
+            select_platform_asset(&release, "nestlone-macos-arm64").expect("dispatcher asset");
         assert_eq!(
             dispatcher.browser_download_url,
-            "https://github.com/bdugsj/nestlone/releases/download/v0.8.61/codewhale-macos-arm64"
+            "https://github.com/bdugsj/nestlone/releases/download/v0.8.61/nestlone-macos-arm64"
         );
-        let tui = select_platform_asset(&release, "codewhale-tui-macos-arm64").expect("tui asset");
+        let tui = select_platform_asset(&release, "nestlone-tui-macos-arm64").expect("tui asset");
         assert_eq!(
             tui.browser_download_url,
-            "https://github.com/bdugsj/nestlone/releases/download/v0.8.61/codewhale-tui-macos-arm64"
+            "https://github.com/bdugsj/nestlone/releases/download/v0.8.61/nestlone-tui-macos-arm64"
         );
     }
 
@@ -2626,8 +2629,8 @@ E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855  *codewhale-win
             hint.contains(nestlone_release::UPDATE_VERSION_ENV),
             "{hint}"
         );
-        assert!(hint.contains("codewhale-cli"), "{hint}");
-        assert!(hint.contains("codewhale-tui --locked"), "{hint}");
+        assert!(hint.contains("nestlone-cli"), "{hint}");
+        assert!(hint.contains("nestlone-tui --locked"), "{hint}");
     }
 
     fn serve_http_responses(
@@ -2685,8 +2688,8 @@ E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855  *codewhale-win
         let body = br#"{
           "tag_name": "v9.9.9",
           "assets": [
-            { "name": "codewhale-linux-x64", "browser_download_url": "http://example.invalid/codewhale-linux-x64" },
-            { "name": "codewhale-artifacts-sha256.txt", "browser_download_url": "http://example.invalid/codewhale-artifacts-sha256.txt" }
+            { "name": "nestlone-linux-x64", "browser_download_url": "http://example.invalid/nestlone-linux-x64" },
+            { "name": "nestlone-artifacts-sha256.txt", "browser_download_url": "http://example.invalid/nestlone-artifacts-sha256.txt" }
           ]
         }"#;
         let (url, request_rx, handle) = serve_http_once("200 OK", "application/json", body);
@@ -2703,7 +2706,7 @@ E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855  *codewhale-win
             "got {request:?}"
         );
         assert!(
-            request_lower.contains("user-agent: codewhale-updater"),
+            request_lower.contains("user-agent: nestlone-updater"),
             "got {request:?}"
         );
         handle.join().expect("test server thread");
@@ -2714,7 +2717,7 @@ E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855  *codewhale-win
         let body = br#"{
           "tag_name": "v9.9.9",
           "assets": [
-            { "name": "codewhale-linux-x64", "browser_download_url": "http://example.invalid/codewhale-linux-x64" }
+            { "name": "nestlone-linux-x64", "browser_download_url": "http://example.invalid/nestlone-linux-x64" }
           ]
         }"#;
         let (url, request_rx, handle) = serve_http_responses(vec![
@@ -2754,7 +2757,7 @@ E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855  *codewhale-win
           { "tag_name": "v0.9.0", "prerelease": false, "assets": [] },
           { "tag_name": "v0.9.0-rc.1", "prerelease": true, "assets": [] },
           { "tag_name": "v0.9.0-beta.2", "prerelease": true, "assets": [
-            { "name": "codewhale-linux-x64", "browser_download_url": "http://example.invalid/codewhale-linux-x64" }
+            { "name": "nestlone-linux-x64", "browser_download_url": "http://example.invalid/nestlone-linux-x64" }
           ] },
           { "tag_name": "v0.9.0-beta.1", "prerelease": true, "assets": [] }
         ]"#;
@@ -2819,7 +2822,7 @@ E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855  *codewhale-win
         let request_lower = request.to_ascii_lowercase();
         assert!(request.starts_with("GET /release "), "got {request:?}");
         assert!(
-            request_lower.contains("user-agent: codewhale-updater"),
+            request_lower.contains("user-agent: nestlone-updater"),
             "got {request:?}"
         );
         handle.join().expect("test server thread");

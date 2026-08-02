@@ -274,7 +274,7 @@ fn admission_root() -> PathBuf {
     if let Some(home) = crate::config::effective_home_dir() {
         return home.join(".codewhale").join("resource-admission");
     }
-    std::env::temp_dir().join("codewhale-resource-admission")
+    std::env::temp_dir().join("nestlone-resource-admission")
 }
 
 /// Host free-RAM fraction in `0.0..=1.0`, or `None` when it cannot be measured.
@@ -420,7 +420,7 @@ mod tests {
     #[test]
     fn infers_only_expensive_rust_compilation_commands() {
         for command in [
-            "cargo test -p codewhale-tui shell::tests",
+            "cargo test -p nestlone-tui shell::tests",
             "env CARGO_BUILD_JOBS=2 cargo build --workspace",
             "cargo check",
             "cargo clippy --all-targets",

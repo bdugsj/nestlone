@@ -531,7 +531,7 @@ fn warns_when_allow_shell_nested_under_general_section() {
 fn load_honors_nestlone_home_for_primary_config_path() -> Result<()> {
     let _lock = lock_test_env();
     let dir = tempfile::tempdir()?;
-    let nestlone_home = dir.path().join("isolated-codewhale");
+    let nestlone_home = dir.path().join("isolated-nestlone");
     fs::create_dir_all(&nestlone_home)?;
     fs::write(nestlone_home.join("config.toml"), "provider = \"zai\"\n")?;
     let _nestlone_home = EnvVarGuard::set("CODEWHALE_HOME", nestlone_home.as_os_str());
@@ -550,7 +550,7 @@ fn load_honors_nestlone_home_for_primary_config_path() -> Result<()> {
 fn load_accepts_dispatcher_written_camel_case_config_shape() -> Result<()> {
     let _lock = lock_test_env();
     let dir = tempfile::tempdir()?;
-    let nestlone_home = dir.path().join("isolated-codewhale");
+    let nestlone_home = dir.path().join("isolated-nestlone");
     fs::create_dir_all(&nestlone_home)?;
     fs::write(
         nestlone_home.join("config.toml"),
@@ -1125,7 +1125,7 @@ fn apply_env_overrides_sets_search_api_key() {
 #[test]
 fn apply_env_overrides_sets_search_base_url() {
     let _guard = lock_test_env();
-    let prev_codewhale = env::var_os("CODEWHALE_SEARCH_BASE_URL");
+    let prev_nestlone = env::var_os("CODEWHALE_SEARCH_BASE_URL");
     let prev_deepseek = env::var_os("DEEPSEEK_SEARCH_BASE_URL");
     unsafe {
         env::remove_var("CODEWHALE_SEARCH_BASE_URL");
@@ -1139,7 +1139,7 @@ fn apply_env_overrides_sets_search_base_url() {
     apply_env_overrides(&mut config);
 
     unsafe {
-        EnvGuard::restore_var("CODEWHALE_SEARCH_BASE_URL", prev_codewhale);
+        EnvGuard::restore_var("CODEWHALE_SEARCH_BASE_URL", prev_nestlone);
         EnvGuard::restore_var("DEEPSEEK_SEARCH_BASE_URL", prev_deepseek);
     }
     assert_eq!(
@@ -1151,12 +1151,12 @@ fn apply_env_overrides_sets_search_base_url() {
 #[test]
 fn nestlone_search_base_url_env_wins_over_legacy_alias() {
     let _guard = lock_test_env();
-    let prev_codewhale = env::var_os("CODEWHALE_SEARCH_BASE_URL");
+    let prev_nestlone = env::var_os("CODEWHALE_SEARCH_BASE_URL");
     let prev_deepseek = env::var_os("DEEPSEEK_SEARCH_BASE_URL");
     unsafe {
         env::set_var(
             "CODEWHALE_SEARCH_BASE_URL",
-            "https://codewhale-search.example/html/",
+            "https://nestlone-search.example/html/",
         );
         env::set_var(
             "DEEPSEEK_SEARCH_BASE_URL",
@@ -1168,12 +1168,12 @@ fn nestlone_search_base_url_env_wins_over_legacy_alias() {
     apply_env_overrides(&mut config);
 
     unsafe {
-        EnvGuard::restore_var("CODEWHALE_SEARCH_BASE_URL", prev_codewhale);
+        EnvGuard::restore_var("CODEWHALE_SEARCH_BASE_URL", prev_nestlone);
         EnvGuard::restore_var("DEEPSEEK_SEARCH_BASE_URL", prev_deepseek);
     }
     assert_eq!(
         config.search.and_then(|search| search.base_url),
-        Some("https://codewhale-search.example/html/".to_string())
+        Some("https://nestlone-search.example/html/".to_string())
     );
 }
 
@@ -2369,7 +2369,7 @@ fn save_api_key_writes_config_file_under_cfg_test() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-test-{}-{}",
+        "nestlone-tui-test-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -2489,7 +2489,7 @@ fn save_api_key_onboarding_routes_openrouter_key_to_provider_table() -> Result<(
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-onboarding-provider-{}-{}",
+        "nestlone-tui-onboarding-provider-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -2514,7 +2514,7 @@ fn ensure_config_file_exists_creates_first_run_template() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-first-run-config-{}-{}",
+        "nestlone-tui-first-run-config-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -2540,7 +2540,7 @@ fn workspace_trust_round_trips_through_global_config() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-workspace-trust-{}-{}",
+        "nestlone-tui-workspace-trust-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -2576,7 +2576,7 @@ fn workspace_trust_reads_existing_projects_table() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-existing-project-trust-{}-{}",
+        "nestlone-tui-existing-project-trust-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -2636,7 +2636,7 @@ fn save_deepseek_key_uses_isolated_file_store_without_plaintext_config() -> Resu
     let _lock = lock_test_env();
     let temp_root = tempfile::tempdir()?;
     let _guard = EnvGuard::new(temp_root.path());
-    let nestlone_home = temp_root.path().join("codewhale-home");
+    let nestlone_home = temp_root.path().join("nestlone-home");
     let config_path = nestlone_home.join("config.toml");
     let _nestlone_home = EnvVarGuard::set("CODEWHALE_HOME", nestlone_home.as_os_str());
     let _config_path = EnvVarGuard::set("CODEWHALE_CONFIG_PATH", config_path.as_os_str());
@@ -2668,7 +2668,7 @@ fn save_non_deepseek_key_uses_isolated_file_store_without_plaintext_config() -> 
     let _lock = lock_test_env();
     let temp_root = tempfile::tempdir()?;
     let _guard = EnvGuard::new(temp_root.path());
-    let nestlone_home = temp_root.path().join("codewhale-home");
+    let nestlone_home = temp_root.path().join("nestlone-home");
     let config_path = nestlone_home.join("config.toml");
     let _nestlone_home = EnvVarGuard::set("CODEWHALE_HOME", nestlone_home.as_os_str());
     let _config_path = EnvVarGuard::set("CODEWHALE_CONFIG_PATH", config_path.as_os_str());
@@ -2701,7 +2701,7 @@ fn provider_api_key_config_failure_restores_secret_and_keeps_external_route() ->
     for prior in [None, Some("prior-xai-secret")] {
         let temp_root = tempfile::tempdir()?;
         let _guard = EnvGuard::new(temp_root.path());
-        let nestlone_home = temp_root.path().canonicalize()?.join("codewhale-home");
+        let nestlone_home = temp_root.path().canonicalize()?.join("nestlone-home");
         fs::create_dir_all(&nestlone_home)?;
         let config_path = nestlone_home.join("config.toml");
         fs::create_dir(&config_path)?;
@@ -2766,7 +2766,7 @@ fn root_api_key_config_failure_restores_absent_and_existing_secret_state() -> Re
     for prior in [None, Some("prior-deepseek-secret")] {
         let temp_root = tempfile::tempdir()?;
         let _guard = EnvGuard::new(temp_root.path());
-        let nestlone_home = temp_root.path().join("codewhale-home");
+        let nestlone_home = temp_root.path().join("nestlone-home");
         fs::create_dir_all(&nestlone_home)?;
         let config_path = nestlone_home.join("config.toml");
         fs::create_dir(&config_path)?;
@@ -2792,7 +2792,7 @@ fn save_key_falls_back_to_config_when_isolated_file_store_is_unwritable() -> Res
     let _lock = lock_test_env();
     let temp_root = tempfile::tempdir()?;
     let _guard = EnvGuard::new(temp_root.path());
-    let nestlone_home = temp_root.path().join("codewhale-home");
+    let nestlone_home = temp_root.path().join("nestlone-home");
     let config_path = nestlone_home.join("config.toml");
     fs::create_dir_all(nestlone_home.join("secrets"))?;
     fs::write(
@@ -3050,7 +3050,7 @@ fn clear_api_key_strips_root_and_provider_scoped_keys() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-clear-{}-{}",
+        "nestlone-tui-clear-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -3084,7 +3084,7 @@ api_key = "old-openrouter-key"
     );
     assert!(
         !after.contains("old-provider-key"),
-        "provider-scoped codewhale key must be stripped: {after}"
+        "provider-scoped nestlone key must be stripped: {after}"
     );
     assert!(
         !after.contains("old-openrouter-key"),
@@ -3108,7 +3108,7 @@ fn save_api_key_inserts_key_when_only_a_comment_mentions_it() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-api-key-comment-{}-{}",
+        "nestlone-tui-api-key-comment-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -3153,7 +3153,7 @@ fn save_api_key_replaces_existing_key_preserving_comments() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-api-key-replace-{}-{}",
+        "nestlone-tui-api-key-replace-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -3197,7 +3197,7 @@ fn save_api_key_for_preserves_comments_in_provider_tables() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-provider-key-comments-{}-{}",
+        "nestlone-tui-provider-key-comments-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -3259,7 +3259,7 @@ fn clear_api_key_preserves_comments_and_unrelated_keys() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-clear-comments-{}-{}",
+        "nestlone-tui-clear-comments-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -3316,7 +3316,7 @@ fn clear_active_provider_api_key_handles_quoted_table_headers() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-clear-quoted-{}-{}",
+        "nestlone-tui-clear-quoted-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -3361,7 +3361,7 @@ fn clear_active_provider_api_key_clears_deepseek_cn_root_scope() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-clear-deepseek-cn-{}-{}",
+        "nestlone-tui-clear-deepseek-cn-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -3399,7 +3399,7 @@ fn clear_active_provider_api_key_distinguishes_literal_and_named_custom_routes()
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-clear-custom-{}-{}",
+        "nestlone-tui-clear-custom-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -3446,7 +3446,7 @@ fn clear_active_provider_api_key_prefers_exact_custom_table_over_legacy_root() -
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-clear-exact-custom-{}-{}",
+        "nestlone-tui-clear-exact-custom-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -3488,7 +3488,7 @@ fn save_workspace_trust_preserves_comments() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-trust-comments-{}-{}",
+        "nestlone-tui-trust-comments-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -3535,7 +3535,7 @@ fn deepseek_api_key_prefers_explicit_in_memory_override() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-override-{}-{}",
+        "nestlone-tui-override-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -3561,7 +3561,7 @@ fn deepseek_api_key_prefers_saved_config_over_stale_env() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-config-over-env-{}-{}",
+        "nestlone-tui-config-over-env-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -3587,7 +3587,7 @@ fn standalone_tui_reads_saved_secret_before_ambient_env() -> Result<()> {
     let _lock = lock_test_env();
     let temp_root = tempfile::tempdir()?;
     let _guard = EnvGuard::new(temp_root.path());
-    let nestlone_home = temp_root.path().join("isolated-codewhale");
+    let nestlone_home = temp_root.path().join("isolated-nestlone");
     fs::create_dir_all(&nestlone_home)?;
     let _nestlone_home = EnvVarGuard::set("CODEWHALE_HOME", nestlone_home.as_os_str());
     let _backend = EnvVarGuard::set("CODEWHALE_SECRET_BACKEND", "file");
@@ -3614,7 +3614,7 @@ fn authenticated_local_provider_reads_saved_secret() -> Result<()> {
     let _lock = lock_test_env();
     let temp_root = tempfile::tempdir()?;
     let _guard = EnvGuard::new(temp_root.path());
-    let nestlone_home = temp_root.path().join("isolated-codewhale");
+    let nestlone_home = temp_root.path().join("isolated-nestlone");
     fs::create_dir_all(&nestlone_home)?;
     let _nestlone_home = EnvVarGuard::set("CODEWHALE_HOME", nestlone_home.as_os_str());
     let _backend = EnvVarGuard::set("CODEWHALE_SECRET_BACKEND", "file");
@@ -3642,7 +3642,7 @@ fn named_custom_provider_never_reuses_generic_custom_secret() -> Result<()> {
     let _lock = lock_test_env();
     let temp_root = tempfile::tempdir()?;
     let _guard = EnvGuard::new(temp_root.path());
-    let nestlone_home = temp_root.path().join("isolated-codewhale");
+    let nestlone_home = temp_root.path().join("isolated-nestlone");
     fs::create_dir_all(&nestlone_home)?;
     let _nestlone_home = EnvVarGuard::set("CODEWHALE_HOME", nestlone_home.as_os_str());
     let _backend = EnvVarGuard::set("CODEWHALE_SECRET_BACKEND", "file");
@@ -3679,7 +3679,7 @@ fn built_in_provider_custom_endpoint_never_reuses_global_credentials() -> Result
     let _lock = lock_test_env();
     let temp_root = tempfile::tempdir()?;
     let _guard = EnvGuard::new(temp_root.path());
-    let nestlone_home = temp_root.path().join("isolated-codewhale");
+    let nestlone_home = temp_root.path().join("isolated-nestlone");
     fs::create_dir_all(&nestlone_home)?;
     let _nestlone_home = EnvVarGuard::set("CODEWHALE_HOME", nestlone_home.as_os_str());
     let _backend = EnvVarGuard::set("CODEWHALE_SECRET_BACKEND", "file");
@@ -4245,7 +4245,7 @@ fn auth_mode_none_suppresses_config_env_secret_and_oauth_credentials() -> Result
     let _lock = lock_test_env();
     let temp_root = tempfile::tempdir()?;
     let _guard = EnvGuard::new(temp_root.path());
-    let nestlone_home = temp_root.path().join("isolated-codewhale");
+    let nestlone_home = temp_root.path().join("isolated-nestlone");
     fs::create_dir_all(&nestlone_home)?;
     let _nestlone_home = EnvVarGuard::set("CODEWHALE_HOME", nestlone_home.as_os_str());
     let _backend = EnvVarGuard::set("CODEWHALE_SECRET_BACKEND", "file");
@@ -4326,7 +4326,7 @@ fn auth_mode_none_suppresses_config_env_secret_and_oauth_credentials() -> Result
 fn active_provider_detects_env_only_api_key() -> Result<()> {
     let _lock = lock_test_env();
     let temp_root =
-        env::temp_dir().join(format!("codewhale-tui-env-only-key-{}", std::process::id()));
+        env::temp_dir().join(format!("nestlone-tui-env-only-key-{}", std::process::id()));
     fs::create_dir_all(&temp_root)?;
     let _guard = EnvGuard::new(&temp_root);
 
@@ -4356,7 +4356,7 @@ fn deepseek_api_key_ignores_sentinel_placeholder() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-sentinel-{}-{}",
+        "nestlone-tui-sentinel-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -4384,7 +4384,7 @@ fn default_user_paths_use_nestlone_home_for_fresh_installs() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-fresh-home-test-{}-{}",
+        "nestlone-tui-fresh-home-test-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -4426,7 +4426,7 @@ fn default_user_paths_preserve_existing_legacy_files() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-legacy-home-test-{}-{}",
+        "nestlone-tui-legacy-home-test-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -4456,14 +4456,14 @@ fn default_user_paths_preserve_existing_legacy_files() -> Result<()> {
 #[test]
 fn nestlone_config_path_env_wins_over_legacy_env() -> Result<()> {
     let _lock = lock_test_env();
-    let prev_codewhale = env::var_os("CODEWHALE_CONFIG_PATH");
+    let prev_nestlone = env::var_os("CODEWHALE_CONFIG_PATH");
     let prev_deepseek = env::var_os("DEEPSEEK_CONFIG_PATH");
     let nanos = SystemTime::now()
         .duration_since(UNIX_EPOCH)
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-config-env-test-{}-{}",
+        "nestlone-tui-config-env-test-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -4478,7 +4478,7 @@ fn nestlone_config_path_env_wins_over_legacy_env() -> Result<()> {
     assert_eq!(env_config_path().unwrap(), preferred);
 
     unsafe {
-        EnvGuard::restore_var("CODEWHALE_CONFIG_PATH", prev_codewhale);
+        EnvGuard::restore_var("CODEWHALE_CONFIG_PATH", prev_nestlone);
         EnvGuard::restore_var("DEEPSEEK_CONFIG_PATH", prev_deepseek);
     }
 
@@ -4493,7 +4493,7 @@ fn test_tilde_expansion_in_paths() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-tilde-test-{}-{}",
+        "nestlone-tui-tilde-test-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -4537,7 +4537,7 @@ fn test_load_uses_tilde_expanded_deepseek_config_path() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-load-tilde-test-{}-{}",
+        "nestlone-tui-load-tilde-test-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -4566,7 +4566,7 @@ fn test_load_falls_back_to_home_config_when_env_path_missing() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-load-fallback-test-{}-{}",
+        "nestlone-tui-load-fallback-test-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -4625,7 +4625,7 @@ fn test_save_api_key_doesnt_match_similar_keys() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-api-key-test-{}-{}",
+        "nestlone-tui-api-key-test-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -4672,7 +4672,7 @@ fn apply_env_overrides_ignores_empty_api_key() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-empty-key-{}-{}",
+        "nestlone-tui-empty-key-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -4705,7 +4705,7 @@ fn apply_env_overrides_does_not_copy_api_key_into_config() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-env-key-not-config-{}-{}",
+        "nestlone-tui-env-key-not-config-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -5539,7 +5539,7 @@ model = "opencode-go/glm-5.2"
 #[test]
 fn normalize_model_name_rejects_invalid_or_non_deepseek_ids() {
     assert!(normalize_model_name("qwen3-coder").is_none());
-    assert!(normalize_model_name("codewhale v4").is_none());
+    assert!(normalize_model_name("nestlone v4").is_none());
     assert!(normalize_model_name("").is_none());
 }
 
@@ -5717,7 +5717,7 @@ fn deepseek_model_env_overrides_default_text_model() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-model-env-test-{}-{}",
+        "nestlone-tui-model-env-test-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -5795,7 +5795,7 @@ fn http_headers_load_from_root_config() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-http-headers-root-{}-{}",
+        "nestlone-tui-http-headers-root-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -5859,7 +5859,7 @@ fn http_headers_env_overrides_config() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-http-headers-env-{}-{}",
+        "nestlone-tui-http-headers-env-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -5913,7 +5913,7 @@ fn nvidia_nim_provider_normalizes_deepseek_v4_pro_alias() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-nim-model-alias-test-{}-{}",
+        "nestlone-tui-nim-model-alias-test-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -5944,7 +5944,7 @@ fn nvidia_nim_provider_normalizes_deepseek_v4_flash_alias() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-nim-flash-model-alias-test-{}-{}",
+        "nestlone-tui-nim-flash-model-alias-test-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -6023,7 +6023,7 @@ fn nvidia_nim_env_overrides_provider_and_credentials() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-nim-env-test-{}-{}",
+        "nestlone-tui-nim-env-test-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -6052,7 +6052,7 @@ fn nvidia_nim_env_accepts_short_nim_base_url_alias() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-nim-base-url-alias-test-{}-{}",
+        "nestlone-tui-nim-base-url-alias-test-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -6079,7 +6079,7 @@ fn nvidia_nim_env_accepts_facade_base_url_forwarding() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-nim-forwarded-base-url-test-{}-{}",
+        "nestlone-tui-nim-forwarded-base-url-test-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -6204,7 +6204,7 @@ fn xiaomi_mimo_provider_uses_documented_defaults() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-xiaomi-mimo-defaults-{}-{}",
+        "nestlone-tui-xiaomi-mimo-defaults-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -6327,7 +6327,7 @@ fn xiaomi_mimo_custom_env_url_does_not_inherit_ambient_key() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-xiaomi-mimo-env-test-{}-{}",
+        "nestlone-tui-xiaomi-mimo-env-test-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -6365,7 +6365,7 @@ fn xiaomi_mimo_env_token_plan_mode_uses_token_plan_key_and_endpoint() -> Result<
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-xiaomi-mimo-token-plan-env-test-{}-{}",
+        "nestlone-tui-xiaomi-mimo-token-plan-env-test-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -6400,7 +6400,7 @@ fn xiaomi_mimo_env_pay_as_you_go_mode_prefers_standard_key() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-xiaomi-mimo-payg-env-test-{}-{}",
+        "nestlone-tui-xiaomi-mimo-payg-env-test-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -6447,7 +6447,7 @@ fn atlascloud_env_overrides_provider_base_url_and_model() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-atlascloud-env-test-{}-{}",
+        "nestlone-tui-atlascloud-env-test-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -6491,7 +6491,7 @@ fn wanjie_ark_custom_env_url_does_not_inherit_ambient_key() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-wanjie-env-test-{}-{}",
+        "nestlone-tui-wanjie-env-test-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -6525,7 +6525,7 @@ fn wanjie_ark_provider_accepts_custom_model_and_table_key() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-wanjie-table-{}-{}",
+        "nestlone-tui-wanjie-table-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -6564,7 +6564,7 @@ fn openai_provider_accepts_custom_model_and_base_url() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-openai-table-{}-{}",
+        "nestlone-tui-openai-table-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -6603,7 +6603,7 @@ fn openai_provider_accepts_dashscope_bailian_fixture() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-dashscope-openai-{}-{}",
+        "nestlone-tui-dashscope-openai-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -6642,7 +6642,7 @@ fn qianfan_provider_accepts_custom_model_and_base_url() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-qianfan-provider-{}-{}",
+        "nestlone-tui-qianfan-provider-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -6681,7 +6681,7 @@ fn provider_config_loads_reasoning_stream_style() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-reasoning-style-{}-{}",
+        "nestlone-tui-reasoning-style-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -6713,7 +6713,7 @@ reasoning_stream_style = "inline_tags"
     Ok(())
 }
 
-// Regression for issue #1714: `codewhale --provider openai --model
+// Regression for issue #1714: `nestlone --provider openai --model
 // MiniMax-M2.7` forwards the choice via DEEPSEEK_MODEL (never
 // OPENAI_MODEL) and uses the DEFAULT base_url. The explicit custom model
 // must pass through verbatim instead of silently becoming a
@@ -6726,7 +6726,7 @@ fn deepseek_model_env_passes_custom_model_through_for_non_deepseek_providers() -
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-1714-passthrough-{}-{}",
+        "nestlone-tui-1714-passthrough-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -6779,7 +6779,7 @@ fn openai_custom_env_url_does_not_inherit_ambient_key() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-openai-env-test-{}-{}",
+        "nestlone-tui-openai-env-test-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -6817,7 +6817,7 @@ fn openai_facade_custom_url_does_not_inherit_ambient_key() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-openai-forwarded-base-url-test-{}-{}",
+        "nestlone-tui-openai-forwarded-base-url-test-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -6855,7 +6855,7 @@ fn openrouter_provider_uses_canonical_defaults() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-or-defaults-{}-{}",
+        "nestlone-tui-or-defaults-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -6881,7 +6881,7 @@ fn novita_provider_uses_canonical_defaults() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-novita-defaults-{}-{}",
+        "nestlone-tui-novita-defaults-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -6907,7 +6907,7 @@ fn fireworks_provider_uses_canonical_defaults() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-fireworks-defaults-{}-{}",
+        "nestlone-tui-fireworks-defaults-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -6947,7 +6947,7 @@ fn volcengine_provider_requires_api_key() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-volcengine-auth-test-{}-{}",
+        "nestlone-tui-volcengine-auth-test-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -6973,7 +6973,7 @@ fn volcengine_custom_env_url_does_not_inherit_ambient_key() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-volcengine-env-test-{}-{}",
+        "nestlone-tui-volcengine-env-test-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -7008,7 +7008,7 @@ fn siliconflow_provider_uses_canonical_defaults() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-siliconflow-defaults-{}-{}",
+        "nestlone-tui-siliconflow-defaults-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -7038,7 +7038,7 @@ fn sglang_provider_works_without_api_key() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-sglang-defaults-{}-{}",
+        "nestlone-tui-sglang-defaults-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -7066,7 +7066,7 @@ fn ollama_provider_uses_local_defaults_without_api_key() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-ollama-defaults-{}-{}",
+        "nestlone-tui-ollama-defaults-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -7094,7 +7094,7 @@ fn ollama_model_is_passed_through_verbatim() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-ollama-model-test-{}-{}",
+        "nestlone-tui-ollama-model-test-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -7128,7 +7128,7 @@ fn deepseek_base_url_env_scopes_to_self_hosted_providers() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-self-hosted-base-url-test-{}-{}",
+        "nestlone-tui-self-hosted-base-url-test-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -7163,7 +7163,7 @@ fn vllm_env_resolves_reported_lan_http_endpoint_and_model() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-vllm-lan-http-test-{}-{}",
+        "nestlone-tui-vllm-lan-http-test-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -7192,7 +7192,7 @@ fn ollama_env_overrides_base_url_and_model() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-ollama-env-test-{}-{}",
+        "nestlone-tui-ollama-env-test-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -7221,7 +7221,7 @@ fn openrouter_env_api_key_resolves_via_deepseek_api_key() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-or-env-key-{}-{}",
+        "nestlone-tui-or-env-key-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -7250,7 +7250,7 @@ fn novita_env_api_key_resolves_via_deepseek_api_key() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-novita-env-key-{}-{}",
+        "nestlone-tui-novita-env-key-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -7279,7 +7279,7 @@ fn fireworks_env_overrides_key_and_model() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-fireworks-env-key-{}-{}",
+        "nestlone-tui-fireworks-env-key-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -7314,7 +7314,7 @@ fn siliconflow_custom_env_url_does_not_inherit_ambient_key() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-siliconflow-env-test-{}-{}",
+        "nestlone-tui-siliconflow-env-test-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -7349,7 +7349,7 @@ fn arcee_provider_uses_direct_defaults() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-arcee-defaults-test-{}-{}",
+        "nestlone-tui-arcee-defaults-test-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -7377,7 +7377,7 @@ fn arcee_custom_env_url_does_not_inherit_ambient_key() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-arcee-env-test-{}-{}",
+        "nestlone-tui-arcee-env-test-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -7414,7 +7414,7 @@ fn arcee_provider_table_configures_direct_route() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-arcee-table-test-{}-{}",
+        "nestlone-tui-arcee-table-test-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -7449,7 +7449,7 @@ fn siliconflow_cn_base_url_env_normalizes_model_aliases() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-siliconflow-cn-env-test-{}-{}",
+        "nestlone-tui-siliconflow-cn-env-test-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -7480,7 +7480,7 @@ fn openrouter_base_url_env_overrides_default() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-or-base-url-{}-{}",
+        "nestlone-tui-or-base-url-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -7507,7 +7507,7 @@ fn openrouter_reads_provider_table_from_config_file() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-or-table-{}-{}",
+        "nestlone-tui-or-table-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -7541,7 +7541,7 @@ fn siliconflow_reads_provider_table_from_config_file() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-siliconflow-table-{}-{}",
+        "nestlone-tui-siliconflow-table-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -7576,7 +7576,7 @@ fn siliconflow_cn_reads_hyphenated_provider_table_from_config_file() -> Result<(
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-siliconflow-cn-table-{}-{}",
+        "nestlone-tui-siliconflow-cn-table-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -7613,7 +7613,7 @@ fn siliconflow_cn_preserves_reported_deepseek_prefixed_v4_route() -> Result<()> 
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-siliconflow-cn-v4-report-{}-{}",
+        "nestlone-tui-siliconflow-cn-v4-report-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -7654,7 +7654,7 @@ fn siliconflow_cn_falls_back_to_shared_siliconflow_table_when_unset() -> Result<
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-siliconflow-cn-fallback-{}-{}",
+        "nestlone-tui-siliconflow-cn-fallback-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -7694,7 +7694,7 @@ fn siliconflow_cn_env_overrides_write_cn_table_only() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-siliconflow-cn-env-table-{}-{}",
+        "nestlone-tui-siliconflow-cn-env-table-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -7749,7 +7749,7 @@ fn openrouter_custom_base_url_preserves_provider_model() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-or-custom-model-{}-{}",
+        "nestlone-tui-or-custom-model-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -7785,7 +7785,7 @@ fn novita_reads_provider_table_from_config_file() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-novita-table-{}-{}",
+        "nestlone-tui-novita-table-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -7818,7 +7818,7 @@ fn moonshot_kimi_import_is_api_key_only_and_never_reads_external_credentials() -
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-kimi-code-oauth-key-{}-{}",
+        "nestlone-tui-kimi-code-oauth-key-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -8091,7 +8091,7 @@ fn moonshot_kimi_code_api_key_uses_coding_model() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-kimi-code-key-{}-{}",
+        "nestlone-tui-kimi-code-key-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -8193,7 +8193,7 @@ fn moonshot_kimi_code_env_base_url_selects_coding_model() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-kimi-code-env-url-{}-{}",
+        "nestlone-tui-kimi-code-env-url-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -8226,7 +8226,7 @@ api_key = "kimi-code-env-key"
 /// Regression for issue #2160: a stale root `default_text_model` carried
 /// over from a DeepSeek setup must not steer the Kimi Code endpoint to
 /// `deepseek-v4-pro`. The user-facing trigger here is the legacy
-/// `DEEPSEEK_PROVIDER` env var (still produced by the `codewhale
+/// `DEEPSEEK_PROVIDER` env var (still produced by the `nestlone
 /// --provider moonshot` dispatcher for compat); the test also has a
 /// `CODEWHALE_PROVIDER` twin below for the public env path.
 #[test]
@@ -8237,7 +8237,7 @@ fn moonshot_kimi_code_model_overrides_root_deepseek_default() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-kimi-code-root-model-{}-{}",
+        "nestlone-tui-kimi-code-root-model-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -8269,7 +8269,7 @@ base_url = "https://api.kimi.com/coding/v1"
 /// Same regression as above, but driven by the public `CODEWHALE_PROVIDER`
 /// env var. Documents the recommended user-facing setup path: never
 /// `DEEPSEEK_PROVIDER=moonshot`, always `CODEWHALE_PROVIDER=moonshot`
-/// (or `codewhale --provider moonshot`, which also resolves through
+/// (or `nestlone --provider moonshot`, which also resolves through
 /// this code path internally).
 #[test]
 fn moonshot_kimi_code_model_resolves_via_nestlone_provider_env() -> Result<()> {
@@ -8279,7 +8279,7 @@ fn moonshot_kimi_code_model_resolves_via_nestlone_provider_env() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-kimi-code-cw-env-{}-{}",
+        "nestlone-tui-kimi-code-cw-env-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -8319,7 +8319,7 @@ fn nestlone_provider_env_takes_precedence_over_deepseek_provider() -> Result<()>
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-cw-vs-ds-provider-{}-{}",
+        "nestlone-tui-cw-vs-ds-provider-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -8353,7 +8353,7 @@ fn moonshot_platform_defaults_to_kimi_k27_code() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-moonshot-platform-{}-{}",
+        "nestlone-tui-moonshot-platform-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -8387,7 +8387,7 @@ fn has_api_key_for_detects_env_and_config_per_provider() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-has-key-{}-{}",
+        "nestlone-tui-has-key-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -8460,7 +8460,7 @@ fn has_api_key_for_uses_deepseek_cn_provider_table() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-has-key-cn-{}-{}",
+        "nestlone-tui-has-key-cn-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -8509,7 +8509,7 @@ fn xai_oauth_selection_falls_back_to_explicit_api_key_without_external_io() -> R
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-xai-auth-{}-{}",
+        "nestlone-tui-xai-auth-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -8604,7 +8604,7 @@ fn save_api_key_for_openrouter_writes_provider_table() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-save-key-or-{}-{}",
+        "nestlone-tui-save-key-or-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -8737,7 +8737,7 @@ fn save_api_key_for_deepseek_cn_uses_root_deepseek_storage() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-save-key-cn-{}-{}",
+        "nestlone-tui-save-key-cn-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -8767,7 +8767,7 @@ fn nvidia_nim_reads_facade_provider_table() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-nim-provider-table-test-{}-{}",
+        "nestlone-tui-nim-provider-table-test-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -8806,7 +8806,7 @@ fn nvidia_nim_provider_table_key_overrides_root_deepseek_key() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-nim-root-key-precedence-test-{}-{}",
+        "nestlone-tui-nim-root-key-precedence-test-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -8817,7 +8817,7 @@ fn nvidia_nim_provider_table_key_overrides_root_deepseek_key() -> Result<()> {
     ensure_parent_dir(&config_path)?;
     fs::write(
         &config_path,
-        r#"api_key = "codewhale-root-key"
+        r#"api_key = "nestlone-root-key"
 provider = "nvidia-nim"
 
 [providers.nvidia_nim]
@@ -9482,7 +9482,7 @@ fn huggingface_provider_uses_direct_defaults() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-huggingface-defaults-test-{}-{}",
+        "nestlone-tui-huggingface-defaults-test-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -9510,7 +9510,7 @@ fn huggingface_hf_token_env_api_key_resolves() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-huggingface-hf-token-test-{}-{}",
+        "nestlone-tui-huggingface-hf-token-test-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -9536,7 +9536,7 @@ fn huggingface_missing_key_error_mentions_env_fallbacks() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-huggingface-missing-key-test-{}-{}",
+        "nestlone-tui-huggingface-missing-key-test-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -9566,7 +9566,7 @@ fn huggingface_custom_env_urls_do_not_inherit_ambient_keys() -> Result<()> {
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-huggingface-env-test-{}-{}",
+        "nestlone-tui-huggingface-env-test-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -9694,7 +9694,7 @@ fn huggingface_short_custom_env_url_does_not_inherit_ambient_key() -> Result<()>
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-huggingface-short-env-test-{}-{}",
+        "nestlone-tui-huggingface-short-env-test-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -10217,7 +10217,7 @@ fn legacy_literal_custom_env_overrides_preserve_root_route_shape() -> Result<()>
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-legacy-custom-env-{}-{}",
+        "nestlone-tui-legacy-custom-env-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -10447,7 +10447,7 @@ fn native_memory_backend_owns_explicit_path_and_disables_legacy_fallback() {
     );
 }
 
-/// v0.9.1 kimi-k3 dogfood report: a dogfood user ran `codewhale --provider moonshot --model kimi-k3`
+/// v0.9.1 kimi-k3 dogfood report: a dogfood user ran `nestlone --provider moonshot --model kimi-k3`
 /// and the session kept reporting `kimi-k2.7-code`. The `--model` flag reaches
 /// this binary as `CODEWHALE_MODEL`, so the route it produces is asserted here
 /// end to end: the effective model, the endpoint, and the id that goes on the
@@ -10460,7 +10460,7 @@ fn cli_model_flag_selects_kimi_k3_on_the_moonshot_platform_route() -> Result<()>
         .unwrap()
         .as_nanos();
     let temp_root = env::temp_dir().join(format!(
-        "codewhale-tui-kimi-k3-cli-{}-{nanos}",
+        "nestlone-tui-kimi-k3-cli-{}-{nanos}",
         std::process::id()
     ));
     fs::create_dir_all(&temp_root)?;

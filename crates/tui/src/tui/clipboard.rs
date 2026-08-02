@@ -1109,7 +1109,7 @@ exit 42
             .duration_since(std::time::UNIX_EPOCH)
             .expect("clock after epoch")
             .as_nanos();
-        let socket = format!("codewhale-clipboard-{}-{nonce}", std::process::id());
+        let socket = format!("nestlone-clipboard-{}-{nonce}", std::process::id());
 
         struct TmuxServer(String);
         impl Drop for TmuxServer {

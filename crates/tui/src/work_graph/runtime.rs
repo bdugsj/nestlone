@@ -18,9 +18,9 @@ use super::{
 };
 
 pub(crate) const ACTIVE_OPERATION_SUMMARY_START: &str =
-    "<!-- codewhale:active-work-operations:start -->";
+    "<!-- nestlone:active-work-operations:start -->";
 pub(crate) const ACTIVE_OPERATION_SUMMARY_END: &str =
-    "<!-- codewhale:active-work-operations:end -->";
+    "<!-- nestlone:active-work-operations:end -->";
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct WorkRuntimeSnapshot {

@@ -769,7 +769,7 @@ fn sanitize_profile_prose(text: &str, max_len: usize) -> String {
 
 /// Extract the first balanced `{...}` object from untrusted output, so fenced
 /// or prose-wrapped JSON still parses. Mirrors the constitution pipeline's
-/// extractor (which is private to codewhale-config).
+/// extractor (which is private to nestlone-config).
 fn extract_first_json_object(raw: &str) -> Option<&str> {
     let start = raw.find('{')?;
     let mut depth = 0usize;

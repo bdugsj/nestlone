@@ -59,7 +59,7 @@ fn spawn_minimal_with_env(
     ws: qa_harness::harness::SealedWorkspace,
     extra_env: &[(&str, &str)],
 ) -> anyhow::Result<(qa_harness::harness::SealedWorkspace, Harness)> {
-    let mut builder = Harness::builder(Harness::cargo_bin("codewhale-tui"))
+    let mut builder = Harness::builder(Harness::cargo_bin("nestlone-tui"))
         .cwd(ws.workspace())
         .clear_env()
         .seal_home(ws.home())
@@ -367,7 +367,7 @@ fn assert_real_pty_frame_geometry(frame: &qa_harness::Frame, cols: u16, rows: u1
 
 fn assert_empty_state_hierarchy(frame: &qa_harness::Frame, ascii_safe: bool) {
     let dump = frame.debug_dump();
-    let context = visible_row_with_text(frame, "codewhale").expect("empty-state context row");
+    let context = visible_row_with_text(frame, "nestlone").expect("empty-state context row");
     let composer = visible_row_with_text(frame, COMPOSER_READY_TEXT).expect("composer row");
     assert!(
         context < composer,
@@ -531,7 +531,7 @@ fn v091_real_pty_visual_matrix_preserves_control_grammar() -> anyhow::Result<()>
             }))?,
         )?;
 
-        let mut builder = Harness::builder(Harness::cargo_bin("codewhale-tui"))
+        let mut builder = Harness::builder(Harness::cargo_bin("nestlone-tui"))
             .cwd(ws.workspace())
             .clear_env()
             .seal_home(ws.home())
@@ -775,7 +775,7 @@ model = "k3"
     std::fs::create_dir_all(ws.workspace().join(".deepseek"))?;
     std::fs::write(ws.workspace().join(".deepseek").join("trusted"), "")?;
 
-    let mut h = Harness::builder(Harness::cargo_bin("codewhale-tui"))
+    let mut h = Harness::builder(Harness::cargo_bin("nestlone-tui"))
         .cwd(ws.workspace())
         .clear_env()
         .seal_home(ws.home())
@@ -828,7 +828,7 @@ model = "k3"
     std::fs::write(&config_path, config_before)?;
     std::fs::write(ws.home().join(".codewhale").join(".onboarded"), "")?;
 
-    let mut h = Harness::builder(Harness::cargo_bin("codewhale-tui"))
+    let mut h = Harness::builder(Harness::cargo_bin("nestlone-tui"))
         .cwd(ws.workspace())
         .clear_env()
         .seal_home(ws.home())
@@ -887,7 +887,7 @@ web_search = true
 "#,
     )?;
 
-    let mut h = Harness::builder(Harness::cargo_bin("codewhale-tui"))
+    let mut h = Harness::builder(Harness::cargo_bin("nestlone-tui"))
         .cwd(ws.workspace())
         .clear_env()
         .seal_home(ws.home())
@@ -992,7 +992,7 @@ fn printable_v_stays_in_composer_and_alt_help_fallback_works() -> anyhow::Result
 fn resize_and_mouse_wheel_preserve_composer_ownership() -> anyhow::Result<()> {
     let _guard = qa_pty_test_lock();
     let ws = make_sealed_workspace()?;
-    let mut h = Harness::builder(Harness::cargo_bin("codewhale-tui"))
+    let mut h = Harness::builder(Harness::cargo_bin("nestlone-tui"))
         .cwd(ws.workspace())
         .clear_env()
         .seal_home(ws.home())
@@ -1069,7 +1069,7 @@ fn work_surface_real_rows_own_click_wheel_and_resize() -> anyhow::Result<()> {
         }))?,
     )?;
 
-    let mut h = Harness::builder(Harness::cargo_bin("codewhale-tui"))
+    let mut h = Harness::builder(Harness::cargo_bin("nestlone-tui"))
         .cwd(ws.workspace())
         .clear_env()
         .seal_home(ws.home())
@@ -1307,7 +1307,7 @@ fn approval_modal_keeps_wheel_for_review_and_denies_without_side_effect() -> any
     let (base_url, server) = spawn_approval_fixture_server()?;
     let ws = make_sealed_workspace()?;
     let denied_path = ws.workspace().join("approval-proof.txt");
-    let mut h = Harness::builder(Harness::cargo_bin("codewhale-tui"))
+    let mut h = Harness::builder(Harness::cargo_bin("nestlone-tui"))
         .cwd(ws.workspace())
         .clear_env()
         .seal_home(ws.home())
@@ -1453,7 +1453,7 @@ fn work_and_permission_are_visible_at_release_terminal_sizes() -> anyhow::Result
             }))?,
         )?;
 
-        let mut h = Harness::builder(Harness::cargo_bin("codewhale-tui"))
+        let mut h = Harness::builder(Harness::cargo_bin("nestlone-tui"))
             .cwd(ws.workspace())
             .clear_env()
             .seal_home(ws.home())
@@ -1593,7 +1593,7 @@ fn legacy_work_ctrl_t_save_export_and_restart_are_consistent() -> anyhow::Result
     )?;
 
     let spawn = || {
-        Harness::builder(Harness::cargo_bin("codewhale-tui"))
+        Harness::builder(Harness::cargo_bin("nestlone-tui"))
             .cwd(ws.workspace())
             .clear_env()
             .seal_home(ws.home())
@@ -1761,7 +1761,7 @@ fn legacy_work_ctrl_t_save_export_and_restart_are_consistent() -> anyhow::Result
 fn cancelled_bang_shell_settles_transcript_card() -> anyhow::Result<()> {
     let _guard = qa_pty_test_lock();
     let ws = make_sealed_workspace()?;
-    let mut h = Harness::builder(Harness::cargo_bin("codewhale-tui"))
+    let mut h = Harness::builder(Harness::cargo_bin("nestlone-tui"))
         .cwd(ws.workspace())
         .clear_env()
         .seal_home(ws.home())
@@ -1840,7 +1840,7 @@ fn skills_opens_manager_owned_then_compatible() -> anyhow::Result<()> {
         "Workspace beta skill",
     )?;
 
-    let mut h = Harness::builder(Harness::cargo_bin("codewhale-tui"))
+    let mut h = Harness::builder(Harness::cargo_bin("nestlone-tui"))
         .cwd(ws.workspace())
         .clear_env()
         .seal_home(ws.home())
@@ -1997,7 +1997,7 @@ fn copy_selection_over_ssh_uses_default_tmux_clipboard_path() -> anyhow::Result<
     let nonce = std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)?
         .as_nanos();
-    let socket = format!("codewhale-pty-{}-{nonce}", std::process::id());
+    let socket = format!("nestlone-pty-{}-{nonce}", std::process::id());
     struct TmuxServer(String);
     impl Drop for TmuxServer {
         fn drop(&mut self) {
@@ -2500,7 +2500,7 @@ fn spawn_file_mutation_harness(
 ) -> anyhow::Result<Harness> {
     let nestlone_home = ws.home().join(".codewhale");
     let codex_home = ws.home().join(".codex");
-    let mut builder = Harness::builder(Harness::cargo_bin("codewhale-tui"))
+    let mut builder = Harness::builder(Harness::cargo_bin("nestlone-tui"))
         .cwd(ws.workspace())
         .clear_env()
         .seal_home(ws.home())
@@ -3464,7 +3464,7 @@ fn long_output_scrolls_and_restores_follow_tail() -> anyhow::Result<()> {
 
     let (base_url, server) = spawn_long_reply_fixture(content)?;
     let ws = make_sealed_workspace()?;
-    let mut h = Harness::builder(Harness::cargo_bin("codewhale-tui"))
+    let mut h = Harness::builder(Harness::cargo_bin("nestlone-tui"))
         .cwd(ws.workspace())
         .clear_env()
         .seal_home(ws.home())
@@ -3575,7 +3575,7 @@ fn real_tool_lifecycle_crosses_work_status_resize_and_scroll_in_a_unix_pty() -> 
         }))?,
     )?;
 
-    let mut h = Harness::builder(Harness::cargo_bin("codewhale-tui"))
+    let mut h = Harness::builder(Harness::cargo_bin("nestlone-tui"))
         .cwd(ws.workspace())
         .clear_env()
         .seal_home(ws.home())
@@ -4051,7 +4051,7 @@ fn semantic_activity_motion_crosses_reasoning_reading_and_tool_use_in_a_real_uni
             }))?,
         )?;
 
-        let mut builder = Harness::builder(Harness::cargo_bin("codewhale-tui"))
+        let mut builder = Harness::builder(Harness::cargo_bin("nestlone-tui"))
             .cwd(ws.workspace())
             .clear_env()
             .seal_home(ws.home())

@@ -43,9 +43,9 @@ impl PluginOrigin {
     #[must_use]
     pub fn as_str(self) -> &'static str {
         match self {
-            Self::Builtin => "codewhale-builtin",
-            Self::CodeWhaleHome => "codewhale-home",
-            Self::Workspace => "workspace-codewhale",
+            Self::Builtin => "nestlone-builtin",
+            Self::CodeWhaleHome => "nestlone-home",
+            Self::Workspace => "workspace-nestlone",
         }
     }
 }

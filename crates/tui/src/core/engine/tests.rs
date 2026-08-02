@@ -3077,8 +3077,8 @@ fn tool_catalog_filter_is_inert_without_gates() {
 fn structured_state_block_carries_stable_state_without_work() {
     let state = StructuredState {
         mode_label: "Agent".to_string(),
-        workspace: PathBuf::from("/workspace/codewhale"),
-        cwd: Some(PathBuf::from("/workspace/codewhale")),
+        workspace: PathBuf::from("/workspace/nestlone"),
+        cwd: Some(PathBuf::from("/workspace/nestlone")),
         working_set_summary: None,
         subagent_snapshots: Vec::new(),
     };
@@ -3102,8 +3102,8 @@ fn env_only_auth_error_gets_recovery_hint() {
 
     assert!(message.contains("DEEPSEEK_API_KEY"));
     assert!(message.contains("no saved config key is present"));
-    assert!(message.contains("codewhale auth status"));
-    assert!(message.contains("codewhale auth set --provider deepseek"));
+    assert!(message.contains("nestlone auth status"));
+    assert!(message.contains("nestlone auth set --provider deepseek"));
 }
 
 #[test]
@@ -3124,7 +3124,7 @@ fn config_auth_error_does_not_blame_env() {
 
 #[test]
 fn plugin_tools_dir_honors_missing_custom_directory_without_fallback() {
-    let missing = PathBuf::from("definitely-missing-codewhale-plugin-dir");
+    let missing = PathBuf::from("definitely-missing-nestlone-plugin-dir");
     let tools_config = crate::config::ToolsConfig {
         plugin_dir: Some(missing.to_string_lossy().to_string()),
         ..Default::default()
@@ -4826,7 +4826,7 @@ async fn runtime_goal_updates_emit_ui_snapshot() {
             "verified with focused tests".to_string(),
             crate::tools::goal::GoalCompletionVerification {
                 status: "passed".to_string(),
-                check: "cargo test -p codewhale-tui runtime_goal_updates_emit_ui_snapshot"
+                check: "cargo test -p nestlone-tui runtime_goal_updates_emit_ui_snapshot"
                     .to_string(),
                 summary: "focused runtime goal snapshot test passed".to_string(),
                 ..Default::default()
@@ -9188,7 +9188,7 @@ async fn later_request_sees_an_intervening_work_update() {
 fn turn_start_structured_state_carries_no_work_section() {
     let state = StructuredState {
         mode_label: "Agent".to_string(),
-        workspace: PathBuf::from("/workspace/codewhale"),
+        workspace: PathBuf::from("/workspace/nestlone"),
         cwd: None,
         working_set_summary: None,
         subagent_snapshots: Vec::new(),
@@ -9221,7 +9221,7 @@ async fn fork_state_block_reuses_the_canonical_work_body() {
 
     let state = StructuredState {
         mode_label: "Agent".to_string(),
-        workspace: PathBuf::from("/workspace/codewhale"),
+        workspace: PathBuf::from("/workspace/nestlone"),
         cwd: None,
         working_set_summary: None,
         subagent_snapshots: Vec::new(),
@@ -9711,9 +9711,9 @@ async fn sync_session_projects_persisted_subagent_handoff_for_headless_restore()
     let (engine, handle) = Engine::new(config, &Config::default());
     let payload = concat!(
         "Child result retained.\nCheckpoint: engine restore is covered.\n",
-        "<codewhale:subagent.done>{\"agent_id\":\"agent_headless\",",
+        "<nestlone:subagent.done>{\"agent_id\":\"agent_headless\",",
         "\"status\":\"completed\",\"summary_location\":\"previous_line\"}",
-        "</codewhale:subagent.done>",
+        "</nestlone:subagent.done>",
     );
     let messages = vec![
         Message {
@@ -10460,7 +10460,7 @@ fn task_gate_run_results_are_structured_before_context_insertion() {
             "gate": {
                 "id": "gate_abcd1234",
                 "gate": "clippy",
-                "command": "cargo clippy -p codewhale-tui --all-targets --all-features --locked -- -D warnings",
+                "command": "cargo clippy -p nestlone-tui --all-targets --all-features --locked -- -D warnings",
                 "cwd": "/repo",
                 "exit_code": 1,
                 "status": "failed",
@@ -10480,7 +10480,7 @@ fn task_gate_run_results_are_structured_before_context_insertion() {
 
     assert!(context.contains("[task_gate_run result summarized for context]"));
     assert!(context.contains("gate: clippy, status: failed, exit_code: 1"));
-    assert!(context.contains("cargo clippy -p codewhale-tui"));
+    assert!(context.contains("cargo clippy -p nestlone-tui"));
     assert!(context.contains("summary: warning promoted to error"));
     assert!(context.contains("log_path: /repo/.codewhale/runtime/gate.log"));
 }
@@ -12217,7 +12217,7 @@ fn filter_tool_call_delta_strips_bracket_marker() {
 fn filter_tool_call_delta_strips_deepseek_xml_marker() {
     let mut in_block = false;
     let visible = filter_tool_call_delta(
-        "before <codewhale:tool_call name=\"x\">payload</codewhale:tool_call> after",
+        "before <nestlone:tool_call name=\"x\">payload</nestlone:tool_call> after",
         &mut in_block,
     );
     assert!(!in_block);
@@ -13409,7 +13409,7 @@ async fn background_completion_after_a_turn_is_delivered_once_on_the_next_turn()
         &std::fs::read(evidence_path).expect("read exact completion evidence"),
     )
     .expect("parse completion evidence");
-    assert_eq!(evidence["schema"], "codewhale.shell_completion.evidence.v1");
+    assert_eq!(evidence["schema"], "nestlone.shell_completion.evidence.v1");
     assert_eq!(evidence["stdout"]["encoding"], "utf-8");
     assert_eq!(evidence["stdout"]["content"], stdout_body);
     assert_eq!(evidence["stderr"]["encoding"], "utf-8");

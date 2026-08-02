@@ -187,7 +187,7 @@ fn build_escape(method: Method, in_tmux: bool, msg: &str) -> Vec<u8> {
         }
         Method::Ghostty => {
             // Ghostty notification: OSC 777 ; notify ; title ; message BEL
-            let seq = format!("\x1b]777;notify;codewhale;{msg}\x07");
+            let seq = format!("\x1b]777;notify;nestlone;{msg}\x07");
             wrap_for_multiplexer(&seq, in_tmux).into_bytes()
         }
         // Auto and Off and MacOS should not reach build_escape.
@@ -857,7 +857,7 @@ pub fn subagent_terminal_payload(
     let result_line = result
         .lines()
         .map(str::trim)
-        .find(|line| !line.is_empty() && !line.starts_with("<codewhale:subagent.done>"));
+        .find(|line| !line.is_empty() && !line.starts_with("<nestlone:subagent.done>"));
     let label = match status {
         SubAgentStatus::Completed => MessageId::NotificationSubagentComplete,
         SubAgentStatus::Failed(_) => MessageId::NotificationSubagentFailed,
@@ -1013,8 +1013,8 @@ mod tests {
 
     #[test]
     fn osc9_body_format() {
-        let out = capture(Method::Osc9, false, "codewhale: done", 0, 1);
-        assert_eq!(out, b"\x1b]9;codewhale: done\x07");
+        let out = capture(Method::Osc9, false, "nestlone: done", 0, 1);
+        assert_eq!(out, b"\x1b]9;nestlone: done\x07");
     }
 
     #[test]
@@ -1060,7 +1060,7 @@ mod tests {
         let out = capture(Method::Ghostty, false, "done", 0, 1);
         let s = String::from_utf8(out).unwrap();
         assert!(
-            s.contains("777;notify;codewhale;done"),
+            s.contains("777;notify;nestlone;done"),
             "should have ghostty seq"
         );
     }

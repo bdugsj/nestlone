@@ -3,11 +3,11 @@
 //! Fleet = who. `/fleet roster` and `/fleet setup` are the authoring views;
 //! `/fleet list|status|interrupt|resume` are control-plane verbs that run
 //! against the **durable** workspace ledger through the shared contract in
-//! `codewhale-lane`, exactly as `codewhale fleet …` does (#1888, #4022).
+//! `nestlone-lane`, exactly as `nestlone fleet …` does (#1888, #4022).
 //!
 //! `/fleet status` used to show the current TUI session's sub-agents. That was
 //! a different thing wearing the same name: session sub-agents are not the
-//! durable Fleet ledger, and a run started by `codewhale fleet run` never
+//! durable Fleet ledger, and a run started by `nestlone fleet run` never
 //! appeared. The session view is still reachable as `/fleet workers` (and
 //! `/subagents`), now labelled as what it is.
 
@@ -36,7 +36,7 @@ fn help_text() -> String {
          Fleet is who. /fleet (or /fleet roster) opens Fleet workers and orchestration state — \
          each member's posture, routing, and origin. /fleet setup opens the authoring wizard.\n\n\
          /fleet list, status, interrupt, and resume act on the durable .codewhale/fleet.jsonl \
-         ledger for this workspace — the same records `codewhale fleet` reads and writes. \
+         ledger for this workspace — the same records `nestlone fleet` reads and writes. \
          /fleet workers (and /subagents) shows sub-agents in the current TUI session only, which \
          is a different set: it does not include durable Fleet runs.\n",
     );
@@ -235,7 +235,7 @@ mod tests {
         }
         for truth in [
             "current TUI session",
-            "codewhale fleet status",
+            "nestlone fleet status",
             ".codewhale/fleet.jsonl",
         ] {
             assert!(message.contains(truth), "help must distinguish {truth}");

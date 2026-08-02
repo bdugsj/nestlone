@@ -196,7 +196,7 @@ pub fn execute(cmd: &str, app: &mut App) -> CommandResult {
             "The /deepseek command was renamed. Use /links (aliases: /dashboard, /api).",
         ),
         "doctor" => CommandResult::error(
-            "The /doctor command is a CLI diagnostic. Run `codewhale doctor` or `codewhale doctor --json`; use `/setup` in the TUI for readiness and verification.",
+            "The /doctor command is a CLI diagnostic. Run `nestlone doctor` or `nestlone doctor --json`; use `/setup` in the TUI for readiness and verification.",
         ),
 
         _ => {
@@ -1355,8 +1355,8 @@ mod tests {
         for cmd in ["/links", "/dashboard", "/api", "/lianjie"] {
             let result = execute(cmd, &mut app);
             let msg = result.message.expect("links commands should return text");
-            assert!(msg.contains("https://codewhale.net/en/docs"));
-            assert!(msg.contains("https://codewhale.net/en/community"));
+            assert!(msg.contains("https://nestlone.net/en/docs"));
+            assert!(msg.contains("https://nestlone.net/en/community"));
             assert!(msg.contains("https://github.com/Hmbown/CodeWhale"));
             assert!(msg.contains("https://app.codewhale.net"));
             assert!(msg.contains("separate sign-in"));

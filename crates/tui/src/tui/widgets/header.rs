@@ -655,7 +655,7 @@ mod tests {
             HeaderData::new(
                 AppMode::Agent,
                 "deepseek-v4-pro",
-                "codewhale-tui",
+                "nestlone-tui",
                 false,
                 palette::WHALE_BG,
             ),
@@ -675,12 +675,12 @@ mod tests {
     fn header_renders_version_chip_when_width_allows() {
         // At a generous width the header must surface the runtime version
         // — users repeatedly ask for it in the live UI (vs only via
-        // `codewhale --version` / `/status`).
+        // `nestlone --version` / `/status`).
         let rendered = render_header(
             HeaderData::new(
                 AppMode::Agent,
                 "deepseek-v4-pro",
-                "codewhale-tui",
+                "nestlone-tui",
                 false,
                 palette::WHALE_BG,
             ),
@@ -702,7 +702,7 @@ mod tests {
             HeaderData::new(
                 AppMode::Yolo,
                 "deepseek-v4-pro",
-                "codewhale-tui",
+                "nestlone-tui",
                 true,
                 palette::WHALE_BG,
             )
@@ -814,7 +814,7 @@ mod tests {
             HeaderData::new(
                 AppMode::Agent,
                 "deepseek-ai/deepseek-v4-flash",
-                "codewhale-tui",
+                "nestlone-tui",
                 false,
                 palette::WHALE_BG,
             )
@@ -833,7 +833,7 @@ mod tests {
             HeaderData::new(
                 AppMode::Agent,
                 "deepseek-v4-pro",
-                "codewhale-tui",
+                "nestlone-tui",
                 false,
                 palette::WHALE_BG,
             ),
@@ -943,7 +943,7 @@ mod tests {
             HeaderData::new(
                 AppMode::Agent,
                 "deepseek-v4-pro",
-                "codewhale-tui",
+                "nestlone-tui",
                 false,
                 palette::WHALE_BG,
             )
@@ -974,7 +974,7 @@ mod tests {
             HeaderData::new(
                 AppMode::Agent,
                 "a-very-long-model-route-that-must-truncate",
-                "codewhale-tui",
+                "nestlone-tui",
                 false,
                 palette::WHALE_BG,
             )
@@ -995,7 +995,7 @@ mod tests {
             HeaderData::new(
                 AppMode::Agent,
                 "GLM-5-Turbo",
-                "codewhale-tui",
+                "nestlone-tui",
                 false,
                 palette::WHALE_BG,
             )
@@ -1015,7 +1015,7 @@ mod tests {
             HeaderData::new(
                 AppMode::Agent,
                 "GLM-5.2",
-                "codewhale-tui",
+                "nestlone-tui",
                 false,
                 palette::WHALE_BG,
             )
@@ -1035,7 +1035,7 @@ mod tests {
             HeaderData::new(
                 AppMode::Agent,
                 "a-very-long-model-route",
-                "codewhale-tui",
+                "nestlone-tui",
                 false,
                 palette::WHALE_BG,
             )
@@ -1055,7 +1055,7 @@ mod tests {
             HeaderData::new(
                 AppMode::Agent,
                 "deepseek-v4-pro",
-                "codewhale-tui",
+                "nestlone-tui",
                 false,
                 palette::WHALE_BG,
             )
@@ -1066,7 +1066,7 @@ mod tests {
             HeaderData::new(
                 AppMode::Agent,
                 "deepseek-v4-pro",
-                "codewhale-tui",
+                "nestlone-tui",
                 false,
                 palette::WHALE_BG,
             )
@@ -1105,7 +1105,7 @@ mod tests {
             HeaderData::new(
                 AppMode::Agent,
                 "deepseek-v4-pro",
-                "codewhale-tui",
+                "nestlone-tui",
                 false,
                 palette::WHALE_BG,
             )

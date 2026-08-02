@@ -24,7 +24,7 @@
 //! Edit prompt text here directly. Content and ordering invariants are
 //! guarded by the test suite in `../prompts.rs` (constitution structure,
 //! binding gates, prefix privacy, byte-stable prefix ordering) — run
-//! `cargo test -p codewhale-tui --bin codewhale-tui prompts` after edits.
+//! `cargo test -p nestlone-tui --bin nestlone-tui prompts` after edits.
 //!
 //! The locale-tagged bookends (per-locale preambles/closers) remain in
 //! `../prompts.rs` next to the override cells that can replace them.
@@ -485,7 +485,7 @@ remain independent.
 "#;
 /// Sub-agent final-message output contract — injected into every sub-agent
 /// brief by the runner in `tools/subagent/mod.rs` so the parent's parser can
-/// rely on the summary line + `<codewhale:subagent.done>` sentinel.
+/// rely on the summary line + `<nestlone:subagent.done>` sentinel.
 pub const SUBAGENT_OUTPUT_FORMAT: &str = r#"## Output contract (mandatory)
 
 End with these exact Markdown headings: `### SUMMARY`, `### EVIDENCE`,
@@ -513,7 +513,7 @@ flow.
 ## Sub-agent completion sentinel
 
 When you open a sub-agent via `agent`, the child runs independently.
-You will receive a `<codewhale:subagent.done>` element in the transcript when it finishes.
+You will receive a `<nestlone:subagent.done>` element in the transcript when it finishes.
 Read its `summary` field and integrate the work — do not re-do what the child already did.
 Use the returned transcript handle with `handle_read` only when the completion summary is insufficient.
 

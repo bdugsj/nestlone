@@ -555,7 +555,7 @@ mod tests {
 
     #[test]
     fn persist_status_items_writes_tui_section_to_config_toml() {
-        let temp_root = temp_root("codewhale-statusline-persist");
+        let temp_root = temp_root("nestlone-statusline-persist");
         fs::create_dir_all(&temp_root).unwrap();
         let _guard = EnvGuard::new(&temp_root);
 
@@ -578,7 +578,7 @@ mod tests {
 
     #[test]
     fn config_toml_path_uses_nestlone_home_for_fresh_installs() {
-        let temp_root = temp_root("codewhale-config-path-fresh");
+        let temp_root = temp_root("nestlone-config-path-fresh");
         fs::create_dir_all(&temp_root).unwrap();
         let _guard = EnvGuard::new(&temp_root);
 
@@ -594,7 +594,7 @@ mod tests {
 
     #[test]
     fn config_toml_path_preserves_legacy_config_when_it_exists() {
-        let temp_root = temp_root("codewhale-config-path-legacy");
+        let temp_root = temp_root("nestlone-config-path-legacy");
         let legacy_config = temp_root.join(".deepseek").join("config.toml");
         fs::create_dir_all(legacy_config.parent().unwrap()).unwrap();
         fs::write(&legacy_config, "").unwrap();
@@ -609,8 +609,8 @@ mod tests {
 
     #[test]
     fn config_toml_path_ignores_legacy_config_when_nestlone_home_is_explicit() {
-        let temp_root = temp_root("codewhale-config-path-explicit-home");
-        let explicit_home = temp_root.join("isolated-codewhale");
+        let temp_root = temp_root("nestlone-config-path-explicit-home");
+        let explicit_home = temp_root.join("isolated-nestlone");
         let legacy_config = temp_root.join(".deepseek").join("config.toml");
         fs::create_dir_all(legacy_config.parent().unwrap()).unwrap();
         fs::write(&legacy_config, "").unwrap();
@@ -629,7 +629,7 @@ mod tests {
 
     #[test]
     fn config_toml_path_prefers_nestlone_env_over_legacy_env() {
-        let temp_root = temp_root("codewhale-config-path-env");
+        let temp_root = temp_root("nestlone-config-path-env");
         fs::create_dir_all(&temp_root).unwrap();
         let _guard = EnvGuard::new(&temp_root);
         let preferred = temp_root.join("preferred.toml");
@@ -645,7 +645,7 @@ mod tests {
 
     #[test]
     fn config_toml_path_uses_existing_home_fallback_when_env_target_is_missing() {
-        let temp_root = temp_root("codewhale-config-path-missing-env-fallback");
+        let temp_root = temp_root("nestlone-config-path-missing-env-fallback");
         let home_config = temp_root.join(".codewhale").join("config.toml");
         fs::create_dir_all(home_config.parent().unwrap()).unwrap();
         fs::write(&home_config, "# existing fallback\n").unwrap();
@@ -662,7 +662,7 @@ mod tests {
 
     #[test]
     fn persist_status_items_preserves_existing_unrelated_keys() {
-        let temp_root = temp_root("codewhale-statusline-preserve");
+        let temp_root = temp_root("nestlone-statusline-preserve");
         fs::create_dir_all(&temp_root).unwrap();
         let _guard = EnvGuard::new(&temp_root);
 
@@ -693,7 +693,7 @@ mod tests {
 
     #[test]
     fn persist_bool_key_preserves_comments() {
-        let temp_root = temp_root("codewhale-persist-comments");
+        let temp_root = temp_root("nestlone-persist-comments");
         fs::create_dir_all(&temp_root).unwrap();
         let _guard = EnvGuard::new(&temp_root);
 
@@ -721,7 +721,7 @@ mod tests {
 
     #[test]
     fn persist_table_bool_key_updates_existing_memory_enabled() {
-        let temp_root = temp_root("codewhale-persist-memory-update");
+        let temp_root = temp_root("nestlone-persist-memory-update");
         fs::create_dir_all(&temp_root).unwrap();
         let _guard = EnvGuard::new(&temp_root);
 
@@ -744,7 +744,7 @@ mod tests {
 
     #[test]
     fn persist_memory_enabled_round_trips_through_config_load() {
-        let temp_root = temp_root("codewhale-persist-memory-roundtrip");
+        let temp_root = temp_root("nestlone-persist-memory-roundtrip");
         fs::create_dir_all(&temp_root).unwrap();
         let _guard = EnvGuard::new(&temp_root);
 
@@ -773,7 +773,7 @@ mod tests {
 
     #[test]
     fn persist_custom_provider_writes_named_openai_compatible_table() {
-        let temp_root = temp_root("codewhale-custom-provider-persist");
+        let temp_root = temp_root("nestlone-custom-provider-persist");
         fs::create_dir_all(&temp_root).unwrap();
         let _guard = EnvGuard::new(&temp_root);
 
@@ -830,7 +830,7 @@ mod tests {
 
     #[test]
     fn persist_custom_provider_rejects_builtin_or_invalid_names() {
-        let temp_root = temp_root("codewhale-custom-provider-invalid");
+        let temp_root = temp_root("nestlone-custom-provider-invalid");
         fs::create_dir_all(&temp_root).unwrap();
         let _guard = EnvGuard::new(&temp_root);
         let path = temp_root.join(".codewhale").join("config.toml");
@@ -858,7 +858,7 @@ mod tests {
 
     #[test]
     fn persist_hotbar_bindings_writes_primary_config_path_for_fresh_installs() {
-        let temp_root = temp_root("codewhale-hotbar-persist-fresh");
+        let temp_root = temp_root("nestlone-hotbar-persist-fresh");
         fs::create_dir_all(&temp_root).unwrap();
         let _guard = EnvGuard::new(&temp_root);
 
@@ -885,7 +885,7 @@ mod tests {
     fn persist_default_hotbar_bindings_round_trips_for_hotbar_on() {
         // #3807: `/hotbar on` persists the explicit default slots (an absent key
         // now means hidden), and they read back as the eight recommended slots.
-        let temp_root = temp_root("codewhale-hotbar-on-defaults");
+        let temp_root = temp_root("nestlone-hotbar-on-defaults");
         fs::create_dir_all(&temp_root).unwrap();
         let _guard = EnvGuard::new(&temp_root);
 
@@ -910,7 +910,7 @@ mod tests {
 
     #[test]
     fn persist_hotbar_bindings_preserves_comments_and_replaces_existing_tables() {
-        let temp_root = temp_root("codewhale-hotbar-persist-comments");
+        let temp_root = temp_root("nestlone-hotbar-persist-comments");
         fs::create_dir_all(&temp_root).unwrap();
         let _guard = EnvGuard::new(&temp_root);
 
@@ -963,7 +963,7 @@ enabled = true
 
     #[test]
     fn persist_hotbar_bindings_writes_empty_array_to_disable_defaults() {
-        let temp_root = temp_root("codewhale-hotbar-persist-empty");
+        let temp_root = temp_root("nestlone-hotbar-persist-empty");
         fs::create_dir_all(&temp_root).unwrap();
         let _guard = EnvGuard::new(&temp_root);
 
@@ -1012,7 +1012,7 @@ action = "mode.plan"
 
     #[test]
     fn golden_replacing_existing_root_value_only_touches_that_value() {
-        let temp_root = temp_root("codewhale-golden-root-value");
+        let temp_root = temp_root("nestlone-golden-root-value");
         fs::create_dir_all(&temp_root).unwrap();
         let _guard = EnvGuard::new(&temp_root);
         let path = temp_root.join(".deepseek").join("config.toml");
@@ -1031,7 +1031,7 @@ action = "mode.plan"
 
     #[test]
     fn golden_mutations_preserve_unrelated_comments_order_and_quoted_tables() {
-        let temp_root = temp_root("codewhale-golden-mutations");
+        let temp_root = temp_root("nestlone-golden-mutations");
         fs::create_dir_all(&temp_root).unwrap();
         let _guard = EnvGuard::new(&temp_root);
         let path = temp_root.join(".deepseek").join("config.toml");
@@ -1123,7 +1123,7 @@ action = "mode.plan"
         // Finding #20 at the primitive level: the old string scan treated a
         // comment mentioning api_key as an existing assignment and skipped
         // the insert entirely.
-        let temp_root = temp_root("codewhale-golden-api-key-comment");
+        let temp_root = temp_root("nestlone-golden-api-key-comment");
         fs::create_dir_all(&temp_root).unwrap();
         let _guard = EnvGuard::new(&temp_root);
         let path = temp_root.join(".deepseek").join("config.toml");
@@ -1212,7 +1212,7 @@ slot = 1
 
     #[test]
     fn persist_custom_provider_unsets_removed_optional_fields() {
-        let temp_root = temp_root("codewhale-custom-provider-unset");
+        let temp_root = temp_root("nestlone-custom-provider-unset");
         fs::create_dir_all(&temp_root).unwrap();
         let _guard = EnvGuard::new(&temp_root);
         let path = temp_root.join(".codewhale").join("config.toml");
@@ -1256,7 +1256,7 @@ slot = 1
     fn config_writes_land_with_owner_only_permissions() {
         use std::os::unix::fs::PermissionsExt;
 
-        let temp_root = temp_root("codewhale-persist-perms");
+        let temp_root = temp_root("nestlone-persist-perms");
         fs::create_dir_all(&temp_root).unwrap();
         let _guard = EnvGuard::new(&temp_root);
         let path = temp_root.join(".deepseek").join("config.toml");
@@ -1324,8 +1324,8 @@ slot = 1
     ///
     /// The TUI resolves it with `Config::default_model()`, which is what
     /// `client.rs` puts on the wire and what `doctor` reports. The dispatcher
-    /// resolves it independently in `codewhale-config`'s
-    /// `resolve_runtime_options`, which is what `codewhale model resolve`
+    /// resolves it independently in `nestlone-config`'s
+    /// `resolve_runtime_options`, which is what `nestlone model resolve`
     /// reports and what the app-server and route descriptors consume. The two
     /// silently disagreed for every non-DeepSeek provider (#4832, #4838): the
     /// dispatcher gated root `default_text_model` behind `provider == Deepseek`
@@ -1387,7 +1387,7 @@ slot = 1
         ];
 
         for (case, body, expected) in cases {
-            let temp_root = temp_root("codewhale-model-chain-agreement");
+            let temp_root = temp_root("nestlone-model-chain-agreement");
             fs::create_dir_all(&temp_root).unwrap();
             let _guard = EnvGuard::new(&temp_root);
             let _model_guard = ModelEnvGuard::new();

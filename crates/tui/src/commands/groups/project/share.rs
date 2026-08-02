@@ -104,7 +104,7 @@ fn render_session_html(history_json: &str, model: &str, mode: &str) -> String {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>codewhale Session Export</title>
+<title>nestlone Session Export</title>
 <style>
   body {{
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -148,7 +148,7 @@ fn html_escape(s: &str) -> String {
 /// Write HTML to a secure temp file and keep it alive for upload.
 fn write_temp_html(html: &str) -> Result<tempfile::NamedTempFile, String> {
     let mut tmp = tempfile::Builder::new()
-        .prefix("codewhale-share-")
+        .prefix("nestlone-share-")
         .suffix(".html")
         .tempfile()
         .map_err(|e| format!("{e}"))?;
@@ -170,7 +170,7 @@ async fn upload_gist(path: &Path) -> Result<String, String> {
             "--filename",
             "session-export.html",
             "--desc",
-            "codewhale Session Export",
+            "nestlone Session Export",
         ])
         .output()
     })
@@ -221,7 +221,7 @@ mod tests {
         assert!(html.contains("deepseek-v4-pro"));
         assert!(html.contains("agent"));
         assert!(html.contains("[{}]"));
-        assert!(html.contains("codewhale"));
+        assert!(html.contains("nestlone"));
     }
 
     #[test]

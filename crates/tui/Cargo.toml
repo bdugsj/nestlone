@@ -6,7 +6,7 @@ rust-version.workspace = true
 license.workspace = true
 repository.workspace = true
 description = "Terminal UI for open-source and open-weight coding models"
-default-run = "nestlone"
+default-run = "nestlone-tui"
 
 [features]
 default = ["tui", "json", "toml", "pdf"]
@@ -18,7 +18,7 @@ long-running-tests = []
 pdf = ["dep:pdf-extract"]
 
 [[bin]]
-name = "nestlone"
+name = "nestlone-tui"
 path = "src/main.rs"
 
 [dependencies]

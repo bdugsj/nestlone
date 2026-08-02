@@ -911,7 +911,7 @@ mod tests {
         fixture_git(repo.path(), &["config", "user.name", "Codewhale Test"]);
         fixture_git(
             repo.path(),
-            &["config", "user.email", "codewhale-test@example.invalid"],
+            &["config", "user.email", "nestlone-test@example.invalid"],
         );
 
         let tracked = repo.path().join("tracked.txt");
@@ -1086,7 +1086,7 @@ mod tests {
             &output,
             "review body",
             vec![ReviewReceiptCheck {
-                name: "cargo test -p codewhale-tui".to_string(),
+                name: "cargo test -p nestlone-tui".to_string(),
                 status: "passed".to_string(),
             }],
         );

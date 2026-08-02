@@ -398,7 +398,7 @@ impl AcpServer {
             .and_then(Value::as_str)
             .map(PathBuf::from)
             .unwrap_or_else(|| self.default_cwd.clone());
-        let session_id = format!("codewhale-{}", uuid::Uuid::new_v4());
+        let session_id = format!("nestlone-{}", uuid::Uuid::new_v4());
         self.sessions.insert(
             session_id.clone(),
             AcpSession {
@@ -662,8 +662,8 @@ fn initialize_result(client_protocol_version: Option<u64>, config: &Config) -> V
             "sessionCapabilities": {}
         },
         "agentInfo": {
-            "name": "codewhale",
-            "title": "codewhale",
+            "name": "nestlone",
+            "title": "nestlone",
             "version": env!("CARGO_PKG_VERSION")
         },
         "authMethods": acp_auth_methods(config)
@@ -674,7 +674,7 @@ fn acp_auth_methods(config: &Config) -> Value {
     let provider = config.api_provider().as_str();
     json!([
         {
-            "id": "codewhale-terminal-auth",
+            "id": "nestlone-terminal-auth",
             "name": "Set Codewhale API key",
             "description": format!("Run Codewhale's terminal credential setup for the {provider} provider."),
             "type": "terminal",
@@ -834,7 +834,7 @@ mod tests {
         let result = initialize_result(Some(1), &Config::default());
 
         assert_eq!(result["protocolVersion"], 1);
-        assert_eq!(result["agentInfo"]["name"], "codewhale");
+        assert_eq!(result["agentInfo"]["name"], "nestlone");
         assert_eq!(result["agentCapabilities"]["loadSession"], false);
         assert_eq!(
             result["agentCapabilities"]["promptCapabilities"]["embeddedContext"],

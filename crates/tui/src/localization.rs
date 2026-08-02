@@ -3533,8 +3533,8 @@ mod tests {
                 locale.tag()
             );
             assert!(
-                !description.contains("codewhale |"),
-                "{} provider description should not name codewhale as a backend: {description}",
+                !description.contains("nestlone |"),
+                "{} provider description should not name nestlone as a backend: {description}",
                 locale.tag()
             );
         }
@@ -3748,7 +3748,7 @@ mod tests {
     /// string is mixed-language copy.
     fn latin_words_in_translated_copy(value: &str) -> Vec<String> {
         const ALLOWED: &[&str] = &[
-            "codewhale",
+            "nestlone",
             "deepseek",
             "fleet",
             "plan",

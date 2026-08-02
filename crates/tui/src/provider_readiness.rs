@@ -1356,7 +1356,7 @@ mod tests {
                         source: nestlone_config::AuthSourceKind::Secret,
                         command: Vec::new(),
                         timeout_ms: None,
-                        secret_id: Some("codewhale/xai".to_string()),
+                        secret_id: Some("nestlone/xai".to_string()),
                     }),
                     ..Default::default()
                 },

@@ -1711,8 +1711,8 @@ fn bang_shell_prefix_parses_compact_and_spaced_forms() {
     assert_eq!(shell_command_from_bang_input("!pwd"), Ok(Some("pwd")));
     assert_eq!(shell_command_from_bang_input("! pwd"), Ok(Some("pwd")));
     assert_eq!(
-        shell_command_from_bang_input("  !  cargo test -p codewhale-tui sidebar"),
-        Ok(Some("cargo test -p codewhale-tui sidebar"))
+        shell_command_from_bang_input("  !  cargo test -p nestlone-tui sidebar"),
+        Ok(Some("cargo test -p nestlone-tui sidebar"))
     );
     assert_eq!(shell_command_from_bang_input("normal message"), Ok(None));
 }
@@ -2212,13 +2212,13 @@ fn cached_skills_respect_nestlone_only_scan_config() {
     let nestlone_dir = workspace
         .join(".codewhale")
         .join("skills")
-        .join("codewhale-skill");
-    std::fs::create_dir_all(&nestlone_dir).expect("codewhale skill dir");
+        .join("nestlone-skill");
+    std::fs::create_dir_all(&nestlone_dir).expect("nestlone skill dir");
     std::fs::write(
         nestlone_dir.join("SKILL.md"),
-        "---\nname: codewhale-skill\ndescription: CodeWhale skill\n---\nbody\n",
+        "---\nname: nestlone-skill\ndescription: CodeWhale skill\n---\nbody\n",
     )
-    .expect("write codewhale skill");
+    .expect("write nestlone skill");
 
     let mut options = test_options(false);
     options.workspace = workspace.clone();
@@ -2238,7 +2238,7 @@ fn cached_skills_respect_nestlone_only_scan_config() {
     assert!(
         app.cached_skills
             .iter()
-            .any(|(name, _)| name == "codewhale-skill"),
+            .any(|(name, _)| name == "nestlone-skill"),
         "CodeWhale skill should be cached: {:?}",
         app.cached_skills
     );
@@ -2255,7 +2255,7 @@ fn cached_skills_respect_nestlone_only_scan_config() {
 fn resolve_skills_dir_requires_nestlone_skills_to_be_directory() {
     let tmp = tempfile::TempDir::new().expect("tempdir");
     let workspace = tmp.path().join("workspace");
-    std::fs::create_dir_all(workspace.join(".codewhale")).expect("codewhale dir");
+    std::fs::create_dir_all(workspace.join(".codewhale")).expect("nestlone dir");
     std::fs::write(
         workspace.join(".codewhale").join("skills"),
         "not a directory",
@@ -2317,13 +2317,13 @@ fn cached_skills_preserve_configured_directory_in_nestlone_only_scan() {
     let nestlone_skill_dir = workspace
         .join(".codewhale")
         .join("skills")
-        .join("workspace-codewhale");
-    std::fs::create_dir_all(&nestlone_skill_dir).expect("workspace codewhale skill dir");
+        .join("workspace-nestlone");
+    std::fs::create_dir_all(&nestlone_skill_dir).expect("workspace nestlone skill dir");
     std::fs::write(
         nestlone_skill_dir.join("SKILL.md"),
-        "---\nname: workspace-codewhale\ndescription: Workspace CodeWhale skill\n---\nbody\n",
+        "---\nname: workspace-nestlone\ndescription: Workspace CodeWhale skill\n---\nbody\n",
     )
-    .expect("write workspace codewhale skill");
+    .expect("write workspace nestlone skill");
 
     let configured_dir = tmp.path().join("configured-skills");
     let configured_skill_dir = configured_dir.join("configured-skill");
@@ -2351,7 +2351,7 @@ fn cached_skills_preserve_configured_directory_in_nestlone_only_scan() {
     assert!(
         app.cached_skills
             .iter()
-            .any(|(name, _)| name == "workspace-codewhale"),
+            .any(|(name, _)| name == "workspace-nestlone"),
         "workspace CodeWhale skill should still be cached: {:?}",
         app.cached_skills
     );
@@ -2370,7 +2370,7 @@ fn cached_skills_reject_nestlone_only_workspace_symlink_escape() {
     let workspace = tmp.path().join("workspace");
     let escape_target = tmp.path().join("escape-target");
     let escaped_skill_dir = escape_target.join("escaped-skill");
-    std::fs::create_dir_all(workspace.join(".codewhale")).expect("codewhale dir");
+    std::fs::create_dir_all(workspace.join(".codewhale")).expect("nestlone dir");
     std::fs::create_dir_all(&escaped_skill_dir).expect("escaped skill dir");
     std::fs::write(
         escaped_skill_dir.join("SKILL.md"),
@@ -2486,7 +2486,7 @@ fn paste_under_threshold_does_not_consolidate() {
 #[test]
 fn large_multiline_paste_preserves_exact_bytes_through_submit() {
     // #4719: large multi-line pastes must not byte-corrupt before submission.
-    // Real dogfood saw paths like `codewhale-v091-exact-88a158-ci` arrive as
+    // Real dogfood saw paths like `nestlone-v091-exact-88a158-ci` arrive as
     // `work-88a158-ci` — assert exact fidelity for a representative payload.
     let tmp = tempfile::TempDir::new().expect("tempdir");
     let mut opts = test_options(false);
@@ -2494,10 +2494,10 @@ fn large_multiline_paste_preserves_exact_bytes_through_submit() {
     let mut app = App::new(opts, &Config::default());
 
     let payload = format!(
-        "Mission path: /Volumes/VIXinSSD/CW/worktrees/codewhale-v091-exact-88a158-ci\n\
+        "Mission path: /Volumes/VIXinSSD/CW/worktrees/nestlone-v091-exact-88a158-ci\n\
          SHA: 0dfe9170a10e081fe48b23239f22d33260f4fa24\n\
          Branch: codex/v091-local-candidate-20260722\n\
-         Paths that must not truncate: codewhale-v091-exact-88a158-ci worktrees/codewhale-v091-exact-88a158-ci\n\
+         Paths that must not truncate: nestlone-v091-exact-88a158-ci worktrees/nestlone-v091-exact-88a158-ci\n\
          Mixed punctuation: a;b:c[m]<n> digits 0123456789 and hyphens-ok\n\
          Unicode: 你好世界 café — keep every codepoint.\n\
          {}",
@@ -5727,7 +5727,7 @@ fn onboarding_submit_api_key_routes_non_deepseek_provider_table() -> std::io::Re
         .unwrap()
         .as_nanos();
     let temp_root = std::env::temp_dir().join(format!(
-        "codewhale-app-onboarding-provider-{}-{}",
+        "nestlone-app-onboarding-provider-{}-{}",
         std::process::id(),
         nanos
     ));
@@ -5924,7 +5924,7 @@ fn failed_startup_default_write_is_reported_not_swallowed() {
     let tmp = tempfile::TempDir::new().expect("tempdir");
     // A regular file where the home directory must be: every settings write
     // below it fails.
-    let blocked_home = tmp.path().join("codewhale-home-file");
+    let blocked_home = tmp.path().join("nestlone-home-file");
     std::fs::write(&blocked_home, "not a directory").expect("blocking file");
     let _home = EnvVarGuard::set("HOME", tmp.path());
     let _user_profile = EnvVarGuard::set("USERPROFILE", tmp.path());
@@ -6539,7 +6539,7 @@ async fn a_late_startup_default_failure_is_returned_not_only_logged() {
     let tmp = tempfile::TempDir::new().expect("tempdir");
     // A regular file where the home directory must be: every settings write
     // below it fails.
-    let blocked_home = tmp.path().join("codewhale-home-file");
+    let blocked_home = tmp.path().join("nestlone-home-file");
     std::fs::write(&blocked_home, "not a directory").expect("blocking file");
     let _home = EnvVarGuard::set("HOME", tmp.path());
     let _user_profile = EnvVarGuard::set("USERPROFILE", tmp.path());
@@ -6685,7 +6685,7 @@ fn hotbar_mode_row_for_the_live_mode_still_shows_the_saved_receipt() {
 
 /// v0.9.1 kimi-k3 dogfood report: `settings.toml`'s `[provider_models]` is a memory of the last
 /// `/model` pick, so it must not override a model the user named for *this*
-/// launch. A dogfood user ran `codewhale --provider moonshot --model kimi-k3`
+/// launch. A dogfood user ran `nestlone --provider moonshot --model kimi-k3`
 /// and the session header kept showing the remembered `kimi-k2.7-code` while
 /// `doctor` reported `kimi-k3`; header and route have to agree.
 #[test]

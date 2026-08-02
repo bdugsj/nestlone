@@ -213,7 +213,7 @@ impl ShellCompletionEvidence {
         }
 
         serde_json::json!({
-            "schema": "codewhale.shell_completion.evidence.v1",
+            "schema": "nestlone.shell_completion.evidence.v1",
             "task_id": self.event.task_id,
             "command": self.event.command,
             "status": format!("{:?}", self.event.status),

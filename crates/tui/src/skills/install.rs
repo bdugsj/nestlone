@@ -62,7 +62,7 @@ fn reqwest_client() -> reqwest::Client {
 /// skills and can be blown away without losing anything irreplaceable.
 pub fn default_cache_skills_dir() -> PathBuf {
     crate::config::effective_home_dir().map_or_else(
-        || PathBuf::from("/tmp/codewhale/cache/skills"),
+        || PathBuf::from("/tmp/nestlone/cache/skills"),
         |p| p.join(".codewhale").join("cache").join("skills"),
     )
 }

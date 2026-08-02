@@ -149,7 +149,7 @@ fn spawn(
     cols: u16,
     rust_log: &str,
 ) -> Result<Harness> {
-    let mut builder = Harness::builder(Harness::cargo_bin("codewhale-tui"))
+    let mut builder = Harness::builder(Harness::cargo_bin("nestlone-tui"))
         .cwd(ws.workspace())
         .clear_env()
         .seal_home(ws.home())

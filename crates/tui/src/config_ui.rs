@@ -400,7 +400,7 @@ pub enum StatusItemValue {
 pub fn parse_mode(arg: Option<&str>) -> Result<ConfigUiMode, String> {
     let raw = arg.unwrap_or("").trim();
     // Bare `/config` opens the legacy native modal — it matches the rest
-    // of the codewhale-tui navy chrome out of the box. Power users can
+    // of the nestlone-tui navy chrome out of the box. Power users can
     // opt into the schemaui-driven editor with `/config tui`, or the
     // browser surface with `/config web` (web feature only).
     if raw.is_empty() || raw.eq_ignore_ascii_case("native") {
@@ -1609,7 +1609,7 @@ mod tests {
             .expect("clock")
             .as_nanos();
         let temp_root = std::env::temp_dir().join(format!(
-            "codewhale-config-ui-cost-currency-{}-{}",
+            "nestlone-config-ui-cost-currency-{}-{}",
             std::process::id(),
             nanos
         ));
@@ -1653,7 +1653,7 @@ cost_currency = "cny"
             .expect("clock")
             .as_nanos();
         let temp_root = std::env::temp_dir().join(format!(
-            "codewhale-config-ui-background-color-{}-{}",
+            "nestlone-config-ui-background-color-{}-{}",
             std::process::id(),
             nanos
         ));
@@ -1879,7 +1879,7 @@ background_color = "#1A1B26"
             .expect("clock")
             .as_nanos();
         let temp_root = std::env::temp_dir().join(format!(
-            "codewhale-config-ui-session-only-{}-{}",
+            "nestlone-config-ui-session-only-{}-{}",
             std::process::id(),
             nanos
         ));

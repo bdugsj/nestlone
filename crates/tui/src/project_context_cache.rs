@@ -202,7 +202,7 @@ mod tests {
         let workspace = tempdir().expect("workspace");
         let home = tempdir().expect("home");
         fs::create_dir(workspace.path().join(".git")).expect("mkdir git");
-        fs::create_dir(workspace.path().join(".codewhale")).expect("mkdir codewhale");
+        fs::create_dir(workspace.path().join(".codewhale")).expect("mkdir nestlone");
         let constitution = workspace
             .path()
             .join(".codewhale")

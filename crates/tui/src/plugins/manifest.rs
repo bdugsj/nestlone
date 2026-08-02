@@ -1127,7 +1127,7 @@ fn hash_bundle(
     // v2 length-frames every variable-length field. The v1 delimiter-only
     // stream was structurally ambiguous across file-record boundaries.
     // Changing the domain invalidates every ambiguous v1 receipt.
-    hasher.update(b"codewhale-plugin-content-v2\0plugin.toml\0");
+    hasher.update(b"nestlone-plugin-content-v2\0plugin.toml\0");
     hasher.update((manifest_bytes.len() as u64).to_le_bytes());
     hasher.update(manifest_bytes);
     let mut budget = HashBudget::default();
@@ -1201,7 +1201,7 @@ fn hash_path(
             .len();
         hasher.update(expected_len.to_le_bytes());
         let mut file_hasher = Sha256::new();
-        file_hasher.update(b"codewhale-plugin-file-bytes-v1\0");
+        file_hasher.update(b"nestlone-plugin-file-bytes-v1\0");
         // Keep the read buffer off the stack. `hash_path` is recursive and the
         // fixed-size array inflated every directory frame, which could exhaust
         // a Tokio worker stack while revalidating a nested plugin bundle.
@@ -1408,7 +1408,7 @@ fn hash_inventory(inventory: &PluginInventory) -> String {
     normalized.insert("network", inventory.network_hosts.join("\n"));
     normalized.insert("lifecycle", inventory.lifecycle_mutation.to_string());
     let mut hasher = Sha256::new();
-    hasher.update(b"codewhale-plugin-capabilities-v1\0");
+    hasher.update(b"nestlone-plugin-capabilities-v1\0");
     for (key, value) in normalized {
         hasher.update(key.as_bytes());
         hasher.update(b"\0");
@@ -1526,7 +1526,7 @@ mod tests {
         fs::write(left.path().join("a.bin"), b"alpha").unwrap();
         fs::write(left.path().join("b.bin"), b"omega").unwrap();
 
-        let mut adversarial = b"alpha\0unix-executable\0\0F\0codewhale-os-path-v1\0".to_vec();
+        let mut adversarial = b"alpha\0unix-executable\0\0F\0nestlone-os-path-v1\0".to_vec();
         adversarial.extend_from_slice(&(b"bundle-relative-file".len() as u64).to_le_bytes());
         adversarial.extend_from_slice(b"bundle-relative-file");
         adversarial.extend_from_slice(b"unix-bytes\0");

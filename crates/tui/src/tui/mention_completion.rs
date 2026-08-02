@@ -110,7 +110,7 @@ impl MentionDiscoveryWorker {
         });
         let thread_shared = Arc::clone(&shared);
         thread::Builder::new()
-            .name("codewhale-mention-discovery".to_string())
+            .name("nestlone-mention-discovery".to_string())
             .spawn(move || worker_loop(&thread_shared, &scanner))?;
         Ok(Self { shared })
     }

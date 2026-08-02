@@ -669,7 +669,7 @@ pub struct TuiOptions {
 pub enum InitialInput {
     /// Pre-populate the composer and wait for the user to press Enter.
     ///
-    /// Used by `codewhale pr <N>` (#451) to drop the model into a session
+    /// Used by `nestlone pr <N>` (#451) to drop the model into a session
     /// with the PR context already typed so the user can edit before sending.
     Prefill(String),
     /// Pre-populate the composer, submit it once startup is ready, then keep

@@ -148,7 +148,7 @@ pub(super) fn stream_read_error_user_message(message: &str, any_content_received
 /// `marker_tables_are_consistent` enforces that they agree.
 pub(crate) const TOOL_CALL_MARKER_PAIRS: [(&str, &str); 28] = [
     ("[TOOL_CALL]", "[/TOOL_CALL]"),
-    ("<codewhale:tool_call", "</codewhale:tool_call>"),
+    ("<nestlone:tool_call", "</nestlone:tool_call>"),
     ("<tool_call", "</tool_call>"),
     ("<invoke ", "</invoke>"),
     ("<function_calls>", "</function_calls>"),
@@ -182,7 +182,7 @@ pub(crate) const TOOL_CALL_MARKER_PAIRS: [(&str, &str); 28] = [
 
 pub(crate) const TOOL_CALL_START_MARKERS: [&str; 28] = [
     "[TOOL_CALL]",
-    "<codewhale:tool_call",
+    "<nestlone:tool_call",
     "<tool_call",
     "<invoke ",
     "<function_calls>",
@@ -213,7 +213,7 @@ pub(crate) const TOOL_CALL_START_MARKERS: [&str; 28] = [
 
 pub(crate) const TOOL_CALL_END_MARKERS: [&str; 28] = [
     "[/TOOL_CALL]",
-    "</codewhale:tool_call>",
+    "</nestlone:tool_call>",
     "</tool_call>",
     "</invoke>",
     "</function_calls>",

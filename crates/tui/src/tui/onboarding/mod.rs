@@ -171,7 +171,7 @@ pub fn tips_lines(app: &App) -> Vec<ratatui::text::Line<'static>> {
         Line::from(vec![
             Span::raw(app.tr(MessageId::OnboardTipsDoctorPrefix).to_string()),
             Span::styled(
-                "codewhale doctor",
+                "nestlone doctor",
                 Style::default()
                     .fg(palette::TEXT_PRIMARY)
                     .add_modifier(Modifier::BOLD),
@@ -524,7 +524,7 @@ mod tests {
         assert!(body.contains("/constitution"));
         assert!(body.contains("/provider"));
         assert!(body.contains("/model"));
-        assert!(body.contains("codewhale doctor"));
+        assert!(body.contains("nestlone doctor"));
         assert!(body.contains("open setup if it needs attention"));
         assert!(!body.contains("open the workspace"));
     }

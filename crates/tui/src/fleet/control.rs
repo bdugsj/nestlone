@@ -1,6 +1,6 @@
 //! Shared Fleet control-plane surface (#1888, #4022).
 //!
-//! `codewhale fleet …` and the `/fleet …` slash command (and therefore its
+//! `nestlone fleet …` and the `/fleet …` slash command (and therefore its
 //! hotbar action) run the *same* verbs against the *same* durable ledger and
 //! render the *same* [`ControlReceipt`]. Nothing here formats twice: the CLI's
 //! `print_status` / `print_inspection` delegate to the renderers below.
@@ -186,7 +186,7 @@ pub fn status_lines(status: &FleetStatusSnapshot) -> Vec<String> {
     lines
 }
 
-/// Exactly the text `codewhale fleet status` has always printed.
+/// Exactly the text `nestlone fleet status` has always printed.
 #[must_use]
 pub fn render_fleet_status_snapshot(status: &FleetStatusSnapshot) -> String {
     status_lines(status).join("\n")
@@ -262,7 +262,7 @@ pub fn render_inspection(inspection: &FleetWorkerInspection) -> String {
     inspection_lines(inspection).join("\n")
 }
 
-/// Artifact listing lines for `codewhale fleet artifacts`.
+/// Artifact listing lines for `nestlone fleet artifacts`.
 #[must_use]
 pub fn artifact_lines(inspection: &FleetWorkerInspection) -> Vec<String> {
     if inspection.artifacts.is_empty() {
@@ -420,7 +420,7 @@ fn instant_of(value: &Known<String>) -> Option<chrono::DateTime<chrono::Utc>> {
 }
 
 // ---------------------------------------------------------------------------
-// Executor — the one code path behind `codewhale fleet …` and `/fleet …`
+// Executor — the one code path behind `nestlone fleet …` and `/fleet …`
 // ---------------------------------------------------------------------------
 
 /// Run a Fleet control verb against the durable workspace ledger, using a
@@ -876,7 +876,7 @@ mod tests {
                 receipt
                     .availability
                     .hint()
-                    .is_some_and(|hint| hint.contains("codewhale fleet restart"))
+                    .is_some_and(|hint| hint.contains("nestlone fleet restart"))
             );
         }
     }

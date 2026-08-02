@@ -321,7 +321,7 @@ fn provider_secret_auth_source_deserializes() {
         r#"
         [providers.openai.auth]
         source = "secret"
-        secret_id = "codewhale/openai"
+        secret_id = "nestlone/openai"
         "#,
     )
     .expect("config toml");
@@ -329,7 +329,7 @@ fn provider_secret_auth_source_deserializes() {
     let auth = config.providers.openai.auth.expect("provider auth source");
     assert_eq!(auth.source, AuthSourceKind::Secret);
     assert_eq!(auth.source_class(), "secret");
-    assert_eq!(auth.secret_id.as_deref(), Some("codewhale/openai"));
+    assert_eq!(auth.secret_id.as_deref(), Some("nestlone/openai"));
     auth.validate().expect("valid secret auth source");
 }
 
@@ -506,7 +506,7 @@ fn config_store_loads_sibling_permissions_toml() {
         .expect("clock")
         .as_nanos();
     let dir = std::env::temp_dir().join(format!(
-        "codewhale-permissions-schema-{}-{unique}",
+        "nestlone-permissions-schema-{}-{unique}",
         std::process::id()
     ));
     fs::create_dir_all(&dir).expect("mkdir");
@@ -557,7 +557,7 @@ fn config_store_loads_permissions_even_when_config_is_absent() {
         .expect("clock")
         .as_nanos();
     let dir = std::env::temp_dir().join(format!(
-        "codewhale-permissions-only-{}-{unique}",
+        "nestlone-permissions-only-{}-{unique}",
         std::process::id()
     ));
     fs::create_dir_all(&dir).expect("mkdir");
@@ -592,7 +592,7 @@ fn config_store_exec_policy_engine_uses_sibling_permissions() {
         .expect("clock")
         .as_nanos();
     let dir = std::env::temp_dir().join(format!(
-        "codewhale-permissions-engine-{}-{unique}",
+        "nestlone-permissions-engine-{}-{unique}",
         std::process::id()
     ));
     fs::create_dir_all(&dir).expect("mkdir");
@@ -2198,7 +2198,7 @@ fn hook_sinks_unix_socket_path_round_trips_through_key_value_api() -> Result<()>
 /// End-to-end smoke for the preferred Kimi Code setup path:
 ///   1. Start from a fresh root config that uses DeepSeek defaults.
 ///   2. Mutate it through the same key-value setters the
-///      `codewhale config set providers.moonshot.*` CLI invokes.
+///      `nestlone config set providers.moonshot.*` CLI invokes.
 ///   3. Switch the active provider through `CODEWHALE_PROVIDER` —
 ///      the public env alias — without ever touching the legacy
 ///      `DEEPSEEK_PROVIDER` name.
@@ -2217,7 +2217,7 @@ fn moonshot_kimi_code_smoke_config_set_then_resolve() -> Result<()> {
         ..ConfigToml::default()
     };
 
-    // Same key paths a user would run via `codewhale config set`.
+    // Same key paths a user would run via `nestlone config set`.
     config.set_value("providers.moonshot.api_key", "kimi-code-key-placeholder")?;
     config.set_value("providers.moonshot.auth_mode", "api_key")?;
     config.set_value("providers.moonshot.base_url", DEFAULT_KIMI_CODE_BASE_URL)?;
@@ -2672,9 +2672,9 @@ fn list_values_redacts_unicode_api_key_without_byte_slicing() {
 fn app_homes_prefer_home_env_before_platform_home_fallback() {
     let _lock = env_lock();
     let home =
-        std::env::temp_dir().join(format!("codewhale-config-home-env-{}", std::process::id()));
+        std::env::temp_dir().join(format!("nestlone-config-home-env-{}", std::process::id()));
     let userprofile = std::env::temp_dir().join(format!(
-        "codewhale-config-userprofile-{}",
+        "nestlone-config-userprofile-{}",
         std::process::id()
     ));
     let _env = StateEnvRestore {
@@ -2690,7 +2690,7 @@ fn app_homes_prefer_home_env_before_platform_home_fallback() {
     }
 
     assert_eq!(
-        nestlone_home().expect("codewhale home"),
+        nestlone_home().expect("nestlone home"),
         home.join(CODEWHALE_APP_DIR)
     );
     assert_eq!(
@@ -2699,7 +2699,7 @@ fn app_homes_prefer_home_env_before_platform_home_fallback() {
     );
 
     let explicit = std::env::temp_dir().join(format!(
-        "codewhale-config-explicit-home-{}",
+        "nestlone-config-explicit-home-{}",
         std::process::id()
     ));
     // Safety: test-only environment mutation is serialized by env_lock().
@@ -2744,7 +2744,7 @@ fn migrate_config_reports_copied_legacy_path() {
         .expect("clock")
         .as_nanos();
     let home = std::env::temp_dir().join(format!(
-        "codewhale-config-migration-{}-{unique}",
+        "nestlone-config-migration-{}-{unique}",
         std::process::id()
     ));
     let legacy_dir = home.join(LEGACY_APP_DIR);
@@ -2791,14 +2791,14 @@ fn explicit_nestlone_home_bypasses_legacy_config_fallback_and_migration() {
         .expect("clock")
         .as_nanos();
     let home = std::env::temp_dir().join(format!(
-        "codewhale-config-explicit-isolation-{}-{unique}",
+        "nestlone-config-explicit-isolation-{}-{unique}",
         std::process::id()
     ));
     let legacy_config = home.join(LEGACY_APP_DIR).join(CONFIG_FILE_NAME);
     fs::create_dir_all(legacy_config.parent().expect("legacy config parent")).expect("legacy dir");
     fs::write(&legacy_config, b"provider = \"deepseek\"\n").expect("legacy config");
 
-    let explicit_home = home.join("isolated-codewhale");
+    let explicit_home = home.join("isolated-nestlone");
     let _env = StateEnvRestore {
         home: env::var_os("HOME"),
         userprofile: env::var_os("USERPROFILE"),
@@ -2870,7 +2870,7 @@ struct StateDirEnv {
 impl StateDirEnv {
     fn install(unique: u128) -> Self {
         let home = std::env::temp_dir().join(format!(
-            "codewhale-state-migration-{}-{unique}",
+            "nestlone-state-migration-{}-{unique}",
             std::process::id()
         ));
         let restore = StateEnvRestore {
@@ -3038,7 +3038,7 @@ fn explicit_nestlone_home_bypasses_legacy_state_fallback_and_migration() {
         .expect("clock")
         .as_nanos();
     let state_env = StateDirEnv::install(unique);
-    let explicit_home = state_env.home.join("isolated-codewhale");
+    let explicit_home = state_env.home.join("isolated-nestlone");
     // Safety: test-only environment mutation is serialized by env_lock().
     unsafe {
         env::set_var("CODEWHALE_HOME", &explicit_home);
@@ -3178,14 +3178,14 @@ fn config_store_save_revalidates_path_before_parent_creation() {
 fn resolve_config_path_rejects_env_traversal() {
     let _lock = env_lock();
     struct ConfigPathEnvGuard {
-        codewhale: Option<OsString>,
+        nestlone: Option<OsString>,
         deepseek: Option<OsString>,
     }
     impl Drop for ConfigPathEnvGuard {
         fn drop(&mut self) {
             // Safety: test-only environment mutation is serialized by env_lock().
             unsafe {
-                match self.codewhale.as_ref() {
+                match self.nestlone.as_ref() {
                     Some(value) => env::set_var("CODEWHALE_CONFIG_PATH", value),
                     None => env::remove_var("CODEWHALE_CONFIG_PATH"),
                 }
@@ -3197,7 +3197,7 @@ fn resolve_config_path_rejects_env_traversal() {
         }
     }
     let _guard = ConfigPathEnvGuard {
-        codewhale: env::var_os("CODEWHALE_CONFIG_PATH"),
+        nestlone: env::var_os("CODEWHALE_CONFIG_PATH"),
         deepseek: env::var_os("DEEPSEEK_CONFIG_PATH"),
     };
 
@@ -3473,7 +3473,7 @@ fn config_store_save_skips_identical_serialized_body() {
         .expect("clock")
         .as_nanos();
     let dir = std::env::temp_dir().join(format!(
-        "codewhale-config-noop-save-{}-{unique}",
+        "nestlone-config-noop-save-{}-{unique}",
         std::process::id()
     ));
     fs::create_dir_all(&dir).expect("mkdir");
@@ -3515,7 +3515,7 @@ fn config_store_save_creates_one_time_backup_before_changed_write() {
         .expect("clock")
         .as_nanos();
     let dir = std::env::temp_dir().join(format!(
-        "codewhale-config-backup-save-{}-{unique}",
+        "nestlone-config-backup-save-{}-{unique}",
         std::process::id()
     ));
     fs::create_dir_all(&dir).expect("mkdir");
@@ -3638,7 +3638,7 @@ fn config_store_save_preserves_disabled_keys() {
 #[test]
 fn config_store_save_preserves_comments_with_other_keys() {
     // Realistic scenario: user already has api_key + model, adds a comment,
-    // then changes model via `codewhale config set model`.
+    // then changes model via `nestlone config set model`.
     let dir = tempfile::tempdir().expect("tempdir");
     let config_path = dir.path().join(CONFIG_FILE_NAME);
     fs::write(

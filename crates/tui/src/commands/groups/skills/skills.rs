@@ -76,7 +76,7 @@ fn skill_discovery_mode(app: &App) -> crate::skills::SkillDiscoveryMode {
 fn skill_discovery_mode_label(mode: crate::skills::SkillDiscoveryMode) -> &'static str {
     match mode {
         crate::skills::SkillDiscoveryMode::Compatible => "compatible",
-        crate::skills::SkillDiscoveryMode::CodeWhaleOnly => "codewhale-only",
+        crate::skills::SkillDiscoveryMode::CodeWhaleOnly => "nestlone-only",
     }
 }
 
@@ -1385,11 +1385,11 @@ mod tests {
             .path()
             .join(".codewhale")
             .join("skills")
-            .join("codewhale-skill");
+            .join("nestlone-skill");
         std::fs::create_dir_all(&nestlone_skill_dir).unwrap();
         std::fs::write(
             nestlone_skill_dir.join("SKILL.md"),
-            "---\nname: codewhale-skill\ndescription: CodeWhale skill\n---\nbody",
+            "---\nname: nestlone-skill\ndescription: CodeWhale skill\n---\nbody",
         )
         .unwrap();
 
@@ -1399,7 +1399,7 @@ mod tests {
         let result = list_skills(&mut app, Some(""));
         let msg = result.message.unwrap();
 
-        assert!(msg.contains("/codewhale-skill"), "got: {msg}");
+        assert!(msg.contains("/nestlone-skill"), "got: {msg}");
         assert!(!msg.contains("/claude-skill"), "got: {msg}");
     }
 
@@ -1422,11 +1422,11 @@ mod tests {
             .path()
             .join(".codewhale")
             .join("skills")
-            .join("codewhale-skill");
+            .join("nestlone-skill");
         std::fs::create_dir_all(&nestlone_skill_dir).unwrap();
         std::fs::write(
             nestlone_skill_dir.join("SKILL.md"),
-            "---\nname: codewhale-skill\ndescription: CodeWhale skill\n---\nbody",
+            "---\nname: nestlone-skill\ndescription: CodeWhale skill\n---\nbody",
         )
         .unwrap();
 
@@ -1438,10 +1438,10 @@ mod tests {
 
         let normalized = msg.replace('\\', "/");
         assert!(
-            normalized.contains("Discovery mode: codewhale-only"),
+            normalized.contains("Discovery mode: nestlone-only"),
             "got: {msg}"
         );
-        assert!(normalized.contains("codewhale-skill"), "got: {msg}");
+        assert!(normalized.contains("nestlone-skill"), "got: {msg}");
         assert!(!normalized.contains("claude-skill"), "got: {msg}");
         assert!(!normalized.contains(".claude/skills"), "got: {msg}");
     }

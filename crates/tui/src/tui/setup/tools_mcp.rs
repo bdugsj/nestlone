@@ -200,7 +200,7 @@ fn mcp_inventory(app: &App, project_mcp_path: &Path) -> McpInventoryRow {
         Err(_) => McpInventoryRow {
             status: InventoryStatus::NeedsConfig,
             detail: format!(
-                "config unreadable at {} (and project {}); open /mcp or run `codewhale doctor` — secrets not shown",
+                "config unreadable at {} (and project {}); open /mcp or run `nestlone doctor` — secrets not shown",
                 display_path(&app.mcp_config_path),
                 display_path(project_mcp_path)
             ),
@@ -238,7 +238,7 @@ fn mcp_snapshot_inventory(
         return McpInventoryRow {
             status: InventoryStatus::Off,
             detail: format!(
-                "nothing configured yet ({paths}); optional — use /mcp or `codewhale mcp init` later"
+                "nothing configured yet ({paths}); optional — use /mcp or `nestlone mcp init` later"
             ),
             scope: McpInventoryScope::Protocol,
         };
@@ -326,7 +326,7 @@ fn mcp_config_inventory(global: &Path, project: &Path, cfg: &McpConfig) -> McpIn
         return McpInventoryRow {
             status: InventoryStatus::Off,
             detail: format!(
-                "nothing configured yet ({paths}); optional — use /mcp or `codewhale mcp init` later"
+                "nothing configured yet ({paths}); optional — use /mcp or `nestlone mcp init` later"
             ),
             scope: McpInventoryScope::Configuration,
         };
@@ -382,7 +382,7 @@ fn mcp_config_inventory(global: &Path, project: &Path, cfg: &McpConfig) -> McpIn
     if !names_off.is_empty() {
         detail.push_str(&format!("; off: {}", names_off.join(", ")));
     }
-    detail.push_str("; /mcp or `codewhale doctor` for full checks");
+    detail.push_str("; /mcp or `nestlone doctor` for full checks");
     McpInventoryRow {
         status,
         detail,
@@ -425,7 +425,7 @@ fn skills_inventory(app: &App) -> InventoryRow {
         return InventoryRow {
             status: InventoryStatus::Off,
             detail: format!(
-                "nothing configured yet (missing at {path}); optional — /skills or `codewhale setup --skills`"
+                "nothing configured yet (missing at {path}); optional — /skills or `nestlone setup --skills`"
             ),
         };
     }
@@ -461,7 +461,7 @@ fn tools_dir_inventory(tools_dir: &Path) -> InventoryRow {
         return InventoryRow {
             status: InventoryStatus::Off,
             detail: format!(
-                "nothing configured yet (missing at {path}); optional — `codewhale setup --tools`"
+                "nothing configured yet (missing at {path}); optional — `nestlone setup --tools`"
             ),
         };
     }
@@ -516,7 +516,7 @@ fn plugins_inventory(app: &App, config: &Config, nestlone_home: &Path) -> Invent
         return InventoryRow {
             status: InventoryStatus::Off,
             detail: format!(
-                "nothing configured yet (missing at {path}); optional — `codewhale setup --plugins`; plugin commands stay distinct from slash and are deferred on Hotbar"
+                "nothing configured yet (missing at {path}); optional — `nestlone setup --plugins`; plugin commands stay distinct from slash and are deferred on Hotbar"
             ),
         };
     }
@@ -639,7 +639,7 @@ mod tests {
     }
 
     fn write_path_only_command(dir: &Path) -> String {
-        let command = "codewhale-setup-mcp-path-only-test";
+        let command = "nestlone-setup-mcp-path-only-test";
         #[cfg(windows)]
         let file_name = format!("{command}.exe");
         #[cfg(not(windows))]
@@ -816,7 +816,7 @@ mod tests {
             crate::McpServerDoctorStatus::Ok(_)
         ));
 
-        server.command = Some("codewhale-setup-mcp-command-that-does-not-exist".to_string());
+        server.command = Some("nestlone-setup-mcp-command-that-does-not-exist".to_string());
         assert_eq!(
             classify_config_server(&server),
             InventoryStatus::NeedsConfig
@@ -1008,7 +1008,7 @@ mod tests {
             plugins_path_display: "~/.codewhale/plugins".into(),
         };
         let text = on_ramp_text(Locale::En, &facts);
-        assert!(text.contains("codewhale mcp init") || text.contains("/mcp"));
+        assert!(text.contains("nestlone mcp init") || text.contains("/mcp"));
         assert!(text.contains("/skills") || text.contains("setup --skills"));
         assert!(text.contains("does not") || text.contains("never") || text.contains("not run"));
         assert!(text.contains("~/.codewhale/mcp.json"));

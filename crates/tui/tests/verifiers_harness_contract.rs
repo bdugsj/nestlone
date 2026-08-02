@@ -94,7 +94,7 @@ impl Fixture {
     fn new(base_url: &str) -> Self {
         let root = TempDir::new().expect("fixture root");
         let home = root.path().join("home");
-        let nestlone_home = root.path().join("codewhale-home");
+        let nestlone_home = root.path().join("nestlone-home");
         let workspace = root.path().join("workspace");
         for dir in [&home, &nestlone_home, &workspace] {
             std::fs::create_dir_all(dir).expect("create fixture dir");
@@ -127,7 +127,7 @@ impl Fixture {
     }
 
     /// The exact `#4641` launch shape, minus the dispatcher hop (this drives the
-    /// `codewhale-tui` runtime directly). `--no-project-config` precedes the
+    /// `nestlone-tui` runtime directly). `--no-project-config` precedes the
     /// subcommand; the prompt follows `--`.
     fn exec_argv(&self, prompt: &str) -> Vec<String> {
         vec![
@@ -213,11 +213,11 @@ fn collect_files(dir: &Path, out: &mut Vec<PathBuf>) {
 }
 
 fn run_with_timeout(mut command: Command, timeout: Duration) -> std::process::Output {
-    let mut child = command.spawn().expect("spawn codewhale-tui exec");
+    let mut child = command.spawn().expect("spawn nestlone-tui exec");
     let stdout_reader = read_pipe_in_background(child.stdout.take().expect("stdout pipe"));
     let stderr_reader = read_pipe_in_background(child.stderr.take().expect("stderr pipe"));
 
-    let status = match child.wait_timeout(timeout).expect("wait for codewhale-tui") {
+    let status = match child.wait_timeout(timeout).expect("wait for nestlone-tui") {
         Some(status) => status,
         None => {
             let _ = child.kill();
@@ -225,7 +225,7 @@ fn run_with_timeout(mut command: Command, timeout: Duration) -> std::process::Ou
             let stdout = join_pipe_reader(stdout_reader, "stdout");
             let stderr = join_pipe_reader(stderr_reader, "stderr");
             panic!(
-                "codewhale-tui exec timed out after {timeout:?}\nstdout:\n{}\nstderr:\n{}",
+                "nestlone-tui exec timed out after {timeout:?}\nstdout:\n{}\nstderr:\n{}",
                 String::from_utf8_lossy(&stdout),
                 String::from_utf8_lossy(&stderr)
             );
@@ -284,10 +284,10 @@ fn preserve_host_env(command: &mut Command) {
 }
 
 fn nestlone_tui_binary() -> PathBuf {
-    if let Some(path) = option_env!("CARGO_BIN_EXE_codewhale-tui") {
+    if let Some(path) = option_env!("CARGO_BIN_EXE_nestlone-tui") {
         return PathBuf::from(path);
     }
-    if let Ok(path) = std::env::var("CARGO_BIN_EXE_codewhale-tui") {
+    if let Ok(path) = std::env::var("CARGO_BIN_EXE_nestlone-tui") {
         return PathBuf::from(path);
     }
     let mut path = std::env::current_exe().expect("current test executable path");
@@ -295,7 +295,7 @@ fn nestlone_tui_binary() -> PathBuf {
     if path.ends_with("deps") {
         path.pop();
     }
-    path.push(format!("codewhale-tui{}", std::env::consts::EXE_SUFFIX));
+    path.push(format!("nestlone-tui{}", std::env::consts::EXE_SUFFIX));
     path
 }
 

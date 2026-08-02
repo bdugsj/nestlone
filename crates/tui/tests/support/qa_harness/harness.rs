@@ -246,8 +246,8 @@ impl Harness {
         if let Some(path) = std::env::var_os(&key) {
             return PathBuf::from(path);
         }
-        if name == "codewhale-tui"
-            && let Some(path) = option_env!("CARGO_BIN_EXE_codewhale-tui")
+        if name == "nestlone-tui"
+            && let Some(path) = option_env!("CARGO_BIN_EXE_nestlone-tui")
         {
             return PathBuf::from(path);
         }

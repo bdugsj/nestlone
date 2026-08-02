@@ -675,9 +675,9 @@ fn validate_base_url_security(base_url: &str) -> Result<()> {
              \n\
              Loopback hosts (localhost, 127.0.0.1, [::1]) are auto-allowed.\n\
              For other trusted local hosts (LAN, llama.cpp on a private IP, etc.)\n\
-             set the env var `{ALLOW_INSECURE_HTTP_ENV}=1` in the shell that runs codewhale and re-run.\n\
+             set the env var `{ALLOW_INSECURE_HTTP_ENV}=1` in the shell that runs nestlone and re-run.\n\
              \n\
-             Example: `{ALLOW_INSECURE_HTTP_ENV}=1 codewhale` (note the underscores).",
+             Example: `{ALLOW_INSECURE_HTTP_ENV}=1 nestlone` (note the underscores).",
         );
     }
 
@@ -3486,7 +3486,7 @@ mod tests {
                 defer_loading: true,
             }])
             .build(ToolContext::new(
-                std::env::temp_dir().join("codewhale-k3-deferred-capture"),
+                std::env::temp_dir().join("nestlone-k3-deferred-capture"),
             ));
         registry
             .to_api_tools()
@@ -5146,7 +5146,7 @@ mod tests {
 
         let _env_lock = crate::test_support::lock_test_env();
         let tmp = tempfile::tempdir().expect("tempdir");
-        let nestlone_home = tmp.path().join("codewhale-home");
+        let nestlone_home = tmp.path().join("nestlone-home");
         let home = tmp.path().join("home");
         std::fs::create_dir_all(&home).expect("create isolated home");
         let _nestlone_home =
@@ -7005,7 +7005,7 @@ mod tests {
     fn moonshot_uses_nestlone_user_agent_not_kimi_cli_identity() {
         let user_agent = client_user_agent(ApiProvider::Moonshot);
 
-        assert!(user_agent.contains("codewhale/"));
+        assert!(user_agent.contains("nestlone/"));
         assert!(!user_agent.to_ascii_lowercase().contains("kimi_cli"));
         assert!(!user_agent.to_ascii_lowercase().contains("kimi-code-cli"));
     }

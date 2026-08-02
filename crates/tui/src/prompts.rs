@@ -35,7 +35,7 @@ pub struct PromptSessionContext<'a> {
     pub translation_enabled: bool,
     /// Active model identifier. The bundled constitution is model-agnostic,
     /// but embedders may still provide a prompt override containing
-    /// `{model_id}`. Defaults to `"codewhale"` when the caller doesn't supply one.
+    /// `{model_id}`. Defaults to `"nestlone"` when the caller doesn't supply one.
     pub model_id: &'a str,
     /// Route-effective context window, when known. Prompt composition no
     /// longer prints context-window facts, but the field remains part of the
@@ -72,7 +72,7 @@ impl Default for PromptSessionContext<'_> {
             project_context_pack_enabled: false,
             locale_tag: "en",
             translation_enabled: false,
-            model_id: "codewhale",
+            model_id: "nestlone",
             context_window_override: None,
             show_thinking: true,
             verbosity: None,
@@ -746,7 +746,7 @@ impl BasePromptOrigin {
     /// Short, user-facing provenance label. Contains no filesystem paths.
     pub(crate) fn label(self) -> &'static str {
         match self {
-            Self::Bundled => "bundled in this codewhale-tui build (BASE_PROMPT, compiled in)",
+            Self::Bundled => "bundled in this nestlone-tui build (BASE_PROMPT, compiled in)",
             Self::ConfigOverride => concat!(
                 "config-directory override installed at startup ",
                 "(prompts/constitution.md, opt-in enabled)"
@@ -936,7 +936,7 @@ pub(crate) fn locale_reinforcement_closer(locale_tag: &str) -> Option<&'static s
 }
 
 const LOCALE_PREAMBLE_ZH_HANS: &str = "## 语言要求\n\n\
-你正在 codewhale 中运行。无论任务上下文（代码、错误日志、文件名）\
+你正在 nestlone 中运行。无论任务上下文（代码、错误日志、文件名）\
 是英文，无论系统提示的其余部分是英文，你都必须用简体中文进行 \
 `reasoning_content`（内部思考）和最终回复。代码、文件路径、工具名称\
 （例如 `read_file`、`exec_shell`）、环境变量、命令行参数和 URL \
@@ -945,7 +945,7 @@ const LOCALE_PREAMBLE_ZH_HANS: &str = "## 语言要求\n\n\
 如果用户明确要求（例如 \"think in English\"），则覆盖此规则。";
 
 const LOCALE_PREAMBLE_JA: &str = "## 言語要件\n\n\
-codewhale を実行しています。タスクコンテキスト（コード、エラーログ、\
+nestlone を実行しています。タスクコンテキスト（コード、エラーログ、\
 ファイル名）が英語であっても、システムプロンプトの他の部分が英語で\
 あっても、`reasoning_content`（内部思考）と最終的な返信は日本語で\
 行ってください。コード、ファイルパス、ツール名（例：`read_file`、\
@@ -956,7 +956,7 @@ codewhale を実行しています。タスクコンテキスト（コード、�
 \"think in English\"）はこのルールを上書きします。";
 
 const LOCALE_PREAMBLE_PT_BR: &str = "## Requisito de Idioma\n\n\
-Você está rodando dentro do codewhale. Escreva tanto \
+Você está rodando dentro do nestlone. Escreva tanto \
 `reasoning_content` (seu pensamento interno) quanto a resposta final \
 em português do Brasil, mesmo quando o contexto da tarefa (código, \
 logs de erro, nomes de arquivos) estiver em inglês e mesmo quando o \
@@ -999,7 +999,7 @@ idioma. A menos que o usuário peça explicitamente a troca (por exemplo, \
 Brasil.";
 
 const LOCALE_PREAMBLE_VI: &str = "## Yêu cầu ngôn ngữ\n\n\
-Bạn đang chạy trong codewhale. Cho dù ngữ cảnh tác vụ (mã nguồn, nhật ký lỗi, tên tệp) \
+Bạn đang chạy trong nestlone. Cho dù ngữ cảnh tác vụ (mã nguồn, nhật ký lỗi, tên tệp) \
 là tiếng Anh, cho dù phần còn lại của system prompt là tiếng Anh, bạn đều phải sử dụng \
 tiếng Việt cho phần `reasoning_content` (suy nghĩ nội bộ) và câu trả lời cuối cùng. Các từ \
 mã nguồn, đường dẫn tệp, tên công cụ (ví dụ `read_file`, `exec_shell`), biến môi trường, \
@@ -1147,7 +1147,7 @@ guidance conflicts, consult ### Whose word wins — that is the only place
 precedence is stated.";
 
 pub fn compose_prompt(personality: Personality) -> String {
-    compose_prompt_with_approval_model_and_shell(personality, "codewhale")
+    compose_prompt_with_approval_model_and_shell(personality, "nestlone")
 }
 
 pub(crate) fn compose_prompt_with_approval_model_and_shell(
@@ -1262,7 +1262,7 @@ pub fn system_prompt_for_mode_with_context_and_skills(
             project_context_pack_enabled: false,
             locale_tag: "en",
             translation_enabled: false,
-            model_id: "codewhale",
+            model_id: "nestlone",
             context_window_override: None,
             show_thinking: true,
             verbosity: None,
@@ -2309,7 +2309,7 @@ start it",
                     project_context_pack_enabled: false,
                     locale_tag: "zh-Hans",
                     translation_enabled: false,
-                    model_id: "codewhale",
+                    model_id: "nestlone",
                     context_window_override: None,
                     show_thinking: true,
                     verbosity: None,
@@ -2435,7 +2435,7 @@ start it",
                     project_context_pack_enabled: false,
                     locale_tag: "zh-Hans",
                     translation_enabled: false,
-                    model_id: "codewhale",
+                    model_id: "nestlone",
                     context_window_override: None,
                     show_thinking: true,
                     verbosity: None,
@@ -2481,7 +2481,7 @@ start it",
                     project_context_pack_enabled: false,
                     locale_tag: "zh-Hans",
                     translation_enabled: false,
-                    model_id: "codewhale",
+                    model_id: "nestlone",
                     context_window_override: None,
                     show_thinking: false,
                     verbosity: None,
@@ -2537,7 +2537,7 @@ start it",
                     project_context_pack_enabled: false,
                     locale_tag: "en",
                     translation_enabled: false,
-                    model_id: "codewhale",
+                    model_id: "nestlone",
                     context_window_override: None,
                     show_thinking: true,
                     verbosity: None,
@@ -2638,7 +2638,7 @@ start it",
                     project_context_pack_enabled: false,
                     locale_tag: "ja",
                     translation_enabled: false,
-                    model_id: "codewhale",
+                    model_id: "nestlone",
                     context_window_override: None,
                     show_thinking: true,
                     verbosity: None,
@@ -2658,8 +2658,8 @@ start it",
         let tmp = tempdir().expect("tempdir");
         let workspace = tmp.path().join("workspace");
         std::fs::create_dir_all(&workspace).expect("workspace dir");
-        let nestlone_home = tmp.path().join("codewhale-home");
-        std::fs::create_dir_all(&nestlone_home).expect("codewhale home");
+        let nestlone_home = tmp.path().join("nestlone-home");
+        std::fs::create_dir_all(&nestlone_home).expect("nestlone home");
         let _nestlone_home =
             crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", nestlone_home.as_os_str());
 
@@ -2715,8 +2715,8 @@ start it",
         let tmp = tempdir().expect("tempdir");
         let workspace = tmp.path().join("workspace");
         std::fs::create_dir_all(&workspace).expect("workspace dir");
-        let nestlone_home = tmp.path().join("codewhale-home");
-        std::fs::create_dir_all(&nestlone_home).expect("codewhale home");
+        let nestlone_home = tmp.path().join("nestlone-home");
+        std::fs::create_dir_all(&nestlone_home).expect("nestlone home");
         let _nestlone_home =
             crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", nestlone_home.as_os_str());
 
@@ -2762,8 +2762,8 @@ start it",
         let tmp = tempdir().expect("tempdir");
         let workspace = tmp.path().join("workspace");
         std::fs::create_dir_all(&workspace).expect("workspace dir");
-        let nestlone_home = tmp.path().join("codewhale-home");
-        std::fs::create_dir_all(&nestlone_home).expect("codewhale home");
+        let nestlone_home = tmp.path().join("nestlone-home");
+        std::fs::create_dir_all(&nestlone_home).expect("nestlone home");
         std::fs::write(
             nestlone_home.join(nestlone_config::user_constitution::USER_CONSTITUTION_FILE_NAME),
             "{ not valid json",
@@ -2824,7 +2824,7 @@ start it",
                     project_context_pack_enabled: false,
                     locale_tag: "en",
                     translation_enabled: false,
-                    model_id: "codewhale",
+                    model_id: "nestlone",
                     context_window_override: None,
                     show_thinking: true,
                     verbosity: None,
@@ -2855,7 +2855,7 @@ start it",
                     project_context_pack_enabled: false,
                     locale_tag: "en",
                     translation_enabled: false,
-                    model_id: "codewhale",
+                    model_id: "nestlone",
                     context_window_override: None,
                     show_thinking: true,
                     verbosity: None,
@@ -2969,7 +2969,7 @@ start it",
                     project_context_pack_enabled: false,
                     locale_tag: "en",
                     translation_enabled: false,
-                    model_id: "codewhale",
+                    model_id: "nestlone",
                     context_window_override: None,
                     show_thinking: true,
                     verbosity: None,
@@ -3001,7 +3001,7 @@ start it",
                     project_context_pack_enabled: true,
                     locale_tag: "en",
                     translation_enabled: false,
-                    model_id: "codewhale",
+                    model_id: "nestlone",
                     context_window_override: None,
                     show_thinking: true,
                     verbosity: None,
@@ -3327,7 +3327,7 @@ start it",
                     project_context_pack_enabled: false,
                     locale_tag: "en",
                     translation_enabled: false,
-                    model_id: "codewhale",
+                    model_id: "nestlone",
                     context_window_override: None,
                     show_thinking: true,
                     verbosity: None,
@@ -3364,7 +3364,7 @@ start it",
                     project_context_pack_enabled: false,
                     locale_tag: "en",
                     translation_enabled: false,
-                    model_id: "codewhale",
+                    model_id: "nestlone",
                     context_window_override: None,
                     show_thinking: true,
                     verbosity: None,
@@ -3658,7 +3658,7 @@ start it",
         assert!(AGENT_MODE.contains("completion events as internal evidence"));
         assert!(AGENT_MODE.contains("verify load-bearing child"));
         assert!(AGENT_MODE.contains("never manufacture completion sentinels"));
-        assert!(!AGENT_MODE.contains("<codewhale:subagent.done>"));
+        assert!(!AGENT_MODE.contains("<nestlone:subagent.done>"));
     }
 
     #[test]
@@ -4027,7 +4027,7 @@ start it",
                     project_context_pack_enabled: false,
                     locale_tag: "en",
                     translation_enabled: false,
-                    model_id: "codewhale",
+                    model_id: "nestlone",
                     context_window_override: None,
                     show_thinking: true,
                     verbosity: Some(" Concise "),
@@ -4122,7 +4122,7 @@ start it",
             project_context_pack_enabled: false,
             locale_tag: "en",
             translation_enabled: false,
-            model_id: "codewhale",
+            model_id: "nestlone",
             context_window_override: None,
             show_thinking: true,
             verbosity: None,

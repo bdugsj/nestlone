@@ -105,10 +105,10 @@ fn malicious_mcp_helper() {
 }
 
 fn nestlone_tui_binary() -> PathBuf {
-    if let Some(path) = option_env!("CARGO_BIN_EXE_codewhale-tui") {
+    if let Some(path) = option_env!("CARGO_BIN_EXE_nestlone-tui") {
         return PathBuf::from(path);
     }
-    if let Ok(path) = std::env::var("CARGO_BIN_EXE_codewhale-tui") {
+    if let Ok(path) = std::env::var("CARGO_BIN_EXE_nestlone-tui") {
         return PathBuf::from(path);
     }
 
@@ -117,7 +117,7 @@ fn nestlone_tui_binary() -> PathBuf {
     if path.ends_with("deps") {
         path.pop();
     }
-    path.push(format!("codewhale-tui{}", std::env::consts::EXE_SUFFIX));
+    path.push(format!("nestlone-tui{}", std::env::consts::EXE_SUFFIX));
     path
 }
 

@@ -1987,7 +1987,7 @@ struct SpawnRequest {
     /// True when the caller supplied `thinking`/`reasoning_effort` explicitly.
     /// A saved Fleet profile's reasoning tier only applies when the caller did
     /// not — an explicit spawn-time tier always wins (#4137 parity with the
-    /// headless `codewhale exec` launch path).
+    /// headless `nestlone exec` launch path).
     thinking_explicit: bool,
     /// Optional working directory for the child. Must canonicalize to a path
     /// inside the parent's workspace. For first-class git worktree isolation,
@@ -2174,7 +2174,7 @@ fn clamp_child_max_spawn_depth(child_spawn_depth: u32, requested_max_depth: u32)
 /// inbox when one of its children finishes (issue #756). For root-spawned
 /// agents that inbox is the engine turn loop; for nested agents it is a
 /// parent-local receiver inside `run_subagent`. Carries the already-rendered
-/// `<codewhale:subagent.done>` sentinel that the model expects in the
+/// `<nestlone:subagent.done>` sentinel that the model expects in the
 /// transcript per the constitution (`prompts/text.rs`, `BASE_PROMPT`).
 #[derive(Debug, Clone)]
 pub struct SubAgentCompletion {
@@ -2342,7 +2342,7 @@ pub struct SubAgentRuntime {
     pub client: DeepSeekClient,
     /// Session `Config` snapshot, used to build a *fresh* LLM client bound to a
     /// different provider when a fleet roster member's profile pins one (#4193,
-    /// the interactive-TUI twin of the headless `codewhale exec --provider`
+    /// the interactive-TUI twin of the headless `nestlone exec --provider`
     /// route from #4181). The engine threads it in via
     /// [`SubAgentRuntime::with_api_config`]; `child_runtime`/`background_runtime`
     /// clone the `Arc` so every descendant can re-derive a provider-B client.
@@ -7092,7 +7092,7 @@ async fn inspect_agent_from_input(
                     "name": snapshot.name,
                     "status": "running",
                     "unchanged": true,
-                    "hint": "No change since your last check. Do not poll: results arrive automatically as <codewhale:subagent.done> sentinels. Either continue independent work, end your turn, or make one agent(action=\"wait\") call to block until this child settles.",
+                    "hint": "No change since your last check. Do not poll: results arrive automatically as <nestlone:subagent.done> sentinels. Either continue independent work, end your turn, or make one agent(action=\"wait\") call to block until this child settles.",
                 });
                 let mut tool_result = ToolResult::json(&payload)
                     .map_err(|err| ToolError::execution_failed(err.to_string()))?;
@@ -7218,7 +7218,7 @@ const SUBAGENT_WAIT_CHECK_INTERVAL: Duration = Duration::from_millis(250);
 /// `agent(action="wait")`: block until a running child settles (leaves
 /// `Running` — completed, failed, cancelled, interrupted/needs-input, or
 /// budget-exhausted), then return a compact summary. Full child results are
-/// still delivered as `<codewhale:subagent.done>` sentinels by the runtime;
+/// still delivered as `<nestlone:subagent.done>` sentinels by the runtime;
 /// this call only provides the legitimate "join" the model previously faked
 /// with peek→sleep loops (#4097).
 ///
@@ -7343,11 +7343,11 @@ async fn wait_result_payload(
         })
         .collect();
     let note = if timed_out {
-        "Wait timed out with children still running. Do not poll — either wait again, continue independent work, or end your turn; results arrive automatically as <codewhale:subagent.done> sentinels."
+        "Wait timed out with children still running. Do not poll — either wait again, continue independent work, or end your turn; results arrive automatically as <nestlone:subagent.done> sentinels."
     } else if settled_entries.is_empty() {
         "No sub-agents are running anymore."
     } else {
-        "Full results arrive as <codewhale:subagent.done> sentinels — read those before synthesizing; do not re-peek settled children unless you need the full projection."
+        "Full results arrive as <nestlone:subagent.done> sentinels — read those before synthesizing; do not re-peek settled children unless you need the full projection."
     };
     let payload = json!({
         "action": "wait",
@@ -8130,12 +8130,12 @@ fn build_initial_subagent_messages_with_system(
             .filter(|state| !state.is_empty())
         {
             messages.push(system_text_message(format!(
-                "<codewhale:fork_state>\n{state}\n</codewhale:fork_state>"
+                "<nestlone:fork_state>\n{state}\n</nestlone:fork_state>"
             )));
         }
 
         messages.push(system_text_message(format!(
-            "<codewhale:subagent_context>\n{}\n</codewhale:subagent_context>",
+            "<nestlone:subagent_context>\n{}\n</nestlone:subagent_context>",
             subagent_system_prompt
         )));
     }
@@ -8532,7 +8532,7 @@ fn strip_evidence_block(text: &str) -> String {
     text.trim().to_string()
 }
 
-/// Build a `<codewhale:subagent.done>` JSON sentinel for a successful child.
+/// Build a `<nestlone:subagent.done>` JSON sentinel for a successful child.
 /// Intended to surface in the parent's transcript so the model recognizes
 /// child completion.
 ///
@@ -8561,7 +8561,7 @@ fn subagent_done_sentinel(agent_id: &str, res: &SubAgentResult, truncated: bool)
     if let Some(needs_input) = res.needs_input.clone() {
         payload["needs_input"] = json!(needs_input);
     }
-    format!("<codewhale:subagent.done>{payload}</codewhale:subagent.done>")
+    format!("<nestlone:subagent.done>{payload}</nestlone:subagent.done>")
 }
 
 fn subagent_failure_class(status: &SubAgentStatus, error: &str) -> &'static str {
@@ -8605,7 +8605,7 @@ fn subagent_failed_sentinel(res: &SubAgentResult, error: &str) -> String {
         "transcript_handle": transcript_handle,
         "error_location": "previous_line",
     });
-    format!("<codewhale:subagent.done>{payload}</codewhale:subagent.done>")
+    format!("<nestlone:subagent.done>{payload}</nestlone:subagent.done>")
 }
 
 fn response_was_truncated(response: &MessageResponse) -> bool {
@@ -9077,7 +9077,7 @@ fn drain_child_completion_events(
 
 fn child_completion_runtime_message(completions: &[SubAgentCompletion]) -> Message {
     let mut text = String::from(
-        "<codewhale:runtime_event kind=\"child_subagent_completion\" visibility=\"internal\">\n\
+        "<nestlone:runtime_event kind=\"child_subagent_completion\" visibility=\"internal\">\n\
 This is an internal runtime event, not user input. One or more child sub-agents \
 you spawned have finished. Treat each child summary as an unverified self-report: \
 if you rely on it, cite the child agent_id and the EVIDENCE lines it provided, \
@@ -9093,7 +9093,7 @@ then re-plan dependent work before claiming completion.\n",
         text.push_str(&completion.payload);
         text.push('\n');
     }
-    text.push_str("</codewhale:runtime_event>");
+    text.push_str("</nestlone:runtime_event>");
 
     Message {
         role: "user".to_string(),
@@ -10704,7 +10704,7 @@ fn apply_spawn_profile(
     });
 
     // A saved Fleet profile's reasoning tier must reach the spawn, not just the
-    // headless `codewhale exec` argv. Without this, `agent { profile: "x" }`
+    // headless `nestlone exec` argv. Without this, `agent { profile: "x" }`
     // (direct AND workflow spawn, which share this path) silently ran on the
     // session tier while the same profile launched as a Fleet subprocess ran on
     // its own. An explicit caller `thinking` still wins.

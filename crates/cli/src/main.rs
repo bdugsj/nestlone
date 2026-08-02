@@ -2,8 +2,8 @@
 static GLOBAL: mimalloc::MiMalloc = mimalloc::MiMalloc;
 
 fn main() -> std::process::ExitCode {
-    // Reset SIGPIPE to SIG_DFL so piping codewhale output into a command that
-    // exits early (e.g. `codewhale doctor | head`) terminates the process
+    // Reset SIGPIPE to SIG_DFL so piping nestlone output into a command that
+    // exits early (e.g. `nestlone doctor | head`) terminates the process
     // cleanly with exit code 141 instead of panicking on the broken-pipe
     // write. Many execution environments (systemd, Docker, some shells)
     // inherit SIGPIPE set to SIG_IGN, which makes write(2) return EPIPE;

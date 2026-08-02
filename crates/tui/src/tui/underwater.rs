@@ -1339,10 +1339,10 @@ pub fn empty_state_lines(app: &App, area: Rect) -> Vec<Line<'static>> {
         |branch| Cow::Owned(branch.to_string()),
     );
     let context = if tier == ShellTier::Compact {
-        format!("codewhale · {branch}")
+        format!("nestlone · {branch}")
     } else {
         format!(
-            "codewhale · {workspace} · {branch} · {} {}",
+            "nestlone · {workspace} · {branch} · {} {}",
             tr(app.ui_locale, MessageId::EmptyStateMcpLabel),
             app.mcp_configured_count
         )
@@ -2174,7 +2174,7 @@ mod tests {
         // A live test run reads as `verifying`. Reduced motion keeps the
         // semantic label while sharing the calm, static live-work marker.
         let mut active = ActiveCell::new();
-        active.push_tool("exec-1", running_exec("cargo test -p codewhale-tui"));
+        active.push_tool("exec-1", running_exec("cargo test -p nestlone-tui"));
         app.active_cell = Some(active);
         assert_eq!(ShellPhase::from_app(&app), ShellPhase::Verifying);
         app.low_motion = true;

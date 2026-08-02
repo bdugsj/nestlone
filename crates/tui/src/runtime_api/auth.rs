@@ -100,7 +100,7 @@ fn request_has_header_runtime_token(req: &Request, expected: &str) -> bool {
         .is_some_and(|token| token == expected)
         || req
             .headers()
-            .get("x-codewhale-runtime-token")
+            .get("x-nestlone-runtime-token")
             .and_then(|value| value.to_str().ok())
             .is_some_and(|token| token == expected)
         || req

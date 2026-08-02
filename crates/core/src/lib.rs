@@ -2286,7 +2286,7 @@ mod tests {
 
     fn temp_core_state(name: &str) -> StateStore {
         let dir =
-            std::env::temp_dir().join(format!("codewhale-core-{name}-{}", Uuid::new_v4().simple()));
+            std::env::temp_dir().join(format!("nestlone-core-{name}-{}", Uuid::new_v4().simple()));
         std::fs::create_dir_all(&dir).expect("create temp state dir");
         StateStore::open(Some(dir.join("state.db"))).expect("open state store")
     }
@@ -2302,7 +2302,7 @@ mod tests {
             updated_at: 10,
             status: PersistedThreadStatus::Running,
             path: None,
-            cwd: PathBuf::from("/tmp/codewhale"),
+            cwd: PathBuf::from("/tmp/nestlone"),
             cli_version: "0.0.0-test".to_string(),
             source: SessionSource::Interactive,
             name: None,
@@ -3055,7 +3055,7 @@ mod tests {
         let spawned = manager
             .spawn_thread_with_history(
                 "deepseek".to_string(),
-                PathBuf::from("/tmp/codewhale"),
+                PathBuf::from("/tmp/nestlone"),
                 InitialHistory::New,
                 true,
             )
@@ -3081,7 +3081,7 @@ mod tests {
         let archived = manager
             .resume_thread_with_history(
                 &resume_params,
-                Path::new("/tmp/codewhale"),
+                Path::new("/tmp/nestlone"),
                 "deepseek".to_string(),
             )
             .expect("resume archived thread")
@@ -3094,7 +3094,7 @@ mod tests {
         let restored = manager
             .resume_thread_with_history(
                 &resume_params,
-                Path::new("/tmp/codewhale"),
+                Path::new("/tmp/nestlone"),
                 "deepseek".to_string(),
             )
             .expect("resume unarchived thread")
@@ -3167,7 +3167,7 @@ mod tests {
                     raw_tool_call_id: None,
                 },
                 AskForApproval::Never,
-                Path::new("/tmp/codewhale"),
+                Path::new("/tmp/nestlone"),
             )
             .await
             .expect("invoke tool");

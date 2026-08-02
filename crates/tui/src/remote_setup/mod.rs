@@ -1,4 +1,4 @@
-//! `codewhale remote-setup` — guided generation of a remote-agent deploy bundle.
+//! `nestlone remote-setup` — guided generation of a remote-agent deploy bundle.
 //!
 //! Generate-only MVP: the wizard collects a cloud target, a chat bridge, and a
 //! model provider, then renders a deploy bundle (env files, systemd units,
@@ -22,7 +22,7 @@ use clap::Args;
 use bundle::{BundleInputs, DEFAULT_PORT, DEFAULT_WORKERS, ProviderInfo, write_bundle};
 use registry::{BRIDGES, BridgeSpec, CLOUD_TARGETS, CloudTarget};
 
-/// Flags for `codewhale remote-setup` (clap), per the RFC command surface.
+/// Flags for `nestlone remote-setup` (clap), per the RFC command surface.
 #[derive(Args, Debug, Clone, Default)]
 pub struct RemoteSetupArgs {
     /// Cloud target slug (lighthouse, azure, digitalocean). Skips the prompt.
@@ -34,7 +34,7 @@ pub struct RemoteSetupArgs {
     /// Provider slug; validated against the provider registry. Skips the prompt.
     #[arg(long)]
     pub provider: Option<String>,
-    /// Bundle output directory (default `./codewhale-deploy/<cloud>-<bridge>`).
+    /// Bundle output directory (default `./nestlone-deploy/<cloud>-<bridge>`).
     #[arg(long, value_name = "DIR")]
     pub out: Option<PathBuf>,
     /// Emit the bundle, do not provision (default).
@@ -97,7 +97,7 @@ pub fn run_remote_setup(args: RemoteSetupArgs) -> Result<()> {
     };
 
     let out_dir = args.out.clone().unwrap_or_else(|| {
-        PathBuf::from("codewhale-deploy").join(format!("{}-{}", cloud.slug, bridge.slug))
+        PathBuf::from("nestlone-deploy").join(format!("{}-{}", cloud.slug, bridge.slug))
     });
 
     // Always render the bundle, even when --apply is requested.

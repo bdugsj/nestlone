@@ -179,8 +179,8 @@ fn install_rustls_crypto_provider() {
 
 #[derive(Parser, Debug)]
 #[command(
-    name = "nestlone",
-    bin_name = "nestlone",
+    name = "nestlone-tui",
+    bin_name = "nestlone-tui",
     author,
     version = env!("DEEPSEEK_BUILD_VERSION"),
     about = "Nestlone — security agent platform (Kali + pentest + RE)",
@@ -366,11 +366,11 @@ enum Commands {
 #[derive(Args, Debug, Clone)]
 #[command(after_help = "\
 Examples:
-  codewhale exec \"explain this function\"
-  codewhale exec --auto \"list crates/ with ls\"
-  codewhale exec --auto --output-format stream-json \"fix the failing test\"
+  nestlone exec \"explain this function\"
+  nestlone exec --auto \"list crates/ with ls\"
+  nestlone exec --auto --output-format stream-json \"fix the failing test\"
 
-Plain `codewhale exec` is a one-shot model response. Use `--auto` for
+Plain `nestlone exec` is a one-shot model response. Use `--auto` for
 non-interactive agent-with-tools execution. `--auto` does not change the
 sandbox posture or elevate a denied tool. Use `--sandbox danger-full-access`
 or `--allow-sandbox-elevation` to explicitly authorize sandbox elevation.
@@ -551,32 +551,32 @@ enum FleetCommand {
     Status,
     /// Inspect one worker's status, heartbeat, latest event, and artifacts
     Inspect {
-        /// Worker id printed by `codewhale fleet run`
+        /// Worker id printed by `nestlone fleet run`
         worker_id: String,
     },
     /// Print bounded log artifacts for one worker
     Logs {
-        /// Worker id printed by `codewhale fleet run`
+        /// Worker id printed by `nestlone fleet run`
         worker_id: String,
     },
     /// List artifact refs for one worker
     Artifacts {
-        /// Worker id printed by `codewhale fleet run`
+        /// Worker id printed by `nestlone fleet run`
         worker_id: String,
     },
     /// Interrupt a running worker task and record a terminal cancellation
     Interrupt {
-        /// Worker id printed by `codewhale fleet run`
+        /// Worker id printed by `nestlone fleet run`
         worker_id: String,
     },
     /// Restart the latest task for a worker
     Restart {
-        /// Worker id printed by `codewhale fleet run`
+        /// Worker id printed by `nestlone fleet run`
         worker_id: String,
     },
     /// Resume a run from durable ledger state, reconciling orphaned/stale leases
     Resume {
-        /// Run id printed by `codewhale fleet run`
+        /// Run id printed by `nestlone fleet run`
         run_id: String,
         /// Seconds without heartbeat before a leased task is treated as stale
         #[arg(long, default_value_t = 300)]
@@ -786,7 +786,7 @@ fn resolve_exec_resume_session_id(args: &ExecArgs, workspace: &Path) -> Result<O
     latest_session_id_for_workspace(workspace)?.map_or_else(
         || {
             bail!(
-                "No saved sessions found for workspace {}. Use `codewhale sessions` to list sessions, or pass `codewhale exec --resume <SESSION_ID> ...`.",
+                "No saved sessions found for workspace {}. Use `nestlone sessions` to list sessions, or pass `nestlone exec --resume <SESSION_ID> ...`.",
                 workspace.display()
             )
         },
@@ -1245,15 +1245,15 @@ enum McpCommand {
     Validate,
     /// Register this Nestlone binary as a local MCP stdio server.
     ///
-    /// This adds a config entry that runs `codewhale serve --mcp` (stdio protocol).
-    /// For the HTTP/SSE runtime API, use `codewhale serve --http` directly instead.
+    /// This adds a config entry that runs `nestlone serve --mcp` (stdio protocol).
+    /// For the HTTP/SSE runtime API, use `nestlone serve --http` directly instead.
     #[command(
         name = "add-self",
-        long_about = "Register this Nestlone binary as a local MCP stdio server.\n\nAdds a config entry to ~/.codewhale/mcp.json that launches `codewhale serve --mcp`\nvia the stdio transport. Other Codewhale sessions (or any MCP client) can then\ndiscover and call tools exposed by this server.\n\nUse `codewhale serve --http` instead if you need the HTTP/SSE runtime API."
+        long_about = "Register this Nestlone binary as a local MCP stdio server.\n\nAdds a config entry to ~/.codewhale/mcp.json that launches `nestlone serve --mcp`\nvia the stdio transport. Other Codewhale sessions (or any MCP client) can then\ndiscover and call tools exposed by this server.\n\nUse `nestlone serve --http` instead if you need the HTTP/SSE runtime API."
     )]
     AddSelf {
-        /// Server name in mcp.json (default: "codewhale")
-        #[arg(long, default_value = "codewhale")]
+        /// Server name in mcp.json (default: "nestlone")
+        #[arg(long, default_value = "nestlone")]
         name: String,
         /// Workspace directory for the MCP server
         #[arg(long)]
@@ -1326,7 +1326,7 @@ const CODEWHALE_MAIN_STACK_BYTES: usize = 16 * 1024 * 1024;
 
 fn main() -> Result<()> {
     // Match the dispatcher entrypoint: Unix shells and supervisors may inherit
-    // SIGPIPE ignored, which turns short pipelines such as `codewhale doctor |
+    // SIGPIPE ignored, which turns short pipelines such as `nestlone doctor |
     // head` into BrokenPipe panics once this delegated TUI binary prints.
     #[cfg(unix)]
     unsafe {
@@ -1414,7 +1414,7 @@ fn main() -> Result<()> {
     // explicit stack while keeping process hardening and the global panic hook
     // above this boundary, before Tokio or any worker thread exists.
     let runtime_thread = std::thread::Builder::new()
-        .name("codewhale-main".to_string())
+        .name("nestlone-main".to_string())
         .stack_size(CODEWHALE_MAIN_STACK_BYTES)
         .spawn(move || run_async_main(cli, command, plugin_discovery, plugin_registry))
         .context("Failed to start the Nestlone runtime thread")?;
@@ -1801,7 +1801,7 @@ async fn run_async_main(
     }
 
     // Top-level prompt mode: submit the initial prompt, then keep the TUI alive
-    // for follow-up messages. Use `codewhale exec` for explicit non-interactive
+    // for follow-up messages. Use `nestlone exec` for explicit non-interactive
     // one-shot behavior (#2370).
     let config = load_config_from_cli(&cli)?;
     if let Some(initial_input) = top_level_prompt_initial_input(&cli.prompt) {
@@ -1815,7 +1815,7 @@ async fn run_async_main(
         .await;
     }
 
-    // Handle session resume. Plain `codewhale` starts fresh: interrupted
+    // Handle session resume. Plain `nestlone` starts fresh: interrupted
     // snapshots are preserved for explicit resume, but never auto-attached.
     let mut startup_notice = None;
     let resume_session_id = if cli.continue_session {
@@ -1828,7 +1828,7 @@ async fn run_async_main(
         let workspace = resolve_workspace(&cli);
         preserve_interrupted_checkpoint_for_explicit_resume(&workspace);
         // Opt-in auto-resume (#2934). Off by default, so the historical
-        // "plain `codewhale` starts fresh" behaviour is unchanged unless the
+        // "plain `nestlone` starts fresh" behaviour is unchanged unless the
         // user asked for something else. The decision never resumes an
         // archived, unreadable, or foreign-workspace session; every fallback
         // carries a receipt rather than silently starting blank.
@@ -1854,8 +1854,8 @@ async fn run_async_main(
 
 /// Resolve the opt-in auto-resume setting into a session id plus a receipt.
 ///
-/// Deliberately scoped to the plain interactive launch. `codewhale "do X"`
-/// (top-level prompt) and `codewhale exec` are not covered: silently prefixing
+/// Deliberately scoped to the plain interactive launch. `nestlone "do X"`
+/// (top-level prompt) and `nestlone exec` are not covered: silently prefixing
 /// a one-shot task with a prior conversation would change what is sent to the
 /// model, which is not a layout preference the user opted into.
 fn resolve_auto_resume(workspace: &Path) -> (Option<String>, Option<String>) {
@@ -2352,7 +2352,7 @@ async fn run_fleet_command(workspace: &Path, config: &Config, args: FleetArgs) -
     use nestlone_protocol::fleet::{FleetAlertEventClass, FleetArtifactKind, FleetRunId};
 
     // Every label and every row below comes from the shared Fleet control
-    // surface, so `codewhale fleet …` and `/fleet …` cannot drift in how they
+    // surface, so `nestlone fleet …` and `/fleet …` cannot drift in how they
     // describe the same durable ledger (#1888, #4022).
     fn print_status(status: &FleetStatusSnapshot) {
         println!("{}", fleet_control::render_fleet_status_snapshot(status));
@@ -2470,7 +2470,7 @@ async fn run_fleet_command(workspace: &Path, config: &Config, args: FleetArgs) -
     let fleet_context = fleet_control::fleet_control_context(workspace);
     // Probing is not enough on its own: `FleetManager::open` *creates* the
     // ledger, and it used to run for every subcommand before this match. That
-    // made `codewhale fleet status` in a ledgerless workspace print
+    // made `nestlone fleet status` in a ledgerless workspace print
     // "no_fleet_ledger" while simultaneously creating the file it said was
     // missing — and the next invocation then reported an empty ledger as if a
     // Fleet had existed all along. Refuse the control verbs here, before the
@@ -2528,7 +2528,7 @@ async fn run_fleet_command(workspace: &Path, config: &Config, args: FleetArgs) -
                 return Ok(());
             }
             println!(
-                "manager loop running; use `codewhale fleet status`, `inspect`, `interrupt`, or `stop --all` from another terminal."
+                "manager loop running; use `nestlone fleet status`, `inspect`, `interrupt`, or `stop --all` from another terminal."
             );
             let mut executor = FleetExecutor::new(workspace);
             let nestlone_binary = fleet::executor::configured_nestlone_binary();
@@ -2588,7 +2588,7 @@ async fn run_fleet_command(workspace: &Path, config: &Config, args: FleetArgs) -
             let report = manager.restart_worker(&worker_id)?;
             print_inspection(&report.inspection);
             println!(
-                "manager loop running for restarted run {}; use `codewhale fleet status`, `inspect`, `interrupt`, or `stop --all` from another terminal.",
+                "manager loop running for restarted run {}; use `nestlone fleet status`, `inspect`, `interrupt`, or `stop --all` from another terminal.",
                 report.run_id.0
             );
             let mut executor = FleetExecutor::new(workspace);
@@ -2785,7 +2785,7 @@ fn init_skills_dir(skills_dir: &Path, force: bool) -> Result<(PathBuf, WriteStat
 fn tools_readme_template() -> &'static str {
     "# Local tools\n\n\
      Drop self-describing scripts here so they can be discovered by\n\
-     `codewhale-tui setup --status` and surfaced in `codewhale-tui doctor`.\n\n\
+     `nestlone-tui setup --status` and surfaced in `nestlone-tui doctor`.\n\n\
      When `[tools.plugin_dir]` is set in config.toml (or when the default\n\
      `~/.codewhale/tools/` directory exists), they are auto-discovered and\n\
      registered as model-visible tools.\n\n\
@@ -2807,7 +2807,7 @@ fn tools_example_script() -> &'static str {
      # name: example\n\
      # description: Print a confirmation that local tool discovery works\n\
      # usage: example [name]\n\
-     printf 'codewhale-tui local tool ok: %s\\n' \"${1:-world}\"\n"
+     printf 'nestlone-tui local tool ok: %s\\n' \"${1:-world}\"\n"
 }
 
 fn init_tools_dir(tools_dir: &Path, force: bool) -> Result<(PathBuf, WriteStatus, WriteStatus)> {
@@ -2909,7 +2909,7 @@ fn init_plugins_dir(
     ))
 }
 
-/// Resolve the user-supplied CORS origins for `codewhale serve --http`.
+/// Resolve the user-supplied CORS origins for `nestlone serve --http`.
 ///
 /// Sources, in priority order (later sources extend earlier ones):
 /// 1. `--cors-origin URL` flags (repeatable)
@@ -3054,7 +3054,7 @@ fn run_setup(
             }
         }
         println!(
-            "    Next: edit the file, then run `codewhale mcp list` or `codewhale mcp tools`."
+            "    Next: edit the file, then run `nestlone mcp list` or `nestlone mcp tools`."
         );
     }
 
@@ -3267,7 +3267,7 @@ fn provider_auth_hint(provider: crate::config::ApiProvider) -> String {
         "see docs/PROVIDERS.md for ChatGPT/Codex OAuth setup".to_string()
     } else {
         format!(
-            "codewhale auth set --provider {} --api-key \"...\"",
+            "nestlone auth set --provider {} --api-key \"...\"",
             provider.as_str()
         )
     }
@@ -3344,7 +3344,7 @@ fn run_setup_status(
             let login_hint = if provider == crate::config::ApiProvider::OpenaiCodex {
                 provider_auth_hint(provider)
             } else {
-                format!("codewhale auth set --provider {provider_identity} --api-key \"...\"")
+                format!("nestlone auth set --provider {provider_identity} --api-key \"...\"")
             };
             let config_location = if provider == crate::config::ApiProvider::Custom
                 && config.uses_legacy_literal_custom_route()
@@ -3451,7 +3451,7 @@ fn run_setup_status(
     println!("  {} {}", "·".dimmed(), dotenv_status_line(workspace));
 
     println!();
-    println!("Run `codewhale doctor --json` for a machine-readable check.");
+    println!("Run `nestlone doctor --json` for a machine-readable check.");
     Ok(())
 }
 
@@ -3610,7 +3610,7 @@ async fn run_doctor(
                         "  {} latest: {latest_tag}",
                         "!".truecolor(sky_r, sky_g, sky_b)
                     );
-                    println!("    Update available. Run `codewhale update` to install.");
+                    println!("    Update available. Run `nestlone update` to install.");
                 }
                 Ok(std::cmp::Ordering::Equal) => {
                     println!(
@@ -3637,7 +3637,7 @@ async fn run_doctor(
                 "  {} latest release check failed: {err}",
                 "!".truecolor(sky_r, sky_g, sky_b)
             );
-            println!("    Run `codewhale update --check` to retry.");
+            println!("    Run `nestlone update --check` to retry.");
         }
     }
     println!();
@@ -3803,7 +3803,7 @@ async fn run_doctor(
             "✗".truecolor(red_r, red_g, red_b)
         );
         println!(
-            "    Run 'codewhale auth set --provider <name>' to save a key to ~/.codewhale/config.toml."
+            "    Run 'nestlone auth set --provider <name>' to save a key to ~/.codewhale/config.toml."
         );
         false
     };
@@ -3874,21 +3874,21 @@ async fn run_doctor(
                 );
                 if error_msg.contains("401") || error_msg.contains("Unauthorized") {
                     println!(
-                        "    Invalid API key. Check `codewhale auth status`, DEEPSEEK_API_KEY, or config.toml"
+                        "    Invalid API key. Check `nestlone auth status`, DEEPSEEK_API_KEY, or config.toml"
                     );
                     if matches!(api_key_source, ApiKeySource::Keyring) {
                         println!(
                             "    The rejected key came from the OS keyring via the dispatcher."
                         );
                         println!(
-                            "    Run `codewhale auth status` to inspect config/keyring/env sources."
+                            "    Run `nestlone auth status` to inspect config/keyring/env sources."
                         );
                     } else if matches!(api_key_source, ApiKeySource::Env) {
                         println!(
                             "    The rejected key came from DEEPSEEK_API_KEY; no saved config key is present."
                         );
                         println!(
-                            "    Run `codewhale auth set --provider deepseek` to save a config key that overrides stale env."
+                            "    Run `nestlone auth set --provider deepseek` to save a config key that overrides stale env."
                         );
                     }
                 } else if error_msg.contains("403") || error_msg.contains("Forbidden") {
@@ -3922,7 +3922,7 @@ async fn run_doctor(
             "·".dimmed()
         );
         println!(
-            "    Run `codewhale doctor --probe-local` to opt in; the request may start a local service."
+            "    Run `nestlone doctor --probe-local` to opt in; the request may start a local service."
         );
     } else {
         println!("  {} Skipped (no API key configured)", "·".dimmed());
@@ -3978,7 +3978,7 @@ async fn run_doctor(
         Ok(cfg) if cfg.servers.is_empty() => {
             println!("  {} 0 merged server(s) configured", "·".dimmed());
             if !mcp_config_path.exists() && !project_mcp_config_path.exists() {
-                println!("    Run `codewhale mcp init` or add `.codewhale/mcp.json`.");
+                println!("    Run `nestlone mcp init` or add `.codewhale/mcp.json`.");
             }
         }
         Ok(cfg) => {
@@ -4017,7 +4017,7 @@ async fn run_doctor(
                     println!("      disabled; live health not checked");
                 } else {
                     println!(
-                        "      process/protocol/backend: not checked; `codewhale mcp validate` explicitly starts and initializes configured servers"
+                        "      process/protocol/backend: not checked; `nestlone mcp validate` explicitly starts and initializes configured servers"
                     );
                 }
             }
@@ -4067,7 +4067,7 @@ async fn run_doctor(
                 }
             } else {
                 println!(
-                    "    Use codewhale doctor --probe-mcp to opt in to live process/protocol checks; it may start configured servers."
+                    "    Use nestlone doctor --probe-mcp to opt in to live process/protocol checks; it may start configured servers."
                 );
             }
         }
@@ -4207,7 +4207,7 @@ async fn run_doctor(
             .is_some_and(|dir| dir.exists())
         && !global_skills_dir.exists()
     {
-        println!("    Run `codewhale setup --skills` (or add --local for ./skills).");
+        println!("    Run `nestlone setup --skills` (or add --local for ./skills).");
     }
 
     // Tools directory
@@ -4228,7 +4228,7 @@ async fn run_doctor(
             "·".dimmed(),
             crate::utils::display_path(&tools_dir)
         );
-        println!("    Run `codewhale setup --tools` to scaffold a starter dir.");
+        println!("    Run `nestlone setup --tools` to scaffold a starter dir.");
     }
 
     // Plugins directory
@@ -4249,7 +4249,7 @@ async fn run_doctor(
             "·".dimmed(),
             crate::utils::display_path(&plugins_dir)
         );
-        println!("    Run `codewhale setup --plugins` to scaffold a starter dir.");
+        println!("    Run `nestlone setup --plugins` to scaffold a starter dir.");
     }
 
     // Storage surfaces (#422 / #440 / #500)
@@ -4997,7 +4997,7 @@ fn print_doctor_legacy_state_report(
             }
         }
         println!(
-            "    Start Codewhale once to trigger safe migration where available, then rerun `codewhale doctor`."
+            "    Start Codewhale once to trigger safe migration where available, then rerun `nestlone doctor`."
         );
     }
 
@@ -5018,7 +5018,7 @@ fn print_doctor_session_recovery_report(
                 "·".dimmed()
             );
             println!(
-                "    This preserves the explicit home boundary. To inspect the default home, use a separate shell with CODEWHALE_HOME unset and rerun `codewhale doctor`."
+                "    This preserves the explicit home boundary. To inspect the default home, use a separate shell with CODEWHALE_HOME unset and rerun `nestlone doctor`."
             );
         }
         DoctorSessionRecoveryStatus::NoLegacySessions => {
@@ -5062,7 +5062,7 @@ fn print_doctor_session_recovery_report(
             }
             if report.recoverable_file_count > DOCTOR_SESSION_RECOVERY_HUMAN_SAMPLE_LIMIT {
                 println!(
-                    "    · {} more filename(s); `codewhale doctor --json` includes a bounded metadata-only sample",
+                    "    · {} more filename(s); `nestlone doctor --json` includes a bounded metadata-only sample",
                     report.recoverable_file_count - DOCTOR_SESSION_RECOVERY_HUMAN_SAMPLE_LIMIT
                 );
             }
@@ -5073,10 +5073,10 @@ fn print_doctor_session_recovery_report(
                 crate::utils::display_path(&report.primary_sessions_path),
             );
             println!(
-                "      2. Close other Codewhale processes, then run `codewhale sessions`; migration adds only missing files, never overwrites primary files, and leaves legacy originals in place."
+                "      2. Close other Codewhale processes, then run `nestlone sessions`; migration adds only missing files, never overwrites primary files, and leaves legacy originals in place."
             );
             println!(
-                "      3. Rerun `codewhale doctor`. If filenames remain, keep both backups and report only the listed source/destination names."
+                "      3. Rerun `nestlone doctor`. If filenames remain, keep both backups and report only the listed source/destination names."
             );
         }
         DoctorSessionRecoveryStatus::ScanFailed => {
@@ -5088,7 +5088,7 @@ fn print_doctor_session_recovery_report(
                 println!("    {error}");
             }
             println!(
-                "    Keep both session directories unchanged, back them up, fix path permissions or shape, and rerun `codewhale doctor` before attempting migration."
+                "    Keep both session directories unchanged, back them up, fix path permissions or shape, and rerun `nestlone doctor` before attempting migration."
             );
         }
     }
@@ -5133,7 +5133,7 @@ fn doctor_session_recovery_json(report: &DoctorSessionRecoveryReport) -> serde_j
         "recoverable_files_truncated": report.recoverable_file_count > report.recoverable.len(),
         "error": report.error,
         "recovery_command": if report.needs_attention() && report.status != DoctorSessionRecoveryStatus::ScanFailed {
-            Some("codewhale sessions")
+            Some("nestlone sessions")
         } else {
             None
         },
@@ -6134,7 +6134,7 @@ fn run_doctor_json(
         },
         "api_connectivity": {
             "checked": false,
-            "note": "Skipped in --json mode; run `codewhale doctor` for a live check.",
+            "note": "Skipped in --json mode; run `nestlone doctor` for a live check.",
         },
         "capability": provider_capability_report(config),
     });
@@ -6549,7 +6549,7 @@ fn doctor_timeout_recovery_lines(config: &Config) -> Vec<String> {
                 && !target.base_url.contains("api.deepseeki.com") =>
         {
             lines.push(
-                "If this is a custom DeepSeek-compatible endpoint, set its HTTPS base URL in ~/.codewhale/config.toml and rerun `codewhale doctor`."
+                "If this is a custom DeepSeek-compatible endpoint, set its HTTPS base URL in ~/.codewhale/config.toml and rerun `nestlone doctor`."
                     .to_string(),
             );
         }
@@ -6568,7 +6568,7 @@ fn doctor_timeout_recovery_lines(config: &Config) -> Vec<String> {
     }
 
     lines.push(
-        "Run `codewhale doctor --json` and include `base_url`, `default_text_model`, and `api_connectivity` when filing an issue."
+        "Run `nestlone doctor --json` and include `base_url`, `default_text_model`, and `api_connectivity` when filing an issue."
             .to_string(),
     );
     lines
@@ -6866,7 +6866,7 @@ fn rustc_version() -> String {
 
 /// List saved sessions
 fn sessions_resume_command() -> &'static str {
-    "codewhale resume"
+    "nestlone resume"
 }
 
 fn list_sessions(limit: usize, search: Option<String>) -> Result<()> {
@@ -6891,7 +6891,7 @@ fn list_sessions(limit: usize, search: Option<String>) -> Result<()> {
         println!("{}", "No sessions found.".truecolor(sky_r, sky_g, sky_b));
         println!(
             "Start a new session with: {}",
-            "codewhale".truecolor(human_r, human_g, human_b)
+            "nestlone".truecolor(human_r, human_g, human_b)
         );
         return Ok(());
     }
@@ -6931,7 +6931,7 @@ fn list_sessions(limit: usize, search: Option<String>) -> Result<()> {
     );
     println!(
         "Continue latest in this workspace: {}",
-        "codewhale --continue".truecolor(action_r, action_g, action_b)
+        "nestlone --continue".truecolor(action_r, action_g, action_b)
     );
 
     Ok(())
@@ -6968,7 +6968,7 @@ fn init_project() -> Result<()> {
             );
             println!();
             println!("Edit this file to customize how the AI agent works with your project.");
-            println!("The instructions will be loaded automatically when you run codewhale.");
+            println!("The instructions will be loaded automatically when you run nestlone.");
         }
         Err(e) => {
             println!(
@@ -7072,7 +7072,7 @@ fn resolve_session_id(session_id: Option<String>, last: bool, workspace: &Path) 
     if last {
         return latest_session_id_for_workspace(workspace)?.ok_or_else(|| {
             anyhow!(
-                "No saved sessions found for workspace {}. Use `codewhale sessions` to list all sessions, or `codewhale resume <SESSION_ID>` to resume one explicitly.",
+                "No saved sessions found for workspace {}. Use `nestlone sessions` to list all sessions, or `nestlone resume <SESSION_ID>` to resume one explicitly.",
                 workspace.display()
             )
         });
@@ -7317,7 +7317,7 @@ fn run_review_receipt_check(diff: &str, args: &ReviewArgs) -> Result<()> {
     } else {
         crate::tools::review::latest_review_receipt_for_diff(diff)?.ok_or_else(|| {
             anyhow!(
-                "No review receipt found for the current diff. Run `codewhale review --write-receipt` first, or pass --receipt-path."
+                "No review receipt found for the current diff. Run `nestlone review --write-receipt` first, or pass --receipt-path."
             )
         })?
     };
@@ -7386,7 +7386,7 @@ fn review_receipt_validation_status(
     }
 }
 
-/// `codewhale pr <N>` (#451) — fetch a GitHub PR via `gh`, format
+/// `nestlone pr <N>` (#451) — fetch a GitHub PR via `gh`, format
 /// title + body + diff as the composer's first message, and launch
 /// the interactive TUI. Falls back gracefully if `gh` is missing.
 async fn run_pr(
@@ -7401,7 +7401,7 @@ async fn run_pr(
         bail!(
             "`gh` CLI not found on PATH. Install GitHub CLI \
              (https://cli.github.com) and authenticate (`gh auth login`) \
-             so `codewhale pr <N>` can fetch PR metadata and the diff."
+             so `nestlone pr <N>` can fetch PR metadata and the diff."
         );
     }
 
@@ -7718,7 +7718,7 @@ async fn run_mcp_command(
                     );
                 }
             }
-            println!("Edit the file, then run `codewhale mcp list` or `codewhale mcp tools`.");
+            println!("Edit the file, then run `nestlone mcp list` or `nestlone mcp tools`.");
             Ok(())
         }
         McpCommand::List => {
@@ -7918,7 +7918,7 @@ async fn run_mcp_command(
                     .is_ok_and(|support| support.is_some())
             {
                 println!(
-                    "OAuth is available for '{name}'. Run `codewhale mcp login {name}` to authenticate."
+                    "OAuth is available for '{name}'. Run `nestlone mcp login {name}` to authenticate."
                 );
             }
             Ok(())
@@ -8026,7 +8026,7 @@ async fn run_mcp_command(
             let mut cfg = load_mcp_config(&config_path)?;
             if cfg.servers.contains_key(&name) {
                 bail!(
-                    "MCP server '{name}' already exists in {}. Use `codewhale mcp remove {name}` first, or choose a different --name.",
+                    "MCP server '{name}' already exists in {}. Use `nestlone mcp remove {name}` first, or choose a different --name.",
                     config_path.display()
                 );
             }
@@ -8067,8 +8067,8 @@ async fn run_mcp_command(
                 workspace.map_or(String::new(), |ws| format!(" --workspace {ws}"))
             );
             println!();
-            println!("Tip: Use `codewhale mcp validate` to test the connection.");
-            println!("     Use `codewhale serve --http` for the HTTP/SSE runtime API instead.");
+            println!("Tip: Use `nestlone mcp validate` to test the connection.");
+            println!("     Use `nestlone serve --http` for the HTTP/SSE runtime API instead.");
             Ok(())
         }
     }
@@ -8518,7 +8518,7 @@ fn checkpoint_age_label(age: std::time::Duration) -> String {
 /// single-slot `checkpoints/latest.json`; each must be younger than 24 hours
 /// **and its workspace must match the resolved launch workspace after
 /// canonicalisation** — the newest matching candidate wins. If no candidate
-/// matches, a one-line notice points at `codewhale sessions`, and nothing is
+/// matches, a one-line notice points at `nestlone sessions`, and nothing is
 /// auto-loaded: another workspace's checkpoint file is never touched (it may
 /// belong to a live session there).
 fn recover_interrupted_checkpoint_for_resume(launch_workspace: &Path) -> Option<String> {
@@ -8543,7 +8543,7 @@ fn recover_interrupted_checkpoint_for_resume(launch_workspace: &Path) -> Option<
         if let Some(newest) = mismatched.first() {
             eprintln!(
                 "Note: an interrupted session from another workspace ({}) is \
-                 available. Run `codewhale sessions` to list saved sessions. Starting \
+                 available. Run `nestlone sessions` to list saved sessions. Starting \
                  fresh in {}.",
                 newest.session.metadata.workspace.display(),
                 launch_workspace.display(),
@@ -8598,7 +8598,7 @@ fn saved_session_is_newer(
 }
 
 /// Preserve an interrupted checkpoint on a normal fresh launch without
-/// attaching it to the new TUI instance. This keeps "open another codewhale in
+/// attaching it to the new TUI instance. This keeps "open another nestlone in
 /// the same folder" from re-entering the previous in-flight session while still
 /// leaving an explicit resume path.
 ///
@@ -8628,12 +8628,12 @@ fn preserve_interrupted_checkpoint_for_explicit_resume(launch_workspace: &Path) 
     if session_manager::workspace_scope_matches(&session_workspace, launch_workspace) {
         eprintln!(
             "Found an in-flight session snapshot ({age_str}). Starting a new \
-             session. Run `codewhale --continue` to resume it."
+             session. Run `nestlone --continue` to resume it."
         );
     } else {
         eprintln!(
             "Note: an interrupted session from another workspace ({}) is \
-             available. Run `codewhale sessions` to list saved sessions. Starting \
+             available. Run `nestlone sessions` to list saved sessions. Starting \
              fresh in {}.",
             session_workspace.display(),
             launch_workspace.display(),
@@ -9579,7 +9579,7 @@ fn exec_stream_value(event: &ExecStreamEvent) -> Result<serde_json::Value> {
         object.insert("schema_version".to_string(), serde_json::json!(1));
         object.insert(
             "schema".to_string(),
-            serde_json::json!("codewhale.exec-stream"),
+            serde_json::json!("nestlone.exec-stream"),
         );
     }
     Ok(value)
@@ -10210,7 +10210,7 @@ fn exec_stream_resume_hint(session_id: &str) -> String {
     if session_id.trim().is_empty() {
         String::new()
     } else {
-        "codewhale exec --resume <redacted-session-id>".to_string()
+        "nestlone exec --resume <redacted-session-id>".to_string()
     }
 }
 
@@ -11393,7 +11393,7 @@ mod doctor_legacy_state_tests {
         assert_eq!(json["chat_contents_read"], false);
         assert_eq!(json["checkpoint_internals_scanned"], false);
         assert_eq!(json["recoverable_file_count"], 1);
-        assert_eq!(json["recovery_command"], "codewhale sessions");
+        assert_eq!(json["recovery_command"], "nestlone sessions");
         assert_eq!(json["recoverable_files"][0]["name"], "recover-me.json");
         let serialized = json.to_string();
         assert!(
@@ -11630,7 +11630,7 @@ mod doctor_legacy_state_tests {
     fn doctor_state_roots_ignore_ambient_legacy_home_when_nestlone_home_is_explicit() {
         let _env_lock = crate::test_support::lock_test_env();
         let tmp = TempDir::new().expect("tempdir");
-        let explicit_home = tmp.path().join("isolated-codewhale");
+        let explicit_home = tmp.path().join("isolated-nestlone");
         let ambient_legacy = tmp.path().join(".deepseek");
         fs::create_dir_all(&ambient_legacy).expect("ambient legacy root");
         fs::write(
@@ -11677,7 +11677,7 @@ mod doctor_setup_state_tests {
 
     fn prepare_env(tmp: &TempDir) -> (crate::test_support::EnvVarGuard, PathBuf) {
         let nestlone_home = tmp.path().join(".codewhale");
-        fs::create_dir_all(&nestlone_home).expect("codewhale home");
+        fs::create_dir_all(&nestlone_home).expect("nestlone home");
         (
             crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", nestlone_home.as_os_str()),
             nestlone_home,
@@ -11971,7 +11971,7 @@ mod doctor_setup_state_tests {
         );
         assert_eq!(
             codex_status["revoke_command"],
-            "codewhale auth external-revoke --provider openai-codex"
+            "nestlone auth external-revoke --provider openai-codex"
         );
         let human = doctor_external_credential_consent_lines(&codex_read_only).join("\n");
         assert!(human.contains("path="), "{human}");
@@ -12758,7 +12758,7 @@ mod doctor_endpoint_tests {
         assert!(text.contains("api.deepseek.com"));
         assert!(text.contains("custom DeepSeek-compatible endpoint"));
         assert!(!text.contains("provider = \"deepseek-cn\""));
-        assert!(text.contains("codewhale doctor --json"));
+        assert!(text.contains("nestlone doctor --json"));
     }
 
     #[test]
@@ -12949,14 +12949,14 @@ mod terminal_mode_tests {
 
     #[test]
     fn prompt_flag_accepts_split_prompt_words_for_windows_cmd_shims() {
-        let cli = parse_cli(&["codewhale", "-p", "hello", "world"]);
+        let cli = parse_cli(&["nestlone", "-p", "hello", "world"]);
 
         assert_eq!(cli.prompt, vec!["hello", "world"]);
     }
 
     #[test]
     fn prompt_flag_starts_interactive_submit_input() {
-        let cli = parse_cli(&["codewhale", "-p", "read", "the", "project"]);
+        let cli = parse_cli(&["nestlone", "-p", "read", "the", "project"]);
 
         assert_eq!(
             top_level_prompt_initial_input(&cli.prompt),
@@ -12966,7 +12966,7 @@ mod terminal_mode_tests {
 
     #[test]
     fn companion_binary_reports_its_own_name() {
-        assert_eq!(Cli::command().get_name(), "nestlone");
+        assert_eq!(Cli::command().get_name(), "nestlone-tui");
     }
 
     #[test]
@@ -13340,7 +13340,7 @@ mod terminal_mode_tests {
 
     #[test]
     fn exec_accepts_split_prompt_words_for_windows_cmd_shims() {
-        let cli = parse_cli(&["codewhale", "exec", "hello", "world"]);
+        let cli = parse_cli(&["nestlone", "exec", "hello", "world"]);
         let Some(Commands::Exec(args)) = cli.command else {
             panic!("expected exec command");
         };
@@ -13350,7 +13350,7 @@ mod terminal_mode_tests {
 
     #[test]
     fn exec_keeps_model_flag_before_split_prompt_words() {
-        let cli = parse_cli(&["codewhale", "exec", "--model", "auto", "hello", "world"]);
+        let cli = parse_cli(&["nestlone", "exec", "--model", "auto", "hello", "world"]);
         let Some(Commands::Exec(args)) = cli.command else {
             panic!("expected exec command");
         };
@@ -13361,7 +13361,7 @@ mod terminal_mode_tests {
 
     #[test]
     fn exec_keeps_flags_before_split_prompt_words() {
-        let cli = parse_cli(&["codewhale", "exec", "--json", "hello", "world"]);
+        let cli = parse_cli(&["nestlone", "exec", "--json", "hello", "world"]);
         let Some(Commands::Exec(args)) = cli.command else {
             panic!("expected exec command");
         };
@@ -13375,7 +13375,7 @@ mod terminal_mode_tests {
         // #4093: Fleet threads `--provider <id>` so a worker launches on its
         // profile-pinned provider even when the parent session is elsewhere.
         let cli = parse_cli(&[
-            "codewhale",
+            "nestlone",
             "exec",
             "--provider",
             "openrouter",
@@ -13800,7 +13800,7 @@ mod terminal_mode_tests {
     #[test]
     fn exec_parses_reasoning_effort_flag_alongside_provider() {
         let cli = parse_cli(&[
-            "codewhale",
+            "nestlone",
             "exec",
             "--provider",
             "openrouter",
@@ -13949,7 +13949,7 @@ mod terminal_mode_tests {
     #[test]
     fn exec_accepts_resume_session_flags_for_harnesses() {
         let cli = parse_cli(&[
-            "codewhale",
+            "nestlone",
             "exec",
             "--resume",
             "abc123",
@@ -13968,7 +13968,7 @@ mod terminal_mode_tests {
 
     #[test]
     fn exec_accepts_session_id_alias() {
-        let cli = parse_cli(&["codewhale", "exec", "--session-id", "abc123", "follow up"]);
+        let cli = parse_cli(&["nestlone", "exec", "--session-id", "abc123", "follow up"]);
         let Some(Commands::Exec(args)) = cli.command else {
             panic!("expected exec command");
         };
@@ -13981,7 +13981,7 @@ mod terminal_mode_tests {
     fn exec_parses_tool_gate_and_hardening_flags() {
         let envelope = r#"{"schema_version":1,"owner":"fleet-worker-1","authority":"read_only"}"#;
         let cli = parse_cli(&[
-            "codewhale",
+            "nestlone",
             "exec",
             "--allowed-tools",
             "read_file,grep_files",
@@ -14025,7 +14025,7 @@ mod terminal_mode_tests {
 
     #[test]
     fn exec_auto_does_not_authorize_sandbox_elevation() {
-        let cli = parse_cli(&["codewhale", "exec", "--auto", "run it"]);
+        let cli = parse_cli(&["nestlone", "exec", "--auto", "run it"]);
         let Some(Commands::Exec(args)) = cli.command else {
             panic!("expected exec command");
         };
@@ -14039,7 +14039,7 @@ mod terminal_mode_tests {
     #[test]
     fn exec_explicit_sandbox_elevation_opt_ins_authorize_retry() {
         let danger = parse_cli(&[
-            "codewhale",
+            "nestlone",
             "exec",
             "--auto",
             "--sandbox",
@@ -14055,7 +14055,7 @@ mod terminal_mode_tests {
         ));
 
         let flag = parse_cli(&[
-            "codewhale",
+            "nestlone",
             "exec",
             "--auto",
             "--allow-sandbox-elevation",
@@ -14159,14 +14159,14 @@ mod terminal_mode_tests {
 
     #[test]
     fn exec_rejects_zero_max_turns() {
-        let err = Cli::try_parse_from(["codewhale", "exec", "--max-turns", "0", "hello"])
+        let err = Cli::try_parse_from(["nestlone", "exec", "--max-turns", "0", "hello"])
             .expect_err("max-turns must be >= 1");
         assert_eq!(err.kind(), clap::error::ErrorKind::ValueValidation);
     }
 
     #[test]
     fn exec_accepts_continue_for_latest_workspace_session() {
-        let cli = parse_cli(&["codewhale", "exec", "--continue", "follow up"]);
+        let cli = parse_cli(&["nestlone", "exec", "--continue", "follow up"]);
         let Some(Commands::Exec(args)) = cli.command else {
             panic!("expected exec command");
         };
@@ -14176,14 +14176,14 @@ mod terminal_mode_tests {
 
     #[test]
     fn sessions_footer_points_to_resume_subcommand() {
-        let cli = parse_cli(&["codewhale", "resume", "abc123"]);
+        let cli = parse_cli(&["nestlone", "resume", "abc123"]);
         let Some(Commands::Resume { session_id, last }) = cli.command else {
             panic!("expected resume command");
         };
 
         assert_eq!(session_id.as_deref(), Some("abc123"));
         assert!(!last);
-        assert_eq!(sessions_resume_command(), "codewhale resume");
+        assert_eq!(sessions_resume_command(), "nestlone resume");
         assert!(!sessions_resume_command().contains("--resume"));
     }
 
@@ -14201,11 +14201,11 @@ mod terminal_mode_tests {
         }
 
         let cases: &[(&[&str], Expected)] = &[
-            (&["codewhale"], Expected::Plain),
-            (&["codewhale", "resume", "--last"], Expected::Resume),
-            (&["codewhale", "fork", "--last"], Expected::Fork),
-            (&["codewhale", "exec", "probe"], Expected::Exec),
-            (&["codewhale", "serve", "--mcp"], Expected::Serve),
+            (&["nestlone"], Expected::Plain),
+            (&["nestlone", "resume", "--last"], Expected::Resume),
+            (&["nestlone", "fork", "--last"], Expected::Fork),
+            (&["nestlone", "exec", "probe"], Expected::Exec),
+            (&["nestlone", "serve", "--mcp"], Expected::Serve),
         ];
 
         for (args, expected) in cases {
@@ -14516,7 +14516,7 @@ mod terminal_mode_tests {
     #[test]
     fn exec_json_conflicts_with_stream_json_output() {
         let err = Cli::try_parse_from([
-            "codewhale",
+            "nestlone",
             "exec",
             "--json",
             "--output-format",
@@ -14550,7 +14550,7 @@ mod terminal_mode_tests {
         assert!(!json.contains('\n'));
         let parsed: serde_json::Value = serde_json::from_str(&json).expect("valid json");
         assert_eq!(parsed["type"], "tool_result");
-        assert_eq!(parsed["schema"], "codewhale.exec-stream");
+        assert_eq!(parsed["schema"], "nestlone.exec-stream");
         assert_eq!(parsed["schema_version"], 1);
         assert_eq!(parsed["duration_ms"], 1000);
         assert_eq!(parsed["side_effect_status"], "not_started");
@@ -14576,7 +14576,7 @@ mod terminal_mode_tests {
         assert!(!json.contains('\n'));
         let parsed: serde_json::Value = serde_json::from_str(&json).expect("valid json");
         assert_eq!(parsed["type"], "workflow_event");
-        assert_eq!(parsed["schema"], "codewhale.exec-stream");
+        assert_eq!(parsed["schema"], "nestlone.exec-stream");
         assert_eq!(parsed["schema_version"], 1);
         assert_eq!(parsed["run_id"], "workflow_1234");
         assert_eq!(parsed["event"]["type"], "handoff_promoted");
@@ -14604,7 +14604,7 @@ mod terminal_mode_tests {
         };
         let consumed = exec_stream_value(&consumed).expect("serializes consumed receipt");
         assert_eq!(consumed["type"], "workflow_event");
-        assert_eq!(consumed["schema"], "codewhale.exec-stream");
+        assert_eq!(consumed["schema"], "nestlone.exec-stream");
         assert_eq!(consumed["schema_version"], 1);
         assert_eq!(consumed["event"]["type"], "handoff_consumed");
         assert_eq!(
@@ -14665,7 +14665,7 @@ mod terminal_mode_tests {
         );
         assert_eq!(
             parsed["meta"]["resume_command"],
-            "codewhale exec --resume <redacted-session-id>"
+            "nestlone exec --resume <redacted-session-id>"
         );
         assert_eq!(parsed["meta"]["workspace"], "/tmp/work");
         assert_eq!(parsed["meta"]["message_count"], 4);
@@ -14787,7 +14787,7 @@ mod terminal_mode_tests {
 
     #[test]
     fn alternate_screen_defaults_on_in_auto_mode() {
-        let cli = parse_cli(&["codewhale"]);
+        let cli = parse_cli(&["nestlone"]);
         let config = Config::default();
 
         assert!(should_use_alt_screen(&cli, &config));
@@ -14797,7 +14797,7 @@ mod terminal_mode_tests {
     fn removed_no_alt_screen_flag_is_rejected() {
         // Negative test: the retired compatibility flag must not be silently
         // accepted and must not reach the alternate-screen decision at all.
-        let error = Cli::try_parse_from(["codewhale", "--no-alt-screen"])
+        let error = Cli::try_parse_from(["nestlone", "--no-alt-screen"])
             .expect_err("--no-alt-screen must no longer parse");
         assert_eq!(
             error.kind(),
@@ -14808,7 +14808,7 @@ mod terminal_mode_tests {
 
     #[test]
     fn config_never_is_accepted_but_keeps_alternate_screen() {
-        let cli = parse_cli(&["codewhale"]);
+        let cli = parse_cli(&["nestlone"]);
         let config = Config {
             tui: Some(crate::config::TuiConfig {
                 alternate_screen: Some("never".to_string()),
@@ -14830,7 +14830,7 @@ mod terminal_mode_tests {
     #[test]
     #[cfg(not(windows))]
     fn mouse_capture_defaults_on_when_alternate_screen_is_active() {
-        let cli = parse_cli(&["codewhale"]);
+        let cli = parse_cli(&["nestlone"]);
         let config = Config::default();
 
         assert!(should_use_mouse_capture_with(
@@ -14844,7 +14844,7 @@ mod terminal_mode_tests {
         // Legacy conhost (no `WT_SESSION` and no `ConEmuPID`) keeps the
         // v0.8.x default-off behavior: mouse-mode reporting on legacy console
         // can leak SGR escapes into the composer.
-        let cli = parse_cli(&["codewhale"]);
+        let cli = parse_cli(&["nestlone"]);
         let config = Config::default();
 
         assert!(!should_use_mouse_capture_with(
@@ -14860,7 +14860,7 @@ mod terminal_mode_tests {
     #[test]
     #[cfg(windows)]
     fn mouse_capture_defaults_on_in_windows_terminal() {
-        let cli = parse_cli(&["codewhale"]);
+        let cli = parse_cli(&["nestlone"]);
         let config = Config::default();
 
         assert!(should_use_mouse_capture_with(
@@ -14878,7 +14878,7 @@ mod terminal_mode_tests {
     #[test]
     #[cfg(windows)]
     fn mouse_capture_defaults_on_in_conemu() {
-        let cli = parse_cli(&["codewhale"]);
+        let cli = parse_cli(&["nestlone"]);
         let config = Config::default();
 
         assert!(should_use_mouse_capture_with(
@@ -14893,7 +14893,7 @@ mod terminal_mode_tests {
 
     #[test]
     fn no_mouse_capture_flag_disables_mouse_capture() {
-        let cli = parse_cli(&["codewhale", "--no-mouse-capture"]);
+        let cli = parse_cli(&["nestlone", "--no-mouse-capture"]);
         let config = Config::default();
 
         assert!(!should_use_mouse_capture_with(
@@ -14903,7 +14903,7 @@ mod terminal_mode_tests {
 
     #[test]
     fn config_can_disable_default_mouse_capture() {
-        let cli = parse_cli(&["codewhale"]);
+        let cli = parse_cli(&["nestlone"]);
         let config = Config {
             tui: Some(crate::config::TuiConfig {
                 alternate_screen: None,
@@ -14926,7 +14926,7 @@ mod terminal_mode_tests {
 
     #[test]
     fn mouse_capture_flag_enables_mouse_capture() {
-        let cli = parse_cli(&["codewhale", "--mouse-capture"]);
+        let cli = parse_cli(&["nestlone", "--mouse-capture"]);
         let config = Config::default();
 
         assert!(should_use_mouse_capture_with(
@@ -14936,7 +14936,7 @@ mod terminal_mode_tests {
 
     #[test]
     fn config_can_enable_mouse_capture() {
-        let cli = parse_cli(&["codewhale"]);
+        let cli = parse_cli(&["nestlone"]);
         let config = Config {
             tui: Some(crate::config::TuiConfig {
                 alternate_screen: None,
@@ -14959,7 +14959,7 @@ mod terminal_mode_tests {
 
     #[test]
     fn mouse_capture_is_off_without_alternate_screen() {
-        let cli = parse_cli(&["codewhale", "--mouse-capture"]);
+        let cli = parse_cli(&["nestlone", "--mouse-capture"]);
         let config = Config::default();
 
         assert!(!should_use_mouse_capture_with(
@@ -14976,7 +14976,7 @@ mod terminal_mode_tests {
 
     #[test]
     fn mouse_capture_defaults_off_in_jetbrains_jediterm() {
-        let cli = parse_cli(&["codewhale"]);
+        let cli = parse_cli(&["nestlone"]);
         let config = Config::default();
 
         assert!(!should_use_mouse_capture_with(
@@ -14991,7 +14991,7 @@ mod terminal_mode_tests {
 
     #[test]
     fn jetbrains_default_off_is_case_insensitive() {
-        let cli = parse_cli(&["codewhale"]);
+        let cli = parse_cli(&["nestlone"]);
         let config = Config::default();
 
         // JetBrains has occasionally varied the casing across releases;
@@ -15008,7 +15008,7 @@ mod terminal_mode_tests {
 
     #[test]
     fn mouse_capture_flag_overrides_jetbrains_default() {
-        let cli = parse_cli(&["codewhale", "--mouse-capture"]);
+        let cli = parse_cli(&["nestlone", "--mouse-capture"]);
         let config = Config::default();
 
         assert!(should_use_mouse_capture_with(
@@ -15023,7 +15023,7 @@ mod terminal_mode_tests {
 
     #[test]
     fn config_mouse_capture_true_overrides_jetbrains_default() {
-        let cli = parse_cli(&["codewhale"]);
+        let cli = parse_cli(&["nestlone"]);
         let config = Config {
             tui: Some(crate::config::TuiConfig {
                 alternate_screen: None,
@@ -15425,7 +15425,7 @@ allow_shell = true
 
     #[test]
     fn exec_no_project_config_skips_user_workspace_overlay() {
-        // #4641: `codewhale --no-project-config exec` must skip the
+        // #4641: `nestlone --no-project-config exec` must skip the
         // workspace-specific `[workspace]`/`[projects]` overlay so a headless
         // launch sees a reproducible config surface. This documents the overlay
         // the `Commands::Exec` gate skips; the end-to-end wiring is proven by
@@ -15597,24 +15597,24 @@ max_subagents = -3
     fn project_overlay_skips_missing_config_file() {
         let tmp = tempdir().expect("tempdir");
         let mut config = Config {
-            provider: Some("codewhale".to_string()),
+            provider: Some("nestlone".to_string()),
             ..Config::default()
         };
         merge_project_config(&mut config, tmp.path());
         // Untouched.
-        assert_eq!(config.provider.as_deref(), Some("codewhale"));
+        assert_eq!(config.provider.as_deref(), Some("nestlone"));
     }
 
     #[test]
     fn project_overlay_skips_malformed_toml() {
         let tmp = workspace_with_project_config("this is not valid TOML !!");
         let mut config = Config {
-            provider: Some("codewhale".to_string()),
+            provider: Some("nestlone".to_string()),
             ..Config::default()
         };
         merge_project_config(&mut config, tmp.path());
         // Untouched on parse error — better to fall back to global than crash.
-        assert_eq!(config.provider.as_deref(), Some("codewhale"));
+        assert_eq!(config.provider.as_deref(), Some("nestlone"));
     }
 
     #[test]
@@ -15626,13 +15626,13 @@ model = ""
 "#,
         );
         let mut config = Config {
-            provider: Some("codewhale".to_string()),
+            provider: Some("nestlone".to_string()),
             default_text_model: Some("deepseek-v4-pro".to_string()),
             ..Config::default()
         };
         merge_project_config(&mut config, tmp.path());
         // Empty strings are ignored — they're rarely a deliberate override.
-        assert_eq!(config.provider.as_deref(), Some("codewhale"));
+        assert_eq!(config.provider.as_deref(), Some("nestlone"));
         assert_eq!(
             config.default_text_model.as_deref(),
             Some("deepseek-v4-pro")
@@ -15748,7 +15748,7 @@ mod doctor_mcp_tests {
     }
 
     fn write_path_only_command(dir: &Path) -> String {
-        let command = "codewhale-doctor-mcp-path-only-test";
+        let command = "nestlone-doctor-mcp-path-only-test";
         #[cfg(windows)]
         let file_name = format!("{command}.exe");
         #[cfg(not(windows))]
@@ -15817,7 +15817,7 @@ mod doctor_mcp_tests {
             "available"
         );
 
-        server.command = Some("codewhale-doctor-mcp-command-that-does-not-exist".to_string());
+        server.command = Some("nestlone-doctor-mcp-command-that-does-not-exist".to_string());
         #[cfg(not(windows))]
         assert!(matches!(
             doctor_check_mcp_server(&server),
@@ -15845,7 +15845,7 @@ mod doctor_mcp_tests {
         let _lock = crate::test_support::lock_test_env();
         let _missing =
             crate::test_support::EnvVarGuard::remove("CODEWHALE_DOCTOR_MCP_MISSING_PATH");
-        let mut server = make_server(Some("codewhale-mcp-command"), &[], None);
+        let mut server = make_server(Some("nestlone-mcp-command"), &[], None);
         server.env.insert(
             "PATH".to_string(),
             "do-not-leak-${CODEWHALE_DOCTOR_MCP_MISSING_PATH}-also-secret".to_string(),
@@ -15884,7 +15884,7 @@ mod doctor_mcp_tests {
         let executable = std::env::current_exe().expect("current test executable");
         let executable = executable.to_string_lossy();
         let mut server = make_server(Some(&executable), &["server/mcp_server.py"], None);
-        server.cwd = Some(PathBuf::from("/tmp/codewhale-project"));
+        server.cwd = Some(PathBuf::from("/tmp/nestlone-project"));
         match doctor_check_mcp_server(&server) {
             McpServerDoctorStatus::Ok(detail) => assert!(detail.contains("stdio")),
             other => panic!("Expected Ok when cwd anchors relative path, got {other:?}"),
@@ -15893,7 +15893,7 @@ mod doctor_mcp_tests {
 
     #[test]
     fn test_self_hosted_absolute_is_ok() {
-        let server = make_server(Some("/usr/local/bin/codewhale"), &["serve", "--mcp"], None);
+        let server = make_server(Some("/usr/local/bin/nestlone"), &["serve", "--mcp"], None);
         match doctor_check_mcp_server(&server) {
             McpServerDoctorStatus::Ok(detail) | McpServerDoctorStatus::Error(detail) => {
                 // On systems where the path doesn't exist, this will be Error.
@@ -15916,7 +15916,7 @@ mod doctor_mcp_tests {
             let hint = crate::mcp::oauth::auth_required_login_hint("nordic-mcp");
             assert_eq!(
                 hint,
-                "MCP server 'nordic-mcp' requires OAuth authentication. Run `codewhale mcp login nordic-mcp` to authenticate."
+                "MCP server 'nordic-mcp' requires OAuth authentication. Run `nestlone mcp login nordic-mcp` to authenticate."
             );
         }
     }
@@ -16620,8 +16620,8 @@ mod setup_helper_tests {
     fn resolve_api_key_source_reports_standalone_secret_store() {
         let _lock = crate::test_support::lock_test_env();
         let temp = TempDir::new().expect("temp home");
-        let nestlone_home = temp.path().join("codewhale-home");
-        std::fs::create_dir_all(&nestlone_home).expect("create codewhale home");
+        let nestlone_home = temp.path().join("nestlone-home");
+        std::fs::create_dir_all(&nestlone_home).expect("create nestlone home");
         let _home =
             crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", nestlone_home.as_os_str());
         let _backend = crate::test_support::EnvVarGuard::set("CODEWHALE_SECRET_BACKEND", "file");
@@ -16641,8 +16641,8 @@ mod setup_helper_tests {
     fn custom_provider_env_source_precedes_saved_secret_store() {
         let _lock = crate::test_support::lock_test_env();
         let temp = TempDir::new().expect("temp home");
-        let nestlone_home = temp.path().join("codewhale-home");
-        std::fs::create_dir_all(&nestlone_home).expect("create codewhale home");
+        let nestlone_home = temp.path().join("nestlone-home");
+        std::fs::create_dir_all(&nestlone_home).expect("create nestlone home");
         let _home =
             crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", nestlone_home.as_os_str());
         let _backend = crate::test_support::EnvVarGuard::set("CODEWHALE_SECRET_BACKEND", "file");
@@ -16685,8 +16685,8 @@ mod setup_helper_tests {
     fn named_custom_provider_does_not_report_generic_secret_store() {
         let _lock = crate::test_support::lock_test_env();
         let temp = TempDir::new().expect("temp home");
-        let nestlone_home = temp.path().join("codewhale-home");
-        std::fs::create_dir_all(&nestlone_home).expect("create codewhale home");
+        let nestlone_home = temp.path().join("nestlone-home");
+        std::fs::create_dir_all(&nestlone_home).expect("create nestlone home");
         let _home =
             crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", nestlone_home.as_os_str());
         let _backend = crate::test_support::EnvVarGuard::set("CODEWHALE_SECRET_BACKEND", "file");
@@ -16837,7 +16837,7 @@ mod setup_helper_tests {
             source: nestlone_config::AuthSourceKind::Secret,
             command: Vec::new(),
             timeout_ms: None,
-            secret_id: Some("codewhale/openai".to_string()),
+            secret_id: Some("nestlone/openai".to_string()),
         });
         let cfg = Config {
             provider: Some("openai".to_string()),
@@ -16980,7 +16980,7 @@ mod pr_prompt_tests {
         // A deliberately-implausible name to confirm the negative
         // branch — `--version` on this would exec(3) → ENOENT.
         assert!(
-            !is_command_available("this-command-cannot-exist-codewhale-tui-test-ENOENT-marker"),
+            !is_command_available("this-command-cannot-exist-nestlone-tui-test-ENOENT-marker"),
             "missing command should return false, not panic"
         );
     }

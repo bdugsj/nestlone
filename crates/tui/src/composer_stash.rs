@@ -499,7 +499,7 @@ this is not json
     #[test]
     fn diagnostic_stash_honors_an_explicit_home_without_legacy_fallback() {
         let tmp = tempfile::tempdir().expect("tempdir");
-        let primary = tmp.path().join("isolated-codewhale").join(STASH_FILE_NAME);
+        let primary = tmp.path().join("isolated-nestlone").join(STASH_FILE_NAME);
         let legacy = tmp.path().join("ambient-deepseek").join(STASH_FILE_NAME);
         std::fs::create_dir_all(legacy.parent().expect("legacy parent")).expect("legacy parent");
         std::fs::write(&legacy, r#"{"text":"ambient draft"}"#).expect("legacy stash");

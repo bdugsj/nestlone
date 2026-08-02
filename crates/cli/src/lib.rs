@@ -155,10 +155,10 @@ fn parse_provider_identifier(value: &str) -> std::result::Result<String, String>
 
 #[derive(Debug, Parser)]
 #[command(
-    name = "codewhale",
+    name = "nestlone",
     version = env!("DEEPSEEK_BUILD_VERSION"),
-    bin_name = "codewhale",
-    override_usage = "codewhale [OPTIONS] [PROMPT]\n       codewhale [OPTIONS] <COMMAND> [ARGS]"
+    bin_name = "nestlone",
+    override_usage = "nestlone [OPTIONS] [PROMPT]\n       nestlone [OPTIONS] <COMMAND> [ARGS]"
 )]
 struct Cli {
     #[arg(long)]
@@ -254,9 +254,9 @@ enum Commands {
     /// Run a non-interactive prompt through the TUI runtime.
     #[command(after_help = "\
 Examples:
-  codewhale exec \"explain this function\"
-  codewhale exec --auto \"list crates/ with ls\"
-  codewhale exec --auto --output-format stream-json \"fix the failing test\"
+  nestlone exec \"explain this function\"
+  nestlone exec --auto \"list crates/ with ls\"
+  nestlone exec --auto --output-format stream-json \"fix the failing test\"
 
 Common forwarded flags:
   --auto                           Enable tool-backed agent mode with auto-approvals
@@ -266,7 +266,7 @@ Common forwarded flags:
   --continue                       Continue the most recent session for this workspace
   --output-format <FORMAT>         Output format: text or stream-json
 
-Plain `codewhale exec` is a one-shot model response. Use `--auto` for
+Plain `nestlone exec` is a one-shot model response. Use `--auto` for
 non-interactive filesystem/shell tool use, matching the supported automation
 path used by stream-json wrappers.
 ")]
@@ -282,8 +282,8 @@ path used by stream-json wrappers.
     /// Run checked-in Workflows through a Lane Runtime backend.
     #[command(after_help = "\
 Examples:
-  codewhale workflow run stopship --fleet stopship --runtime tmux --goal verify-release-candidate
-  codewhale workflow run stopship --fleet stopship --runtime inline --verify
+  nestlone workflow run stopship --fleet stopship --runtime tmux --goal verify-release-candidate
+  nestlone workflow run stopship --fleet stopship --runtime inline --verify
 
 `workflow run` validates the checked-in Workflow source and named Fleet roster,
 creates a Lane record, then dispatches the Workflow tool directly through the
@@ -293,13 +293,13 @@ selected Runtime backend without an operator model turn.
     /// Manage running workflow instances (Lanes) and Runtime backends (#4176).
     #[command(after_help = "\
 Examples:
-  codewhale lane list
-  codewhale lane status <lane-id>
-  codewhale lane attach <lane-id>
-  codewhale lane logs <lane-id>
-  codewhale lane interrupt <lane-id>
-  codewhale lane interrupt <lane-id>@<lifecycle-seq>
-  codewhale lane start --workflow stopship --fleet stopship --runtime tmux --goal verify-release-candidate -- echo hello
+  nestlone lane list
+  nestlone lane status <lane-id>
+  nestlone lane attach <lane-id>
+  nestlone lane logs <lane-id>
+  nestlone lane interrupt <lane-id>
+  nestlone lane interrupt <lane-id>@<lifecycle-seq>
+  nestlone lane start --workflow stopship --fleet stopship --runtime tmux --goal verify-release-candidate -- echo hello
 
 Lane records persist under $CODEWHALE_HOME/lanes/. tmux durability belongs to
 Runtime, not Fleet.
@@ -338,9 +338,9 @@ Forwarded serve options:
       --auth-token <TOKEN>  Require this bearer token for /v1/* runtime API routes
       --insecure            Disable runtime API auth when no token is configured
 
-`codewhale serve --http` and `codewhale serve --mobile` remain compatibility
-aliases for `codewhale app-server --http` and `codewhale app-server --mobile`.
-New integrations should prefer `codewhale app-server`.")]
+`nestlone serve --http` and `nestlone serve --mobile` remain compatibility
+aliases for `nestlone app-server --http` and `nestlone app-server --mobile`.
+New integrations should prefer `nestlone app-server`.")]
     Serve(TuiPassthroughArgs),
     /// Open the first-class local browser client over the canonical Runtime API.
     #[command(
@@ -368,12 +368,12 @@ New integrations should prefer `codewhale app-server`.")]
     /// Run the canonical runtime API / control plane (HTTP/SSE, mobile, stdio).
     #[command(after_help = "\
 Transports:
-  codewhale app-server --http              Full HTTP/SSE runtime API (/v1/*) on 127.0.0.1:7878
-  codewhale app-server --mobile            Runtime API + phone control page (binds 0.0.0.0)
-  codewhale app-server --stdio             JSON-RPC control transport over stdio (no listener)
-  codewhale app-server                     Legacy in-process app-server HTTP on 127.0.0.1:8787
+  nestlone app-server --http              Full HTTP/SSE runtime API (/v1/*) on 127.0.0.1:7878
+  nestlone app-server --mobile            Runtime API + phone control page (binds 0.0.0.0)
+  nestlone app-server --stdio             JSON-RPC control transport over stdio (no listener)
+  nestlone app-server                     Legacy in-process app-server HTTP on 127.0.0.1:8787
 
-`--http` and `--mobile` serve the same mature runtime API as `codewhale serve
+`--http` and `--mobile` serve the same mature runtime API as `nestlone serve
 --http`/`--mobile`, which remain as compatibility aliases. The runtime API token
 is read from --auth-token, CODEWHALE_RUNTIME_TOKEN, or DEEPSEEK_RUNTIME_TOKEN.
 
@@ -382,26 +382,26 @@ See docs/RUNTIME_API.md.")]
     /// Generate shell completions.
     #[command(after_help = r#"Examples:
   Bash (current shell only):
-    source <(codewhale completion bash)
+    source <(nestlone completion bash)
 
   Bash (persistent, Linux/bash-completion):
     mkdir -p ~/.local/share/bash-completion/completions
-    codewhale completion bash > ~/.local/share/bash-completion/completions/codewhale
+    nestlone completion bash > ~/.local/share/bash-completion/completions/nestlone
     # Requires bash-completion to be installed and loaded by your shell.
 
   Zsh:
     mkdir -p ~/.zfunc
-    codewhale completion zsh > ~/.zfunc/_codewhale
+    nestlone completion zsh > ~/.zfunc/_nestlone
     # Add to ~/.zshrc if needed:
     #   fpath=(~/.zfunc $fpath)
     #   autoload -Uz compinit && compinit
 
   Fish:
     mkdir -p ~/.config/fish/completions
-    codewhale completion fish > ~/.config/fish/completions/codewhale.fish
+    nestlone completion fish > ~/.config/fish/completions/nestlone.fish
 
   PowerShell (current shell only):
-    codewhale completion powershell | Out-String | Invoke-Expression
+    nestlone completion powershell | Out-String | Invoke-Expression
 
 The command prints the completion script to stdout; redirect it to a path your shell loads automatically."#)]
     Completion {
@@ -410,7 +410,7 @@ The command prints the completion script to stdout; redirect it to a path your s
     },
     /// Print a usage rollup from the audit log and session store.
     Metrics(MetricsArgs),
-    /// Self-update the `codewhale` binary from GitHub Releases.
+    /// Self-update the `nestlone` binary from GitHub Releases.
     Update(UpdateArgs),
 }
 
@@ -529,7 +529,7 @@ struct LaneLogProxyArgs {
     command: Vec<String>,
 }
 
-/// `codewhale lane …` — running workflow instances (#4176).
+/// `nestlone lane …` — running workflow instances (#4176).
 #[derive(Debug, Args)]
 struct LaneArgs {
     #[command(subcommand)]
@@ -633,7 +633,7 @@ enum LaneCommand {
     },
 }
 
-/// `codewhale workflow …` — Workflow entrypoints backed by Lanes (#4177/#4178).
+/// `nestlone workflow …` — Workflow entrypoints backed by Lanes (#4177/#4178).
 #[derive(Debug, Args)]
 struct WorkflowArgs {
     #[command(subcommand)]
@@ -1298,7 +1298,7 @@ fn lane_process_spec_from_command(command: &Command) -> Result<WorkflowProcessSp
     })
 }
 
-/// Flags for `codewhale remote-setup`. Forwarded to the TUI binary, which owns
+/// Flags for `nestlone remote-setup`. Forwarded to the TUI binary, which owns
 /// the interactive wizard and bundle generation.
 #[derive(Debug, Args, Clone, Default)]
 struct RemoteSetupArgs {
@@ -1311,7 +1311,7 @@ struct RemoteSetupArgs {
     /// Provider slug; validated against the provider registry. Skips the prompt.
     #[arg(long)]
     provider: Option<String>,
-    /// Bundle output directory (default `./codewhale-deploy/<cloud>-<bridge>`).
+    /// Bundle output directory (default `./nestlone-deploy/<cloud>-<bridge>`).
     #[arg(long, value_name = "DIR")]
     out: Option<PathBuf>,
     /// Emit the bundle, do not provision (default).
@@ -1570,11 +1570,11 @@ impl From<ApprovalModeArg> for AskForApproval {
 struct AppServerArgs {
     /// Serve the full HTTP/SSE runtime API (`/v1/*`: sessions, threads, turns,
     /// approvals, events, usage, fleet, tasks). This is the canonical runtime
-    /// API surface; it delegates to the same server as `codewhale serve --http`.
+    /// API surface; it delegates to the same server as `nestlone serve --http`.
     #[arg(long, conflicts_with_all = ["stdio", "mobile"])]
     http: bool,
     /// Serve the runtime API plus the phone-friendly mobile control page.
-    /// Equivalent to the legacy `codewhale serve --mobile`.
+    /// Equivalent to the legacy `nestlone serve --mobile`.
     #[arg(long, conflicts_with = "stdio")]
     mobile: bool,
     /// Run the app-server JSON-RPC control transport over stdio (no listener).
@@ -1827,7 +1827,7 @@ fn run() -> Result<()> {
         }
         Some(Commands::Completion { shell }) => {
             let mut cmd = Cli::command();
-            generate(shell, &mut cmd, "codewhale", &mut io::stdout());
+            generate(shell, &mut cmd, "nestlone", &mut io::stdout());
             Ok(())
         }
         Some(Commands::Metrics(args)) => run_metrics_command(args),
@@ -1870,7 +1870,7 @@ fn root_tui_passthrough(cli: &Cli) -> Result<Vec<String>> {
     if !prompt.is_empty() {
         if cli.continue_session {
             bail!(
-                "`codewhale --continue` resumes the interactive TUI. Use `codewhale exec --continue <PROMPT>` to continue a session non-interactively."
+                "`nestlone --continue` resumes the interactive TUI. Use `nestlone exec --continue <PROMPT>` to continue a session non-interactively."
             );
         }
         forwarded.push("--prompt".to_string());
@@ -1933,7 +1933,7 @@ fn reject_exec_global_flags(args: &[String]) -> Result<()> {
         let flag = arg.split_once('=').map_or(arg.as_str(), |(flag, _)| flag);
         if GLOBAL_ONLY_FLAGS.contains(&flag) {
             bail!(
-                "{flag} must be placed before `exec`.\n\nUse:\n  codewhale {flag} <value> exec \"<prompt>\""
+                "{flag} must be placed before `exec`.\n\nUse:\n  nestlone {flag} <value> exec \"<prompt>\""
             );
         }
     }
@@ -2829,7 +2829,7 @@ fn auth_status_all_providers_with_runtime(
 
     lines.push(String::new());
     lines.push("* = active provider (from config or CODEWHALE_PROVIDER)".to_string());
-    lines.push("Run `codewhale auth status --provider <id>` for detailed info.".to_string());
+    lines.push("Run `nestlone auth status --provider <id>` for detailed info.".to_string());
     lines
 }
 
@@ -3129,7 +3129,7 @@ fn xai_auth_status_lines_for_provider(
                     .to_string(),
             );
             lines.push(
-                "repair: run `codewhale auth xai-device` to replace the owned generation, or switch [providers.xai] auth_mode to \"api_key\" and remove oauth_credential_generation. Grok CLI consent remains blocked until the pointer is absent."
+                "repair: run `nestlone auth xai-device` to replace the owned generation, or switch [providers.xai] auth_mode to \"api_key\" and remove oauth_credential_generation. Grok CLI consent remains blocked until the pointer is absent."
                     .to_string(),
             );
             return lines;
@@ -3304,7 +3304,7 @@ fn run_auth_command_with_secrets_and_runtime(
                 nestlone_config::EXTERNAL_CREDENTIAL_READ_ONLY_SEMANTICS,
             );
             println!(
-                "revoke with: codewhale auth external-revoke --provider {}",
+                "revoke with: nestlone auth external-revoke --provider {}",
                 provider.as_str()
             );
             Ok(())
@@ -3438,7 +3438,7 @@ fn external_consent_preview_lines(
         ),
         "  managed: unavailable (no reviewed schema-safe preservation adapter)".to_string(),
         format!(
-            "  revoke: codewhale auth external-revoke --provider {}",
+            "  revoke: nestlone auth external-revoke --provider {}",
             provider.as_str()
         ),
     ]
@@ -3657,7 +3657,7 @@ fn run_model_command(
             // Only `model resolve --provider X` is a hypothetical. The
             // top-level `--provider` is the route this process is actually on,
             // and it is already folded into `resolved_runtime` — treating it as
-            // a hypothetical made `codewhale --provider moonshot --model
+            // a hypothetical made `nestlone --provider moonshot --model
             // kimi-k3 model resolve` re-derive a registry default and report
             // `kimi-k2.7-code` while the runtime used `kimi-k3` (v0.9.1 kimi-k3 dogfood report). The
             // top-level `--model` was not consulted at all on that path.
@@ -3873,7 +3873,7 @@ fn run_app_server_command(
 }
 
 /// Build the `serve` argv forwarded to the TUI binary for
-/// `codewhale app-server --http`/`--mobile`. Maps app-server flags onto the
+/// `nestlone app-server --http`/`--mobile`. Maps app-server flags onto the
 /// matching `serve` flags (note `--insecure-no-auth` → `--insecure`). The
 /// subcommand-level `--config` is bridged through the global `--config` in the
 /// dispatcher, so it is intentionally not part of this passthrough. An auth
@@ -4308,7 +4308,7 @@ fn run_dispatcher_resume_picker(
 
     println!();
     println!("Windows note: enter a session id or prefix from the list above.");
-    println!("You can also run `codewhale resume --last` to skip this prompt.");
+    println!("You can also run `nestlone resume --last` to skip this prompt.");
     print!("Session id/prefix (Enter to cancel): ");
     io::stdout().flush()?;
 
@@ -4532,13 +4532,13 @@ fn tui_spawn_error(tui: &Path, err: &io::Error) -> String {
     format!(
         "failed to spawn companion TUI binary at {}: {err}\n\
 \n\
-The `codewhale` dispatcher found a `nestlone` file, but the OS refused \
+The `nestlone` dispatcher found a `nestlone` file, but the OS refused \
 to execute it. Common fixes:\n\
   - Run `where nestlone` (Windows) or `which nestlone` (Unix) to confirm \
 the binary is present and executable.\n\
-  - On Windows, run `where codewhale` and `where nestlone`; both should \
+  - On Windows, run `where nestlone` and `where nestlone`; both should \
 come from the same install directory.\n\
-  - If you downloaded release assets manually, keep both `codewhale` and \
+  - If you downloaded release assets manually, keep both `nestlone` and \
 `nestlone` binaries together and make sure the TUI binary is executable.\n\
   - Set NESTLONE_TUI_BIN (legacy aliases: CODEWHALE_TUI_BIN, \
 DEEPSEEK_TUI_BIN) to the absolute path of a working `nestlone` binary.",
@@ -4576,34 +4576,43 @@ fn locate_sibling_tui_binary() -> Result<PathBuf> {
     }
 
     // Build a stable error path so the user sees the platform-correct
-    // expected name, not "nestlone" on Windows.
-    let expected = current.with_file_name(format!("nestlone{}", std::env::consts::EXE_SUFFIX));
+    // expected name, not "nestlone-tui" on Windows.
+    let expected = current.with_file_name(format!("nestlone-tui{}", std::env::consts::EXE_SUFFIX));
     bail!(
-        "Companion `nestlone` binary not found at {}.\n\
+        "Companion `nestlone-tui` binary not found at {}.\n\
 \n\
-The `codewhale` dispatcher delegates interactive sessions to a sibling \
-`nestlone` binary. To fix this, install one of:\n\
-  • cargo:  cargo install codewhale-cli codewhale-tui\n\
-  • GitHub Releases: download BOTH `codewhale-<platform>` AND \
+The `nestlone` dispatcher delegates interactive sessions to a sibling \
+`nestlone-tui` binary. To fix this, install one of:\n\
+  • cargo:  cargo install nestlone-cli nestlone-tui\n\
+  • GitHub Releases: download BOTH `nestlone-tui-<platform>` AND \
 `nestlone-<platform>` from https://github.com/bdugsj/nestlone/releases/latest \
 and place them in the same directory.\n\
 \n\
 Or set NESTLONE_TUI_BIN (legacy aliases: CODEWHALE_TUI_BIN, DEEPSEEK_TUI_BIN) \
-to the absolute path of an existing `nestlone` binary.",
+to the absolute path of an existing `nestlone-tui` binary.",
         expected.display()
     );
 }
 
 /// Return the first existing sibling-binary path under any of the names
-/// `nestlone` might use on this platform. Pure function to keep
+/// `nestlone-tui` might use on this platform. Pure function to keep
 /// `locate_sibling_tui_binary` testable.
 fn sibling_tui_candidate(dispatcher: &Path) -> Option<PathBuf> {
     // Primary: platform-correct name. EXE_SUFFIX is "" on Unix and ".exe"
     // on Windows.
     let primary =
-        dispatcher.with_file_name(format!("nestlone{}", std::env::consts::EXE_SUFFIX));
+        dispatcher.with_file_name(format!("nestlone-tui{}", std::env::consts::EXE_SUFFIX));
     if primary.is_file() {
         return Some(primary);
+    }
+    // Legacy fallback: pre-binary-rename installs shipped a `nestlone`
+    // TUI sibling; keep resolving it so old layouts keep working. The new
+    // dispatcher is also named `nestlone`, so never treat the dispatcher
+    // itself as the TUI.
+    let legacy_nestlone =
+        dispatcher.with_file_name(format!("nestlone{}", std::env::consts::EXE_SUFFIX));
+    if legacy_nestlone.is_file() && legacy_nestlone != dispatcher {
+        return Some(legacy_nestlone);
     }
     // Legacy fallback: pre-rebrand installs shipped a `codewhale-tui`
     // sibling; keep resolving it so old layouts keep working.
@@ -4615,9 +4624,9 @@ fn sibling_tui_candidate(dispatcher: &Path) -> Option<PathBuf> {
     // Windows fallback: a user who manually renamed `.exe` away (per the
     // workaround in #247) still launches successfully under the new code.
     if cfg!(windows) {
-        for suffixless in ["nestlone", "codewhale-tui"] {
+        for suffixless in ["nestlone-tui", "nestlone", "codewhale-tui"] {
             let candidate = dispatcher.with_file_name(suffixless);
-            if candidate.is_file() {
+            if candidate.is_file() && candidate != dispatcher {
                 return Some(candidate);
             }
         }
@@ -4900,7 +4909,7 @@ mod tests {
 
     #[test]
     fn parses_update_beta_flag() {
-        let cli = parse_ok(&["codewhale", "update"]);
+        let cli = parse_ok(&["nestlone", "update"]);
         assert!(matches!(
             cli.command,
             Some(Commands::Update(UpdateArgs {
@@ -4910,7 +4919,7 @@ mod tests {
             }))
         ));
 
-        let cli = parse_ok(&["codewhale", "update", "--beta"]);
+        let cli = parse_ok(&["nestlone", "update", "--beta"]);
         assert!(matches!(
             cli.command,
             Some(Commands::Update(UpdateArgs {
@@ -4920,7 +4929,7 @@ mod tests {
             }))
         ));
 
-        let cli = parse_ok(&["codewhale", "update", "--check"]);
+        let cli = parse_ok(&["nestlone", "update", "--check"]);
         assert!(matches!(
             cli.command,
             Some(Commands::Update(UpdateArgs {
@@ -4930,7 +4939,7 @@ mod tests {
             }))
         ));
 
-        let cli = parse_ok(&["codewhale", "update", "--proxy", "socks5://127.0.0.1:1080"]);
+        let cli = parse_ok(&["nestlone", "update", "--proxy", "socks5://127.0.0.1:1080"]);
         let Some(Commands::Update(args)) = cli.command else {
             panic!("expected update command");
         };
@@ -5009,7 +5018,7 @@ mod tests {
         );
         assert_eq!(model_command_provider_hint(None, None), None);
 
-        let cli = parse_ok(&["codewhale", "--provider", "zai", "model", "list"]);
+        let cli = parse_ok(&["nestlone", "--provider", "zai", "model", "list"]);
         assert_eq!(cli.provider.as_deref(), Some("zai"));
         assert!(matches!(
             cli.command,
@@ -5253,7 +5262,7 @@ mod tests {
 
     #[test]
     fn web_command_is_typed_and_delegates_without_auth_material() {
-        let cli = parse_ok(&["codewhale", "web", "--port", "9091"]);
+        let cli = parse_ok(&["nestlone", "web", "--port", "9091"]);
         let args = match cli.command {
             Some(Commands::Web(args)) => args,
             other => panic!("expected web command, got {other:?}"),
@@ -5266,12 +5275,12 @@ mod tests {
 
     #[test]
     fn web_command_defaults_to_runtime_port_and_documents_bootstrap_boundary() {
-        let cli = parse_ok(&["codewhale", "web"]);
+        let cli = parse_ok(&["nestlone", "web"]);
         assert!(matches!(
             cli.command,
             Some(Commands::Web(WebArgs { port: 7878 }))
         ));
-        let help = help_for(&["codewhale", "web", "--help"]);
+        let help = help_for(&["nestlone", "web", "--help"]);
         assert!(help.contains("--port"));
         assert!(help.contains("one-time loopback bootstrap"));
         assert!(!help.contains("--auth-token"));
@@ -5279,7 +5288,7 @@ mod tests {
 
     #[test]
     fn serve_help_documents_forwarded_runtime_modes() {
-        let help = help_for(&["codewhale", "serve", "--help"]);
+        let help = help_for(&["nestlone", "serve", "--help"]);
         for flag in ["--http", "--mobile", "--web", "--mcp", "--acp"] {
             assert!(
                 help.contains(flag),
@@ -5316,7 +5325,7 @@ mod tests {
                 if args == &["--skills", "--local"]
         ));
 
-        let cli = parse_ok(&["codewhale", "fleet", "init"]);
+        let cli = parse_ok(&["nestlone", "fleet", "init"]);
         assert!(cli.prompt.is_empty());
         assert!(matches!(
             cli.command,
@@ -5324,7 +5333,7 @@ mod tests {
         ));
 
         let cli = parse_ok(&[
-            "codewhale",
+            "nestlone",
             "fleet",
             "run",
             "tasks.json",
@@ -5339,7 +5348,7 @@ mod tests {
         ));
 
         let cli = parse_ok(&[
-            "codewhale",
+            "nestlone",
             "workflow",
             "run",
             "stopship",
@@ -5369,7 +5378,7 @@ mod tests {
 
     #[test]
     fn exec_and_fleet_accept_builtin_and_raw_provider_identifiers() {
-        let builtin = parse_ok(&["codewhale", "--provider", "openrouter", "exec", "Reply OK"]);
+        let builtin = parse_ok(&["nestlone", "--provider", "openrouter", "exec", "Reply OK"]);
         assert_eq!(builtin.provider.as_deref(), Some("openrouter"));
         assert_eq!(
             top_level_provider_override(builtin.provider.as_deref(), builtin.command.as_ref())
@@ -5382,7 +5391,7 @@ mod tests {
             ("lm-studio", vec!["exec", "Reply OK"]),
             ("lm-studio", vec!["fleet", "status"]),
         ] {
-            let argv = std::iter::once("codewhale")
+            let argv = std::iter::once("nestlone")
                 .chain(["--provider", provider])
                 .chain(command.iter().copied())
                 .collect::<Vec<_>>();
@@ -5419,7 +5428,7 @@ mod tests {
 
     #[test]
     fn raw_provider_ids_remain_restricted_to_exec_and_fleet() {
-        let cli = parse_ok(&["codewhale", "--provider", "lm-studio", "model", "list"]);
+        let cli = parse_ok(&["nestlone", "--provider", "lm-studio", "model", "list"]);
         let err = top_level_provider_override(cli.provider.as_deref(), cli.command.as_ref())
             .expect_err("model registry commands still require a built-in provider");
         assert!(
@@ -5427,12 +5436,12 @@ mod tests {
                 .contains("configured custom providers are accepted only by exec and fleet")
         );
 
-        let err = Cli::try_parse_from(["codewhale", "auth", "set", "--provider", "lm-studio"])
+        let err = Cli::try_parse_from(["nestlone", "auth", "set", "--provider", "lm-studio"])
             .expect_err("auth keeps enum-only provider validation");
         assert_eq!(err.kind(), ErrorKind::InvalidValue);
 
         let err = Cli::try_parse_from([
-            "codewhale",
+            "nestlone",
             "--provider",
             "../../lm-studio",
             "exec",
@@ -5475,7 +5484,7 @@ model = "qwen-2.5-7b"
         assert_eq!(resolved.model, "qwen-2.5-7b");
 
         let config = config_path.to_string_lossy().into_owned();
-        let root_cli = parse_ok(&["codewhale", "--config", &config]);
+        let root_cli = parse_ok(&["nestlone", "--config", &config]);
         let root_command = build_tui_command(&root_cli, &resolved, Vec::new())
             .expect("root launch should reach the TUI command boundary");
         let root_args = root_command
@@ -5491,7 +5500,7 @@ model = "qwen-2.5-7b"
         assert_eq!(command_env(&root_command, "DEEPSEEK_PROVIDER"), None);
 
         let cli = parse_ok(&[
-            "codewhale",
+            "nestlone",
             "--config",
             &config,
             "--provider",
@@ -5512,7 +5521,7 @@ model = "qwen-2.5-7b"
     #[test]
     fn hidden_lane_log_proxy_parses_child_argv_and_preserves_other_commands() {
         let cli = parse_ok(&[
-            "codewhale",
+            "nestlone",
             "lane-log-proxy",
             "--log-path",
             "/tmp/lane.ndjson",
@@ -5538,7 +5547,7 @@ model = "qwen-2.5-7b"
             ["/bin/echo", "--child-flag", "hello"].map(str::to_string)
         );
 
-        let cli = parse_ok(&["codewhale", "lane", "list", "--json"]);
+        let cli = parse_ok(&["nestlone", "lane", "list", "--json"]);
         let (proxy, command) = split_lane_log_proxy_command(cli.command);
         assert!(proxy.is_none());
         assert!(matches!(
@@ -5557,7 +5566,7 @@ model = "qwen-2.5-7b"
 
         for descriptor in nestlone_lane::control::operations_for_domain(ControlDomain::Lane) {
             let argv = [
-                "codewhale".to_string(),
+                "nestlone".to_string(),
                 "lane".to_string(),
                 descriptor.verb.to_string(),
             ];
@@ -5584,7 +5593,7 @@ model = "qwen-2.5-7b"
             };
             assert_eq!(
                 parsed, descriptor.operation,
-                "`codewhale lane {}` must map to {}",
+                "`nestlone lane {}` must map to {}",
                 descriptor.verb, descriptor.id
             );
             assert!(
@@ -5607,7 +5616,7 @@ model = "qwen-2.5-7b"
                 "{spelling}"
             );
         }
-        let stop = parse_ok(&["codewhale", "lane", "stop", "lane-a1b2c3d4"]);
+        let stop = parse_ok(&["nestlone", "lane", "stop", "lane-a1b2c3d4"]);
         assert!(matches!(
             stop.command,
             Some(Commands::Lane(LaneArgs {
@@ -5653,7 +5662,7 @@ model = "qwen-2.5-7b"
             .join("..")
             .join("..");
         let cli = parse_ok(&[
-            "codewhale",
+            "nestlone",
             "--profile",
             "workflow-profile",
             "--model",
@@ -5743,7 +5752,7 @@ model = "qwen-2.5-7b"
     #[test]
     fn exec_keeps_global_looking_flags_as_passthrough_args() {
         let cli = parse_ok(&[
-            "codewhale",
+            "nestlone",
             "exec",
             "--provider",
             "definitely-not-a-provider",
@@ -5839,7 +5848,7 @@ model = "qwen-2.5-7b"
     fn deepseek_login_uses_isolated_file_store_and_preserves_tui_defaults() {
         let _lock = env_lock();
         let dir = tempfile::TempDir::new().expect("tempdir");
-        let nestlone_home = dir.path().join("codewhale-home");
+        let nestlone_home = dir.path().join("nestlone-home");
         let nestlone_home_value = nestlone_home.to_string_lossy().into_owned();
         let _home = ScopedEnvVar::set("CODEWHALE_HOME", &nestlone_home_value);
         let _backend = ScopedEnvVar::set("CODEWHALE_SECRET_BACKEND", "file");
@@ -6136,17 +6145,17 @@ model = "qwen-2.5-7b"
 
     #[test]
     fn auth_help_describes_runtime_effective_diagnostics() {
-        let get = help_for(&["codewhale", "auth", "get", "--help"]);
+        let get = help_for(&["nestlone", "auth", "get", "--help"]);
         assert!(get.contains("effective credential route"), "{get}");
         assert!(get.contains("structural OAuth/repair state"), "{get}");
 
-        let status = help_for(&["codewhale", "auth", "status", "--help"]);
+        let status = help_for(&["nestlone", "auth", "status", "--help"]);
         assert!(
             status.contains("runtime-effective credential route state"),
             "{status}"
         );
 
-        let list = help_for(&["codewhale", "auth", "list", "--help"]);
+        let list = help_for(&["nestlone", "auth", "list", "--help"]);
         assert!(list.contains("runtime-effective auth state"), "{list}");
     }
 
@@ -6711,7 +6720,7 @@ model = "qwen-2.5-7b"
         );
         assert!(scoped.contains("external credentials: blocked by the invalid Codewhale-owned xAI OAuth generation pointer"), "{scoped}");
         assert!(
-            scoped.contains("repair: run `codewhale auth xai-device`"),
+            scoped.contains("repair: run `nestlone auth xai-device`"),
             "{scoped}"
         );
         assert!(
@@ -7105,7 +7114,7 @@ model = "qwen-2.5-7b"
             .path()
             .canonicalize()
             .expect("canonical temp root")
-            .join("codewhale-home");
+            .join("nestlone-home");
         let _home = ScopedEnvVar::set("CODEWHALE_HOME", &home.to_string_lossy());
         let config_path = dir.path().join("config.toml");
         let external_path = dir.path().join("grok-auth.json");
@@ -7227,7 +7236,7 @@ model = "qwen-2.5-7b"
             &mut store,
             AuthCommand::Set {
                 provider: ProviderArg::Xai,
-                api_key: Some("xai-codewhale-owned-key".to_string()),
+                api_key: Some("xai-nestlone-owned-key".to_string()),
                 api_key_stdin: false,
             },
             &secrets,
@@ -7342,7 +7351,7 @@ model = "qwen-2.5-7b"
                 .path()
                 .canonicalize()
                 .expect("canonical temp root")
-                .join("codewhale-home");
+                .join("nestlone-home");
             let _home = ScopedEnvVar::set("CODEWHALE_HOME", &home.to_string_lossy());
             let config_path = dir.path().join("config.toml");
             let mut store = ConfigStore::load(Some(config_path.clone())).expect("load store");
@@ -7472,7 +7481,7 @@ model = "qwen-2.5-7b"
             .path()
             .canonicalize()
             .expect("canonical temp root")
-            .join("codewhale-home");
+            .join("nestlone-home");
         let _home = ScopedEnvVar::set("CODEWHALE_HOME", &home.to_string_lossy());
         let path = home.join("config.toml");
         let mut store = ConfigStore::load(Some(path.clone())).expect("store should load");
@@ -7712,11 +7721,11 @@ model = "qwen-2.5-7b"
 
         let cases = [
             (
-                parse_ok(&["codewhale", "--provider", "lm-studio", "exec", "Reply OK"]),
+                parse_ok(&["nestlone", "--provider", "lm-studio", "exec", "Reply OK"]),
                 vec!["exec".to_string(), "Reply OK".to_string()],
             ),
             (
-                parse_ok(&["codewhale", "--provider", "lm-studio", "fleet", "status"]),
+                parse_ok(&["nestlone", "--provider", "lm-studio", "fleet", "status"]),
                 vec!["fleet".to_string(), "status".to_string()],
             ),
         ];
@@ -7774,7 +7783,7 @@ model = "qwen-2.5-7b"
             "--provider",
             "openai",
             "--workspace",
-            "/tmp/codewhale-workspace",
+            "/tmp/nestlone-workspace",
         ]);
         let resolved = ResolvedRuntimeOptions {
             provider: ProviderKind::Openai,
@@ -7824,14 +7833,14 @@ model = "qwen-2.5-7b"
             .collect();
         assert!(
             args.windows(2)
-                .any(|pair| pair == ["--workspace", "/tmp/codewhale-workspace"]),
+                .any(|pair| pair == ["--workspace", "/tmp/nestlone-workspace"]),
             "expected workspace forwarding in args: {args:?}"
         );
     }
 
     #[test]
     fn parses_no_project_config_before_subcommand() {
-        let cli = parse_ok(&["codewhale", "--no-project-config", "exec", "list the files"]);
+        let cli = parse_ok(&["nestlone", "--no-project-config", "exec", "list the files"]);
         assert!(cli.no_project_config);
         match cli.command {
             Some(Commands::Exec(args)) => {
@@ -7846,7 +7855,7 @@ model = "qwen-2.5-7b"
         // `exec` captures trailing args (`trailing_var_arg`), so a misplaced
         // `--no-project-config` is NOT honored as the dispatcher flag — it must
         // appear before the subcommand, exactly like `--skip-onboarding`.
-        let cli = parse_ok(&["codewhale", "exec", "--no-project-config", "hi"]);
+        let cli = parse_ok(&["nestlone", "exec", "--no-project-config", "hi"]);
         assert!(!cli.no_project_config);
         match cli.command {
             Some(Commands::Exec(args)) => {
@@ -7867,7 +7876,7 @@ model = "qwen-2.5-7b"
         let custom_str = custom.to_string_lossy().into_owned();
         let _bin = ScopedEnvVar::set("DEEPSEEK_TUI_BIN", &custom_str);
 
-        let cli = parse_ok(&["codewhale", "--no-project-config", "exec", "hi"]);
+        let cli = parse_ok(&["nestlone", "--no-project-config", "exec", "hi"]);
         let resolved = ResolvedRuntimeOptions {
             provider: ProviderKind::Openai,
             provider_source: ProviderSource::Cli,
@@ -7919,7 +7928,7 @@ model = "qwen-2.5-7b"
         let custom_str = custom.to_string_lossy().into_owned();
         let _bin = ScopedEnvVar::set("DEEPSEEK_TUI_BIN", &custom_str);
 
-        let cli = parse_ok(&["codewhale", "doctor"]);
+        let cli = parse_ok(&["nestlone", "doctor"]);
         let resolved = ResolvedRuntimeOptions {
             provider: ProviderKind::OpenaiCodex,
             provider_source: ProviderSource::Config,
@@ -7961,7 +7970,7 @@ model = "qwen-2.5-7b"
         let custom_str = custom.to_string_lossy().into_owned();
         let _bin = ScopedEnvVar::set("DEEPSEEK_TUI_BIN", &custom_str);
 
-        let cli = parse_ok(&["codewhale", "--provider", "openai-codex", "doctor"]);
+        let cli = parse_ok(&["nestlone", "--provider", "openai-codex", "doctor"]);
         let resolved = ResolvedRuntimeOptions {
             provider: ProviderKind::OpenaiCodex,
             provider_source: ProviderSource::Cli,
@@ -7995,7 +8004,7 @@ model = "qwen-2.5-7b"
         let _lock = env_lock();
         let (_dir, _bin) = install_fake_tui_binary();
 
-        let cli = parse_ok(&["codewhale", "--provider", "anthropic", "doctor"]);
+        let cli = parse_ok(&["nestlone", "--provider", "anthropic", "doctor"]);
         let resolved = resolved_runtime_for_test(ProviderKind::Anthropic, ProviderSource::Cli);
 
         let cmd = build_tui_command(&cli, &resolved, vec!["doctor".to_string()])
@@ -8011,7 +8020,7 @@ model = "qwen-2.5-7b"
         let _lock = env_lock();
         let (_dir, _bin) = install_fake_tui_binary();
 
-        let cli = parse_ok(&["codewhale", "doctor"]);
+        let cli = parse_ok(&["nestlone", "doctor"]);
         let resolved = resolved_runtime_for_test(
             ProviderKind::Anthropic,
             ProviderSource::Env("DEEPSEEK_PROVIDER"),
@@ -8026,7 +8035,7 @@ model = "qwen-2.5-7b"
         let _lock = env_lock();
         let (_dir, _bin) = install_fake_tui_binary();
 
-        let cli = parse_ok(&["codewhale", "doctor"]);
+        let cli = parse_ok(&["nestlone", "doctor"]);
         let mut resolved =
             resolved_runtime_for_test(ProviderKind::Anthropic, ProviderSource::Config);
         resolved.api_key = Some("anthropic-keyring-secret".to_string());
@@ -8110,7 +8119,7 @@ model = "qwen-2.5-7b"
         let _lock = env_lock();
         let (_dir, _bin) = install_fake_tui_binary();
 
-        let cli = parse_ok(&["codewhale"]);
+        let cli = parse_ok(&["nestlone"]);
         let resolved = resolved_runtime_for_test(ProviderKind::Deepseek, ProviderSource::Config);
 
         let cmd = build_tui_command(
@@ -8135,7 +8144,7 @@ model = "qwen-2.5-7b"
         let _lock = env_lock();
         let (_dir, _bin) = install_fake_tui_binary();
 
-        let cli = parse_ok(&["codewhale"]);
+        let cli = parse_ok(&["nestlone"]);
         let mut resolved =
             resolved_runtime_for_test(ProviderKind::Deepseek, ProviderSource::Config);
         resolved.verbosity = Some("normal".to_string());
@@ -8164,13 +8173,13 @@ model = "qwen-2.5-7b"
         let _bin = ScopedEnvVar::set("DEEPSEEK_TUI_BIN", &custom_str);
 
         let cli = parse_ok(&[
-            "codewhale",
+            "nestlone",
             "--provider",
             "moonshot",
             "--model",
             "kimi-k2.7-code",
             "--workspace",
-            "/tmp/codewhale-workspace",
+            "/tmp/nestlone-workspace",
         ]);
         let resolved = ResolvedRuntimeOptions {
             provider: ProviderKind::Moonshot,
@@ -8232,13 +8241,13 @@ model = "qwen-2.5-7b"
         let _bin = ScopedEnvVar::set("DEEPSEEK_TUI_BIN", &custom_str);
 
         let cli = parse_ok(&[
-            "codewhale",
+            "nestlone",
             "--provider",
             "volcengine",
             "--model",
             "DeepSeek-V4-Pro",
             "--workspace",
-            "/tmp/codewhale-workspace",
+            "/tmp/nestlone-workspace",
         ]);
         let resolved = ResolvedRuntimeOptions {
             provider: ProviderKind::Volcengine,
@@ -8357,7 +8366,7 @@ model = "qwen-2.5-7b"
         let _bin = ScopedEnvVar::set("DEEPSEEK_TUI_BIN", &custom_str);
 
         for provider in ProviderKind::ALL {
-            let cli = parse_ok(&["codewhale", "--workspace", "/tmp/codewhale-workspace"]);
+            let cli = parse_ok(&["nestlone", "--workspace", "/tmp/nestlone-workspace"]);
             let resolved = ResolvedRuntimeOptions {
                 provider,
                 provider_source: ProviderSource::Config,
@@ -8427,7 +8436,7 @@ model = "qwen-2.5-7b"
 
     #[test]
     fn parses_top_level_continue_for_interactive_resume() {
-        let cli = parse_ok(&["codewhale", "--continue"]);
+        let cli = parse_ok(&["nestlone", "--continue"]);
 
         assert!(cli.continue_session);
         assert!(cli.prompt_flag.is_none());
@@ -8437,7 +8446,7 @@ model = "qwen-2.5-7b"
 
     #[test]
     fn parses_rc_as_the_account_owned_interactive_handoff() {
-        let cli = parse_ok(&["codewhale", "rc"]);
+        let cli = parse_ok(&["nestlone", "rc"]);
 
         let Some(Commands::Rc(args)) = cli.command else {
             panic!("rc should parse as the remote-control TUI handoff");
@@ -8447,12 +8456,12 @@ model = "qwen-2.5-7b"
 
     #[test]
     fn top_level_continue_rejects_startup_prompt() {
-        let cli = parse_ok(&["codewhale", "--continue", "-p", "follow up"]);
+        let cli = parse_ok(&["nestlone", "--continue", "-p", "follow up"]);
 
         let err = root_tui_passthrough(&cli).expect_err("prompted continue should be rejected");
         assert!(
             err.to_string()
-                .contains("codewhale exec --continue <PROMPT>")
+                .contains("nestlone exec --continue <PROMPT>")
         );
     }
 
@@ -8574,11 +8583,11 @@ model = "qwen-2.5-7b"
                 vec![
                     "<SHELL>",
                     "bash",
-                    "source <(codewhale completion bash)",
-                    "~/.local/share/bash-completion/completions/codewhale",
+                    "source <(nestlone completion bash)",
+                    "~/.local/share/bash-completion/completions/nestlone",
                     "fpath=(~/.zfunc $fpath)",
-                    "codewhale completion fish > ~/.config/fish/completions/codewhale.fish",
-                    "codewhale completion powershell | Out-String | Invoke-Expression",
+                    "nestlone completion fish > ~/.config/fish/completions/nestlone.fish",
+                    "nestlone completion powershell | Out-String | Invoke-Expression",
                 ],
             ),
             ("metrics", vec!["--json", "--since"]),
@@ -8597,8 +8606,8 @@ model = "qwen-2.5-7b"
     }
 
     /// Regression for issue #247: on Windows the dispatcher must find the
-    /// sibling `nestlone.exe`, not bail out looking for an
-    /// extension-less `nestlone`. The candidate resolver also accepts
+    /// sibling `nestlone-tui.exe`, not bail out looking for an
+    /// extension-less `nestlone-tui`. The candidate resolver also accepts
     /// the suffix-less name on Windows so users who manually renamed the
     /// file as a workaround keep working after the upgrade.
     #[test]
@@ -8606,7 +8615,7 @@ model = "qwen-2.5-7b"
         let dir = tempfile::TempDir::new().expect("tempdir");
         let dispatcher = dir
             .path()
-            .join("codewhale")
+            .join("nestlone")
             .with_extension(std::env::consts::EXE_EXTENSION);
         // Touch the dispatcher so its parent dir is the lookup root.
         std::fs::write(&dispatcher, b"").unwrap();
@@ -8615,11 +8624,69 @@ model = "qwen-2.5-7b"
         assert!(sibling_tui_candidate(&dispatcher).is_none());
 
         let target =
-            dispatcher.with_file_name(format!("nestlone{}", std::env::consts::EXE_SUFFIX));
+            dispatcher.with_file_name(format!("nestlone-tui{}", std::env::consts::EXE_SUFFIX));
         std::fs::write(&target, b"").unwrap();
 
         let found = sibling_tui_candidate(&dispatcher).expect("must locate sibling");
         assert_eq!(found, target, "primary platform-correct name wins");
+    }
+
+    /// Pre-rename layouts shipped a `nestlone` TUI sibling beside a
+    /// `codewhale` dispatcher. The resolver must still honour it so those
+    /// installs keep launching the companion TUI after upgrading. (The new
+    /// dispatcher is itself named `nestlone`, so this fallback only fires
+    /// when the dispatcher runs under a different filename.)
+    #[test]
+    fn sibling_tui_candidate_resolves_legacy_nestlone_sibling() {
+        let dir = tempfile::TempDir::new().expect("tempdir");
+        let dispatcher = dir
+            .path()
+            .join("codewhale")
+            .with_extension(std::env::consts::EXE_EXTENSION);
+        std::fs::write(&dispatcher, b"").unwrap();
+
+        // Only the pre-rename sibling exists — no `nestlone-tui`.
+        let target =
+            dispatcher.with_file_name(format!("nestlone{}", std::env::consts::EXE_SUFFIX));
+        std::fs::write(&target, b"").unwrap();
+
+        let found = sibling_tui_candidate(&dispatcher).expect("must locate sibling");
+        assert_eq!(found, target, "legacy `nestlone` sibling resolves as fallback");
+    }
+
+    /// A dispatcher named `nestlone` must never resolve to itself as the
+    /// TUI: the legacy `nestlone` fallback shares the dispatcher's name, so
+    /// it has to be skipped when it points at the running binary.
+    #[test]
+    fn sibling_tui_candidate_never_confuses_dispatcher_with_tui() {
+        let dir = tempfile::TempDir::new().expect("tempdir");
+        let dispatcher = dir
+            .path()
+            .join("nestlone")
+            .with_extension(std::env::consts::EXE_EXTENSION);
+        std::fs::write(&dispatcher, b"").unwrap();
+
+        // Only the dispatcher exists — no TUI of any name.
+        assert!(sibling_tui_candidate(&dispatcher).is_none());
+    }
+
+    /// Pre-rebrand layouts shipped a `codewhale-tui` TUI sibling; keep
+    /// resolving it so untouched old installs keep working.
+    #[test]
+    fn sibling_tui_candidate_resolves_legacy_codewhale_sibling() {
+        let dir = tempfile::TempDir::new().expect("tempdir");
+        let dispatcher = dir
+            .path()
+            .join("nestlone")
+            .with_extension(std::env::consts::EXE_EXTENSION);
+        std::fs::write(&dispatcher, b"").unwrap();
+
+        let target =
+            dispatcher.with_file_name(format!("codewhale-tui{}", std::env::consts::EXE_SUFFIX));
+        std::fs::write(&target, b"").unwrap();
+
+        let found = sibling_tui_candidate(&dispatcher).expect("must locate sibling");
+        assert_eq!(found, target, "legacy `codewhale-tui` sibling resolves as fallback");
     }
 
     #[test]
@@ -8629,7 +8696,7 @@ model = "qwen-2.5-7b"
 
         assert!(message.contains("C:/tools/nestlone.exe"));
         assert!(message.contains("access is denied"));
-        assert!(message.contains("where codewhale"));
+        assert!(message.contains("where nestlone"));
         assert!(message.contains("DEEPSEEK_TUI_BIN"));
     }
 
@@ -8651,7 +8718,7 @@ model = "qwen-2.5-7b"
     #[test]
     fn sibling_tui_candidate_windows_falls_back_to_suffixless() {
         let dir = tempfile::TempDir::new().expect("tempdir");
-        let dispatcher = dir.path().join("codewhale.exe");
+        let dispatcher = dir.path().join("nestlone.exe");
         std::fs::write(&dispatcher, b"").unwrap();
 
         // Only the suffixless name exists — emulates the manual rename.

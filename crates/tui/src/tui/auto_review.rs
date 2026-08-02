@@ -874,7 +874,7 @@ mod tests {
         let policy = AutoReviewPolicy::default();
         let ctx = ctx_for(
             "exec_shell",
-            json!({ "command": "codewhale --version" }),
+            json!({ "command": "nestlone --version" }),
             RunOrigin::Interactive,
             ApprovalMode::Auto,
         );
@@ -944,7 +944,7 @@ mod tests {
         let policy = AutoReviewPolicy::default();
         let ctx = ctx_for(
             "exec_shell",
-            json!({ "command": "cargo test -p codewhale-tui", "background": true }),
+            json!({ "command": "cargo test -p nestlone-tui", "background": true }),
             RunOrigin::Background,
             ApprovalMode::Bypass,
         );

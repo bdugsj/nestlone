@@ -4901,7 +4901,7 @@ mod tests {
         static NEXT_CONFIG_ID: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
         let config_id = NEXT_CONFIG_ID.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
         let isolated_config_path = std::env::temp_dir().join(format!(
-            "codewhale-config-view-test-{}-{config_id}.toml",
+            "nestlone-config-view-test-{}-{config_id}.toml",
             std::process::id()
         ));
         let options = TuiOptions {
@@ -5597,7 +5597,7 @@ api_key_env = "ACME_API_KEY"
     #[test]
     fn config_view_experimental_features_show_effective_state_and_overrides() {
         let temp_root = std::env::temp_dir().join(format!(
-            "codewhale-experimental-config-view-test-{}",
+            "nestlone-experimental-config-view-test-{}",
             std::process::id()
         ));
         fs::create_dir_all(&temp_root).unwrap();
@@ -5637,7 +5637,7 @@ vision_model = true
     #[test]
     fn config_view_shows_fleet_max_spawn_depth_from_config() {
         let temp_root = std::env::temp_dir().join(format!(
-            "codewhale-fleet-config-view-test-{}",
+            "nestlone-fleet-config-view-test-{}",
             std::process::id()
         ));
         fs::create_dir_all(&temp_root).unwrap();
@@ -5727,7 +5727,7 @@ max_spawn_depth = 2
     #[test]
     fn config_view_uses_provider_url_for_non_deepseek_provider() {
         let temp_root = std::env::temp_dir().join(format!(
-            "codewhale-provider-url-view-test-{}",
+            "nestlone-provider-url-view-test-{}",
             std::process::id()
         ));
         fs::create_dir_all(&temp_root).unwrap();

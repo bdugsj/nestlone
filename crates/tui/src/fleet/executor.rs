@@ -1,13 +1,13 @@
-//! Fleet executor — runs a fleet worker as a real `codewhale exec` subprocess.
+//! Fleet executor — runs a fleet worker as a real `nestlone exec` subprocess.
 //!
-//! A fleet worker IS a headless `codewhale exec` run. There is no separate
+//! A fleet worker IS a headless `nestlone exec` run. There is no separate
 //! "fleet worker" execution engine: the sub-agent runtime, full tool surface,
-//! and recursion depth all come from the one `codewhale exec` runtime, so
+//! and recursion depth all come from the one `nestlone exec` runtime, so
 //! fleet and sub-agents are one substrate (not two moving targets).
 //!
 //! This module is the bridge:
 //! - [`build_worker_exec_command`] turns a `FleetTaskSpec` + `FleetExecConfig`
-//!   into the `codewhale [route flags] exec --output-format stream-json …`
+//!   into the `nestlone [route flags] exec --output-format stream-json …`
 //!   argv that a host adapter ([`super::host`]) launches locally or over SSH.
 //! - [`map_exec_stream_line`] maps one stream-json line emitted by that worker
 //!   into a [`FleetWorkerEventPayload`] for the durable ledger, so the ledger
@@ -42,10 +42,10 @@ pub fn configured_nestlone_binary() -> String {
         .ok()
         .map(|value| value.trim().to_string())
         .filter(|value| !value.is_empty())
-        .unwrap_or_else(|| "codewhale".to_string())
+        .unwrap_or_else(|| "nestlone".to_string())
 }
 
-/// Build the `codewhale exec` argv that runs a fleet task headlessly.
+/// Build the `nestlone exec` argv that runs a fleet task headlessly.
 ///
 /// `--auto` is always passed: a headless worker has no human to approve tool
 /// calls, so it runs with full (policy-gated) tool access. `--output-format
@@ -187,10 +187,10 @@ fn build_worker_exec_command_from_prompt(
 ) -> FleetWorkerCommand {
     let mut args: Vec<String> = Vec::new();
 
-    // The canonical `codewhale` dispatcher owns these route overrides as
+    // The canonical `nestlone` dispatcher owns these route overrides as
     // global flags and deliberately rejects them after `exec`. Keep them in
     // front of the subcommand so Fleet commands work through the installed
-    // dispatcher as well as when a host points directly at `codewhale-tui`.
+    // dispatcher as well as when a host points directly at `nestlone-tui`.
     if let Some(model) = model.map(str::trim).filter(|m| !m.is_empty()) {
         args.push("--model".to_string());
         args.push(model.to_string());
@@ -251,7 +251,7 @@ fn build_worker_exec_command_from_prompt(
     FleetWorkerCommand::new(nestlone_binary.to_string(), args)
 }
 
-/// Map one `codewhale exec` stream-json line into a fleet ledger event.
+/// Map one `nestlone exec` stream-json line into a fleet ledger event.
 ///
 /// Returns `None` for lines that don't correspond to a worker lifecycle
 /// transition (e.g. `session_capture`, `metadata`). The exec event schema is
@@ -384,11 +384,11 @@ pub fn classify_worker_exit(exit_code: Option<i32>, stopped: bool) -> FleetWorke
     }
 }
 
-/// Drives fleet workers as real `codewhale exec` subprocesses on the local
+/// Drives fleet workers as real `nestlone exec` subprocesses on the local
 /// host, incrementally draining each worker's stream-json output into fleet
 /// ledger events.
 ///
-/// The caller (the `codewhale fleet run` loop / `FleetManager`) owns the
+/// The caller (the `nestlone fleet run` loop / `FleetManager`) owns the
 /// ledger; the executor owns the OS process boundary and the incremental log
 /// parse. Because the worker is a separate process, its heavy runtime/tool
 /// construction never touches the orchestrator — the parent only ingests a
@@ -867,8 +867,8 @@ mod tests {
     #[test]
     fn worker_command_is_a_headless_nestlone_exec_run() {
         let exec = FleetExecConfig::default();
-        let cmd = build_worker_exec_command("codewhale", &task("read the file"), &exec, None);
-        assert_eq!(cmd.program, "codewhale");
+        let cmd = build_worker_exec_command("nestlone", &task("read the file"), &exec, None);
+        assert_eq!(cmd.program, "nestlone");
         assert_eq!(cmd.args[0], "exec");
         assert!(cmd.args.contains(&"--auto".to_string()));
         // stream-json so the executor can ingest the worker's event stream.
@@ -887,7 +887,7 @@ mod tests {
             append_system_prompt: "never push to main".to_string(),
             ..FleetExecConfig::default()
         };
-        let cmd = build_worker_exec_command("codewhale", &task("audit"), &exec, Some("glm-5.1"));
+        let cmd = build_worker_exec_command("nestlone", &task("audit"), &exec, Some("glm-5.1"));
         let exec_idx = cmd
             .args
             .iter()
@@ -916,7 +916,7 @@ mod tests {
         let mut task = task("audit");
         task.worker.as_mut().unwrap().agent_profile = Some("reviewer".to_string());
         let cmd = build_worker_exec_command_with_profiles(
-            "codewhale",
+            "nestlone",
             &task,
             &FleetExecConfig::default(),
             None,
@@ -946,7 +946,7 @@ mod tests {
         assert!(!launch_spec.runtime_profile.permissions.network);
 
         let cmd = build_worker_exec_command_with_launch_spec(
-            "codewhale",
+            "nestlone",
             &task,
             &launch_spec,
             &FleetExecConfig::default(),
@@ -984,7 +984,7 @@ mod tests {
         let launch_spec = launch_spec(&task, tmp.path());
 
         let cmd = build_worker_exec_command_with_launch_spec(
-            "codewhale",
+            "nestlone",
             &task,
             &launch_spec,
             &FleetExecConfig::default(),
@@ -1026,7 +1026,7 @@ mod tests {
         profile.profile.reasoning_effort = Some("max".to_string());
 
         let cmd = build_worker_exec_command_with_profiles(
-            "codewhale",
+            "nestlone",
             &task,
             &FleetExecConfig::default(),
             Some("deepseek-v4-pro"), // parent/session model on provider A.
@@ -1121,7 +1121,7 @@ mod tests {
         profile.profile.model = Some("qwen-2.5-7b".to_string());
 
         let cmd = build_worker_exec_command_with_profiles(
-            "codewhale",
+            "nestlone",
             &task,
             &FleetExecConfig::default(),
             Some("deepseek-v4-pro"),
@@ -1174,7 +1174,7 @@ mod tests {
     #[test]
     fn worker_command_without_profile_provider_omits_provider_and_keeps_run_model() {
         let cmd = build_worker_exec_command_with_profiles(
-            "codewhale",
+            "nestlone",
             &task("read"),
             &FleetExecConfig::default(),
             Some("deepseek-v4-pro"),
@@ -1218,7 +1218,7 @@ mod tests {
     #[test]
     fn unbounded_max_turns_is_not_passed() {
         let exec = FleetExecConfig::default(); // max_turns == u32::MAX
-        let cmd = build_worker_exec_command("codewhale", &task("x"), &exec, None);
+        let cmd = build_worker_exec_command("nestlone", &task("x"), &exec, None);
         assert!(!cmd.args.join(" ").contains("--max-turns"));
     }
 
@@ -1372,8 +1372,8 @@ mod tests {
     }
 
     /// End-to-end: run a REAL subprocess that emits stream-json (standing in for
-    /// `codewhale exec`), and prove the executor drains its events and terminal
-    /// exit through the real host adapter — no codewhale binary needed. This is
+    /// `nestlone exec`), and prove the executor drains its events and terminal
+    /// exit through the real host adapter — no nestlone binary needed. This is
     /// the verifiable proof that a fleet worker is an out-of-process exec run.
     #[cfg(unix)]
     #[test]
@@ -1467,7 +1467,7 @@ mod tests {
     /// Dogfood smoke (#3166): several concurrent exec-style workers with one
     /// injected failure. Proves the executor drives a small fleet to terminal
     /// outcomes and that a failing worker is classified distinctly from the
-    /// passing ones — all without the codewhale binary.
+    /// passing ones — all without the nestlone binary.
     #[cfg(unix)]
     #[test]
     fn executor_drives_concurrent_workers_with_injected_failure() {

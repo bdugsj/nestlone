@@ -2,10 +2,10 @@ use std::path::PathBuf;
 use std::process::{Command, Output};
 
 fn nestlone_tui_binary() -> PathBuf {
-    if let Some(path) = option_env!("CARGO_BIN_EXE_codewhale-tui") {
+    if let Some(path) = option_env!("CARGO_BIN_EXE_nestlone-tui") {
         return PathBuf::from(path);
     }
-    if let Ok(path) = std::env::var("CARGO_BIN_EXE_codewhale-tui") {
+    if let Ok(path) = std::env::var("CARGO_BIN_EXE_nestlone-tui") {
         return PathBuf::from(path);
     }
 
@@ -14,7 +14,7 @@ fn nestlone_tui_binary() -> PathBuf {
     if path.ends_with("deps") {
         path.pop();
     }
-    path.push(format!("codewhale-tui{}", std::env::consts::EXE_SUFFIX));
+    path.push(format!("nestlone-tui{}", std::env::consts::EXE_SUFFIX));
     path
 }
 
@@ -80,7 +80,7 @@ fn missing_profile_is_terminal_ndjson() {
             "--input-json",
             r#"{"action":"run"}"#,
         ])
-        .env("CODEWHALE_HOME", dir.path().join("codewhale-home"))
+        .env("CODEWHALE_HOME", dir.path().join("nestlone-home"))
         .output()
         .expect("run workflow-tool with missing profile");
     assert_terminal_stream_error(output, "Profile 'missing-profile' not found");
@@ -115,7 +115,7 @@ provider = "anthropic"
             "--input-json",
             r#"{"action":"run","script":"phase('offline'); return { ok: true };"}"#,
         ])
-        .env("CODEWHALE_HOME", dir.path().join("codewhale-home"))
+        .env("CODEWHALE_HOME", dir.path().join("nestlone-home"))
         .env("DEEPSEEK_API_KEY_SOURCE", "cli")
         .env("CODEWHALE_CLI_API_KEY", "profile-switch-secret")
         .output()

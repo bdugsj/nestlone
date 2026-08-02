@@ -264,7 +264,7 @@ impl App {
         // is a convenience default, not an override: when this launch named a
         // model explicitly (`--model`, forwarded as `CODEWHALE_MODEL`), that
         // request wins. Before this fix the memory won unconditionally, so
-        // `codewhale --provider moonshot --model kimi-k3` silently kept running
+        // `nestlone --provider moonshot --model kimi-k3` silently kept running
         // the remembered `kimi-k2.7-code` while `doctor` reported `kimi-k3`.
         let model = if crate::config::explicit_launch_model_override().is_some() {
             model

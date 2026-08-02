@@ -597,7 +597,7 @@ where
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct ConfigToml {
     /// TUI-compatible DeepSeek API key. Kept at the root so both `deepseek`
-    /// and `codewhale-tui` can share a single config file.
+    /// and `nestlone-tui` can share a single config file.
     pub api_key: Option<String>,
     /// TUI-compatible DeepSeek base URL.
     pub base_url: Option<String>,
@@ -625,7 +625,7 @@ pub struct ConfigToml {
     pub telemetry: Option<bool>,
     pub approval_policy: Option<String>,
     pub sandbox_mode: Option<String>,
-    /// Native tool catalog controls shared with `codewhale-tui`.
+    /// Native tool catalog controls shared with `nestlone-tui`.
     #[serde(default)]
     pub tools: Option<ToolsToml>,
     #[serde(default, skip_serializing_if = "ProvidersToml::is_empty")]
@@ -2616,13 +2616,13 @@ impl ConfigToml {
         };
 
         let env_provider_model = env.model_for(provider, &base_url);
-        // Root `default_text_model` is the key `codewhale model set` writes and
+        // Root `default_text_model` is the key `nestlone model set` writes and
         // the setup wizard writes, for every provider. It used to enter this
         // chain only when `provider == Deepseek`, which made this resolver
         // disagree with `Config::default_model()` in the TUI — the chain that
         // actually builds the request — for every non-DeepSeek provider
         // (#4832, #4838). The user's model still shipped; only this resolver,
-        // and therefore `codewhale model resolve`, reported a provider default.
+        // and therefore `nestlone model resolve`, reported a provider default.
         //
         // It is honoured for any provider now, minus the one case the DeepSeek
         // gate was accidentally covering: a stale DeepSeek id left behind by a
@@ -4878,7 +4878,7 @@ fn parse_generated_permissions(path: &Path, body: &str) -> Result<PermissionsTom
 
 fn permission_removal_token(path: &Path, raw: &str, index: usize) -> String {
     let mut hasher = Sha256::new();
-    hasher.update(b"codewhale-permission-removal-v1\0");
+    hasher.update(b"nestlone-permission-removal-v1\0");
     hasher.update(quote_os_path(path).as_bytes());
     hasher.update(b"\0");
     hasher.update(index.to_le_bytes());
@@ -5104,10 +5104,10 @@ pub fn migrate_config_if_needed() -> Result<Option<ConfigMigration>> {
     }
     // Copy the config to the new home.
     if let Some(parent) = primary.parent() {
-        std::fs::create_dir_all(parent).context("failed to create codewhale config directory")?;
+        std::fs::create_dir_all(parent).context("failed to create nestlone config directory")?;
     }
     std::fs::copy(&legacy, &primary)
-        .context("failed to migrate config from deepseek to codewhale home")?;
+        .context("failed to migrate config from deepseek to nestlone home")?;
     tracing::info!(
         "Migrated config from {} to {}",
         legacy.display(),

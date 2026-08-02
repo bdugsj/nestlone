@@ -340,7 +340,7 @@ impl SetupRuntimeFacts {
             format!("{}; retry or open /provider", readiness.label())
         } else if app.api_provider == crate::config::ApiProvider::OpenaiCodex {
             format!(
-                "{}; run codex login, then grant exact read-only access with `codewhale auth external-consent --provider openai-codex --mode read-only`, or open /provider",
+                "{}; run codex login, then grant exact read-only access with `nestlone auth external-consent --provider openai-codex --mode read-only`, or open /provider",
                 readiness.label()
             )
         } else if let Some(url) = crate::config::credential_help_for_provider_route(
@@ -5773,7 +5773,7 @@ mod tests {
         };
         assert_eq!(title, "Remote runtime on-ramp");
         assert!(content.contains("does not generate deploy bundles"));
-        assert!(content.contains("codewhale remote-setup --generate-only"));
+        assert!(content.contains("nestlone remote-setup --generate-only"));
         assert!(content.contains("`--apply` remains unimplemented"));
     }
 
@@ -5866,7 +5866,7 @@ mod tests {
         for locale in Locale::shipped() {
             let content = remote_runtime_on_ramp_text(*locale, &facts);
             assert!(
-                content.contains("codewhale remote-setup --generate-only"),
+                content.contains("nestlone remote-setup --generate-only"),
                 "{}",
                 locale.tag()
             );

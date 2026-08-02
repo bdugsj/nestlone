@@ -1,4 +1,4 @@
-//! `codewhale mcp-server` must proxy to the user's configured servers.
+//! `nestlone mcp-server` must proxy to the user's configured servers.
 //!
 //! Regression coverage for #4727, where every configured server was wired to
 //! an in-process stub: `command`/`args`/`env` were never executed, `health`
@@ -93,7 +93,7 @@ impl Fixture {
         );
     }
 
-    /// Drive `codewhale mcp-server` over stdio with `requests`, returning the
+    /// Drive `nestlone mcp-server` over stdio with `requests`, returning the
     /// parsed JSON-RPC responses plus stderr.
     fn run_mcp_server(&self, requests: &[Value]) -> (Vec<Value>, String) {
         let mut child = self
@@ -103,7 +103,7 @@ impl Fixture {
             .stdout(Stdio::piped())
             .stderr(Stdio::piped())
             .spawn()
-            .expect("spawn codewhale mcp-server");
+            .expect("spawn nestlone mcp-server");
 
         {
             let stdin = child.stdin.as_mut().expect("mcp-server stdin");
@@ -123,10 +123,10 @@ impl Fixture {
 }
 
 fn nestlone_binary() -> PathBuf {
-    if let Some(path) = option_env!("CARGO_BIN_EXE_codewhale") {
+    if let Some(path) = option_env!("CARGO_BIN_EXE_nestlone") {
         return PathBuf::from(path);
     }
-    if let Ok(path) = std::env::var("CARGO_BIN_EXE_codewhale") {
+    if let Ok(path) = std::env::var("CARGO_BIN_EXE_nestlone") {
         return PathBuf::from(path);
     }
     let mut path = std::env::current_exe().expect("current test executable path");
@@ -134,7 +134,7 @@ fn nestlone_binary() -> PathBuf {
     if path.ends_with("deps") {
         path.pop();
     }
-    path.join("codewhale")
+    path.join("nestlone")
 }
 
 fn response_for(responses: &[Value], id: i64) -> &Value {
@@ -195,7 +195,7 @@ fn mcp_server_reports_a_server_it_could_not_spawn() {
     fixture.configure_servers(json!([{
         "config": {
             "name": "broken",
-            "command": "codewhale-nonexistent-mcp-server-binary",
+            "command": "nestlone-nonexistent-mcp-server-binary",
         }
     }]));
 

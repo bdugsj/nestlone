@@ -2229,7 +2229,7 @@ mod tests {
                         "gate": {
                             "id": "gate_test",
                             "gate": "test",
-                            "command": "cargo test -p codewhale-tui --lib",
+                            "command": "cargo test -p nestlone-tui --lib",
                             "cwd": ".",
                             "exit_code": 0,
                             "status": "passed",

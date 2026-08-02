@@ -98,7 +98,7 @@ impl RuntimeWebState {
 }
 
 pub(super) fn bootstrap_url(addr: SocketAddr, nonce: &str) -> String {
-    format!("http://{addr}/__codewhale/bootstrap/{nonce}")
+    format!("http://{addr}/__nestlone/bootstrap/{nonce}")
 }
 
 pub(super) async fn exchange_bootstrap(

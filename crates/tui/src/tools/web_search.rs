@@ -2580,7 +2580,7 @@ mod tests {
 
         let (subpath_url, _) = searxng_search_url(
             Some("https://search.example/searxng?language=en"),
-            "codewhale",
+            "nestlone",
         )
         .expect("searxng subpath url");
         let parsed = reqwest::Url::parse(&subpath_url).expect("valid subpath url");
@@ -2595,7 +2595,7 @@ mod tests {
         );
 
         let (search_url, _) =
-            searxng_search_url(Some("https://search.example/searxng/search"), "codewhale")
+            searxng_search_url(Some("https://search.example/searxng/search"), "nestlone")
                 .expect("searxng search endpoint");
         assert_eq!(
             reqwest::Url::parse(&search_url)

@@ -55,7 +55,7 @@ pub fn error_looks_auth_required(error: &anyhow::Error) -> bool {
 
 pub fn auth_required_login_hint(server_name: &str) -> String {
     format!(
-        "MCP server '{server_name}' requires OAuth authentication. Run `codewhale mcp login {server_name}` to authenticate."
+        "MCP server '{server_name}' requires OAuth authentication. Run `nestlone mcp login {server_name}` to authenticate."
     )
 }
 
@@ -1155,7 +1155,7 @@ mod tests {
     fn auth_required_login_hint_names_server() {
         let hint = auth_required_login_hint("nordic-mcp");
         assert!(hint.contains("nordic-mcp"));
-        assert!(hint.contains("codewhale mcp login nordic-mcp"));
+        assert!(hint.contains("nestlone mcp login nordic-mcp"));
     }
 
     #[tokio::test]

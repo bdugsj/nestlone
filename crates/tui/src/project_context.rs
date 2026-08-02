@@ -2191,7 +2191,7 @@ mod tests {
         let workspace = tempdir().expect("workspace tempdir");
         let home = tempdir().expect("home tempdir");
         fs::create_dir(workspace.path().join(".git")).expect("mkdir git");
-        fs::create_dir(workspace.path().join(".codewhale")).expect("mkdir codewhale");
+        fs::create_dir(workspace.path().join(".codewhale")).expect("mkdir nestlone");
         let constitution = workspace
             .path()
             .join(".codewhale")
@@ -2378,7 +2378,7 @@ mod tests {
         fs::create_dir(&nestlone_dir).expect("mkdir .codewhale");
         let nestlone_agents = nestlone_dir.join("AGENTS.md");
         fs::write(&nestlone_agents, "Codewhale-specific instructions")
-            .expect("write codewhale agents");
+            .expect("write nestlone agents");
 
         let agents_dir = home.path().join(".agents");
         fs::create_dir(&agents_dir).expect("mkdir .agents");
@@ -2408,7 +2408,7 @@ mod tests {
         let nestlone_dir = home.path().join(".codewhale");
         fs::create_dir(&nestlone_dir).expect("mkdir .codewhale");
         fs::write(nestlone_dir.join("WHALE.md"), "Global WHALE legacy")
-            .expect("write codewhale whale");
+            .expect("write nestlone whale");
 
         let agents_dir = home.path().join(".agents");
         fs::create_dir(&agents_dir).expect("mkdir .agents");
@@ -2445,7 +2445,7 @@ mod tests {
         let nestlone_dir = home.path().join(".codewhale");
         fs::create_dir(&nestlone_dir).expect("mkdir .codewhale");
         let global_whale = nestlone_dir.join("WHALE.md");
-        fs::write(&global_whale, "Global WHALE legacy").expect("write codewhale whale");
+        fs::write(&global_whale, "Global WHALE legacy").expect("write nestlone whale");
 
         let ctx = load_project_context_with_parents_and_home(workspace.path(), Some(home.path()));
 
@@ -2474,7 +2474,7 @@ mod tests {
         let nestlone_dir = home.path().join(".codewhale");
         fs::create_dir(&nestlone_dir).expect("mkdir .codewhale");
         fs::write(nestlone_dir.join("WHALE.md"), "Global WHALE legacy")
-            .expect("write codewhale whale");
+            .expect("write nestlone whale");
         let global_instructions = nestlone_dir.join("instructions.md");
         fs::write(&global_instructions, "Global instructions body")
             .expect("write global instructions");
@@ -2813,7 +2813,7 @@ mod tests {
         let outside_dir = outside.path().join("real_rules");
         fs::create_dir_all(&outside_dir).expect("mkdir outside dir");
         fs::write(outside_dir.join("secret.md"), "outside content").expect("write outside");
-        fs::create_dir_all(workspace.path().join(".codewhale")).expect("mkdir codewhale");
+        fs::create_dir_all(workspace.path().join(".codewhale")).expect("mkdir nestlone");
 
         // Symlink the directory itself, not individual files
         std::os::unix::fs::symlink(&outside_dir, workspace.path().join(".codewhale/rules"))
@@ -2838,16 +2838,16 @@ mod tests {
         let tmp = tempdir().expect("tempdir");
         let nestlone_rules = tmp.path().join(".codewhale/rules");
         let claude_rules = tmp.path().join(".claude/rules");
-        fs::create_dir_all(&nestlone_rules).expect("mkdir codewhale rules");
+        fs::create_dir_all(&nestlone_rules).expect("mkdir nestlone rules");
         fs::create_dir_all(&claude_rules).expect("mkdir claude rules");
-        fs::write(nestlone_rules.join("cw.md"), "codewhale-rule").expect("write");
+        fs::write(nestlone_rules.join("cw.md"), "nestlone-rule").expect("write");
         fs::write(claude_rules.join("claude.md"), "claude-rule").expect("write");
 
         let ctx = load_project_context(tmp.path());
         let rules = ctx.rules_block.as_ref().unwrap();
 
         assert!(
-            rules.contains("codewhale-rule"),
+            rules.contains("nestlone-rule"),
             ".codewhale/rules/ should be loaded"
         );
         assert!(
@@ -2855,7 +2855,7 @@ mod tests {
             ".claude/rules/ should be loaded"
         );
         // .codewhale/rules/ content should appear before .claude/rules/ (RULES_DIRS order)
-        let pos_cw = rules.find("codewhale-rule").unwrap();
+        let pos_cw = rules.find("nestlone-rule").unwrap();
         let pos_claude = rules.find("claude-rule").unwrap();
         assert!(
             pos_cw < pos_claude,

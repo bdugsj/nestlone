@@ -8,13 +8,13 @@ repository.workspace = true
 description = "Agentic terminal facade for open-source and open-weight coding models"
 
 [[bin]]
-name = "codewhale"
+name = "nestlone"
 path = "src/main.rs"
 
-# Short-form convenience alias — forwards to `codewhale` silently.
+# Short-form convenience alias — forwards to `nestlone` silently.
 [[bin]]
-name = "codew"
-path = "src/bin/codew.rs"
+name = "nest"
+path = "src/bin/nest.rs"
 
 [dependencies]
 anyhow.workspace = true

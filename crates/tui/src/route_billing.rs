@@ -2324,7 +2324,7 @@ mod tests {
         crate::test_support::EnvVarGuard::remove("MINIMAX_API_KEY")
     }
 
-    /// The release blocker: a MiniMax key saved through `codewhale auth set`
+    /// The release blocker: a MiniMax key saved through `nestlone auth set`
     /// lives in the secret store, so neither the config table nor
     /// `MINIMAX_API_KEY` carries a product marker. Classification must not
     /// open the secret store to find out, and must not silently call the

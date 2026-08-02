@@ -287,7 +287,7 @@ pub fn external_credential_consent_status(
         route_state,
         semantics,
         revoke_command: format!(
-            "codewhale auth external-revoke --provider {}",
+            "nestlone auth external-revoke --provider {}",
             provider.as_str()
         ),
     }
@@ -490,7 +490,7 @@ mod tests {
         assert!(active.semantics.contains("no refresh"));
         assert_eq!(
             active.revoke_command,
-            "codewhale auth external-revoke --provider openai-codex"
+            "nestlone auth external-revoke --provider openai-codex"
         );
 
         let changed_path = absolute_test_path("moved-auth.json");

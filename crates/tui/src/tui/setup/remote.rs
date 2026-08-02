@@ -6,7 +6,7 @@
 //! | mode | what it actually is |
 //! |------|---------------------|
 //! | [`RemoteMode::LocalOnly`] | the default: this machine, nothing exposed |
-//! | [`RemoteMode::RuntimeApi`] | `codewhale serve --http` on loopback, token-authenticated |
+//! | [`RemoteMode::RuntimeApi`] | `nestlone serve --http` on loopback, token-authenticated |
 //! | [`RemoteMode::MobileLan`] | the same runtime reachable from a phone on the LAN |
 //! | [`RemoteMode::ChatBridge`] | a chat bridge (Telegram, Feishu/Lark) in front of the runtime |
 //!
@@ -332,7 +332,7 @@ fn observe_modes(lookup: &dyn Fn(&str) -> Option<String>) -> Vec<RemoteModeFact>
 ///
 /// This deliberately goes through the same `remote_setup::bundle` planning
 /// contract the CLI uses, so the preview cannot drift from what
-/// `codewhale remote-setup --generate-only` would produce. It calls
+/// `nestlone remote-setup --generate-only` would produce. It calls
 /// [`bundle::render_bundle`] (a pure function) and never
 /// [`bundle::write_bundle`]: no file is created, no command is run, and no
 /// cloud resource is provisioned.
@@ -394,7 +394,7 @@ pub(super) fn on_ramp_text(
     command_provider: &str,
 ) -> String {
     let command = format!(
-        "codewhale remote-setup --generate-only --cloud lighthouse --bridge telegram --provider {command_provider} --out ./codewhale-deploy/lighthouse-telegram"
+        "nestlone remote-setup --generate-only --cloud lighthouse --bridge telegram --provider {command_provider} --out ./nestlone-deploy/lighthouse-telegram"
     );
     let base = tr(locale, MessageId::SetupRemoteOnRampText);
     let mut out = base
@@ -546,7 +546,7 @@ mod tests {
 
         let after = std::fs::read_dir(tmp.path()).expect("read tempdir").count();
         assert_eq!(before, after, "the preview must not create any file");
-        assert!(!std::path::Path::new("./codewhale-deploy").exists());
+        assert!(!std::path::Path::new("./nestlone-deploy").exists());
     }
 
     #[test]

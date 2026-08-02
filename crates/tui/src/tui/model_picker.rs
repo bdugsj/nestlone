@@ -2370,15 +2370,15 @@ mod tests {
         }
         env_guards.push(crate::test_support::EnvVarGuard::set(
             "OPENAI_CODEX_AUTH_FILE",
-            "/nonexistent/codewhale-test-codex-auth.json",
+            "/nonexistent/nestlone-test-codex-auth.json",
         ));
         env_guards.push(crate::test_support::EnvVarGuard::set(
             "CODEX_HOME",
-            "/nonexistent/codewhale-test-codex-home",
+            "/nonexistent/nestlone-test-codex-home",
         ));
         env_guards.push(crate::test_support::EnvVarGuard::set(
             "GROK_AUTH_PATH",
-            "/nonexistent/codewhale-test-grok-auth.json",
+            "/nonexistent/nestlone-test-grok-auth.json",
         ));
         let options = TuiOptions {
             start_in_agent_mode: true,

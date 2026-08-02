@@ -598,7 +598,7 @@ mod tests {
         assert!(body.contains(".github/workflows/ci.yml"));
         assert!(body.contains("Do not call a model provider"));
         // Provider neutrality: the dogfood step sends nothing anywhere.
-        assert!(body.contains("./target/release/codewhale exec --help"));
+        assert!(body.contains("./target/release/nestlone exec --help"));
         assert!(body.contains("Never select a provider for them"));
         // Contributor credit is part of the skill's own contract.
         assert!(body.contains("@JayBeest"));

@@ -225,32 +225,32 @@ const SESSION_TITLE_MAX_CHARS: usize = 32;
 const VERSION_HINT_TOAST_TTL_MS: u64 = 12_000;
 
 const REQUIRED_RELEASE_ASSETS: &[&str] = &[
-    "codewhale-artifacts-sha256.txt",
+    "nestlone-artifacts-sha256.txt",
     "codew-android-arm64",
-    "codewhale-android-arm64",
-    "codewhale-android-arm64.tar.gz",
-    "codewhale-tui-android-arm64",
-    "codewhale-linux-arm64",
-    "codewhale-linux-arm64.tar.gz",
-    "codewhale-linux-x64",
-    "codewhale-linux-x64.tar.gz",
-    "codewhale-macos-arm64",
-    "codewhale-macos-arm64.tar.gz",
-    "codewhale-macos-x64",
-    "codewhale-macos-x64.tar.gz",
-    "codewhale-tui-linux-arm64",
-    "codewhale-tui-linux-x64",
-    "codewhale-tui-macos-arm64",
-    "codewhale-tui-macos-x64",
-    "codewhale-tui-windows-x64.exe",
-    "codewhale-windows-x64.exe",
-    "codewhale-windows-x64-portable.zip",
-    "codewhale-windows-x64.zip",
+    "nestlone-android-arm64",
+    "nestlone-android-arm64.tar.gz",
+    "nestlone-tui-android-arm64",
+    "nestlone-linux-arm64",
+    "nestlone-linux-arm64.tar.gz",
+    "nestlone-linux-x64",
+    "nestlone-linux-x64.tar.gz",
+    "nestlone-macos-arm64",
+    "nestlone-macos-arm64.tar.gz",
+    "nestlone-macos-x64",
+    "nestlone-macos-x64.tar.gz",
+    "nestlone-tui-linux-arm64",
+    "nestlone-tui-linux-x64",
+    "nestlone-tui-macos-arm64",
+    "nestlone-tui-macos-x64",
+    "nestlone-tui-windows-x64.exe",
+    "nestlone-windows-x64.exe",
+    "nestlone-windows-x64-portable.zip",
+    "nestlone-windows-x64.zip",
     "codew-windows-arm64.exe",
-    "codewhale-tui-windows-arm64.exe",
-    "codewhale-windows-arm64.exe",
-    "codewhale-windows-arm64-portable.zip",
-    "codewhale-windows-arm64.zip",
+    "nestlone-tui-windows-arm64.exe",
+    "nestlone-windows-arm64.exe",
+    "nestlone-windows-arm64-portable.zip",
+    "nestlone-windows-arm64.zip",
 ];
 
 fn is_session_approved_for_tool(app: &App, tool_name: &str, grouping_key: &str) -> bool {
@@ -522,7 +522,7 @@ impl TerminalInputPump {
         let thread_paused = Arc::clone(&paused);
         let thread_paused_ack = Arc::clone(&paused_ack);
         let handle = thread::Builder::new()
-            .name("codewhale-terminal-input".to_string())
+            .name("nestlone-terminal-input".to_string())
             .spawn(move || {
                 let mut last_heartbeat = Instant::now();
                 while !thread_stop.load(Ordering::Acquire) {
@@ -1732,7 +1732,7 @@ pub async fn run_tui(
         // `#![deny(clippy::print_stderr)]` would otherwise refuse it.
         #[allow(clippy::print_stderr)]
         {
-            eprintln!("codewhale: {failure}");
+            eprintln!("nestlone: {failure}");
         }
     }
 
@@ -1762,8 +1762,8 @@ fn require_interactive_terminal(stdin_is_tty: bool, stdout_is_tty: bool) -> Resu
     Err(anyhow::anyhow!(
         "Codewhale TUI requires an interactive terminal (stdin and stdout must be a TTY).\n\
          Open a real terminal (Terminal.app, iTerm, Windows Terminal, …) and run `codew` \
-         or `codewhale` there — not from a pipe, cron job, or non-TTY launcher.\n\
-         For headless prompts use `codewhale exec \"…\"` instead."
+         or `nestlone` there — not from a pipe, cron job, or non-TTY launcher.\n\
+         For headless prompts use `nestlone exec \"…\"` instead."
     ))
 }
 
@@ -1776,7 +1776,7 @@ fn tui_launch_preflight_explains_non_tty_failure() {
             .expect_err("a missing TTY must fail before raw mode");
         let message = err.to_string();
         assert!(message.contains("interactive terminal"), "{message}");
-        assert!(message.contains("codewhale exec"), "{message}");
+        assert!(message.contains("nestlone exec"), "{message}");
     }
 }
 
@@ -1785,7 +1785,7 @@ fn should_show_resume_hint(session_id: Option<&str>) -> bool {
 }
 
 fn resume_hint_text() -> &'static str {
-    "To continue this session, execute codewhale run --continue"
+    "To continue this session, execute nestlone run --continue"
 }
 
 /// One side of the raw-mode probe abandonment handshake between the startup
@@ -1973,8 +1973,8 @@ fn bounded_subagent_hook_preview(text: &str) -> (String, bool) {
 }
 
 fn subagent_completion_status(result: &str) -> Option<String> {
-    const START: &str = "<codewhale:subagent.done>";
-    const END: &str = "</codewhale:subagent.done>";
+    const START: &str = "<nestlone:subagent.done>";
+    const END: &str = "</nestlone:subagent.done>";
 
     if let Some(start) = result.find(START).map(|idx| idx + START.len())
         && let Some(end) = result[start..].find(END).map(|idx| idx + start)
@@ -2004,8 +2004,8 @@ fn subagent_completion_status(result: &str) -> Option<String> {
 }
 
 fn subagent_failure_notice(result: &str) -> Option<String> {
-    const START: &str = "<codewhale:subagent.done>";
-    const END: &str = "</codewhale:subagent.done>";
+    const START: &str = "<nestlone:subagent.done>";
+    const END: &str = "</nestlone:subagent.done>";
     let start = result.find(START)? + START.len();
     let end = result[start..].find(END)? + start;
     let value = serde_json::from_str::<serde_json::Value>(&result[start..end]).ok()?;
@@ -2046,7 +2046,7 @@ fn subagent_status_from_completion_result(result: &str) -> SubAgentStatus {
         .lines()
         .find_map(|line| {
             let trimmed = line.trim();
-            (!trimmed.is_empty() && !trimmed.starts_with("<codewhale:subagent.done>"))
+            (!trimmed.is_empty() && !trimmed.starts_with("<nestlone:subagent.done>"))
                 .then_some(trimmed.to_string())
         })
         .unwrap_or_else(|| "sub-agent finished".to_string());
@@ -18202,7 +18202,7 @@ impl UpdateNotice {
     /// Short line for the transient status toast (unchanged wording).
     fn toast_line(&self) -> String {
         format!(
-            "v{latest} available - run `codewhale update` and restart",
+            "v{latest} available - run `nestlone update` and restart",
             latest = self.latest
         )
     }
@@ -18213,7 +18213,7 @@ impl UpdateNotice {
     fn notice_block(&self) -> String {
         format!(
             "Update available: v{current} -> v{latest}\n\
-             Run `codewhale update` to upgrade, then restart.",
+             Run `nestlone update` to upgrade, then restart.",
             current = self.current,
             latest = self.latest
         )
@@ -18378,14 +18378,14 @@ mod provider_key_validation_tests {
         mirror_saved_api_key_in_config(
             &mut config,
             ApiProvider::Xai,
-            "codewhale-owned-api-key".to_string(),
+            "nestlone-owned-api-key".to_string(),
         );
 
         let xai = config
             .provider_config_for(ApiProvider::Xai)
             .expect("xAI live config");
         assert_eq!(xai.auth_mode.as_deref(), Some("api_key"));
-        assert_eq!(xai.api_key.as_deref(), Some("codewhale-owned-api-key"));
+        assert_eq!(xai.api_key.as_deref(), Some("nestlone-owned-api-key"));
         assert!(xai.external_credentials.is_none());
     }
 

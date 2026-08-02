@@ -535,7 +535,7 @@ fn base_source_entries(model: &str, workspace: &Path, skills_dir: Option<&Path>)
     builder.push(SourceEntry::text(
         SourceKind::CompactionRelayTemplate,
         "Compaction relay template",
-        Some("bundled in this codewhale-tui build (COMPACT_TEMPLATE, compiled in)".to_string()),
+        Some("bundled in this nestlone-tui build (COMPACT_TEMPLATE, compiled in)".to_string()),
         ActivationReason::AlwaysOn,
         COMPACT_TEMPLATE,
         CountingConfidence::High,

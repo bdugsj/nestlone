@@ -1948,7 +1948,7 @@ impl SettingsTransaction {
 ///    `default_mode` / `permission_posture` against each other.
 /// 2. An **advisory file lock on an adjacent `settings.toml.lock`**, following
 ///    the `nestlone_config::config_document` pattern. The process mutex says
-///    nothing about a second Codewhale process (a second TUI, `codewhale exec`,
+///    nothing about a second Codewhale process (a second TUI, `nestlone exec`,
 ///    the runtime HTTP surface in another instance) doing its own
 ///    load/modify/save. Without a cross-process lock those two interleave and
 ///    the later save reverts the earlier one's field — last-save-wins across
@@ -2689,7 +2689,7 @@ mod tests {
     // -----------------------------------------------------------------------
     //
     // The in-process mutex says nothing about a *second* Codewhale process on
-    // the same home directory — a second TUI, `codewhale exec`, the runtime HTTP
+    // the same home directory — a second TUI, `nestlone exec`, the runtime HTTP
     // surface in another instance. Two of those doing load/modify/save at once
     // is the same last-save-wins bug the in-process lock was added to prevent,
     // and no amount of thread-based testing can observe it: threads share the
@@ -4006,7 +4006,7 @@ mod tests {
                 // test isolates the VTE signal instead, so keep that separate
                 // platform heuristic from changing its motion assertions.
                 #[cfg(windows)]
-                std::env::set_var("WT_SESSION", "codewhale-test");
+                std::env::set_var("WT_SESSION", "nestlone-test");
             }
             let mut settings = animated_settings();
             assert!(!settings.low_motion, "default is animated");
@@ -4249,7 +4249,7 @@ mod tests {
                 }
                 std::env::set_var(var, val);
                 #[cfg(windows)]
-                std::env::set_var("WT_SESSION", "codewhale-test");
+                std::env::set_var("WT_SESSION", "nestlone-test");
             }
             let mut settings = animated_settings();
             assert!(!settings.low_motion, "default is animated");
@@ -4578,7 +4578,7 @@ mod tests {
         let _g = config_path_test_guard();
         let tmp = tempfile::tempdir().expect("tempdir");
         let nestlone_home = tmp.path().join(".codewhale");
-        std::fs::create_dir_all(&nestlone_home).expect("codewhale home");
+        std::fs::create_dir_all(&nestlone_home).expect("nestlone home");
         std::fs::write(
             nestlone_home.join("settings.toml"),
             "default_mode = \"yolo\"\n",
@@ -4656,7 +4656,7 @@ mod tests {
         let display = loaded.display(crate::localization::Locale::En);
         assert!(
             display.contains(&format!("Config file: {}", primary.display())),
-            "settings display should surface the canonical codewhale path:\n{display}"
+            "settings display should surface the canonical nestlone path:\n{display}"
         );
     }
 
@@ -4730,7 +4730,7 @@ mod tests {
         let display = loaded.display(crate::localization::Locale::En);
         assert!(
             display.contains(&format!("Config file: {}", primary.display())),
-            "settings display should surface the canonical codewhale path:\n{display}"
+            "settings display should surface the canonical nestlone path:\n{display}"
         );
     }
 
@@ -4738,7 +4738,7 @@ mod tests {
     fn settings_load_ignores_legacy_files_when_nestlone_home_is_explicit() {
         let _g = config_path_test_guard();
         let tmp = tempfile::tempdir().expect("tempdir");
-        let explicit_home = tmp.path().join("isolated-codewhale");
+        let explicit_home = tmp.path().join("isolated-nestlone");
         let legacy_dir = tmp.path().join(".deepseek");
         std::fs::create_dir_all(&legacy_dir).expect("legacy dir");
         std::fs::write(
@@ -4821,7 +4821,7 @@ mod tests {
     fn tui_prefs_path_ignores_legacy_home_when_nestlone_home_is_explicit() {
         let _g = config_path_test_guard();
         let tmp = tempfile::tempdir().expect("tempdir");
-        let explicit_home = tmp.path().join("isolated-codewhale");
+        let explicit_home = tmp.path().join("isolated-nestlone");
         let legacy_dir = tmp.path().join(".deepseek");
         std::fs::create_dir_all(&legacy_dir).expect("legacy dir");
         std::fs::write(legacy_dir.join("tui.toml"), "theme = \"light\"\n").expect("legacy prefs");

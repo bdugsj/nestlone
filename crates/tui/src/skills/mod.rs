@@ -46,7 +46,7 @@ const MAX_SKILL_NAME_CHARS: usize = 64;
 #[must_use]
 pub fn default_skills_dir() -> PathBuf {
     crate::config::effective_home_dir().map_or_else(
-        || PathBuf::from("/tmp/codewhale/skills"),
+        || PathBuf::from("/tmp/nestlone/skills"),
         |p| p.join(".codewhale").join("skills"),
     )
 }
@@ -1983,8 +1983,8 @@ body";
         );
         write_skill(
             &workspace.join(".codewhale").join("skills"),
-            "from-codewhale",
-            "codewhale skill",
+            "from-nestlone",
+            "nestlone skill",
             "body",
         );
         write_skill(
@@ -1995,7 +1995,7 @@ body";
         );
         write_skill(
             &configured_dir,
-            "configured-codewhale",
+            "configured-nestlone",
             "configured skill",
             "body",
         );
@@ -2008,8 +2008,8 @@ body";
         );
         let names: Vec<&str> = registry.list().iter().map(|s| s.name.as_str()).collect();
 
-        assert!(names.contains(&"from-codewhale"));
-        assert!(names.contains(&"configured-codewhale"));
+        assert!(names.contains(&"from-nestlone"));
+        assert!(names.contains(&"configured-nestlone"));
         assert!(
             !names.contains(&"from-claude") && !names.contains(&"from-agents"),
             "CodeWhale-only mode must not import cross-tool skills: {names:?}"

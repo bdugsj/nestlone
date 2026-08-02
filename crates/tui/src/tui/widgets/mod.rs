@@ -704,7 +704,7 @@ impl Renderable for ChatWidget {
         let area = _area;
         crate::tui::hover_layer::begin_frame();
 
-        // Repaint the full chat area with the codewhale-ink background each
+        // Repaint the full chat area with the nestlone-ink background each
         // frame. Ratatui's `Paragraph` only writes cells that contain text,
         // so cells the current frame's paragraph doesn't touch would
         // otherwise hold the *previous* frame's contents (the `:24Z`
@@ -4971,7 +4971,7 @@ mod tests {
     fn slash_completion_hints_exclude_set_and_deepseek_commands() {
         let hints = slash_completion_hints("/", 128, &[], Locale::En, None, ApiProvider::Deepseek);
         assert!(!hints.iter().any(|hint| hint.name == "/set"));
-        assert!(!hints.iter().any(|hint| hint.name == "/codewhale"));
+        assert!(!hints.iter().any(|hint| hint.name == "/nestlone"));
     }
 
     #[test]
@@ -6215,7 +6215,7 @@ mod tests {
     fn empty_state_shows_startup_context() {
         let mut app = create_test_app();
         app.onboarding_needs_api_key = false;
-        app.workspace = PathBuf::from("/tmp/codewhale-test-workspace");
+        app.workspace = PathBuf::from("/tmp/nestlone-test-workspace");
         app.mcp_configured_count = 2;
 
         let lines = build_empty_state_lines(&app, Rect::new(0, 0, 100, 20));
@@ -6230,7 +6230,7 @@ mod tests {
             .collect::<Vec<_>>()
             .join("\n");
 
-        assert!(rendered.contains("codewhale · /tmp/codewhale-test-workspace · no git · mcp 2"));
+        assert!(rendered.contains("nestlone · /tmp/nestlone-test-workspace · no git · mcp 2"));
         assert!(rendered.contains("Fleet ready  /fleet setup"));
         assert!(
             !rendered.contains("Fleet setup  /fleet setup"),
@@ -6262,7 +6262,7 @@ mod tests {
     #[test]
     fn empty_state_centers_startup_block_by_actual_text_width() {
         let mut app = create_test_app();
-        app.workspace = PathBuf::from("/tmp/codewhale-test-workspace");
+        app.workspace = PathBuf::from("/tmp/nestlone-test-workspace");
 
         let lines = build_empty_state_lines(&app, Rect::new(0, 0, 100, 20));
         let text_lines = lines
@@ -6274,7 +6274,7 @@ mod tests {
                     .collect::<String>()
             })
             .collect::<Vec<_>>();
-        let context = "codewhale · /tmp/codewhale-test-workspace · no git · mcp 0";
+        let context = "nestlone · /tmp/nestlone-test-workspace · no git · mcp 0";
         let context_line = text_lines
             .iter()
             .find(|line| line.trim_start() == context)
@@ -6288,7 +6288,7 @@ mod tests {
     #[test]
     fn underwater_launch_is_visibly_deep_and_preserves_text_cells() {
         let mut app = create_test_app();
-        app.workspace = PathBuf::from("/tmp/codewhale-test-workspace");
+        app.workspace = PathBuf::from("/tmp/nestlone-test-workspace");
         app.model = "deepseek-v4-pro".to_string();
 
         let area = Rect::new(0, 0, 100, 20);
@@ -6314,7 +6314,7 @@ mod tests {
         let leads = rendered.matches("><o>").count() + rendered.matches("<o><").count();
         assert_eq!(leads, 1, "exactly one eyed lead fish:\n{rendered}");
 
-        let context = "codewhale · /tmp/codewhale-test-workspace · no git · mcp 0";
+        let context = "nestlone · /tmp/nestlone-test-workspace · no git · mcp 0";
         let context_x = ((100usize - UnicodeWidthStr::width(context)) / 2) as u16;
         let context_cell = (0..area.height)
             .find_map(|y| (buf[(context_x, y)].symbol() == "c").then_some((context_x, y)))
@@ -7553,12 +7553,12 @@ diff --git a/src/b.rs b/src/b.rs\n\
             "exec_shell",
             "Built-in safety gate requires approval: destructive background/headless actions cannot auto-approve",
             &serde_json::json!({
-                "command": "cd /Volumes/VIXinSSD/codewhale; cargo clippy -p codewhale-tui --all-targets --locked -- -D warnings 2>&1 | tee /tmp/codewhale-clippy.log",
-                "cwd": "/Volumes/VIXinSSD/codewhale",
+                "command": "cd /Volumes/VIXinSSD/nestlone; cargo clippy -p nestlone-tui --all-targets --locked -- -D warnings 2>&1 | tee /tmp/nestlone-clippy.log",
+                "cwd": "/Volumes/VIXinSSD/nestlone",
             }),
             "exec_shell:cargo-clippy",
             Some("Confirmed - passes in isolation, so this is the documentation gate."),
-            std::path::Path::new("/Volumes/VIXinSSD/codewhale"),
+            std::path::Path::new("/Volumes/VIXinSSD/nestlone"),
         );
         let view = crate::tui::approval::ApprovalView::new(request.clone());
         let widget = ApprovalWidget::new(&request, &view);

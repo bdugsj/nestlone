@@ -100,7 +100,7 @@ impl ToolSpec for ReadFileTool {
     }
 
     fn description(&self) -> &'static str {
-        "Read a UTF-8 file from the workspace. Use this instead of `cat`, `head`, `tail`, or `sed -n '..p'` in `exec_shell` — it's faster, sandbox-aware, and skips the approval prompt. Plain text is returned as-is and records the file snapshot required before `edit_file` will make a narrow in-place edit. CodeWhale config files and file-backed credential stores cannot be read with this tool; use `codewhale config list` or `codewhale auth status` for safe inspection. PDFs are auto-extracted via the bundled pure-Rust extractor (no Poppler install required). Image screenshots are OCR-extracted when local OCR is available. Cannot read other non-PDF binaries.\n\nFor large files, use `start_line` and `max_lines` to read in chunks. By default, returns at most 200 lines (~16KB). If `truncated=\"true\"` in the response, use `next_start_line` to continue reading. For PDFs, use `pages` instead — `start_line`/`max_lines` only apply to text files."
+        "Read a UTF-8 file from the workspace. Use this instead of `cat`, `head`, `tail`, or `sed -n '..p'` in `exec_shell` — it's faster, sandbox-aware, and skips the approval prompt. Plain text is returned as-is and records the file snapshot required before `edit_file` will make a narrow in-place edit. CodeWhale config files and file-backed credential stores cannot be read with this tool; use `nestlone config list` or `nestlone auth status` for safe inspection. PDFs are auto-extracted via the bundled pure-Rust extractor (no Poppler install required). Image screenshots are OCR-extracted when local OCR is available. Cannot read other non-PDF binaries.\n\nFor large files, use `start_line` and `max_lines` to read in chunks. By default, returns at most 200 lines (~16KB). If `truncated=\"true\"` in the response, use `next_start_line` to continue reading. For PDFs, use `pages` instead — `start_line`/`max_lines` only apply to text files."
     }
 
     fn input_schema(&self) -> Value {
@@ -141,7 +141,7 @@ impl ToolSpec for ReadFileTool {
         let file_path = context.resolve_path(path_str)?;
         if is_nestlone_credential_path(&file_path) {
             return Err(ToolError::permission_denied(
-                "read_file cannot expose CodeWhale configuration or credential-store files; use `codewhale config list` or `codewhale auth status` for safe inspection",
+                "read_file cannot expose CodeWhale configuration or credential-store files; use `nestlone config list` or `nestlone auth status` for safe inspection",
             ));
         }
         let pages = optional_str(&input, "pages");
@@ -1512,7 +1512,7 @@ mod tests {
                 .expect_err("credential-bearing CodeWhale file must be denied");
             let message = err.to_string();
             assert!(message.contains("cannot expose CodeWhale"), "{message}");
-            assert!(message.contains("codewhale config list"), "{message}");
+            assert!(message.contains("nestlone config list"), "{message}");
         }
 
         let ordinary = ReadFileTool

@@ -1,6 +1,6 @@
 //! Model-facing Workflow runner over the live sub-agent runtime.
 //!
-//! The JS VM stays in `codewhale-workflow-js`; this module supplies the TUI
+//! The JS VM stays in `nestlone-workflow-js`; this module supplies the TUI
 //! driver that turns each `task(...)` call into a real `SubAgentManager` spawn.
 
 use std::collections::HashMap;

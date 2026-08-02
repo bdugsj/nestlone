@@ -172,7 +172,7 @@ fn workspace_status_reports_head_and_dirty_counts() -> Result<()> {
             "-c",
             "user.name=CodeWhale Test",
             "-c",
-            "user.email=codewhale@example.invalid",
+            "user.email=nestlone@example.invalid",
             "commit",
             "-m",
             "init",
@@ -808,7 +808,7 @@ async fn spawn_test_server_with_config_path(
         tokio::task::JoinHandle<()>,
     )>,
 > {
-    let root = std::env::temp_dir().join(format!("codewhale-config-api-{}", Uuid::new_v4()));
+    let root = std::env::temp_dir().join(format!("nestlone-config-api-{}", Uuid::new_v4()));
     let sessions_dir = root.join("sessions");
     let workspace = root.join("workspace");
     fs::create_dir_all(&root)?;
@@ -836,7 +836,7 @@ async fn spawn_test_server_with_config_path_and_profile(
         tokio::task::JoinHandle<()>,
     )>,
 > {
-    let root = std::env::temp_dir().join(format!("codewhale-config-api-{}", Uuid::new_v4()));
+    let root = std::env::temp_dir().join(format!("nestlone-config-api-{}", Uuid::new_v4()));
     let sessions_dir = root.join("sessions");
     let workspace = root.join("workspace");
     fs::create_dir_all(&root)?;
@@ -923,7 +923,7 @@ async fn collect_sse_frames(
 fn write_fake_fleet_binary(root: &Path, marker: &Path) -> Result<PathBuf> {
     use std::os::unix::fs::PermissionsExt;
 
-    let binary = root.join("fake-codewhale");
+    let binary = root.join("fake-nestlone");
     fs::write(
         &binary,
         format!(
@@ -943,8 +943,8 @@ fn write_fake_fleet_binary(root: &Path, marker: &Path) -> Result<PathBuf> {
     // Codewhale binary. A `.cmd` fake introduces an extra `cmd.exe` wrapper
     // whose lifetime can end before the Fleet host attaches its Job Object,
     // making the test race a process topology production does not use.
-    let source = root.join("fake-codewhale.rs");
-    let binary = root.join("fake-codewhale.exe");
+    let source = root.join("fake-nestlone.rs");
+    let binary = root.join("fake-nestlone.exe");
     let helper = format!(
         r##"fn main() {{
     std::fs::File::create({marker:?}).expect("create Fleet restart marker");
@@ -1072,7 +1072,7 @@ async fn health_and_tasks_endpoints_work() -> Result<()> {
         .json()
         .await?;
     assert_eq!(health["status"], "ok");
-    assert_eq!(health["service"], "codewhale-runtime-api");
+    assert_eq!(health["service"], "nestlone-runtime-api");
 
     let created: serde_json::Value = client
         .post(format!("http://{addr}/v1/tasks"))
@@ -1121,7 +1121,7 @@ async fn health_and_tasks_endpoints_work() -> Result<()> {
 #[cfg(unix)]
 #[tokio::test]
 async fn mcp_tools_endpoint_is_passive_until_connect_requested() -> Result<()> {
-    let root = std::env::temp_dir().join(format!("codewhale-mcp-tools-api-{}", Uuid::new_v4()));
+    let root = std::env::temp_dir().join(format!("nestlone-mcp-tools-api-{}", Uuid::new_v4()));
     let sessions_dir = root.join("sessions");
     fs::create_dir_all(&root)?;
     let sentinel = root.join("mcp-spawned");
@@ -1238,7 +1238,7 @@ async fn runtime_token_guard_protects_v1_routes() -> Result<()> {
 
     let nestlone_header = client
         .get(format!("http://{addr}/v1/threads/summary"))
-        .header("x-codewhale-runtime-token", &token)
+        .header("x-nestlone-runtime-token", &token)
         .send()
         .await?
         .error_for_status()?;
@@ -1258,7 +1258,7 @@ async fn runtime_token_guard_protects_v1_routes() -> Result<()> {
 
 #[tokio::test]
 async fn web_bootstrap_sets_strict_cookie_once_and_preserves_v1_auth() -> Result<()> {
-    let root = std::env::temp_dir().join(format!("codewhale-web-api-{}", Uuid::new_v4()));
+    let root = std::env::temp_dir().join(format!("nestlone-web-api-{}", Uuid::new_v4()));
     let sessions_dir = root.join("sessions");
     let workspace = root.join("workspace");
     let token = "cwrt_runtime_secret_never_in_browser_storage".to_string();
@@ -1299,14 +1299,14 @@ async fn web_bootstrap_sets_strict_cookie_once_and_preserves_v1_auth() -> Result
 
     let wrong = client
         .get(format!(
-            "http://{addr}/__codewhale/bootstrap/cwwb_00000000000000000000000000000000"
+            "http://{addr}/__nestlone/bootstrap/cwwb_00000000000000000000000000000000"
         ))
         .send()
         .await?;
     assert_eq!(wrong.status(), StatusCode::UNAUTHORIZED);
 
     let exchange = client
-        .get(format!("http://{addr}/__codewhale/bootstrap/{nonce}"))
+        .get(format!("http://{addr}/__nestlone/bootstrap/{nonce}"))
         .send()
         .await?;
     assert_eq!(exchange.status(), StatusCode::SEE_OTHER);
@@ -1382,7 +1382,7 @@ async fn web_bootstrap_sets_strict_cookie_once_and_preserves_v1_auth() -> Result
     assert_eq!(bearer_post.status(), StatusCode::CREATED);
 
     let reused = client
-        .get(format!("http://{addr}/__codewhale/bootstrap/{nonce}"))
+        .get(format!("http://{addr}/__nestlone/bootstrap/{nonce}"))
         .send()
         .await?;
     assert_eq!(reused.status(), StatusCode::UNAUTHORIZED);
@@ -1400,7 +1400,7 @@ async fn web_assets_are_absent_outside_web_mode() -> Result<()> {
         return Ok(());
     };
     let client = crate::tls::reqwest_client();
-    for path in ["/", "/assets/codewhale-web.css", "/assets/codewhale-web.js"] {
+    for path in ["/", "/assets/nestlone-web.css", "/assets/nestlone-web.js"] {
         let response = client.get(format!("http://{addr}{path}")).send().await?;
         assert_eq!(response.status(), StatusCode::NOT_FOUND, "path={path}");
     }
@@ -1425,7 +1425,7 @@ async fn thread_summary_includes_workspace_branch_metadata() -> Result<()> {
             "-c",
             "user.name=CodeWhale Test",
             "-c",
-            "user.email=codewhale@example.invalid",
+            "user.email=nestlone@example.invalid",
             "commit",
             "-m",
             "init",
@@ -1641,7 +1641,7 @@ async fn workspace_and_automation_endpoints_work() -> Result<()> {
 
 #[tokio::test]
 async fn fleet_status_runtime_api_exposes_state_and_actions() -> Result<()> {
-    let root = std::env::temp_dir().join(format!("codewhale-fleet-api-{}", Uuid::new_v4()));
+    let root = std::env::temp_dir().join(format!("nestlone-fleet-api-{}", Uuid::new_v4()));
     let workspace = root.join("workspace");
     fs::create_dir_all(&workspace)?;
     let sub_agent_manager = runtime_api_sub_agent_manager(&workspace, 2);
@@ -1687,7 +1687,7 @@ async fn fleet_status_runtime_api_exposes_state_and_actions() -> Result<()> {
         1,
     )?;
     let restarted_marker = root.join("restarted-worker-ran");
-    let fake_codewhale = write_fake_fleet_binary(&root, &restarted_marker)?;
+    let fake_nestlone = write_fake_fleet_binary(&root, &restarted_marker)?;
     let worker_id = report.worker_ids[0].clone();
     let sessions_dir = root.join("sessions");
     let Some((addr, _runtime_threads, handle)) =
@@ -1698,7 +1698,7 @@ async fn fleet_status_runtime_api_exposes_state_and_actions() -> Result<()> {
             false,
             workspace,
             Some(sub_agent_manager),
-            Some(fake_codewhale.display().to_string()),
+            Some(fake_nestlone.display().to_string()),
         )
         .await?
     else {
@@ -1860,7 +1860,7 @@ async fn agent_runs_runtime_api_exposes_persisted_worker_receipts() -> Result<()
     use crate::worker_profile::{ModelRoute, ToolScope, WorkerRuntimeProfile};
     use std::collections::VecDeque;
 
-    let root = std::env::temp_dir().join(format!("codewhale-agent-runs-api-{}", Uuid::new_v4()));
+    let root = std::env::temp_dir().join(format!("nestlone-agent-runs-api-{}", Uuid::new_v4()));
     let workspace = root.join("workspace");
     fs::create_dir_all(workspace.join(".codewhale/state"))?;
 
@@ -3613,7 +3613,7 @@ async fn session_resume_thread_returns_404_for_missing_session() -> Result<()> {
 #[tokio::test]
 async fn session_resume_thread_returns_400_when_saved_custom_provider_was_removed() -> Result<()> {
     let root = std::env::temp_dir().join(format!(
-        "codewhale-session-removed-provider-{}",
+        "nestlone-session-removed-provider-{}",
         Uuid::new_v4()
     ));
     let sessions_dir = root.join("sessions");
@@ -4226,7 +4226,7 @@ fn snapshots_endpoint_lists_workspace_snapshots() -> Result<()> {
 async fn spawn_server_with_saved_sessions(
     sessions: &[(&str, &str, bool)],
 ) -> Result<Option<(SocketAddr, PathBuf, tokio::task::JoinHandle<()>)>> {
-    let root = std::env::temp_dir().join(format!("codewhale-session-routes-{}", Uuid::new_v4()));
+    let root = std::env::temp_dir().join(format!("nestlone-session-routes-{}", Uuid::new_v4()));
     let sessions_dir = root.join("sessions");
     let workspace = root.join("workspace");
     fs::create_dir_all(&workspace)?;
@@ -4860,7 +4860,7 @@ async fn runtime_info_reports_bind_state() -> Result<()> {
         .error_for_status()?
         .json()
         .await?;
-    assert_eq!(info["service"], "codewhale-runtime-api");
+    assert_eq!(info["service"], "nestlone-runtime-api");
     assert_eq!(info["runtime_api_version"], "1.0");
     assert_eq!(info["nestlone_version"], info["version"]);
     assert_eq!(info["bind_host"], "127.0.0.1");
@@ -5428,7 +5428,7 @@ fn resolve_skills_dir_respects_nestlone_only_scan() {
     let agents_skills = workspace.join(".agents").join("skills");
     let nestlone_skills = workspace.join(".codewhale").join("skills");
     fs::create_dir_all(&agents_skills).expect("create agents skills dir");
-    fs::create_dir_all(&nestlone_skills).expect("create codewhale skills dir");
+    fs::create_dir_all(&nestlone_skills).expect("create nestlone skills dir");
 
     let config = Config {
         skills: Some(crate::config::SkillsConfig {
@@ -5439,7 +5439,7 @@ fn resolve_skills_dir_respects_nestlone_only_scan() {
     };
     let resolved = resolve_skills_dir(&config, workspace);
 
-    let expected = fs::canonicalize(&nestlone_skills).expect("canonical codewhale skills");
+    let expected = fs::canonicalize(&nestlone_skills).expect("canonical nestlone skills");
     assert_eq!(resolved, expected);
 }
 
@@ -5449,7 +5449,7 @@ fn resolve_skills_dir_preserves_explicit_dir_in_nestlone_only_scan() {
     let workspace = tmp.path().join("workspace");
     let nestlone_skills = workspace.join(".codewhale").join("skills");
     let configured_skills = tmp.path().join("configured-skills");
-    fs::create_dir_all(&nestlone_skills).expect("create codewhale skills dir");
+    fs::create_dir_all(&nestlone_skills).expect("create nestlone skills dir");
     fs::create_dir_all(&configured_skills).expect("create configured skills dir");
 
     let config = Config {
@@ -5591,9 +5591,9 @@ fn resolve_skills_dir_rejects_nestlone_only_symlink_escaping_workspace() {
     fs::create_dir_all(&workspace_root).expect("create workspace");
     fs::create_dir_all(&escape_target).expect("create escape target");
 
-    let dotcodewhale = workspace_root.join(".codewhale");
-    fs::create_dir_all(&dotcodewhale).expect("create .codewhale");
-    let bad_link = dotcodewhale.join("skills");
+    let dotnestlone = workspace_root.join(".codewhale");
+    fs::create_dir_all(&dotnestlone).expect("create .codewhale");
+    let bad_link = dotnestlone.join("skills");
     std::os::unix::fs::symlink(&escape_target, &bad_link).expect("symlink");
 
     let config = Config {
@@ -5650,7 +5650,7 @@ async fn post_set_config(
 
 #[tokio::test]
 async fn set_config_rejects_unknown_key_with_bad_request() -> Result<()> {
-    let root = std::env::temp_dir().join(format!("codewhale-config-unknown-{}", Uuid::new_v4()));
+    let root = std::env::temp_dir().join(format!("nestlone-config-unknown-{}", Uuid::new_v4()));
     let sessions_dir = root.join("sessions");
     let Some((addr, _runtime_threads, handle)) =
         spawn_test_server_with_root(root, sessions_dir).await?
@@ -5682,7 +5682,7 @@ async fn set_config_rejects_unknown_key_with_bad_request() -> Result<()> {
 async fn set_config_validates_max_history_input() -> Result<()> {
     // Fix #4: invalid max_history input must return 400 instead of silently
     // falling back to a default value.
-    let root = std::env::temp_dir().join(format!("codewhale-config-maxhist-{}", Uuid::new_v4()));
+    let root = std::env::temp_dir().join(format!("nestlone-config-maxhist-{}", Uuid::new_v4()));
     let sessions_dir = root.join("sessions");
     let Some((addr, _runtime_threads, handle)) =
         spawn_test_server_with_root(root, sessions_dir).await?
@@ -5715,7 +5715,7 @@ async fn set_config_validates_max_history_input() -> Result<()> {
 async fn set_config_validates_subagents_enabled_input() -> Result<()> {
     // Fix #1: subagents_enabled must validate input and reject non-boolean
     // values with a descriptive 400 error.
-    let root = std::env::temp_dir().join(format!("codewhale-config-subenabled-{}", Uuid::new_v4()));
+    let root = std::env::temp_dir().join(format!("nestlone-config-subenabled-{}", Uuid::new_v4()));
     let sessions_dir = root.join("sessions");
     let Some((addr, _runtime_threads, handle)) =
         spawn_test_server_with_root(root, sessions_dir).await?
@@ -5747,7 +5747,7 @@ async fn set_config_validates_subagents_enabled_input() -> Result<()> {
 async fn set_config_validates_subagents_max_depth_input() -> Result<()> {
     // Fix #1: subagents_max_depth must validate input and reject non-integer
     // values with a descriptive 400 error.
-    let root = std::env::temp_dir().join(format!("codewhale-config-subdepth-{}", Uuid::new_v4()));
+    let root = std::env::temp_dir().join(format!("nestlone-config-subdepth-{}", Uuid::new_v4()));
     let sessions_dir = root.join("sessions");
     let Some((addr, _runtime_threads, handle)) =
         spawn_test_server_with_root(root, sessions_dir).await?
@@ -5772,7 +5772,7 @@ async fn set_config_with_config_path_writes_to_specified_file() -> Result<()> {
     // Fix #2: when the server is started with --config, set_config must
     // persist to that specific file rather than the default discovery path.
     let root =
-        std::env::temp_dir().join(format!("codewhale-config-path-persist-{}", Uuid::new_v4()));
+        std::env::temp_dir().join(format!("nestlone-config-path-persist-{}", Uuid::new_v4()));
     fs::create_dir_all(&root)?;
     let config_file = root.join("custom-config.toml");
     fs::write(&config_file, "# initial\n")?;
@@ -5838,7 +5838,7 @@ async fn set_config_with_config_path_writes_to_specified_file() -> Result<()> {
 #[tokio::test]
 async fn reload_config_endpoint_returns_success() -> Result<()> {
     // Basic smoke test that /v1/config/reload returns 200 with a message.
-    let root = std::env::temp_dir().join(format!("codewhale-config-reload-{}", Uuid::new_v4()));
+    let root = std::env::temp_dir().join(format!("nestlone-config-reload-{}", Uuid::new_v4()));
     let sessions_dir = root.join("sessions");
     let Some((addr, _runtime_threads, handle)) =
         spawn_test_server_with_root(root, sessions_dir).await?
@@ -5910,7 +5910,7 @@ async fn get_provider_models(
 #[tokio::test]
 async fn get_config_returns_active_provider_model() -> Result<()> {
     let root = std::env::temp_dir().join(format!(
-        "codewhale-config-active-provider-{}",
+        "nestlone-config-active-provider-{}",
         Uuid::new_v4()
     ));
     fs::create_dir_all(&root)?;
@@ -5945,7 +5945,7 @@ async fn get_config_returns_active_provider_model() -> Result<()> {
 #[tokio::test]
 async fn api_surfaces_only_configured_model_for_custom_provider_route() -> Result<()> {
     let root = std::env::temp_dir().join(format!(
-        "codewhale-config-custom-provider-model-{}",
+        "nestlone-config-custom-provider-model-{}",
         Uuid::new_v4()
     ));
     fs::create_dir_all(&root)?;
@@ -6007,7 +6007,7 @@ async fn api_surfaces_only_configured_model_for_custom_provider_route() -> Resul
 #[tokio::test]
 async fn api_surfaces_only_active_model_when_runtime_route_passes_ids_through() -> Result<()> {
     let root = std::env::temp_dir().join(format!(
-        "codewhale-config-runtime-pass-through-{}",
+        "nestlone-config-runtime-pass-through-{}",
         Uuid::new_v4()
     ));
     fs::create_dir_all(&root)?;
@@ -6063,7 +6063,7 @@ async fn reload_config_reads_from_config_path_and_updates_in_memory_state() -> R
     // state.config_path), the reload will read an empty/default config and
     // the persisted value will NOT appear in GET /v1/config → test fails.
     let root =
-        std::env::temp_dir().join(format!("codewhale-config-reload-path-{}", Uuid::new_v4()));
+        std::env::temp_dir().join(format!("nestlone-config-reload-path-{}", Uuid::new_v4()));
     fs::create_dir_all(&root)?;
     let config_file = root.join("custom-config.toml");
     fs::write(&config_file, "# initial\n")?;
@@ -6189,7 +6189,7 @@ async fn switch_provider_without_model_arg_preserves_user_per_provider_model() -
     // touch the model key when no model arg is provided — mirroring the
     // TUI's `/provider volcengine` (model: None) flow in
     // `commands/groups/core/provider.rs` + `tui/ui.rs::switch_provider`.
-    let root = std::env::temp_dir().join(format!("codewhale-switch-no-model-{}", Uuid::new_v4()));
+    let root = std::env::temp_dir().join(format!("nestlone-switch-no-model-{}", Uuid::new_v4()));
     fs::create_dir_all(&root)?;
     let config_file = root.join("custom-config.toml");
     fs::write(
@@ -6262,7 +6262,7 @@ async fn switch_provider_with_explicit_model_arg_persists_model() -> Result<()> 
     // glm-2.5` or a model-picker selection), the switch endpoint MUST
     // persist that model — mirroring `switch_provider`'s
     // `if model_override.is_some()` branch (ui.rs:9400-9405).
-    let root = std::env::temp_dir().join(format!("codewhale-switch-with-model-{}", Uuid::new_v4()));
+    let root = std::env::temp_dir().join(format!("nestlone-switch-with-model-{}", Uuid::new_v4()));
     fs::create_dir_all(&root)?;
     let config_file = root.join("custom-config.toml");
     fs::write(
@@ -6312,7 +6312,7 @@ model = "glm-2"
 
 #[tokio::test]
 async fn switch_provider_rejects_unknown_provider_id() -> Result<()> {
-    let root = std::env::temp_dir().join(format!("codewhale-switch-unknown-{}", Uuid::new_v4()));
+    let root = std::env::temp_dir().join(format!("nestlone-switch-unknown-{}", Uuid::new_v4()));
     fs::create_dir_all(&root)?;
     let config_file = root.join("custom-config.toml");
     fs::write(&config_file, "# empty\n")?;
@@ -6345,7 +6345,7 @@ async fn switch_provider_rejects_unknown_provider_id() -> Result<()> {
 async fn switch_provider_rejects_legacy_deepseek_cn_alias() -> Result<()> {
     // The legacy `deepseek-cn` alias has no ProviderKind metadata; the
     // GUI must use `deepseek` instead. Same guard as list_provider_models.
-    let root = std::env::temp_dir().join(format!("codewhale-switch-cn-alias-{}", Uuid::new_v4()));
+    let root = std::env::temp_dir().join(format!("nestlone-switch-cn-alias-{}", Uuid::new_v4()));
     fs::create_dir_all(&root)?;
     let config_file = root.join("custom-config.toml");
     fs::write(&config_file, "# empty\n")?;
@@ -6377,7 +6377,7 @@ async fn switch_provider_with_deepseek_and_explicit_model_updates_default_text_m
     // root key) in addition to the provider change, mirroring
     // `switch_provider` in ui.rs which pins `default_model` for DeepSeek.
     let root = std::env::temp_dir().join(format!(
-        "codewhale-switch-deepseek-model-{}",
+        "nestlone-switch-deepseek-model-{}",
         Uuid::new_v4()
     ));
     fs::create_dir_all(&root)?;
@@ -6438,7 +6438,7 @@ async fn switch_provider_empty_model_string_treated_as_no_override() -> Result<(
     // as no model at all — the endpoint should NOT persist a model key,
     // matching the TUI's behavior where a blank model arg is ignored.
     let root =
-        std::env::temp_dir().join(format!("codewhale-switch-empty-model-{}", Uuid::new_v4()));
+        std::env::temp_dir().join(format!("nestlone-switch-empty-model-{}", Uuid::new_v4()));
     fs::create_dir_all(&root)?;
     let config_file = root.join("custom-config.toml");
     fs::write(
@@ -6490,7 +6490,7 @@ async fn switch_provider_persists_provider_key_on_disk() -> Result<()> {
     // Verify that the root `provider = "..."` key is correctly written to
     // the config file on disk, not just in the response body.
     let root =
-        std::env::temp_dir().join(format!("codewhale-switch-provider-disk-{}", Uuid::new_v4()));
+        std::env::temp_dir().join(format!("nestlone-switch-provider-disk-{}", Uuid::new_v4()));
     fs::create_dir_all(&root)?;
     let config_file = root.join("custom-config.toml");
     fs::write(
@@ -6529,7 +6529,7 @@ model = "glm-2"
 #[tokio::test]
 async fn zai_model_update_is_provider_scoped_and_preserves_deepseek_fallback() -> Result<()> {
     let root = std::env::temp_dir().join(format!(
-        "codewhale-config-zai-model-scope-{}",
+        "nestlone-config-zai-model-scope-{}",
         Uuid::new_v4()
     ));
     fs::create_dir_all(&root)?;
@@ -6599,7 +6599,7 @@ model = "GLM-5.2"
 #[tokio::test]
 async fn reload_config_preserves_profile_selected_named_custom_route() -> Result<()> {
     let root = std::env::temp_dir().join(format!(
-        "codewhale-config-reload-profile-{}",
+        "nestlone-config-reload-profile-{}",
         Uuid::new_v4()
     ));
     fs::create_dir_all(&root)?;
@@ -6658,7 +6658,7 @@ async fn reload_config_refreshes_mcp_config_path() -> Result<()> {
     // removed the stale field and read directly from config, this test also
     // validates that architectural decision.
     let root =
-        std::env::temp_dir().join(format!("codewhale-config-mcp-refresh-{}", Uuid::new_v4()));
+        std::env::temp_dir().join(format!("nestlone-config-mcp-refresh-{}", Uuid::new_v4()));
     fs::create_dir_all(&root)?;
     let config_file = root.join("custom-config.toml");
     fs::write(&config_file, "# initial\n")?;
@@ -6724,7 +6724,7 @@ async fn set_config_with_persist_false_does_not_write_to_disk() -> Result<()> {
     // Verify the persist:false branch: response reports persisted:false and
     // the config file on disk is NOT modified. This is the "dry run" path
     // the GUI can use to validate input without committing changes.
-    let root = std::env::temp_dir().join(format!("codewhale-config-nopersist-{}", Uuid::new_v4()));
+    let root = std::env::temp_dir().join(format!("nestlone-config-nopersist-{}", Uuid::new_v4()));
     fs::create_dir_all(&root)?;
     let config_file = root.join("custom-config.toml");
     let initial_contents = "# initial empty config\n";
@@ -6776,7 +6776,7 @@ async fn set_config_subagents_max_depth_below_ceiling_not_clamped() -> Result<()
     // The existing clamping test only verifies over-ceiling clamping; this
     // test ensures legitimate values are not accidentally modified.
     let root =
-        std::env::temp_dir().join(format!("codewhale-config-depth-noclamp-{}", Uuid::new_v4()));
+        std::env::temp_dir().join(format!("nestlone-config-depth-noclamp-{}", Uuid::new_v4()));
     fs::create_dir_all(&root)?;
     let config_file = root.join("custom-config.toml");
     fs::write(&config_file, "# initial\n")?;
@@ -6833,7 +6833,7 @@ async fn set_config_subagents_enabled_false_persists() -> Result<()> {
     // Verify that subagents_enabled=false is properly persisted. The
     // existing test only verifies the true branch; this covers the false
     // branch to ensure both boolean values round-trip correctly.
-    let root = std::env::temp_dir().join(format!("codewhale-config-subfalse-{}", Uuid::new_v4()));
+    let root = std::env::temp_dir().join(format!("nestlone-config-subfalse-{}", Uuid::new_v4()));
     fs::create_dir_all(&root)?;
     let config_file = root.join("custom-config.toml");
     fs::write(&config_file, "[subagents]\nenabled = true\n")?;
@@ -6867,7 +6867,7 @@ async fn reload_config_with_malformed_file_returns_error() -> Result<()> {
     // Verify error handling: if the config file contains invalid TOML,
     // reload should return 500 instead of crashing or silently succeeding.
     // This catches regressions where the map_err is accidentally removed.
-    let root = std::env::temp_dir().join(format!("codewhale-config-malformed-{}", Uuid::new_v4()));
+    let root = std::env::temp_dir().join(format!("nestlone-config-malformed-{}", Uuid::new_v4()));
     fs::create_dir_all(&root)?;
     let config_file = root.join("custom-config.toml");
     fs::write(&config_file, "# initial\n")?;
@@ -6910,7 +6910,7 @@ async fn reload_config_with_malformed_file_returns_error() -> Result<()> {
 #[tokio::test]
 async fn set_config_model_follows_persisted_provider_before_reload() -> Result<()> {
     let root = std::env::temp_dir().join(format!(
-        "codewhale-config-provider-model-{}",
+        "nestlone-config-provider-model-{}",
         Uuid::new_v4()
     ));
     fs::create_dir_all(&root)?;
@@ -6978,7 +6978,7 @@ async fn reload_config_applies_multiple_persisted_keys() -> Result<()> {
     // reload picks up ALL changes. This catches regressions where reload
     // only applies the last-written key or where set_config overwrites
     // prior keys unexpectedly.
-    let root = std::env::temp_dir().join(format!("codewhale-config-multi-{}", Uuid::new_v4()));
+    let root = std::env::temp_dir().join(format!("nestlone-config-multi-{}", Uuid::new_v4()));
     fs::create_dir_all(&root)?;
     let config_file = root.join("custom-config.toml");
     fs::write(&config_file, "# initial\n")?;
@@ -7071,7 +7071,7 @@ async fn set_config_response_contains_all_expected_fields() -> Result<()> {
     // Verify the SetConfigResponse shape: key, value, message, persisted,
     // requires_reload. This catches serialization regressions and ensures
     // the GUI client can rely on these fields being present and correct.
-    let root = std::env::temp_dir().join(format!("codewhale-config-shape-{}", Uuid::new_v4()));
+    let root = std::env::temp_dir().join(format!("nestlone-config-shape-{}", Uuid::new_v4()));
     fs::create_dir_all(&root)?;
     let config_file = root.join("custom-config.toml");
     fs::write(&config_file, "# initial\n")?;
@@ -7164,7 +7164,7 @@ async fn cors_layer_advertises_exact_supported_headers_and_never_an_extra() -> R
         .header("Access-Control-Request-Method", "POST")
         .header(
             "Access-Control-Request-Headers",
-            "authorization, content-type, accept, x-codewhale-runtime-token, x-deepseek-runtime-token",
+            "authorization, content-type, accept, x-nestlone-runtime-token, x-deepseek-runtime-token",
         )
         .send()
         .await?;
@@ -7191,7 +7191,7 @@ async fn cors_layer_advertises_exact_supported_headers_and_never_an_extra() -> R
         "accept",
         "authorization",
         "content-type",
-        "x-codewhale-runtime-token",
+        "x-nestlone-runtime-token",
         "x-deepseek-runtime-token",
     ]
     .into_iter()

@@ -140,22 +140,22 @@ where
                     Ok(Ok(response)) => Ok(response),
                     Ok(Err(err)) => Err(anyhow::anyhow!(
                         "SSE stream request failed after HTTP/1.1 fallback: {err}. \
-                         `codewhale doctor` can still pass when non-streaming requests work; \
-                         on Windows or proxy networks, try `CODEWHALE_FORCE_HTTP1=1` and rerun `codewhale`."
+                         `nestlone doctor` can still pass when non-streaming requests work; \
+                         on Windows or proxy networks, try `CODEWHALE_FORCE_HTTP1=1` and rerun `nestlone`."
                     )),
                     Err(_elapsed) => Err(anyhow::anyhow!(
                         "SSE stream request did not receive response headers after {}s \
-                         (HTTP/2 and HTTP/1.1). `codewhale doctor` can still pass when \
+                         (HTTP/2 and HTTP/1.1). `nestlone doctor` can still pass when \
                          non-streaming requests work; try `CODEWHALE_FORCE_HTTP1=1` and \
-                         rerun `codewhale`.",
+                         rerun `nestlone`.",
                         open_req.open_timeout.as_secs()
                     )),
                 }
             } else {
                 Err(anyhow::anyhow!(
                     "SSE stream request did not receive response headers after {}s. \
-                     `codewhale doctor` can still pass when non-streaming requests work; \
-                     on Windows or proxy networks, try `CODEWHALE_FORCE_HTTP1=1` and rerun `codewhale`.",
+                     `nestlone doctor` can still pass when non-streaming requests work; \
+                     on Windows or proxy networks, try `CODEWHALE_FORCE_HTTP1=1` and rerun `nestlone`.",
                     open_req.open_timeout.as_secs()
                 ))
             }

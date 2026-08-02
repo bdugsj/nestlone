@@ -22,7 +22,7 @@ pub(crate) fn isolated_test_state_root() -> &'static Path {
             .unwrap_or_default()
             .as_nanos();
         let root = std::env::temp_dir().join(format!(
-            "codewhale-tui-test-state-{}-{nonce}",
+            "nestlone-tui-test-state-{}-{nonce}",
             std::process::id()
         ));
         std::fs::create_dir_all(&root).unwrap_or_else(|error| {
@@ -454,7 +454,7 @@ mod tests {
                 crate::config_persistence::persist_root_bool_key(None, "allow_shell", true)
                     .expect("write isolated config");
             let direct_config_path =
-                crate::config::save_workspace_trust(Path::new("/tmp/codewhale-test-workspace"))
+                crate::config::save_workspace_trust(Path::new("/tmp/nestlone-test-workspace"))
                     .expect("write through direct default config path");
             crate::settings::Settings::default()
                 .save()
@@ -547,7 +547,7 @@ mod tests {
         let (started_tx, started_rx) = mpsc::channel();
         let (tx, rx) = mpsc::channel();
         let redirected = std::env::temp_dir().join(format!(
-            "codewhale-config-path-read-barrier-{}",
+            "nestlone-config-path-read-barrier-{}",
             std::process::id()
         ));
 

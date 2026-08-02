@@ -38,7 +38,7 @@ fn user_asks(world: &mut DirectoryListingWorld, prompt: String) {
         .arg("--record")
         .arg(record_dir.path())
         .output()
-        .expect("run codewhale-tui eval");
+        .expect("run nestlone-tui eval");
 
     assert!(
         output.status.success(),
@@ -165,10 +165,10 @@ fn read_jsonl_records(path: &Path) -> Vec<serde_json::Value> {
 }
 
 fn nestlone_tui_binary() -> PathBuf {
-    if let Some(path) = option_env!("CARGO_BIN_EXE_codewhale-tui") {
+    if let Some(path) = option_env!("CARGO_BIN_EXE_nestlone-tui") {
         return PathBuf::from(path);
     }
-    if let Ok(path) = std::env::var("CARGO_BIN_EXE_codewhale-tui") {
+    if let Ok(path) = std::env::var("CARGO_BIN_EXE_nestlone-tui") {
         return PathBuf::from(path);
     }
 
@@ -177,6 +177,6 @@ fn nestlone_tui_binary() -> PathBuf {
     if path.ends_with("deps") {
         path.pop();
     }
-    path.push(format!("codewhale-tui{}", std::env::consts::EXE_SUFFIX));
+    path.push(format!("nestlone-tui{}", std::env::consts::EXE_SUFFIX));
     path
 }

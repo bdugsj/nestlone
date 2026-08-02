@@ -18,7 +18,7 @@ use tempfile::TempDir;
 fn doctor_text_leaves_a_sealed_home_untouched() {
     let output = run_sealed_diagnostic(["doctor"]);
     let stdout = String::from_utf8_lossy(&output.stdout);
-    assert!(stdout.contains("codewhale Doctor"), "stdout:\n{stdout}");
+    assert!(stdout.contains("nestlone Doctor"), "stdout:\n{stdout}");
 }
 
 #[test]
@@ -40,7 +40,7 @@ fn doctor_json_rejects_kimi_code_claude_alias_with_machine_readable_guidance() {
     let fixture = TempDir::new().expect("fixture root");
     let workspace = fixture.path().join("workspace");
     let home = fixture.path().join("home");
-    let nestlone_home = fixture.path().join("isolated-codewhale-home");
+    let nestlone_home = fixture.path().join("isolated-nestlone-home");
     fs::create_dir_all(&workspace).expect("workspace");
     let config = workspace.join("kimi-invalid.toml");
     let config_bytes = br#"provider = "moonshot"
@@ -115,7 +115,7 @@ fn doctor_json_reports_valid_kimi_code_k3_context_override_from_runtime_route() 
     let fixture = TempDir::new().expect("fixture root");
     let workspace = fixture.path().join("workspace");
     let home = fixture.path().join("home");
-    let nestlone_home = fixture.path().join("isolated-codewhale-home");
+    let nestlone_home = fixture.path().join("isolated-nestlone-home");
     fs::create_dir_all(&workspace).expect("workspace");
     let config = workspace.join("kimi-valid.toml");
     let config_bytes = br#"provider = "moonshot"
@@ -278,7 +278,7 @@ fn doctor_json_does_not_inherit_an_ambient_legacy_secret_from_an_explicit_home()
     let fixture = TempDir::new().expect("fixture root");
     let workspace = fixture.path().join("workspace");
     let home = fixture.path().join("home");
-    let nestlone_home = fixture.path().join("isolated-codewhale-home");
+    let nestlone_home = fixture.path().join("isolated-nestlone-home");
     fs::create_dir_all(&workspace).expect("workspace");
     let legacy = home.join(".deepseek").join("secrets").join("secrets.json");
     FileKeyringStore::new(&legacy)
@@ -490,7 +490,7 @@ fn doctor_json_stash_honors_an_explicit_nestlone_home() {
     let fixture = TempDir::new().expect("fixture root");
     let workspace = fixture.path().join("workspace");
     let home = fixture.path().join("home");
-    let nestlone_home = fixture.path().join("isolated-codewhale-home");
+    let nestlone_home = fixture.path().join("isolated-nestlone-home");
     fs::create_dir_all(&workspace).expect("workspace");
     let ambient_stash = home.join(".codewhale").join("composer_stash.jsonl");
     fs::create_dir_all(ambient_stash.parent().expect("ambient stash parent"))
@@ -544,7 +544,7 @@ fn run_sealed_diagnostic<const N: usize>(args: [&str; N]) -> Output {
     let fixture = TempDir::new().expect("fixture root");
     let workspace = fixture.path().join("workspace");
     let sealed_home = fixture.path().join("sealed-home");
-    let nestlone_home = fixture.path().join("sealed-codewhale-home");
+    let nestlone_home = fixture.path().join("sealed-nestlone-home");
     std::fs::create_dir_all(&workspace).expect("workspace");
 
     let mut command = Command::new(nestlone_tui_binary());
@@ -740,10 +740,10 @@ fn preserve_host_platform_runtime(_command: &mut Command) {
 }
 
 fn nestlone_tui_binary() -> PathBuf {
-    if let Some(path) = option_env!("CARGO_BIN_EXE_codewhale-tui") {
+    if let Some(path) = option_env!("CARGO_BIN_EXE_nestlone-tui") {
         return PathBuf::from(path);
     }
-    if let Ok(path) = std::env::var("CARGO_BIN_EXE_codewhale-tui") {
+    if let Ok(path) = std::env::var("CARGO_BIN_EXE_nestlone-tui") {
         return PathBuf::from(path);
     }
 
@@ -752,6 +752,6 @@ fn nestlone_tui_binary() -> PathBuf {
     if path.ends_with("deps") {
         path.pop();
     }
-    path.push(format!("codewhale-tui{}", std::env::consts::EXE_SUFFIX));
+    path.push(format!("nestlone-tui{}", std::env::consts::EXE_SUFFIX));
     path
 }

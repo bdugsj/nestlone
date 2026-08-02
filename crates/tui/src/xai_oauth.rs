@@ -313,13 +313,13 @@ pub fn get_credentials(config: &Config) -> Result<XaiOAuthCredentials> {
     let mut file = load_external_auth_file(&grant)?;
     let (scope, entry) = select_entry(&mut file).ok_or_else(|| {
         anyhow::anyhow!(
-            "xAI OAuth credentials at {} have no usable entry. Run `grok login` again or use `codewhale auth xai-device` for Codewhale-owned storage.",
+            "xAI OAuth credentials at {} have no usable entry. Run `grok login` again or use `nestlone auth xai-device` for Codewhale-owned storage.",
             nestlone_config::quote_os_path(grant.path())
         )
     })?;
     if !entry_access_token_is_fresh(&entry) {
         bail!(
-            "xAI OAuth access token in {} is expired. Read-only consent never refreshes or rewrites another CLI's credentials. Run `grok login` again or use `codewhale auth xai-device`.",
+            "xAI OAuth access token in {} is expired. Read-only consent never refreshes or rewrites another CLI's credentials. Run `grok login` again or use `nestlone auth xai-device`.",
             nestlone_config::quote_os_path(grant.path())
         );
     }
@@ -362,13 +362,13 @@ where
     let path = store.path_for(name)?;
     let mut file = load_owned_auth_file_from_store(store, name)?.ok_or_else(|| {
         anyhow::anyhow!(
-            "Codewhale-owned xAI OAuth credentials were not found at {}. Run `codewhale auth xai-device` again.",
+            "Codewhale-owned xAI OAuth credentials were not found at {}. Run `nestlone auth xai-device` again.",
             nestlone_config::quote_os_path(&path)
         )
     })?;
     let (scope, mut entry) = select_entry(&mut file).ok_or_else(|| {
         anyhow::anyhow!(
-            "Codewhale-owned xAI OAuth credentials at {} have no usable entry. Run `codewhale auth xai-device` again.",
+            "Codewhale-owned xAI OAuth credentials at {} have no usable entry. Run `nestlone auth xai-device` again.",
             nestlone_config::quote_os_path(&path)
         )
     })?;
@@ -388,7 +388,7 @@ where
         .filter(|t| !t.trim().is_empty())
         .context(
             "xAI OAuth access token expired and no refresh_token is stored. \
-             Run `grok login` or `codewhale auth xai-device` again.",
+             Run `grok login` or `nestlone auth xai-device` again.",
         )?;
     let issuer = entry
         .oidc_issuer
@@ -419,7 +419,7 @@ where
 /// pending in memory until [`activate_device_login`] commits an owned
 /// generation and its config pointer.
 ///
-/// Public residual entry point for CLI/TUI wiring (`codewhale auth` /
+/// Public residual entry point for CLI/TUI wiring (`nestlone auth` /
 /// slash command). Call from a headless or TUI surface that can print the
 /// verification URL.
 pub async fn device_code_login() -> Result<PendingXaiDeviceLogin> {
@@ -652,7 +652,7 @@ fn activate_device_login_locked(
         && let Err(error) = store.remove(&previous)
     {
         tracing::warn!(
-            target: "codewhale::xai_oauth",
+            target: "nestlone::xai_oauth",
             error = %error,
             "new xAI OAuth generation committed but superseded generation cleanup failed"
         );
@@ -673,11 +673,11 @@ pub fn missing_auth_message() -> String {
     format!(
         "xAI OAuth credentials not found.\n\
          Options:\n\
-         1. Run `codewhale auth xai-device` for Codewhale-owned OAuth storage\n\
+         1. Run `nestlone auth xai-device` for Codewhale-owned OAuth storage\n\
          2. To read an existing Grok CLI login without changing it, run \
-         `codewhale auth external-consent --provider xai --mode read-only --path {}`\n\
+         `nestlone auth external-consent --provider xai --mode read-only --path {}`\n\
          3. Or use API-key auth: export XAI_API_KEY=... / \
-         codewhale auth set --provider xai",
+         nestlone auth set --provider xai",
         nestlone_config::quote_os_path(&auth_file_path())
     )
 }
@@ -736,7 +736,7 @@ fn parse_auth_file(raw: &str, path: &Path) -> Result<AuthFile> {
             }
             Err(_) => {
                 tracing::warn!(
-                    target: "codewhale::xai_oauth",
+                    target: "nestlone::xai_oauth",
                     "skipping unreadable xAI auth entry"
                 );
             }
@@ -901,7 +901,7 @@ fn resolve_device_oauth_endpoints(issuer: &str) -> DeviceOauthEndpoints {
         Err(err) => {
             let fallback = fallback_device_oauth_endpoints(issuer);
             tracing::warn!(
-                target: "codewhale::xai_oauth",
+                target: "nestlone::xai_oauth",
                 error = %err,
                 device_authorization_endpoint = %fallback.device_authorization_endpoint,
                 token_endpoint = %fallback.token_endpoint,
@@ -1338,7 +1338,7 @@ mod tests {
         })
         .to_string();
         fs::write(&path, &raw).unwrap();
-        let owned_home = root.join("codewhale-owned");
+        let owned_home = root.join("nestlone-owned");
         let _home_guard = crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", &owned_home);
         let _path_guard = crate::test_support::EnvVarGuard::set("GROK_AUTH_PATH", &path);
         let config = Config {
@@ -1389,7 +1389,7 @@ mod tests {
         })
         .to_string();
         fs::write(&path, &raw).unwrap();
-        let owned_home = root.join("codewhale-owned");
+        let owned_home = root.join("nestlone-owned");
         let _home_guard = crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", &owned_home);
         let _path_guard = crate::test_support::EnvVarGuard::set("GROK_AUTH_PATH", &path);
         let config = Config {
@@ -1469,7 +1469,7 @@ mod tests {
         )
         .unwrap();
         let _home_guard =
-            crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", root.join("codewhale-owned"));
+            crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", root.join("nestlone-owned"));
         let _path_guard = crate::test_support::EnvVarGuard::set("GROK_AUTH_PATH", &path);
         let _key_guard = crate::test_support::EnvVarGuard::remove("XAI_API_KEY");
         let config = Config {

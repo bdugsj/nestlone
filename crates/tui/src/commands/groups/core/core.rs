@@ -1543,7 +1543,7 @@ mod tests {
         assert!(msg.contains("no canonical vendor credential page exists"));
         assert!(msg.contains("OPENAI_API_KEY"));
         assert!(msg.contains("XIAOMI_MIMO_TOKEN_PLAN_API_KEY"));
-        assert!(!msg.contains("https://codewhale.dev/docs/providers"));
+        assert!(!msg.contains("https://nestlone.dev/docs/providers"));
         assert!(result.action.is_none());
     }
 
@@ -1607,7 +1607,7 @@ mod tests {
         assert!(result.message.is_some());
         let msg = result.message.unwrap();
         assert!(msg.contains("Codewhale"));
-        assert!(!msg.contains("codewhale Home Dashboard"));
+        assert!(!msg.contains("nestlone Home Dashboard"));
         assert!(msg.contains("Model:"));
         assert!(msg.contains("Mode:"));
         assert!(msg.contains("Workspace:"));
@@ -1662,7 +1662,7 @@ mod tests {
             !msg.lines()
                 .any(|line| line.trim_start().starts_with("/set "))
         );
-        assert!(!msg.contains("/codewhale"));
+        assert!(!msg.contains("/nestlone"));
     }
 
     #[test]

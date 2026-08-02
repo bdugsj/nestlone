@@ -1068,7 +1068,7 @@ fn coordination_acceptance_preserves_scopes_candidates_and_replay() {
         repo.path(),
         &[
             "-c",
-            "user.name=codewhale Tests",
+            "user.name=nestlone Tests",
             "-c",
             "user.email=tests@example.com",
             "-c",
@@ -1090,7 +1090,7 @@ fn coordination_acceptance_preserves_scopes_candidates_and_replay() {
         repo.path(),
         &[
             "-c",
-            "user.name=codewhale Tests",
+            "user.name=nestlone Tests",
             "-c",
             "user.email=tests@example.com",
             "-c",
@@ -1368,7 +1368,7 @@ fn init_subagent_git_repo() -> tempfile::TempDir {
     let commit = Command::new("git")
         .args([
             "-c",
-            "user.name=codewhale Tests",
+            "user.name=nestlone Tests",
             "-c",
             "user.email=tests@example.com",
             "-c",
@@ -3106,7 +3106,7 @@ fn test_apply_spawn_profile_depth_hint_flows_from_member() {
 }
 
 /// A saved Fleet profile's reasoning tier must reach the spawn itself, not
-/// only the headless `codewhale exec` argv. Direct and workflow spawns share
+/// only the headless `nestlone exec` argv. Direct and workflow spawns share
 /// `apply_spawn_profile`, so this covers both.
 #[test]
 fn test_apply_spawn_profile_carries_profile_reasoning_into_the_spawn() {
@@ -3461,9 +3461,9 @@ fn forked_subagent_messages_preserve_parent_prefix_then_append_task() {
     assert_eq!(messages.first(), Some(&parent_message));
     assert_eq!(messages.len(), 4);
     assert_eq!(messages[1].role, "system");
-    assert!(message_text(&messages[1]).contains("<codewhale:fork_state>"));
+    assert!(message_text(&messages[1]).contains("<nestlone:fork_state>"));
     assert_eq!(messages[2].role, "system");
-    assert!(message_text(&messages[2]).contains("<codewhale:subagent_context>"));
+    assert!(message_text(&messages[2]).contains("<nestlone:subagent_context>"));
     assert_eq!(messages[3].role, "user");
     assert!(message_text(&messages[3]).contains("inspect parser"));
 }
@@ -6680,7 +6680,7 @@ fn persist_state_rejects_symlinked_state_directory() {
     let outside = tmp.path().join("outside-state");
     let nestlone_dir = workspace.join(".codewhale");
     let state_dir = nestlone_dir.join("state");
-    std::fs::create_dir_all(&nestlone_dir).expect("mkdir codewhale");
+    std::fs::create_dir_all(&nestlone_dir).expect("mkdir nestlone");
     std::fs::create_dir_all(&outside).expect("mkdir outside");
     std::os::unix::fs::symlink(&outside, &state_dir).expect("symlink state dir");
 
@@ -6937,7 +6937,7 @@ fn init_git_repo_at(path: &std::path::Path) {
     let commit = Command::new("git")
         .args([
             "-c",
-            "user.name=codewhale Tests",
+            "user.name=nestlone Tests",
             "-c",
             "user.email=tests@example.com",
             "commit",
@@ -7183,13 +7183,13 @@ fn fresh_forked_and_nested_subagents_share_authority_bound_skill_catalogs() {
 fn subagent_done_sentinel_format_is_well_formed() {
     let res = make_snapshot(SubAgentStatus::Completed);
     let sentinel = subagent_done_sentinel("agent_xyz", &res, false);
-    assert!(sentinel.starts_with("<codewhale:subagent.done>"));
-    assert!(sentinel.ends_with("</codewhale:subagent.done>"));
+    assert!(sentinel.starts_with("<nestlone:subagent.done>"));
+    assert!(sentinel.ends_with("</nestlone:subagent.done>"));
 
     // The inner JSON parses and carries the expected fields.
     let inner = sentinel
-        .trim_start_matches("<codewhale:subagent.done>")
-        .trim_end_matches("</codewhale:subagent.done>");
+        .trim_start_matches("<nestlone:subagent.done>")
+        .trim_end_matches("</nestlone:subagent.done>");
     let parsed: serde_json::Value = serde_json::from_str(inner).expect("inner JSON parses");
     assert_eq!(parsed["agent_id"], "agent_xyz");
     assert_eq!(parsed["status"], "completed");
@@ -7212,8 +7212,8 @@ fn subagent_done_sentinel_keeps_large_result_out_of_metadata() {
     res.result = Some("x".repeat(2048));
     let sentinel = subagent_done_sentinel("agent_big", &res, false);
     let inner = sentinel
-        .trim_start_matches("<codewhale:subagent.done>")
-        .trim_end_matches("</codewhale:subagent.done>");
+        .trim_start_matches("<nestlone:subagent.done>")
+        .trim_end_matches("</nestlone:subagent.done>");
     let parsed: serde_json::Value = serde_json::from_str(inner).expect("inner JSON parses");
     assert_eq!(parsed["agent_id"], "agent_big");
     assert_eq!(parsed["summary_location"], "previous_line");
@@ -7234,8 +7234,8 @@ fn subagent_done_sentinel_marks_truncated_summaries() {
     let res = make_snapshot(SubAgentStatus::Completed);
     let sentinel = subagent_done_sentinel("agent_trunc", &res, true);
     let inner = sentinel
-        .trim_start_matches("<codewhale:subagent.done>")
-        .trim_end_matches("</codewhale:subagent.done>");
+        .trim_start_matches("<nestlone:subagent.done>")
+        .trim_end_matches("</nestlone:subagent.done>");
     let parsed: serde_json::Value = serde_json::from_str(inner).expect("inner JSON parses");
     assert_eq!(parsed["summary_kind"], "truncated");
 }
@@ -7346,8 +7346,8 @@ fn subagent_failed_sentinel_format_is_well_formed() {
     result.name = "agent_zzz".to_string();
     let sentinel = subagent_failed_sentinel(&result, "boom");
     let inner = sentinel
-        .trim_start_matches("<codewhale:subagent.done>")
-        .trim_end_matches("</codewhale:subagent.done>");
+        .trim_start_matches("<nestlone:subagent.done>")
+        .trim_end_matches("</nestlone:subagent.done>");
     let parsed: serde_json::Value = serde_json::from_str(inner).expect("inner JSON parses");
     assert_eq!(parsed["agent_id"], "agent_zzz");
     assert_eq!(parsed["status"], "failed");
@@ -8931,7 +8931,7 @@ fn persisted_advisory_assignment_roles_replay_and_repersist_as_consultant() {
 fn stub_runtime() -> SubAgentRuntime {
     use tokio_util::sync::CancellationToken;
 
-    let workspace = std::env::temp_dir().join("codewhale-test-stub");
+    let workspace = std::env::temp_dir().join("nestlone-test-stub");
     let context = ToolContext::new(workspace.clone());
     SubAgentRuntime {
         client: stub_client(),
@@ -10303,7 +10303,7 @@ fn nested_tool_runtime_routes_child_completions_to_local_inbox() {
     let sent = emit_parent_completion(
         &nested_child_runtime,
         "agent_nested",
-        "nested child summary\n<codewhale:subagent.done>{}</codewhale:subagent.done>",
+        "nested child summary\n<nestlone:subagent.done>{}</nestlone:subagent.done>",
     );
 
     assert!(sent, "nested child should report to the local parent inbox");
@@ -10352,9 +10352,9 @@ fn subagent_budget_exhaustion_completion_carries_budget_exhausted_sentinel() {
     );
     let inner = completion
         .payload
-        .split("<codewhale:subagent.done>")
+        .split("<nestlone:subagent.done>")
         .nth(1)
-        .and_then(|chunk| chunk.split("</codewhale:subagent.done>").next())
+        .and_then(|chunk| chunk.split("</nestlone:subagent.done>").next())
         .expect("sentinel json");
     let parsed: serde_json::Value = serde_json::from_str(inner).expect("sentinel parses");
     assert_eq!(parsed["event"], "subagent.failed");
@@ -10376,7 +10376,7 @@ fn subagent_completion_inlines_evidence_before_sentinel() {
         .expect("evidence block");
     let sentinel_pos = completion
         .payload
-        .find("<codewhale:subagent.done>")
+        .find("<nestlone:subagent.done>")
         .expect("sentinel");
     assert!(evidence_pos < sentinel_pos, "evidence before sentinel");
     assert!(completion.payload.contains("src/lib.rs:1-3"));
@@ -10470,7 +10470,7 @@ fn child_runtime_preserves_step_api_timeout() {
 fn subagent_completion_payload_carries_existing_sentinel_format() {
     // The payload format is the same one already documented in
     // prompts/text.rs (SUBAGENT_OUTPUT_FORMAT): human summary on line 1,
-    // `<codewhale:subagent.done>` sentinel on line 2. This test pins the
+    // `<nestlone:subagent.done>` sentinel on line 2. This test pins the
     // format so future refactors don't silently break the model's parsing
     // contract.
     let mut snap = make_snapshot(SubAgentStatus::Completed);
@@ -10484,14 +10484,14 @@ fn subagent_completion_payload_carries_existing_sentinel_format() {
     let first = lines.next().expect("first line is summary");
     let second = lines.next().expect("second line is sentinel");
     assert!(
-        !first.starts_with("<codewhale:subagent.done>"),
+        !first.starts_with("<nestlone:subagent.done>"),
         "summary should not be the sentinel itself"
     );
     assert!(
-        second.starts_with("<codewhale:subagent.done>"),
+        second.starts_with("<nestlone:subagent.done>"),
         "second line is the sentinel"
     );
-    assert!(second.ends_with("</codewhale:subagent.done>"));
+    assert!(second.ends_with("</nestlone:subagent.done>"));
     assert!(
         second.contains("\"agent_id\":\"agent_test\""),
         "sentinel JSON includes agent_id"
@@ -13156,7 +13156,7 @@ fn a_read_only_member_cannot_smuggle_commands_through_the_verifier_surface() {
 #[test]
 fn a_shell_capable_read_only_member_keeps_test_selection_arguments() {
     for (name, input) in [
-        ("run_tests", json!({"args": "-p codewhale-tui"})),
+        ("run_tests", json!({"args": "-p nestlone-tui"})),
         (
             "Run",
             json!({"action": "tests", "args": "--lib fleet::exact"}),
@@ -13362,7 +13362,7 @@ fn a_verifier_runs_bounded_test_selections_and_nothing_else_at_dispatch() {
 
     for (name, input) in [
         ("run_tests", json!({})),
-        ("run_tests", json!({"args": "-p codewhale-tui exact_fleet"})),
+        ("run_tests", json!({"args": "-p nestlone-tui exact_fleet"})),
         ("Run", json!({"action": "tests", "args": "--lib --exact"})),
         ("run_verifiers", json!({})),
         ("Run", json!({"action": "verifiers"})),

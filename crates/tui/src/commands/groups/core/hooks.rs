@@ -57,7 +57,7 @@ fn events() -> CommandResult {
     let mut out = String::new();
     out.push_str(
         "Available hook events (use one of these as `event = \"...\"` in your `[[hooks.hooks]]` entry).\n\
-         Hooks are a TUI runtime feature: `codewhale exec`, the CLI dispatcher, the app-server,\n\
+         Hooks are a TUI runtime feature: `nestlone exec`, the CLI dispatcher, the app-server,\n\
          and the workflow tool do not fire them.\n\n",
     );
     // Order matters — group lifecycle events first, then per-tool,
@@ -526,7 +526,7 @@ mod tests {
         let body = events().message.expect("non-empty body");
         // Scope truth: this is a TUI runtime feature.
         assert!(body.contains("TUI runtime feature"), "{body}");
-        assert!(body.contains("codewhale exec"), "{body}");
+        assert!(body.contains("nestlone exec"), "{body}");
         // Steering allowlist, matching docs/HOOKS.md.
         assert!(body.contains("`message_submit`, `tool_call_before`, and `shell_env`"));
         // And the honest caveat about what observer-only does not mean.

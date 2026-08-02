@@ -1,6 +1,6 @@
 //! Gherkin binary health and eval harness smoke test for command extraction.
 //!
-//! This runs the binary through `codewhale-tui eval` and verifies that the
+//! This runs the binary through `nestlone-tui eval` and verifies that the
 //! executable still loads and reports a successful JSON evaluation after the
 //! core/session command modules are extracted.
 
@@ -46,11 +46,11 @@ fn eval_harness_runs_shell_command(world: &mut CoreSessionExtractionWorld) {
         ])
         .arg(record_dir.path())
         .output()
-        .expect("codewhale-tui eval should start");
+        .expect("nestlone-tui eval should start");
 
     assert!(
         output.status.success(),
-        "codewhale-tui eval failed\nstderr:\n{}",
+        "nestlone-tui eval failed\nstderr:\n{}",
         String::from_utf8_lossy(&output.stderr)
     );
 
@@ -146,10 +146,10 @@ async fn nestlone_eval_runs_after_extraction() {
 }
 
 fn nestlone_tui_binary() -> PathBuf {
-    if let Some(path) = option_env!("CARGO_BIN_EXE_codewhale-tui") {
+    if let Some(path) = option_env!("CARGO_BIN_EXE_nestlone-tui") {
         return PathBuf::from(path);
     }
-    if let Ok(path) = std::env::var("CARGO_BIN_EXE_codewhale-tui") {
+    if let Ok(path) = std::env::var("CARGO_BIN_EXE_nestlone-tui") {
         return PathBuf::from(path);
     }
 
@@ -158,6 +158,6 @@ fn nestlone_tui_binary() -> PathBuf {
     if path.ends_with("deps") {
         path.pop();
     }
-    path.push(format!("codewhale-tui{}", std::env::consts::EXE_SUFFIX));
+    path.push(format!("nestlone-tui{}", std::env::consts::EXE_SUFFIX));
     path
 }

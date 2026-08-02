@@ -161,11 +161,11 @@ impl StuckGuard {
     }
 }
 
-pub(super) const RUNTIME_NOTICE: &str = "<codewhale:runtime_event kind=\"stuck_guard\" visibility=\"internal\">\n\
+pub(super) const RUNTIME_NOTICE: &str = "<nestlone:runtime_event kind=\"stuck_guard\" visibility=\"internal\">\n\
 This is an internal runtime event. The previous steps appear to be repeating without progress.\n\
 Change strategy: vary the tool arguments or method, inspect the latest result, or ask for the\n\
 missing information. Do not repeat the same action unchanged.\n\
-</codewhale:runtime_event>";
+</nestlone:runtime_event>";
 
 fn normalized_text_hash(text: &str) -> u64 {
     stable_hash(&text.split_whitespace().collect::<Vec<_>>().join(" "))

@@ -1613,7 +1613,7 @@ mod tests {
         )
         .await;
         let body_text = first_wire_body.to_string();
-        assert!(body_text.contains("<codewhale:work_state>"), "{body_text}");
+        assert!(body_text.contains("<nestlone:work_state>"), "{body_text}");
         assert!(
             body_text.contains("preserve this graph-authoritative Work item"),
             "{body_text}"

@@ -880,7 +880,7 @@ impl FleetAlertEndpoint {
 /// Resolved-route detail persisted on a [`FleetReceipt`] (#3154).
 ///
 /// This is an additive, *plain-strings* snapshot of the route a fleet worker
-/// resolved to. It deliberately does NOT depend on any `codewhale-config` route
+/// resolved to. It deliberately does NOT depend on any `nestlone-config` route
 /// type so the protocol crate stays free of the route model.
 ///
 /// CRITICAL no-secrets invariant: this struct carries ONLY non-sensitive route
@@ -1400,13 +1400,13 @@ mod tests {
         let spec = FleetHostSpec::Ssh {
             host: "builder.trusted.example.com".to_string(),
             port: Some(22),
-            user: Some("codewhale".to_string()),
+            user: Some("nestlone".to_string()),
             identity: Some(PathBuf::from("~/.ssh/nestlone_fleet")),
             known_hosts: Some(PathBuf::from("~/.ssh/known_hosts")),
             host_key_fingerprint: Some("SHA256:aLGqZo1M6c...".to_string()),
-            working_directory: Some(PathBuf::from("/srv/codewhale/work")),
+            working_directory: Some(PathBuf::from("/srv/nestlone/work")),
             env_allowlist: vec!["CODEWHALE_PROFILE".to_string()],
-            nestlone_binary: Some("/usr/local/bin/codewhale".to_string()),
+            nestlone_binary: Some("/usr/local/bin/nestlone".to_string()),
         };
         let json = serde_json::to_string_pretty(&spec).unwrap();
         assert!(json.contains("\"known_hosts\""));

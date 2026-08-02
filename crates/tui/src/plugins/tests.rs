@@ -184,7 +184,7 @@ fn aba_source_skill_body_is_replaced_by_the_staged_snapshot_before_activation() 
     let staged_bytes = fs::read(&active.skill_snapshots[0].path).unwrap();
     let mut digest = sha2::Sha256::new();
     use sha2::Digest as _;
-    digest.update(b"codewhale-plugin-file-bytes-v1\0");
+    digest.update(b"nestlone-plugin-file-bytes-v1\0");
     digest.update(staged_bytes);
     let staged_hash = digest
         .finalize()

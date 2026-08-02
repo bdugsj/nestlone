@@ -327,10 +327,10 @@ fn json_response(value: Value) -> ResponseTemplate {
 }
 
 fn binary() -> PathBuf {
-    std::env::var_os("CARGO_BIN_EXE_codewhale-tui")
+    std::env::var_os("CARGO_BIN_EXE_nestlone-tui")
         .map(PathBuf::from)
         .unwrap_or_else(|| {
-            PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../target/debug/codewhale-tui")
+            PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../target/debug/nestlone-tui")
         })
 }
 
@@ -356,7 +356,7 @@ fn preserve_host_env(command: &mut Command) {
 }
 
 fn run_with_timeout(mut command: Command, timeout: Duration) -> std::process::Output {
-    let mut child = command.spawn().expect("spawn codewhale exec");
+    let mut child = command.spawn().expect("spawn nestlone exec");
     let stdout = read_in_background(child.stdout.take().expect("stdout"));
     let stderr = read_in_background(child.stderr.take().expect("stderr"));
     let status = child
@@ -365,7 +365,7 @@ fn run_with_timeout(mut command: Command, timeout: Duration) -> std::process::Ou
         .unwrap_or_else(|| {
             let _ = child.kill();
             let _ = child.wait();
-            panic!("codewhale exec timed out")
+            panic!("nestlone exec timed out")
         });
     std::process::Output {
         status,

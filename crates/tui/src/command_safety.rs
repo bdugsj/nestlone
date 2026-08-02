@@ -467,7 +467,7 @@ fn is_nestlone_readonly_invocation(tokens: &[&str]) -> bool {
     let Some((command, args)) = tokens.split_first() else {
         return false;
     };
-    if !matches!(*command, "codewhale" | "codew") {
+    if !matches!(*command, "nestlone" | "codew") {
         return false;
     }
     matches!(args, ["--version"] | ["-V"] | ["-v"] | ["--help"] | ["-h"])
@@ -1178,10 +1178,10 @@ mod tests {
         assert_eq!(analyze_command("cat file.txt").level, SafetyLevel::Safe);
         assert_eq!(analyze_command("git status").level, SafetyLevel::Safe);
         assert_eq!(
-            analyze_command("codewhale --version").level,
+            analyze_command("nestlone --version").level,
             SafetyLevel::Safe
         );
-        assert_eq!(analyze_command("codewhale --help").level, SafetyLevel::Safe);
+        assert_eq!(analyze_command("nestlone --help").level, SafetyLevel::Safe);
         assert_eq!(
             analyze_command("grep pattern file").level,
             SafetyLevel::Safe
@@ -1334,7 +1334,7 @@ mod tests {
             SafetyLevel::Dangerous
         );
         assert_ne!(
-            analyze_command("cargo run --bin codewhale -- eval").level,
+            analyze_command("cargo run --bin nestlone -- eval").level,
             SafetyLevel::Dangerous
         );
     }
@@ -1358,7 +1358,7 @@ mod tests {
         // contain the substring "eval" but are not eval invocations.
         // Guard against the naive `command.contains("eval")` regression
         // — these should stay safe / workspace-safe, never Dangerous.
-        let evaluate_safe = analyze_command("cargo run --bin codewhale -- eval").level;
+        let evaluate_safe = analyze_command("cargo run --bin nestlone -- eval").level;
         assert_ne!(
             evaluate_safe,
             SafetyLevel::Dangerous,

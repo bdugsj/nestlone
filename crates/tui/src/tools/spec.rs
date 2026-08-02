@@ -149,7 +149,7 @@ pub enum SandboxPolicy {
 
 /// Machine-readable mutation boundary for a headless worker process.
 ///
-/// Fleet serializes this envelope onto the exact `codewhale exec` argv. The
+/// Fleet serializes this envelope onto the exact `nestlone exec` argv. The
 /// child installs it before constructing its engine, and every ToolContext in
 /// that process inherits the same outer cap. Nested agents may narrow this
 /// boundary, but cannot remove or expand it.

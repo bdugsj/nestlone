@@ -71,7 +71,7 @@ impl RegisterCommand for StructcopyCmd {
 }
 
 /// Versioned envelope identity carried in every receipt.
-const SCHEMA_ID: &str = "codewhale/structcopy/v1";
+const SCHEMA_ID: &str = "nestlone/structcopy/v1";
 /// Redaction contract label so consumers can tell which seams ran.
 const REDACTION_CONTRACT: &str = "export-sanitize/v1+typed-markers/v1+strict-url/v2+path-redact/v2";
 /// Marker substituted for subtrees cut by the depth cap. Structural markers

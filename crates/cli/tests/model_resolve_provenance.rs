@@ -194,7 +194,7 @@ fn resolve_with_global_flags(
         .collect()
 }
 
-/// v0.9.1 kimi-k3 dogfood report: `codewhale --provider moonshot --model kimi-k3 model resolve`
+/// v0.9.1 kimi-k3 dogfood report: `nestlone --provider moonshot --model kimi-k3 model resolve`
 /// reported `kimi-k2.7-code`. The top-level flags are the route this process
 /// is on, not a hypothetical, so the diagnostic has to answer with the runtime
 /// resolution instead of re-deriving a registry default and ignoring `--model`.
@@ -279,10 +279,10 @@ fn an_unservable_model_on_the_selected_provider_is_reported_as_a_fallback() {
 }
 
 fn nestlone_binary() -> PathBuf {
-    if let Some(path) = option_env!("CARGO_BIN_EXE_codewhale") {
+    if let Some(path) = option_env!("CARGO_BIN_EXE_nestlone") {
         return PathBuf::from(path);
     }
-    if let Ok(path) = std::env::var("CARGO_BIN_EXE_codewhale") {
+    if let Ok(path) = std::env::var("CARGO_BIN_EXE_nestlone") {
         return PathBuf::from(path);
     }
 
@@ -291,6 +291,6 @@ fn nestlone_binary() -> PathBuf {
     if path.ends_with("deps") {
         path.pop();
     }
-    path.push(format!("codewhale{}", std::env::consts::EXE_SUFFIX));
+    path.push(format!("nestlone{}", std::env::consts::EXE_SUFFIX));
     path
 }

@@ -3823,7 +3823,7 @@ mod tests {
                     cost_microusd: 12,
                 },
                 required_tests: vec![StudentReplayTestResult {
-                    name: "cargo test -p codewhale-workflow".to_string(),
+                    name: "cargo test -p nestlone-workflow".to_string(),
                     passed: true,
                 }],
                 policy_violations: Vec::new(),

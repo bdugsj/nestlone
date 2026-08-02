@@ -2114,8 +2114,8 @@ mod tests {
     fn risk_read_only_shell_commands_route_benign() {
         let cat = ToolCategory::Shell;
         for command in [
-            "codewhale --version",
-            "codewhale --help",
+            "nestlone --version",
+            "nestlone --help",
             "git status --porcelain",
         ] {
             assert_eq!(

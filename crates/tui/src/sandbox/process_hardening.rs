@@ -1,6 +1,6 @@
 //! Process hardening for Linux sandbox defense-in-depth (#2183).
 //!
-//! This module applies kernel-level restrictions to the codewhale-tui process
+//! This module applies kernel-level restrictions to the nestlone-tui process
 //! itself. These hardening measures protect the *parent* TUI process and its
 //! descendants from information leaks and privilege-escalation vectors; they
 //! are not a filesystem or network sandbox for child commands. The Landlock

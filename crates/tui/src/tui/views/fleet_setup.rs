@@ -1397,7 +1397,7 @@ impl FleetSetupView {
 
     fn review_policy_summary(&self) -> String {
         format!(
-            "Workers run without a token cap by default · {}s api, {}s heartbeat. Launch with Fleet → exec; /fleet workers (or /subagents) shows sub-agents in the current interactive session; /fleet status and codewhale fleet status both read the persistent .codewhale/fleet.jsonl ledger.",
+            "Workers run without a token cap by default · {}s api, {}s heartbeat. Launch with Fleet → exec; /fleet workers (or /subagents) shows sub-agents in the current interactive session; /fleet status and nestlone fleet status both read the persistent .codewhale/fleet.jsonl ledger.",
             self.snapshot.api_timeout_secs, self.snapshot.heartbeat_timeout_secs
         )
     }
@@ -1620,7 +1620,7 @@ mod tests {
 
     fn snapshot() -> FleetSetupSnapshot {
         FleetSetupSnapshot {
-            workspace: PathBuf::from("/tmp/codewhale-test-workspace"),
+            workspace: PathBuf::from("/tmp/nestlone-test-workspace"),
             locale: crate::localization::Locale::En,
             provider_ready: true,
             provider: "DeepSeek".to_string(),
@@ -2688,7 +2688,7 @@ mod tests {
         let policy = FleetSetupView::from_snapshot(snapshot()).review_policy_summary();
         for truth in [
             "current interactive session",
-            "codewhale fleet status",
+            "nestlone fleet status",
             ".codewhale/fleet.jsonl",
         ] {
             assert!(policy.contains(truth), "review policy missing: {truth}");

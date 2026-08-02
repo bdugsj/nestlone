@@ -2497,7 +2497,7 @@ impl ProviderPickerView {
                     Style::default().fg(palette::TEXT_MUTED),
                 )),
                 Line::from(Span::styled(
-                    "CLI: codewhale auth external-consent --provider openai-codex; no token is stored here.",
+                    "CLI: nestlone auth external-consent --provider openai-codex; no token is stored here.",
                     Style::default().fg(palette::TEXT_MUTED),
                 )),
             ]
@@ -2704,7 +2704,7 @@ impl ProviderPickerView {
             )),
             Line::from(self.tr(MessageId::ProviderExternalRejectUnsafe)),
             Line::from(format!(
-                "{revoke_label}: codewhale auth external-revoke --provider {}",
+                "{revoke_label}: nestlone auth external-revoke --provider {}",
                 provider.as_str()
             )),
         ])
@@ -6348,7 +6348,7 @@ mod tests {
         let grok_raw = "grok-external-file-must-not-be-read";
         std::fs::write(&codex_path, codex_raw).expect("write Codex trap");
         std::fs::write(&grok_path, grok_raw).expect("write Grok trap");
-        let owned_home = temp.path().join("codewhale-owned");
+        let owned_home = temp.path().join("nestlone-owned");
 
         let _nestlone_home = crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", &owned_home);
         let _codex_path =
@@ -6421,7 +6421,7 @@ mod tests {
             assert!(visible.contains("External: access=read_only"), "{visible}");
             assert!(visible.contains("Owner/path:"), "{visible}");
             assert!(
-                visible.contains("revoke: codewhale auth external-revoke"),
+                visible.contains("revoke: nestlone auth external-revoke"),
                 "{visible}"
             );
             assert!(

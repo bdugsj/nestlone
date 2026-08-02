@@ -1003,7 +1003,7 @@ impl RuntimeBridge {
         let mut command = if let Some(path) = current_exe {
             Command::new(path)
         } else {
-            Command::new("codewhale")
+            Command::new("nestlone")
         };
         // Pass the runtime auth token out-of-band via env (not argv) so local
         // `ps` cannot read credential material from the child command line.
@@ -2930,7 +2930,7 @@ mod tests {
     async fn stdio_runtime_bridge_applies_thread_start_hints() {
         async fn create_thread(Json(body): Json<Value>) -> Json<Value> {
             assert_eq!(body["model"], "deepseek-v4");
-            assert_eq!(body["workspace"], "/tmp/codewhale-stdio");
+            assert_eq!(body["workspace"], "/tmp/nestlone-stdio");
             Json(json!({
                 "id": "thr_runtime",
                 "model": body["model"].clone(),
@@ -2956,7 +2956,7 @@ mod tests {
                 "legacy_thread",
                 Some(RuntimeThreadHint {
                     model: Some("deepseek-v4".to_string()),
-                    workspace: Some(PathBuf::from("/tmp/codewhale-stdio")),
+                    workspace: Some(PathBuf::from("/tmp/nestlone-stdio")),
                 }),
             )
             .await

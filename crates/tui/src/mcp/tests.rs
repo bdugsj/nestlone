@@ -419,7 +419,7 @@ fn reviewed_plugin_environment_uses_only_the_pre_dotenv_snapshot() {
 }
 
 fn write_path_only_test_command(dir: &Path) -> String {
-    let command = "codewhale-mcp-path-only-test";
+    let command = "nestlone-mcp-path-only-test";
     #[cfg(windows)]
     let file_name = format!("{command}.exe");
     #[cfg(not(windows))]
@@ -505,7 +505,7 @@ fn static_mcp_command_uses_expanded_sanitized_stdio_path() {
 fn static_mcp_command_reports_missing_with_server_path_override() {
     let temp = tempfile::tempdir().expect("tempdir");
     let mut server = test_server_config();
-    server.command = Some("codewhale-mcp-command-that-does-not-exist".to_string());
+    server.command = Some("nestlone-mcp-command-that-does-not-exist".to_string());
     server.env.insert(
         "PATH".to_string(),
         temp.path().to_string_lossy().into_owned(),
@@ -522,7 +522,7 @@ fn static_mcp_command_reports_invalid_path_expansion() {
     let _lock = crate::test_support::lock_test_env();
     let _missing = crate::test_support::EnvVarGuard::remove("CODEWHALE_MCP_MISSING_PATH_DIR");
     let mut server = test_server_config();
-    server.command = Some("codewhale-mcp-command".to_string());
+    server.command = Some("nestlone-mcp-command".to_string());
     server.env.insert(
         "PATH".to_string(),
         "do-not-leak-${CODEWHALE_MCP_MISSING_PATH_DIR}-also-secret".to_string(),
@@ -532,7 +532,7 @@ fn static_mcp_command_reports_invalid_path_expansion() {
         .expect_err("missing PATH placeholder must fail static validation");
     let error = format!("{error:#}");
     assert!(error.contains("CODEWHALE_MCP_MISSING_PATH_DIR"));
-    assert!(!error.contains("codewhale-mcp-command"));
+    assert!(!error.contains("nestlone-mcp-command"));
     assert!(!error.contains("do-not-leak"));
     assert!(!error.contains("also-secret"));
 }
@@ -556,7 +556,7 @@ fn static_mcp_command_anchors_relative_and_empty_path_to_server_cwd() {
     let cwd = temp.path().join("server-cwd");
     let bin = cwd.join("relative-bin");
     fs::create_dir_all(&bin).expect("relative bin dir");
-    let relative_command = "codewhale-mcp-relative-path-test";
+    let relative_command = "nestlone-mcp-relative-path-test";
     write_unix_test_command(&bin.join(relative_command), 0o755);
 
     let mut server = test_server_config();
@@ -570,7 +570,7 @@ fn static_mcp_command_anchors_relative_and_empty_path_to_server_cwd() {
         McpCommandAvailability::Available
     );
 
-    let empty_path_command = "codewhale-mcp-empty-path-test";
+    let empty_path_command = "nestlone-mcp-empty-path-test";
     write_unix_test_command(&cwd.join(empty_path_command), 0o755);
     server.command = Some(empty_path_command.to_string());
     server.env.insert("PATH".to_string(), String::new());
@@ -585,7 +585,7 @@ fn static_mcp_command_anchors_relative_and_empty_path_to_server_cwd() {
 #[test]
 fn static_mcp_command_preserves_literal_name_and_requires_execute_bits() {
     let temp = tempfile::tempdir().expect("tempdir");
-    let literal_command = " codewhale-mcp-literal-command-test ";
+    let literal_command = " nestlone-mcp-literal-command-test ";
     write_unix_test_command(&temp.path().join(literal_command), 0o755);
 
     let mut server = test_server_config();
@@ -600,9 +600,9 @@ fn static_mcp_command_preserves_literal_name_and_requires_execute_bits() {
         "static validation must not trim the command passed to Command::new"
     );
 
-    let non_executable = temp.path().join("codewhale-mcp-non-executable-test");
+    let non_executable = temp.path().join("nestlone-mcp-non-executable-test");
     write_unix_test_command(&non_executable, 0o644);
-    server.command = Some("codewhale-mcp-non-executable-test".to_string());
+    server.command = Some("nestlone-mcp-non-executable-test".to_string());
     assert_eq!(
         static_mcp_command_availability(&server).expect("PATH execute-bit check"),
         McpCommandAvailability::Missing
@@ -633,7 +633,7 @@ fn static_mcp_command_matches_windows_path_and_extension_rules() {
 
     server.command = Some(
         temp.path()
-            .join("codewhale-mcp-path-only-test")
+            .join("nestlone-mcp-path-only-test")
             .to_string_lossy()
             .into_owned(),
     );
@@ -642,7 +642,7 @@ fn static_mcp_command_matches_windows_path_and_extension_rules() {
         McpCommandAvailability::Available
     );
 
-    let pathext_command = "codewhale-mcp-pathext-only-test";
+    let pathext_command = "nestlone-mcp-pathext-only-test";
     fs::write(
         temp.path().join(format!("{pathext_command}.cmd")),
         b"@exit /b 0\r\n",
@@ -796,7 +796,7 @@ fn mcp_auth_required_error_item_is_model_visible() {
         item["message"]
             .as_str()
             .expect("message")
-            .contains("codewhale mcp login nordic-mcp")
+            .contains("nestlone mcp login nordic-mcp")
     );
 }
 
@@ -2614,7 +2614,7 @@ async fn connect_all_reloads_before_snapshotting_new_server_names() {
 
     std::fs::write(
         &path,
-        r#"{"servers":{"late":{"command":"codewhale-test-command-that-does-not-exist"}}}"#,
+        r#"{"servers":{"late":{"command":"nestlone-test-command-that-does-not-exist"}}}"#,
     )
     .unwrap();
     // Make the test independent of filesystem mtime granularity.
@@ -3433,7 +3433,7 @@ async fn discover_snapshot_includes_underlying_spawn_error_in_chain() {
         r#"{
             "mcpServers": {
                 "broken": {
-                    "command": "codewhale-tui-test-this-binary-does-not-exist-9f8e7d6c5b4a",
+                    "command": "nestlone-tui-test-this-binary-does-not-exist-9f8e7d6c5b4a",
                     "args": []
                 }
             }

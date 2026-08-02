@@ -15,7 +15,7 @@ pub(super) const NUDGE_THRESHOLD: usize = 3;
 pub(super) const RECEIPT_THRESHOLD: usize = 5;
 pub(super) const STOP_THRESHOLD: usize = 8;
 
-const CORRECTIVE_NUDGE: &str = "[codewhale read-repeat guard] This identical read-only call has already been requested multiple times in the current user turn. Reuse the result already in context, change the arguments, or switch methods; do not issue the same read unchanged.";
+const CORRECTIVE_NUDGE: &str = "[nestlone read-repeat guard] This identical read-only call has already been requested multiple times in the current user turn. Reuse the result already in context, change the arguments, or switch methods; do not issue the same read unchanged.";
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub(super) struct ReadRepeatKey {
@@ -147,7 +147,7 @@ impl ReadRepeatGuard {
         if occurrence.count < NUDGE_THRESHOLD {
             return;
         }
-        if !result.content.contains("[codewhale read-repeat guard]") {
+        if !result.content.contains("[nestlone read-repeat guard]") {
             if !result.content.is_empty() {
                 result.content.push_str("\n\n");
             }

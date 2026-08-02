@@ -417,7 +417,7 @@ mod tests {
     #[test]
     fn kimi_membership_unknown_output_cap_does_not_clamp_to_4k() {
         let _lock = crate::test_support::lock_test_env();
-        let _codewhale = crate::test_support::EnvVarGuard::remove("CODEWHALE_MAX_OUTPUT_TOKENS");
+        let _nestlone = crate::test_support::EnvVarGuard::remove("CODEWHALE_MAX_OUTPUT_TOKENS");
         let _deepseek = crate::test_support::EnvVarGuard::remove("DEEPSEEK_MAX_OUTPUT_TOKENS");
 
         for model in ["kimi-for-coding", "kimi-for-coding-highspeed"] {
@@ -445,7 +445,7 @@ mod tests {
     #[test]
     fn kimi_membership_route_limit_still_caps_output() {
         let _lock = crate::test_support::lock_test_env();
-        let _codewhale = crate::test_support::EnvVarGuard::remove("CODEWHALE_MAX_OUTPUT_TOKENS");
+        let _nestlone = crate::test_support::EnvVarGuard::remove("CODEWHALE_MAX_OUTPUT_TOKENS");
         let _deepseek = crate::test_support::EnvVarGuard::remove("DEEPSEEK_MAX_OUTPUT_TOKENS");
 
         let limits = RouteLimits {
@@ -468,7 +468,7 @@ mod tests {
     #[test]
     fn known_glm_and_minimax_output_caps_remain_authoritative() {
         let _lock = crate::test_support::lock_test_env();
-        let _codewhale = crate::test_support::EnvVarGuard::remove("CODEWHALE_MAX_OUTPUT_TOKENS");
+        let _nestlone = crate::test_support::EnvVarGuard::remove("CODEWHALE_MAX_OUTPUT_TOKENS");
         let _deepseek = crate::test_support::EnvVarGuard::remove("DEEPSEEK_MAX_OUTPUT_TOKENS");
 
         // GLM 5.2: 1M window, documented 131K output. The requested cap is the

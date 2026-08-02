@@ -431,7 +431,7 @@ fn read_skill_bytes(path: &Path) -> Result<Vec<u8>, String> {
 
 fn hash_skill_bytes(bytes: &[u8]) -> String {
     let mut hasher = Sha256::new();
-    hasher.update(b"codewhale-plugin-file-bytes-v1\0");
+    hasher.update(b"nestlone-plugin-file-bytes-v1\0");
     hasher.update(bytes);
     hasher
         .finalize()
@@ -492,7 +492,7 @@ fn plugin_id(scope: PluginScope, name: &str, canonical_root: &Path) -> PluginId 
     let mut hasher = Sha256::new();
     // v2 intentionally invalidates receipts produced by the former lossy
     // Unicode path identity.
-    hasher.update(b"codewhale-plugin-id-v2\0");
+    hasher.update(b"nestlone-plugin-id-v2\0");
     hasher.update(scope.as_str().as_bytes());
     hasher.update(b"\0");
     super::path_identity::hash_os_path(&mut hasher, b"canonical-plugin-root", canonical_root);

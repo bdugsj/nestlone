@@ -28,7 +28,7 @@ fn dispatcher_diagnostics_leave_legacy_secret_state_unchanged() {
     ] {
         let fixture = TempDir::new().expect("fixture root");
         let sealed_home = fixture.path().join("sealed-home");
-        let nestlone_home = fixture.path().join("sealed-codewhale-home");
+        let nestlone_home = fixture.path().join("sealed-nestlone-home");
         let primary_home = sealed_home.join(".codewhale");
         let legacy = sealed_home
             .join(".deepseek")
@@ -44,7 +44,7 @@ fn dispatcher_diagnostics_leave_legacy_secret_state_unchanged() {
         let before_legacy = fs::read(&legacy).expect("read synthetic legacy store");
 
         let receipt = fixture.path().join("delegated-args.txt");
-        let fake_tui = fixture.path().join("fake-codewhale-tui");
+        let fake_tui = fixture.path().join("fake-nestlone-tui");
         fs::write(
             &fake_tui,
             "#!/bin/sh\nprintf '%s\\n' \"$@\" > \"$DIAGNOSTIC_DISPATCH_RECEIPT\"\nif [ \"$1\" = doctor ] && [ \"$2\" = --context-json ]; then\n  printf '%s\\n' '{\"entries\":[]}'\nfi\n",
@@ -147,10 +147,10 @@ fn collect_relative_paths(root: &Path, current: &Path, paths: &mut Vec<PathBuf>)
 }
 
 fn nestlone_binary() -> PathBuf {
-    if let Some(path) = option_env!("CARGO_BIN_EXE_codewhale") {
+    if let Some(path) = option_env!("CARGO_BIN_EXE_nestlone") {
         return PathBuf::from(path);
     }
-    if let Ok(path) = std::env::var("CARGO_BIN_EXE_codewhale") {
+    if let Ok(path) = std::env::var("CARGO_BIN_EXE_nestlone") {
         return PathBuf::from(path);
     }
 
@@ -159,6 +159,6 @@ fn nestlone_binary() -> PathBuf {
     if path.ends_with("deps") {
         path.pop();
     }
-    path.push(format!("codewhale{}", std::env::consts::EXE_SUFFIX));
+    path.push(format!("nestlone{}", std::env::consts::EXE_SUFFIX));
     path
 }

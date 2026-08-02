@@ -177,7 +177,7 @@ pub fn missing_auth_message() -> String {
          \n\
          Codewhale checks OPENAI_CODEX_ACCESS_TOKEN and CODEX_ACCESS_TOKEN automatically.\n\
          Access to the Codex CLI file is disabled by default. After `codex login`, grant read-only access explicitly with:\n\
-         `codewhale auth external-consent --provider openai-codex --mode read-only --path {}`\n\
+         `nestlone auth external-consent --provider openai-codex --mode read-only --path {}`\n\
          Read-only access never refreshes or rewrites the Codex CLI file.",
         nestlone_config::quote_os_path(&auth_file_path())
     )

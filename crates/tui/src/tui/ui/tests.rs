@@ -1095,7 +1095,7 @@ impl Drop for SettingsHomeGuard {
 fn resume_hint_uses_canonical_resume_command() {
     assert_eq!(
         resume_hint_text(),
-        "To continue this session, execute codewhale run --continue"
+        "To continue this session, execute nestlone run --continue"
     );
     assert!(should_show_resume_hint(Some(
         "019dd9d6-4f44-7c83-9863-59674a12b827"
@@ -4394,9 +4394,9 @@ fn apply_loaded_session_projects_subagent_handoff_without_retry_draft_or_user_ce
     let mut app = create_test_app();
     let payload = concat!(
         "Implemented the resume projection.\nCheckpoint: focused tests pass.\n",
-        "<codewhale:subagent.done>{\"agent_id\":\"agent_resume\",\"name\":\"Tide\",",
+        "<nestlone:subagent.done>{\"agent_id\":\"agent_resume\",\"name\":\"Tide\",",
         "\"agent_type\":\"implementer\",\"status\":\"completed\",",
-        "\"summary_location\":\"previous_line\"}</codewhale:subagent.done>",
+        "\"summary_location\":\"previous_line\"}</nestlone:subagent.done>",
     );
     // Literal v0.9.0 persisted fixture: keep this independent from the current
     // producer so a producer/parser drift cannot make the regression test
@@ -4406,13 +4406,13 @@ fn apply_loaded_session_projects_subagent_handoff_without_retry_draft_or_user_ce
         content: vec![
             ContentBlock::Text {
                 text: format!(
-                    "<codewhale:runtime_event kind=\"subagent_completion\" visibility=\"internal\">\n\
+                    "<nestlone:runtime_event kind=\"subagent_completion\" visibility=\"internal\">\n\
 This is an internal runtime event, not user input. Use the sub-agent completion \
 data below to continue coordinating the current task. Do not tell the user they \
 pasted sentinels, do not explain the sentinel protocol, and do not quote the raw \
 XML unless the user explicitly asks to debug sub-agent internals.\n\n\
 {payload}\n\
-</codewhale:runtime_event>"
+</nestlone:runtime_event>"
                 ),
                 cache_control: None,
             },
@@ -8251,7 +8251,7 @@ fn init_git_repo() -> TempDir {
     let commit = Command::new("git")
         .args([
             "-c",
-            "user.name=codewhale Tests",
+            "user.name=nestlone Tests",
             "-c",
             "user.email=tests@example.com",
             "-c",
@@ -9113,7 +9113,7 @@ fn subagent_hook_preview_is_bounded_on_char_boundaries() {
 #[test]
 fn subagent_completion_status_reads_done_sentinel() {
     let result = r#"done
-<codewhale:subagent.done>{"agent_id":"agent_x","status":"completed"}</codewhale:subagent.done>"#;
+<nestlone:subagent.done>{"agent_id":"agent_x","status":"completed"}</nestlone:subagent.done>"#;
 
     assert_eq!(
         subagent_completion_status(result).as_deref(),
@@ -9126,12 +9126,12 @@ fn subagent_completion_status_reads_done_sentinel() {
 fn subagent_failure_notice_surfaces_receipt_fields() {
     let result = concat!(
         "Failed: quota exhausted\n",
-        "<codewhale:subagent.done>{\"event\":\"subagent.failed\",",
+        "<nestlone:subagent.done>{\"event\":\"subagent.failed\",",
         "\"agent_id\":\"agent_x\",\"name\":\"Tide\",",
         "\"status\":\"failed\",\"failure_class\":\"auth_or_quota\",",
         "\"steps\":12,\"elapsed_ms\":3456,",
         "\"transcript_handle\":\"agent:agent_x/full_transcript\"}",
-        "</codewhale:subagent.done>",
+        "</nestlone:subagent.done>",
     );
 
     let notice = subagent_failure_notice(result).expect("failure notice");
@@ -9162,7 +9162,7 @@ fn subagent_completion_status_reads_summary_fallbacks() {
 #[test]
 fn subagent_status_from_completion_result_maps_terminal_sentinels() {
     let failed = r#"Tool timed out
-<codewhale:subagent.done>{"agent_id":"agent_x","status":"failed"}</codewhale:subagent.done>"#;
+<nestlone:subagent.done>{"agent_id":"agent_x","status":"failed"}</nestlone:subagent.done>"#;
     match subagent_status_from_completion_result(failed) {
         crate::tools::subagent::SubAgentStatus::Failed(reason) => {
             assert_eq!(reason, "Tool timed out")
@@ -9171,7 +9171,7 @@ fn subagent_status_from_completion_result_maps_terminal_sentinels() {
     }
 
     let interrupted = r#"Waiting for follow-up
-<codewhale:subagent.done>{"agent_id":"agent_x","status":"interrupted"}</codewhale:subagent.done>"#;
+<nestlone:subagent.done>{"agent_id":"agent_x","status":"interrupted"}</nestlone:subagent.done>"#;
     match subagent_status_from_completion_result(interrupted) {
         crate::tools::subagent::SubAgentStatus::Interrupted(reason) => {
             assert_eq!(reason, "Waiting for follow-up")
@@ -9180,14 +9180,14 @@ fn subagent_status_from_completion_result_maps_terminal_sentinels() {
     }
 
     let budget = r#"Token budget exhausted
-<codewhale:subagent.done>{"agent_id":"agent_x","status":"budget_exhausted"}</codewhale:subagent.done>"#;
+<nestlone:subagent.done>{"agent_id":"agent_x","status":"budget_exhausted"}</nestlone:subagent.done>"#;
     assert_eq!(
         subagent_status_from_completion_result(budget),
         crate::tools::subagent::SubAgentStatus::BudgetExhausted
     );
 
     let cancelled = r#"Cancelled
-<codewhale:subagent.done>{"agent_id":"agent_x","status":"cancelled"}</codewhale:subagent.done>"#;
+<nestlone:subagent.done>{"agent_id":"agent_x","status":"cancelled"}</nestlone:subagent.done>"#;
     assert_eq!(
         subagent_status_from_completion_result(cancelled),
         crate::tools::subagent::SubAgentStatus::Cancelled
@@ -9203,7 +9203,7 @@ fn subagent_status_from_completion_result_maps_terminal_sentinels() {
 fn agent_complete_terminal_verb_is_truthful_for_cancelled_workers() {
     let cancelled = subagent_status_from_completion_result(
         r#"Cancelled
-<codewhale:subagent.done>{"agent_id":"agent_x","status":"cancelled"}</codewhale:subagent.done>"#,
+<nestlone:subagent.done>{"agent_id":"agent_x","status":"cancelled"}</nestlone:subagent.done>"#,
     );
 
     assert_eq!(subagent_terminal_verb(&cancelled), "cancelled");
@@ -9931,7 +9931,7 @@ fn version_hint_requires_complete_release_assets() {
             .iter()
             .filter(|asset| {
                 asset.get("name").and_then(serde_json::Value::as_str)
-                    != Some("codewhale-artifacts-sha256.txt")
+                    != Some("nestlone-artifacts-sha256.txt")
             })
             .cloned()
             .collect(),
@@ -10031,11 +10031,11 @@ fn update_notice_block_is_persistent_and_actionable() {
         "includes release-notes link: {block:?}"
     );
     assert!(
-        block.contains("codewhale update"),
+        block.contains("nestlone update"),
         "includes the update command: {block:?}"
     );
     assert!(
-        block.contains("codewhale update --check"),
+        block.contains("nestlone update --check"),
         "prefers the check-first command: {block:?}"
     );
     assert!(
@@ -11101,7 +11101,7 @@ fn visible_slash_menu_entries_excludes_removed_commands() {
     assert!(entries.iter().any(|entry| entry.name == "/config"));
     assert!(entries.iter().any(|entry| entry.name == "/links"));
     assert!(!entries.iter().any(|entry| entry.name == "/set"));
-    assert!(!entries.iter().any(|entry| entry.name == "/codewhale"));
+    assert!(!entries.iter().any(|entry| entry.name == "/nestlone"));
 }
 
 #[test]
@@ -15747,7 +15747,7 @@ fn dismissing_named_custom_model_picker_restores_app_owned_config_route() {
 async fn model_picker_skips_setup_receipt_when_settings_persistence_fails() {
     let _lock = crate::test_support::lock_test_env();
     let tmp = TempDir::new().expect("settings tempdir");
-    let bad_home = tmp.path().join("codewhale-home-file");
+    let bad_home = tmp.path().join("nestlone-home-file");
     std::fs::write(&bad_home, "not a directory").expect("bad home file");
     let _home = crate::test_support::EnvVarGuard::set("HOME", tmp.path().as_os_str());
     let _userprofile = crate::test_support::EnvVarGuard::set("USERPROFILE", tmp.path().as_os_str());
@@ -17017,7 +17017,7 @@ fn approval_prompt_uses_event_input_after_message_complete_drain() {
     app.pending_tool_uses.clear();
 
     let event_input = serde_json::json!({
-        "command": "cargo test -p codewhale-tui approval",
+        "command": "cargo test -p nestlone-tui approval",
         "workdir": "/repo",
     });
     push_approval_request_view(
@@ -17043,7 +17043,7 @@ fn approval_prompt_uses_event_input_after_message_complete_drain() {
         panic!("expected approval params pager from Alt+V");
     };
 
-    assert!(content.contains("cargo test -p codewhale-tui approval"));
+    assert!(content.contains("cargo test -p nestlone-tui approval"));
     assert!(content.contains("/repo"));
     assert!(!content.contains("stale value from drained list"));
     assert_ne!(content.trim(), "{}");
@@ -17859,7 +17859,7 @@ fn env_only_auth_failure_reopens_provider_onboarding() {
     use crate::error_taxonomy::ErrorEnvelope;
     let mut app = create_test_app();
     app.api_provider = crate::config::ApiProvider::Anthropic;
-    app.config_path = Some(std::path::PathBuf::from("/tmp/codewhale-phase2.toml"));
+    app.config_path = Some(std::path::PathBuf::from("/tmp/nestlone-phase2.toml"));
     app.api_key_env_only = true;
     app.onboarding = crate::tui::app::OnboardingState::None;
     app.onboarding_needs_api_key = false;
@@ -17884,7 +17884,7 @@ fn env_only_auth_failure_reopens_provider_onboarding() {
     assert!(
         status.contains("anthropic")
             && status.contains("ANTHROPIC_API_KEY")
-            && status.contains("/tmp/codewhale-phase2.toml"),
+            && status.contains("/tmp/nestlone-phase2.toml"),
         "expected active-provider/env/path recovery hint, got {status:?}"
     );
     assert!(!status.contains("DEEPSEEK_API_KEY"), "{status}");
@@ -18210,7 +18210,7 @@ fn render_footer_from_surfaces_background_shell_even_without_tasks_panel() {
     app.task_panel = vec![crate::tui::app::TaskPanelEntry {
         id: "shell_abc".to_string(),
         status: "running".to_string(),
-        prompt_summary: "shell: cargo test -p codewhale-tui".to_string(),
+        prompt_summary: "shell: cargo test -p nestlone-tui".to_string(),
         duration_ms: Some(5_000),
         kind: crate::tui::app::TaskPanelEntryKind::Background,
         stale: false,
@@ -19071,7 +19071,7 @@ fn subagent_completion_notification_uses_summary_line_not_sentinel() {
     let payload = crate::tui::notifications::subagent_terminal_payload(
         crate::localization::Locale::En,
         "agent_live",
-        "Finished the docs audit.\n<codewhale:subagent.done>{}</codewhale:subagent.done>",
+        "Finished the docs audit.\n<nestlone:subagent.done>{}</nestlone:subagent.done>",
         &crate::tools::subagent::SubAgentStatus::Completed,
         false,
         Duration::from_secs(42),
@@ -19080,7 +19080,7 @@ fn subagent_completion_notification_uses_summary_line_not_sentinel() {
     assert_eq!(payload.headline(), "Sub-agent complete");
     assert_eq!(payload.detail(), Some("agent_live"));
     assert_eq!(payload.preview(), Some("Finished the docs audit."));
-    assert!(!payload.render_inline().contains("codewhale:subagent.done"));
+    assert!(!payload.render_inline().contains("nestlone:subagent.done"));
 }
 
 #[test]
@@ -19104,7 +19104,7 @@ fn subagent_cancelled_notification_never_claims_completion() {
     let payload = crate::tui::notifications::subagent_terminal_payload(
         crate::localization::Locale::En,
         "agent_stopped",
-        "Cancelled\n<codewhale:subagent.done>{\"status\":\"cancelled\"}</codewhale:subagent.done>",
+        "Cancelled\n<nestlone:subagent.done>{\"status\":\"cancelled\"}</nestlone:subagent.done>",
         &crate::tools::subagent::SubAgentStatus::Cancelled,
         false,
         Duration::from_secs(2),
@@ -19487,7 +19487,7 @@ mod work_sidebar_projection_tests {
         // the list of running jobs, so the task panel refresh picks up the
         // correct state.
         let temp_dir = std::env::temp_dir().join(format!(
-            "codewhale-test-shell-cancel-{}",
+            "nestlone-test-shell-cancel-{}",
             std::process::id()
         ));
         let _ = std::fs::create_dir_all(&temp_dir);

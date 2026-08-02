@@ -1257,13 +1257,13 @@ mod tests {
         let nestlone_skill_dir = workspace
             .join(".codewhale")
             .join("skills")
-            .join("codewhale-skill");
-        std::fs::create_dir_all(&nestlone_skill_dir).expect("create codewhale skill dir");
+            .join("nestlone-skill");
+        std::fs::create_dir_all(&nestlone_skill_dir).expect("create nestlone skill dir");
         std::fs::write(
             nestlone_skill_dir.join("SKILL.md"),
-            "---\nname: codewhale-skill\ndescription: CodeWhale skill\n---\nbody",
+            "---\nname: nestlone-skill\ndescription: CodeWhale skill\n---\nbody",
         )
-        .expect("write codewhale skill");
+        .expect("write nestlone skill");
 
         let entries = build_entries(
             Locale::En,
@@ -1279,7 +1279,7 @@ mod tests {
             .map(|entry| entry.label.as_str())
             .collect();
 
-        assert!(skill_labels.contains(&"$codewhale-skill"));
+        assert!(skill_labels.contains(&"$nestlone-skill"));
         assert!(!skill_labels.contains(&"$claude-skill"));
     }
 

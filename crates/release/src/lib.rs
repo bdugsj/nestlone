@@ -7,7 +7,7 @@ use serde::Deserialize;
 ///
 /// Mirror directories must contain this file alongside platform binaries so
 /// that download integrity can be verified.
-pub const CHECKSUM_MANIFEST_ASSET: &str = "codewhale-artifacts-sha256.txt";
+pub const CHECKSUM_MANIFEST_ASSET: &str = "nestlone-artifacts-sha256.txt";
 
 /// GitHub API URL for the single latest stable release.
 pub const LATEST_RELEASE_URL: &str =
@@ -39,7 +39,7 @@ pub const UPDATE_VERSION_ENV: &str = "DEEPSEEK_TUI_VERSION";
 pub const LEGACY_UPDATE_VERSION_ENV: &str = "DEEPSEEK_VERSION";
 
 /// User-Agent header sent with release metadata requests.
-pub const UPDATE_USER_AGENT: &str = "codewhale-updater";
+pub const UPDATE_USER_AGENT: &str = "nestlone-updater";
 
 const CNB_RELEASE_ASSET_BASE: &str = "https://cnb.cool/bdugsj/nestlone/-/releases";
 const RELEASE_METADATA_TIMEOUT: Duration = Duration::from_secs(5);
@@ -193,10 +193,10 @@ pub fn update_network_fallback_hint() -> String {
         "GitHub release downloads may be blocked or slow on this network.\n\
          For mainland China, use one of these fallback paths:\n\
            1. Source build from the CNB mirror, installing both shipped binaries:\n\
-              cargo install --git {CNB_REPO_URL} --tag vX.Y.Z codewhale-cli --locked --force\n\
-              cargo install --git {CNB_REPO_URL} --tag vX.Y.Z codewhale-tui --locked --force\n\
+              cargo install --git {CNB_REPO_URL} --tag vX.Y.Z nestlone-cli --locked --force\n\
+              cargo install --git {CNB_REPO_URL} --tag vX.Y.Z nestlone-tui --locked --force\n\
            2. Use a binary asset mirror:\n\
-              {RELEASE_BASE_URL_ENV}=https://<mirror>/<release-assets>/ {UPDATE_VERSION_ENV}=X.Y.Z codewhale update\n\
+              {RELEASE_BASE_URL_ENV}=https://<mirror>/<release-assets>/ {UPDATE_VERSION_ENV}=X.Y.Z nestlone update\n\
          The mirror directory must contain {CHECKSUM_MANIFEST_ASSET} and the platform binaries."
     )
 }

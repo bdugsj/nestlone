@@ -18,7 +18,7 @@ pub fn lines(app: &App) -> Vec<Line<'static>> {
 
     vec![
         Line::from(Span::styled(
-            "codewhale",
+            "nestlone",
             Style::default()
                 .fg(palette::WHALE_HUMAN)
                 .add_modifier(Modifier::BOLD),

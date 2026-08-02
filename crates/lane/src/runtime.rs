@@ -49,7 +49,7 @@ impl RuntimeBackendKind {
 /// Inputs for starting a lane under a runtime backend.
 #[derive(Clone)]
 pub struct LaneStartSpec {
-    /// Command argv to run inside the backend (e.g. `codewhale exec …`).
+    /// Command argv to run inside the backend (e.g. `nestlone exec …`).
     pub command: Vec<String>,
     /// Working directory for the command (defaults to worktree or cwd).
     pub cwd: Option<PathBuf>,
@@ -1342,7 +1342,7 @@ mod tests {
     #[test]
     fn lane_start_spec_debug_redacts_environment_values() {
         let spec = LaneStartSpec {
-            command: vec!["codewhale-tui".into()],
+            command: vec!["nestlone-tui".into()],
             cwd: None,
             environment: vec![("DEEPSEEK_API_KEY".into(), "secret-value".into())],
             log_proxy: None,
@@ -1480,8 +1480,8 @@ mod tests {
             "sh".to_string(),
             "-c".to_string(),
             "test \"$LANE_PROXY_SECRET\" = present || exit 9; \
-             printf '%s\\n' '{\"type\":\"workflow_event\",\"schema\":\"codewhale.exec-stream\",\"schema_version\":1,\"run_id\":\"workflow_1234\",\"event\":{\"type\":\"handoff_promoted\",\"artifact_id\":\"workflow_1234:agent_1:review-gate:review_report\",\"gate_id\":\"review-gate\",\"kind\":\"review_report\",\"from_role\":\"reviewer\",\"to_role\":\"verifier\",\"producer_task_id\":\"agent_1\"}}'; \
-             printf '%s\\n' '{\"type\":\"workflow_event\",\"schema\":\"codewhale.exec-stream\",\"schema_version\":1,\"run_id\":\"workflow_1234\",\"event\":{\"type\":\"handoff_consumed\",\"artifact_id\":\"workflow_1234:agent_1:review-gate:review_report\",\"kind\":\"review_report\",\"from_role\":\"reviewer\",\"to_role\":\"verifier\",\"consumer_task_id\":\"agent_2\"}}'; \
+             printf '%s\\n' '{\"type\":\"workflow_event\",\"schema\":\"nestlone.exec-stream\",\"schema_version\":1,\"run_id\":\"workflow_1234\",\"event\":{\"type\":\"handoff_promoted\",\"artifact_id\":\"workflow_1234:agent_1:review-gate:review_report\",\"gate_id\":\"review-gate\",\"kind\":\"review_report\",\"from_role\":\"reviewer\",\"to_role\":\"verifier\",\"producer_task_id\":\"agent_1\"}}'; \
+             printf '%s\\n' '{\"type\":\"workflow_event\",\"schema\":\"nestlone.exec-stream\",\"schema_version\":1,\"run_id\":\"workflow_1234\",\"event\":{\"type\":\"handoff_consumed\",\"artifact_id\":\"workflow_1234:agent_1:review-gate:review_report\",\"kind\":\"review_report\",\"from_role\":\"reviewer\",\"to_role\":\"verifier\",\"consumer_task_id\":\"agent_2\"}}'; \
              printf 'unterminated\\377'; \
              printf '%s\\n' '{\"type\":\"lane_process_exit\",\"exit_code\":0}' >&2; \
              exit 7"
@@ -1516,7 +1516,7 @@ mod tests {
             .iter()
             .find(|value| value["type"] == "workflow_event")
             .expect("preserved workflow handoff receipt");
-        assert_eq!(workflow_event["schema"], "codewhale.exec-stream");
+        assert_eq!(workflow_event["schema"], "nestlone.exec-stream");
         assert_eq!(workflow_event["schema_version"], 1);
         assert_eq!(workflow_event["run_id"], "workflow_1234");
         assert_eq!(workflow_event["event"]["type"], "handoff_promoted");
@@ -1534,7 +1534,7 @@ mod tests {
             .iter()
             .find(|value| value["event"]["type"] == "handoff_consumed")
             .expect("preserved workflow handoff consumption receipt");
-        assert_eq!(consumed_event["schema"], "codewhale.exec-stream");
+        assert_eq!(consumed_event["schema"], "nestlone.exec-stream");
         assert_eq!(consumed_event["schema_version"], 1);
         assert_eq!(consumed_event["run_id"], "workflow_1234");
         assert_eq!(
@@ -1663,7 +1663,7 @@ mod tests {
         let tmux = bin_dir.join("tmux");
         fs::write(
             &tmux,
-            "#!/bin/sh\nprintf '%s\\n' 'no server running on /tmp/codewhale-test.sock' >&2\nexit 1\n",
+            "#!/bin/sh\nprintf '%s\\n' 'no server running on /tmp/nestlone-test.sock' >&2\nexit 1\n",
         )
         .unwrap();
         let mut permissions = fs::metadata(&tmux).unwrap().permissions();

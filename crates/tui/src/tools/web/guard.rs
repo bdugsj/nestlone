@@ -567,7 +567,7 @@ mod tests {
     #[tokio::test]
     async fn unresolved_hostname_is_rejected_before_request() {
         let url =
-            reqwest::Url::parse("https://codewhale-unresolvable-fetch-target.invalid/resource")
+            reqwest::Url::parse("https://nestlone-unresolvable-fetch-target.invalid/resource")
                 .unwrap();
         let err = validate_fetch_target(&url, &ctx(), "fetch_url")
             .await
@@ -732,7 +732,7 @@ mod tests {
     #[tokio::test]
     async fn web_run_tool_label_is_used_in_dns_error() {
         let url =
-            reqwest::Url::parse("https://codewhale-unresolvable-web-run-target.invalid/resource")
+            reqwest::Url::parse("https://nestlone-unresolvable-web-run-target.invalid/resource")
                 .unwrap();
         let err = validate_fetch_target(&url, &ctx(), "web_run")
             .await

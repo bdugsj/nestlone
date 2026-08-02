@@ -141,7 +141,7 @@ pub trait McpManagedClient: Send + Sync {
 
 /// A simple in-memory MCP client for tests and embedding callers.
 ///
-/// This is **not** wired into `codewhale mcp-server`: that path spawns
+/// This is **not** wired into `nestlone mcp-server`: that path spawns
 /// [`ChildProcessMcpClient`] and reports a typed error when the configured
 /// command cannot be run. Serving canned values there made a broken
 /// integration look identical to a working one (#4727).
@@ -741,7 +741,7 @@ fn build_stdio_state(initial_definitions: Vec<McpServerDefinition>) -> StdioMcpS
         // operator; `lifecycle` carries the same text for programmatic clients.
         if let Err(err) = state.start_definition(&definition) {
             tracing::warn!("MCP server '{name}' is not available: {err:#}");
-            eprintln!("codewhale mcp-server: server '{name}' is not available: {err:#}");
+            eprintln!("nestlone mcp-server: server '{name}' is not available: {err:#}");
         }
     }
 
@@ -1705,7 +1705,7 @@ mod tests {
         // typo in `command` was indistinguishable from a working server.
         let mut state = build_stdio_state(vec![definition(
             "broken",
-            "codewhale-nonexistent-mcp-server-binary",
+            "nestlone-nonexistent-mcp-server-binary",
             &[],
         )]);
 

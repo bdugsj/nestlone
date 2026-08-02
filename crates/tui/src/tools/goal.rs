@@ -467,7 +467,7 @@ fn gap_fingerprint(gaps: &[String]) -> Option<String> {
     }
 
     let mut hasher = Sha256::new();
-    hasher.update(b"codewhale-goal-gaps-v1\0");
+    hasher.update(b"nestlone-goal-gaps-v1\0");
     for gap in normalized {
         hasher.update(gap.as_bytes());
         hasher.update([0]);
@@ -969,7 +969,7 @@ mod tests {
                     "evidence": "focused tests passed",
                     "verification": {
                         "status": "passed",
-                        "check": "cargo test -p codewhale-tui goal_loop",
+                        "check": "cargo test -p nestlone-tui goal_loop",
                         "summary": "focused tests passed"
                     }
                 }),
