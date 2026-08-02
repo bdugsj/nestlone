@@ -179,8 +179,8 @@ fn install_rustls_crypto_provider() {
 
 #[derive(Parser, Debug)]
 #[command(
-    name = "codewhale-tui",
-    bin_name = "codewhale-tui",
+    name = "nestlone",
+    bin_name = "nestlone",
     author,
     version = env!("DEEPSEEK_BUILD_VERSION"),
     about = "Nestlone — security agent platform (Kali + pentest + RE)",
@@ -6782,7 +6782,7 @@ mod speech_cli_tests {
     #[test]
     fn speech_command_parses_cli_passthrough_smoke() {
         let cli = Cli::try_parse_from([
-            "codewhale-tui",
+            "nestlone",
             "speech",
             "hello",
             "--model",
@@ -12833,7 +12833,7 @@ mod terminal_mode_tests {
 
     #[test]
     fn hidden_remote_control_flag_starts_the_interactive_handoff() {
-        let cli = parse_cli(&["codewhale-tui", "--remote-control"]);
+        let cli = parse_cli(&["nestlone", "--remote-control"]);
         assert!(cli.remote_control);
     }
 
@@ -12855,7 +12855,7 @@ mod terminal_mode_tests {
             vec!["serve", "--mcp"],
         ] {
             let mut args = vec![
-                "codewhale-tui".to_string(),
+                "nestlone".to_string(),
                 "--workspace".to_string(),
                 workspace_arg.clone(),
             ];
@@ -12966,12 +12966,12 @@ mod terminal_mode_tests {
 
     #[test]
     fn companion_binary_reports_its_own_name() {
-        assert_eq!(Cli::command().get_name(), "codewhale-tui");
+        assert_eq!(Cli::command().get_name(), "nestlone");
     }
 
     #[test]
     fn xai_device_auth_subcommand_parses() {
-        let cli = parse_cli(&["codewhale-tui", "auth", "xai-device"]);
+        let cli = parse_cli(&["nestlone", "auth", "xai-device"]);
         assert!(matches!(
             cli.command,
             Some(Commands::Auth(TuiAuthArgs {
@@ -12983,7 +12983,7 @@ mod terminal_mode_tests {
     #[test]
     fn workflow_tool_internal_subcommand_parses_exact_json() {
         let cli = parse_cli(&[
-            "codewhale-tui",
+            "nestlone",
             "workflow-tool",
             "--approval-source",
             "explicit-workflow-command",
