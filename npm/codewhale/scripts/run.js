@@ -9,7 +9,7 @@ function isVersionFlag(args = process.argv.slice(2)) {
 
 function printVersionFallback(binaryName) {
   const binVersion =
-    pkg.codewhaleBinaryVersion || pkg.deepseekBinaryVersion || pkg.version;
+    pkg.nestloneBinaryVersion || pkg.deepseekBinaryVersion || pkg.version;
   console.log(`${binaryName} (npm wrapper) v${pkg.version}`);
   console.log(`binary version: v${binVersion}`);
   console.log(`repo: ${pkg.repository?.url || "N/A"}`);
@@ -46,26 +46,26 @@ async function run(binaryName, options = {}) {
   return exit(result.status ?? 1);
 }
 
-async function runCodeWhale() {
-  await run("codewhale");
+async function runNestlone() {
+  await run("nestlone");
 }
 
-async function runCodeWhaleTui() {
-  await run("codewhale-tui");
+async function runNestloneTui() {
+  await run("nestlone-tui");
 }
 
 module.exports = {
   run,
-  runCodeWhale,
-  runCodeWhaleTui,
+  runNestlone,
+  runNestloneTui,
   _internal: { isVersionFlag, printVersionFallback },
 };
 
 if (require.main === module) {
   const command = process.argv[1] || "";
   if (command.includes("tui")) {
-    runCodeWhaleTui();
+    runNestloneTui();
   } else {
-    runCodeWhale();
+    runNestlone();
   }
 }

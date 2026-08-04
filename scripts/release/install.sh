@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
-# CodeWhale Unix installer
-# Copies codewhale, codew, and codewhale-tui to ~/.local/bin (or $PREFIX/bin)
+# Nestlone Unix installer
+# Copies nestlone, nest, and nestlone-tui to ~/.local/bin (or $PREFIX/bin)
 
 PREFIX="${PREFIX:-$HOME/.local}"
 BIN_DIR="${PREFIX}/bin"
@@ -54,7 +54,7 @@ preflight_glibc() {
     if [[ "$(uname -s)" != "Linux" ]]; then
         return 0
     fi
-    if [[ "${CODEWHALE_SKIP_GLIBC_CHECK:-}" == "1" || "${DEEPSEEK_TUI_SKIP_GLIBC_CHECK:-}" == "1" || "${DEEPSEEK_SKIP_GLIBC_CHECK:-}" == "1" ]]; then
+    if [[ "${NESTLONE_SKIP_GLIBC_CHECK:-}" == "1" || "${CODEWHALE_SKIP_GLIBC_CHECK:-}" == "1" || "${DEEPSEEK_TUI_SKIP_GLIBC_CHECK:-}" == "1" || "${DEEPSEEK_SKIP_GLIBC_CHECK:-}" == "1" ]]; then
         return 0
     fi
 
@@ -66,24 +66,24 @@ preflight_glibc() {
     local host
     if ! host="$(detect_host_glibc)" || [[ -z "$host" ]]; then
         echo "ERROR: $(basename "$bin") requires GLIBC_$required, but no GNU libc was detected." >&2
-        echo "Build from source instead: cargo install codewhale-cli --locked && cargo install codewhale-tui --locked" >&2
-        echo "Set CODEWHALE_SKIP_GLIBC_CHECK=1 to bypass this check at your own risk." >&2
+        echo "Build from source instead: cargo install nestlone-cli --locked && cargo install nestlone-tui --locked" >&2
+        echo "Set NESTLONE_SKIP_GLIBC_CHECK=1 to bypass this check at your own risk." >&2
         return 1
     fi
 
     if [[ "$(version_code "$host")" -lt "$(version_code "$required")" ]]; then
         echo "ERROR: $(basename "$bin") requires GLIBC_$required, but this system has glibc $host." >&2
         echo "Ubuntu 22.04 ships glibc 2.35 and cannot run assets built against Ubuntu 24.04/glibc 2.39." >&2
-        echo "Build from source instead: cargo install codewhale-cli --locked && cargo install codewhale-tui --locked" >&2
+        echo "Build from source instead: cargo install nestlone-cli --locked && cargo install nestlone-tui --locked" >&2
         echo "Release follow-up: build Linux GNU assets against an older glibc baseline or add a musl/static asset." >&2
-        echo "Set CODEWHALE_SKIP_GLIBC_CHECK=1 to bypass this check at your own risk." >&2
+        echo "Set NESTLONE_SKIP_GLIBC_CHECK=1 to bypass this check at your own risk." >&2
         return 1
     fi
 }
 
 mkdir -p "$BIN_DIR"
 
-echo "Installing codewhale to $BIN_DIR ..."
+echo "Installing nestlone to $BIN_DIR ..."
 
 install_binary() {
     local src="$1"
@@ -95,7 +95,7 @@ install_binary() {
     mv -f "$tmp" "$dst"
 }
 
-for bin in codewhale codew codewhale-tui; do
+for bin in nestlone nest nestlone-tui; do
     src="$SCRIPT_DIR/$bin"
     dst="$BIN_DIR/$bin"
     if [[ ! -f "$src" ]]; then
@@ -127,4 +127,4 @@ if [[ ":$PATH:" != *":$BIN_DIR:"* ]]; then
 fi
 
 echo ""
-echo "Then run: codewhale"
+echo "Then run: nestlone"

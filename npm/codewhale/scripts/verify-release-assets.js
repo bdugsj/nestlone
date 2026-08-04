@@ -18,20 +18,22 @@ function resolveBinaryVersion() {
   const configuredVersion =
     process.env.DEEPSEEK_TUI_VERSION ||
     process.env.DEEPSEEK_VERSION ||
-    pkg.codewhaleBinaryVersion || pkg.deepseekBinaryVersion ||
+    pkg.nestloneBinaryVersion || pkg.deepseekBinaryVersion ||
     pkg.version;
   return String(configuredVersion).trim();
 }
 
 function resolveRepo() {
-  return process.env.DEEPSEEK_TUI_GITHUB_REPO || process.env.DEEPSEEK_GITHUB_REPO || "Hmbown/CodeWhale";
+  return process.env.DEEPSEEK_TUI_GITHUB_REPO || process.env.DEEPSEEK_GITHUB_REPO || "bdugsj/nestlone";
 }
 
 function hasReleaseBaseOverride() {
   return Boolean(
-    process.env.CODEWHALE_RELEASE_BASE_URL ||
+    process.env.NESTLONE_RELEASE_BASE_URL ||
+      process.env.CODEWHALE_RELEASE_BASE_URL ||
       process.env.DEEPSEEK_TUI_RELEASE_BASE_URL ||
       process.env.DEEPSEEK_RELEASE_BASE_URL ||
+      process.env.NESTLONE_USE_CNB_MIRROR ||
       process.env.CODEWHALE_USE_CNB_MIRROR,
   );
 }
@@ -44,15 +46,18 @@ function assertPackageVersionMatchesBinaryVersion(version) {
   if (packageVersionMatchesBinaryVersion(version)) {
     return;
   }
-  if (process.env.CODEWHALE_ALLOW_NPM_BINARY_MISMATCH === "1") {
+  if (
+    process.env.NESTLONE_ALLOW_NPM_BINARY_MISMATCH === "1" ||
+    process.env.CODEWHALE_ALLOW_NPM_BINARY_MISMATCH === "1"
+  ) {
     console.log(
       `npm package version ${pkg.version} points at binary release ${version} (allowed packaging-only mismatch).`,
     );
     return;
   }
   throw new Error(
-    `npm package version ${pkg.version} does not match codewhaleBinaryVersion ${version}. ` +
-      "Set CODEWHALE_ALLOW_NPM_BINARY_MISMATCH=1 only for an intentional packaging-only npm release.",
+    `npm package version ${pkg.version} does not match nestloneBinaryVersion ${version}. ` +
+      "Set NESTLONE_ALLOW_NPM_BINARY_MISMATCH=1 only for an intentional packaging-only npm release.",
   );
 }
 
@@ -67,7 +72,7 @@ function requestStatus(url, method = "HEAD", redirects = 0) {
       {
         method,
         headers: {
-          "User-Agent": "codewhale-npm-release-check",
+          "User-Agent": "nestlone-npm-release-check",
         },
       },
       (res) => {
@@ -108,7 +113,7 @@ async function downloadText(url, redirects = 0) {
         url,
         {
           headers: {
-            "User-Agent": "codewhale-npm-release-check",
+            "User-Agent": "nestlone-npm-release-check",
           },
         },
         (res) => {
@@ -142,7 +147,7 @@ async function downloadJson(url, redirects = 0) {
   return new Promise((resolve, reject) => {
     const headers = {
       Accept: "application/vnd.github+json",
-      "User-Agent": "codewhale-npm-release-check",
+      "User-Agent": "nestlone-npm-release-check",
       "X-GitHub-Api-Version": "2022-11-28",
     };
     const token = process.env.GITHUB_TOKEN || process.env.GH_TOKEN;

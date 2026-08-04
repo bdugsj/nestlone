@@ -28,7 +28,7 @@ fi
 mkdir -p "${bundle_dir}"
 bundle_dir="$(cd "${bundle_dir}" && pwd)"
 
-manifest="${bundle_dir}/codewhale-bundles-sha256.txt"
+manifest="${bundle_dir}/nestlone-bundles-sha256.txt"
 : > "${manifest}"
 
 bundle() {
@@ -39,19 +39,19 @@ bundle() {
   local ext="$5"
   local variant="$6"
 
-  local stem="codewhale-${platform}${variant:+-}${variant}"
+  local stem="nestlone-${platform}${variant:+-}${variant}"
   local stage_root
   stage_root="$(mktemp -d)"
   local stage_dir="${stage_root}/${stem}"
   mkdir -p "${stage_dir}"
 
-  local cli_dst="codewhale"
-  local shim_dst="codew"
-  local tui_dst="codewhale-tui"
+  local cli_dst="nestlone"
+  local shim_dst="nest"
+  local tui_dst="nestlone-tui"
   if [[ "${platform}" == windows-* ]]; then
-    cli_dst="codewhale.exe"
-    shim_dst="codew.exe"
-    tui_dst="codewhale-tui.exe"
+    cli_dst="nestlone.exe"
+    shim_dst="nest.exe"
+    tui_dst="nestlone-tui.exe"
   fi
 
   cp "${artifact_dir}/${cli_src}/${cli_src}" "${stage_dir}/${cli_dst}"
@@ -107,23 +107,23 @@ bundle() {
 }
 
 bundle linux-x64 \
-  codewhale-linux-x64 codew-linux-x64 codewhale-tui-linux-x64 tar.gz ""
+  nestlone-linux-x64 nest-linux-x64 nestlone-tui-linux-x64 tar.gz ""
 bundle linux-arm64 \
-  codewhale-linux-arm64 codew-linux-arm64 codewhale-tui-linux-arm64 tar.gz ""
+  nestlone-linux-arm64 nest-linux-arm64 nestlone-tui-linux-arm64 tar.gz ""
 bundle android-arm64 \
-  codewhale-android-arm64 codew-android-arm64 codewhale-tui-android-arm64 tar.gz ""
+  nestlone-android-arm64 nest-android-arm64 nestlone-tui-android-arm64 tar.gz ""
 bundle macos-x64 \
-  codewhale-macos-x64 codew-macos-x64 codewhale-tui-macos-x64 tar.gz ""
+  nestlone-macos-x64 nest-macos-x64 nestlone-tui-macos-x64 tar.gz ""
 bundle macos-arm64 \
-  codewhale-macos-arm64 codew-macos-arm64 codewhale-tui-macos-arm64 tar.gz ""
+  nestlone-macos-arm64 nest-macos-arm64 nestlone-tui-macos-arm64 tar.gz ""
 bundle windows-x64 \
-  codewhale-windows-x64.exe codew-windows-x64.exe codewhale-tui-windows-x64.exe zip ""
+  nestlone-windows-x64.exe nest-windows-x64.exe nestlone-tui-windows-x64.exe zip ""
 bundle windows-x64 \
-  codewhale-windows-x64.exe codew-windows-x64.exe codewhale-tui-windows-x64.exe zip portable
+  nestlone-windows-x64.exe nest-windows-x64.exe nestlone-tui-windows-x64.exe zip portable
 bundle windows-arm64 \
-  codewhale-windows-arm64.exe codew-windows-arm64.exe codewhale-tui-windows-arm64.exe zip ""
+  nestlone-windows-arm64.exe nest-windows-arm64.exe nestlone-tui-windows-arm64.exe zip ""
 bundle windows-arm64 \
-  codewhale-windows-arm64.exe codew-windows-arm64.exe codewhale-tui-windows-arm64.exe zip portable
+  nestlone-windows-arm64.exe nest-windows-arm64.exe nestlone-tui-windows-arm64.exe zip portable
 
 sort -o "${manifest}" "${manifest}"
 echo "Bundle checksum manifest:"

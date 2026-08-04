@@ -31,18 +31,18 @@ EOF
 
   cat >"${root}/crates/example/Cargo.toml" <<'EOF'
 [package]
-name = "codewhale-example"
+name = "nestlone-example"
 version.workspace = true
 
 [dependencies]
-codewhale-core = { path = "../core", version = "0.8.68" }
+nestlone-core = { path = "../core", version = "0.8.68" }
 EOF
 
   cat >"${root}/npm/codewhale/package.json" <<'EOF'
 {
-  "name": "codewhale",
+  "name": "nestlone",
   "version": "0.8.68",
-  "codewhaleBinaryVersion": "0.8.68"
+  "nestloneBinaryVersion": "0.8.68"
 }
 EOF
 
@@ -77,7 +77,7 @@ EOF
   cat >"${root}/docs/INSTALL.md" <<'EOF'
 The npm wrapper installs the matching published binaries.
 
-codewhale --version   # prints the published version that was installed
+nestlone --version   # prints the published version that was installed
 EOF
 
   cat >"${root}/docs/public-surface-facts.json" <<'EOF'
@@ -101,7 +101,7 @@ EOF
   printf 'fixture generated facts\n' >"${root}/web/lib/facts.generated.ts"
 
   for readme in README.md README.zh-CN.md README.ja-JP.md README.vi.md README.ko-KR.md; do
-    printf 'Install Codewhale from the package manager.\n' >"${root}/${readme}"
+    printf 'Install Nestlone from the package manager.\n' >"${root}/${readme}"
   done
 
   cat >"${root}/bin/cargo" <<'EOF'
@@ -155,7 +155,7 @@ PREPARE_RELEASE_TEST_MARKERS="${success_markers}" \
 grep -Fq 'version = "0.9.0"' "${success_root}/Cargo.toml"
 grep -Fq 'version = "0.9.0"' "${success_root}/crates/example/Cargo.toml"
 grep -Fq '"version": "0.9.0"' "${success_root}/npm/codewhale/package.json"
-grep -Fq '"codewhaleBinaryVersion": "0.9.0"' \
+grep -Fq '"nestloneBinaryVersion": "0.9.0"' \
   "${success_root}/npm/codewhale/package.json"
 grep -Fq '"version": "0.9.0"' "${success_root}/package-lock.json"
 grep -Fq 'RELEASE_TAG="${RELEASE_TAG:-v0.9.0}"' \
@@ -257,7 +257,7 @@ make_fixture "${legacy_root}"
 mkdir -p "${legacy_markers}"
 cat >"${legacy_root}/docs/INSTALL.md" <<'EOF'
 The npm wrapper is published at v0.8.68.
-codewhale --version   # 0.8.68
+nestlone --version   # 0.8.68
 EOF
 
 PREPARE_RELEASE_TEST_MARKERS="${legacy_markers}" \
@@ -265,7 +265,7 @@ PREPARE_RELEASE_TEST_MARKERS="${legacy_markers}" \
   "${legacy_root}/scripts/release/prepare-release.sh" 0.9.0 >/dev/null
 
 grep -Fq 'wrapper is published at v0.9.0' "${legacy_root}/docs/INSTALL.md"
-grep -Fq 'codewhale --version   # 0.9.0' "${legacy_root}/docs/INSTALL.md"
+grep -Fq 'nestlone --version   # 0.9.0' "${legacy_root}/docs/INSTALL.md"
 
 stale_root="${tmp_dir}/stale"
 stale_markers="${tmp_dir}/stale-markers"

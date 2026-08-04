@@ -24,9 +24,9 @@ test("openharmony x64 resolves to linux x64 binaries", () => {
   withMockedOs("openharmony", "x64", () => {
     const { detectBinaryNames } = require(ARTIFACTS_PATH);
     const result = detectBinaryNames();
-    assert.equal(result.codewhale, "codewhale-linux-x64");
-    assert.equal(result.tui, "codewhale-tui-linux-x64");
-    assert.equal(result.codew, "codew-linux-x64");
+    assert.equal(result.nestlone, "nestlone-linux-x64");
+    assert.equal(result.tui, "nestlone-tui-linux-x64");
+    assert.equal(result.nest, "nest-linux-x64");
   });
 });
 
@@ -34,9 +34,9 @@ test("openharmony arm64 resolves to linux arm64 binaries", () => {
   withMockedOs("openharmony", "arm64", () => {
     const { detectBinaryNames } = require(ARTIFACTS_PATH);
     const result = detectBinaryNames();
-    assert.equal(result.codewhale, "codewhale-linux-arm64");
-    assert.equal(result.tui, "codewhale-tui-linux-arm64");
-    assert.equal(result.codew, "codew-linux-arm64");
+    assert.equal(result.nestlone, "nestlone-linux-arm64");
+    assert.equal(result.tui, "nestlone-tui-linux-arm64");
+    assert.equal(result.nest, "nest-linux-arm64");
   });
 });
 
@@ -44,9 +44,9 @@ test("android arm64 resolves to Termux-native Android assets", () => {
   withMockedOs("android", "arm64", () => {
     const { detectBinaryNames } = require(ARTIFACTS_PATH);
     const result = detectBinaryNames();
-    assert.equal(result.codewhale, "codewhale-android-arm64");
-    assert.equal(result.tui, "codewhale-tui-android-arm64");
-    assert.equal(result.codew, "codew-android-arm64");
+    assert.equal(result.nestlone, "nestlone-android-arm64");
+    assert.equal(result.tui, "nestlone-tui-android-arm64");
+    assert.equal(result.nest, "nest-android-arm64");
   });
 });
 
@@ -64,16 +64,16 @@ test("genuinely unsupported platform throws with raw platform name", () => {
 });
 
 test("known platforms are unaffected by alias map", () => {
-  for (const [platform, arch, expectedCodeWhale] of [
-    ["linux", "x64", "codewhale-linux-x64"],
-    ["darwin", "arm64", "codewhale-macos-arm64"],
-    ["win32", "x64", "codewhale-windows-x64.exe"],
-    ["win32", "arm64", "codewhale-windows-arm64.exe"],
+  for (const [platform, arch, expectedNestlone] of [
+    ["linux", "x64", "nestlone-linux-x64"],
+    ["darwin", "arm64", "nestlone-macos-arm64"],
+    ["win32", "x64", "nestlone-windows-x64.exe"],
+    ["win32", "arm64", "nestlone-windows-arm64.exe"],
   ]) {
     withMockedOs(platform, arch, () => {
       const { detectBinaryNames } = require(ARTIFACTS_PATH);
       const result = detectBinaryNames();
-      assert.equal(result.codewhale, expectedCodeWhale);
+      assert.equal(result.nestlone, expectedNestlone);
     });
   }
 });
@@ -84,9 +84,9 @@ test("Windows arm64 resolves the complete native binary family", () => {
     assert.deepEqual(detectBinaryNames(), {
       platform: "win32",
       arch: "arm64",
-      codewhale: "codewhale-windows-arm64.exe",
-      tui: "codewhale-tui-windows-arm64.exe",
-      codew: "codew-windows-arm64.exe",
+      nestlone: "nestlone-windows-arm64.exe",
+      tui: "nestlone-tui-windows-arm64.exe",
+      nest: "nest-windows-arm64.exe",
     });
   });
 });
@@ -118,21 +118,21 @@ test("release asset inventory includes binaries, archives, installer, and manife
   } = require(ARTIFACTS_PATH);
   const assetNames = allAssetNames();
   const releaseAssetNames = allReleaseAssetNames();
-  assert.ok(assetNames.includes("codewhale-windows-x64.exe"));
-  assert.ok(assetNames.includes("codewhale-tui-windows-x64.exe"));
-  assert.ok(assetNames.includes("codew-windows-x64.exe"));
-  assert.ok(assetNames.includes("codewhale.bat"));
-  assert.ok(assetNames.includes("codewhale-windows-arm64.exe"));
-  assert.ok(assetNames.includes("codewhale-tui-windows-arm64.exe"));
-  assert.ok(assetNames.includes("codew-windows-arm64.exe"));
-  assert.ok(assetNames.includes("codewhale-android-arm64"));
-  assert.ok(assetNames.includes("codewhale-tui-android-arm64"));
-  assert.ok(assetNames.includes("codew-android-arm64"));
-  assert.ok(!assetNames.includes("codewhale-linux-riscv64"));
-  assert.ok(releaseAssetNames.includes("codew-windows-x64.exe"));
-  assert.ok(releaseAssetNames.includes("codewhale.bat"));
-  assert.ok(releaseAssetNames.includes("codew-windows-arm64.exe"));
-  assert.ok(releaseAssetNames.includes("codew-android-arm64"));
+  assert.ok(assetNames.includes("nestlone-windows-x64.exe"));
+  assert.ok(assetNames.includes("nestlone-tui-windows-x64.exe"));
+  assert.ok(assetNames.includes("nest-windows-x64.exe"));
+  assert.ok(assetNames.includes("nestlone.bat"));
+  assert.ok(assetNames.includes("nestlone-windows-arm64.exe"));
+  assert.ok(assetNames.includes("nestlone-tui-windows-arm64.exe"));
+  assert.ok(assetNames.includes("nest-windows-arm64.exe"));
+  assert.ok(assetNames.includes("nestlone-android-arm64"));
+  assert.ok(assetNames.includes("nestlone-tui-android-arm64"));
+  assert.ok(assetNames.includes("nest-android-arm64"));
+  assert.ok(!assetNames.includes("nestlone-linux-riscv64"));
+  assert.ok(releaseAssetNames.includes("nest-windows-x64.exe"));
+  assert.ok(releaseAssetNames.includes("nestlone.bat"));
+  assert.ok(releaseAssetNames.includes("nest-windows-arm64.exe"));
+  assert.ok(releaseAssetNames.includes("nest-android-arm64"));
   for (const bundle of BUNDLE_ASSET_NAMES) {
     assert.ok(releaseAssetNames.includes(bundle));
   }
@@ -163,22 +163,22 @@ test("CNB mirror URLs use the repository that publishes release assets", () => {
       } = require(ARTIFACTS_PATH);
 
       assert.deepEqual(CNB_RELEASE_ASSET_NAMES, [
-        "codewhale-linux-x64",
-        "codew-linux-x64",
-        "codewhale-tui-linux-x64",
-        "codewhale-artifacts-sha256.txt",
+        "nestlone-linux-x64",
+        "nest-linux-x64",
+        "nestlone-tui-linux-x64",
+        "nestlone-artifacts-sha256.txt",
       ]);
       assert.equal(
         releaseBaseUrl("0.8.68"),
-        "https://cnb.cool/codewhale.net/codewhale/-/releases/v0.8.68/",
+        "https://cnb.cool/nestlone.net/nestlone/-/releases/v0.8.68/",
       );
       assert.equal(
-        releaseAssetUrl("codewhale-linux-x64", "0.8.68"),
-        "https://cnb.cool/codewhale.net/codewhale/-/releases/v0.8.68/codewhale-linux-x64",
+        releaseAssetUrl("nestlone-linux-x64", "0.8.68"),
+        "https://cnb.cool/nestlone.net/nestlone/-/releases/v0.8.68/nestlone-linux-x64",
       );
       assert.equal(
         checksumManifestUrl("0.8.68"),
-        "https://cnb.cool/codewhale.net/codewhale/-/releases/v0.8.68/codewhale-artifacts-sha256.txt",
+        "https://cnb.cool/nestlone.net/nestlone/-/releases/v0.8.68/nestlone-artifacts-sha256.txt",
       );
     } finally {
       for (const key of keys) {

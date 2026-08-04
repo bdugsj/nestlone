@@ -133,7 +133,7 @@ function parsePackJson(stdout) {
 }
 
 async function main() {
-  const tempRoot = await fsp.mkdtemp(path.join(os.tmpdir(), "codewhale-npm-smoke-"));
+  const tempRoot = await fsp.mkdtemp(path.join(os.tmpdir(), "nestlone-npm-smoke-"));
   const suppliedAssetsDir = String(
     process.env.CODEWHALE_SMOKE_ASSETS_DIR || "",
   ).trim();
@@ -178,15 +178,15 @@ async function main() {
 
     await runCommand("npm", ["init", "-y"], { cwd: installDir });
     await runCommand("npm", ["install", tarball], { cwd: installDir, env });
-    await runCommand("npx", ["--no-install", "codewhale", "doctor", "--help"], {
+    await runCommand("npx", ["--no-install", "nestlone", "doctor", "--help"], {
       cwd: installDir,
       env,
     });
-    await runCommand("npx", ["--no-install", "codew", "--version"], {
+    await runCommand("npx", ["--no-install", "nest", "--version"], {
       cwd: installDir,
       env,
     });
-    await runCommand("npx", ["--no-install", "codewhale-tui", "--help"], {
+    await runCommand("npx", ["--no-install", "nestlone-tui", "--help"], {
       cwd: installDir,
       env,
     });

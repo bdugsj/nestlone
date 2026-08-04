@@ -17,7 +17,7 @@ function sha256(content) {
 }
 
 async function makeTempDir(t) {
-  const dir = await fs.promises.mkdtemp(path.join(os.tmpdir(), "codewhale-install-test-"));
+  const dir = await fs.promises.mkdtemp(path.join(os.tmpdir(), "nestlone-install-test-"));
   t.after(() => fs.promises.rm(dir, { force: true, recursive: true }));
   return dir;
 }
@@ -66,9 +66,9 @@ test("install script remains parseable before the Node support guard runs", () =
 
 test("native shortcut has its own platform asset and installed path", () => {
   const paths = _internal.binaryPaths();
-  assert.match(paths.codew.asset, /^codew-/);
-  assert.equal(path.basename(paths.codew.target), process.platform === "win32" ? "codew.exe" : "codew");
-  assert.notEqual(paths.codew.target, paths.codewhale.target);
+  assert.match(paths.nest.asset, /^nest-/);
+  assert.equal(path.basename(paths.nest.target), process.platform === "win32" ? "nest.exe" : "nest");
+  assert.notEqual(paths.nest.target, paths.nestlone.target);
 });
 
 test("install failure hint explains release base override for blocked GitHub downloads", () => {
@@ -77,7 +77,7 @@ test("install failure hint explains release base override for blocked GitHub dow
   try {
     const error = Object.assign(
       new Error(
-        "fetch https://github.com/Hmbown/CodeWhale/releases/download/v0.8.19/codewhale-artifacts-sha256.txt failed after 5 attempts:\ngetaddrinfo ENOTFOUND github.com",
+        "fetch https://github.com/bdugsj/nestlone/releases/download/v0.8.19/nestlone-artifacts-sha256.txt failed after 5 attempts:\ngetaddrinfo ENOTFOUND github.com",
       ),
       { code: "ENOTFOUND" },
     );
@@ -85,7 +85,7 @@ test("install failure hint explains release base override for blocked GitHub dow
     const hint = installFailureHint(error);
 
     assert.match(hint, /DEEPSEEK_TUI_RELEASE_BASE_URL/);
-    assert.match(hint, /codewhale-artifacts-sha256\.txt/);
+    assert.match(hint, /nestlone-artifacts-sha256\.txt/);
     assert.match(hint, /platform binaries/);
     assert.match(hint, /#npm-binary-download-times-out/);
   } finally {
@@ -108,7 +108,7 @@ test("install failure hint checks configured release base when override is alrea
     const hint = installFailureHint(error);
 
     assert.match(hint, /is set to https:\/\/mirror\.example\/deepseek\//);
-    assert.match(hint, /codewhale-artifacts-sha256\.txt/);
+    assert.match(hint, /nestlone-artifacts-sha256\.txt/);
     assert.doesNotMatch(hint, /If GitHub is unavailable/);
   } finally {
     if (previous === undefined) {
@@ -119,32 +119,42 @@ test("install failure hint checks configured release base when override is alrea
   }
 });
 
-test("glibc preflight message is Codewhale-branded and actionable", () => {
+test("glibc preflight message is Nestlone-branded and actionable", () => {
   const message = glibcInternal.glibcCompatibilityMessage([2, 39, 0], [2, 35, 0]);
 
-  assert.match(message, /Prebuilt Codewhale Linux binaries require GLIBC_2\.39/);
+  assert.match(message, /Prebuilt Nestlone Linux binaries require GLIBC_2\.39/);
   assert.match(message, /this system has glibc 2\.35/);
-  assert.match(message, /cargo install codewhale-cli --locked/);
+  assert.match(message, /cargo install nestlone-cli --locked/);
   assert.match(message, /Linux x64 release asset is a static \(musl\) build/);
   assert.match(message, /Linux arm64 asset is a GNU libc build/);
-  assert.match(message, /CODEWHALE_SKIP_GLIBC_CHECK=1/);
+  assert.match(message, /NESTLONE_SKIP_GLIBC_CHECK=1/);
 });
 
 test("glibc preflight accepts canonical and legacy skip env vars", () => {
+  const previousNestlone = process.env.NESTLONE_SKIP_GLIBC_CHECK;
   const previousCodewhale = process.env.CODEWHALE_SKIP_GLIBC_CHECK;
   const previousTui = process.env.DEEPSEEK_TUI_SKIP_GLIBC_CHECK;
   const previousLegacy = process.env.DEEPSEEK_SKIP_GLIBC_CHECK;
+  delete process.env.NESTLONE_SKIP_GLIBC_CHECK;
   delete process.env.CODEWHALE_SKIP_GLIBC_CHECK;
   delete process.env.DEEPSEEK_TUI_SKIP_GLIBC_CHECK;
   delete process.env.DEEPSEEK_SKIP_GLIBC_CHECK;
   try {
     assert.equal(glibcInternal.skipGlibcCheck(), false);
+    process.env.NESTLONE_SKIP_GLIBC_CHECK = "1";
+    assert.equal(glibcInternal.skipGlibcCheck(), true);
+    delete process.env.NESTLONE_SKIP_GLIBC_CHECK;
     process.env.CODEWHALE_SKIP_GLIBC_CHECK = "1";
     assert.equal(glibcInternal.skipGlibcCheck(), true);
     delete process.env.CODEWHALE_SKIP_GLIBC_CHECK;
     process.env.DEEPSEEK_TUI_SKIP_GLIBC_CHECK = "1";
     assert.equal(glibcInternal.skipGlibcCheck(), true);
   } finally {
+    if (previousNestlone === undefined) {
+      delete process.env.NESTLONE_SKIP_GLIBC_CHECK;
+    } else {
+      process.env.NESTLONE_SKIP_GLIBC_CHECK = previousNestlone;
+    }
     if (previousCodewhale === undefined) {
       delete process.env.CODEWHALE_SKIP_GLIBC_CHECK;
     } else {
@@ -165,17 +175,17 @@ test("glibc preflight accepts canonical and legacy skip env vars", () => {
 
 test("ensureBinary adopts a manually placed target binary after checksum validation", async (t) => {
   const dir = await makeTempDir(t);
-  const target = path.join(dir, process.platform === "win32" ? "codewhale.exe" : "codewhale");
-  const assetName = process.platform === "win32" ? "codewhale-windows-x64.exe" : "codewhale-linux-x64";
+  const target = path.join(dir, process.platform === "win32" ? "nestlone.exe" : "nestlone");
+  const assetName = process.platform === "win32" ? "nestlone-windows-x64.exe" : "nestlone-linux-x64";
   const version = "0.8.25";
-  const content = Buffer.from("manual codewhale binary");
+  const content = Buffer.from("manual nestlone binary");
   let checksumLoads = 0;
 
   await fs.promises.writeFile(target, content, { mode: 0o600 });
   await fs.promises.writeFile(`${target}.version`, "0.8.24", "utf8");
 
   const result = await withoutForcedDownload(() =>
-    _internal.ensureBinary(target, assetName, version, "Hmbown/CodeWhale", async () => {
+    _internal.ensureBinary(target, assetName, version, "bdugsj/nestlone", async () => {
       checksumLoads += 1;
       return new Map([[assetName, sha256(content)]]);
     }),
@@ -191,8 +201,8 @@ test("ensureBinary adopts a manually placed target binary after checksum validat
 
 test("ensureBinary adopts an official release-named binary placed in downloads", async (t) => {
   const dir = await makeTempDir(t);
-  const target = path.join(dir, process.platform === "win32" ? "codewhale.exe" : "codewhale");
-  const assetName = process.platform === "win32" ? "codewhale-windows-x64.exe" : "codewhale-linux-x64";
+  const target = path.join(dir, process.platform === "win32" ? "nestlone.exe" : "nestlone");
+  const assetName = process.platform === "win32" ? "nestlone-windows-x64.exe" : "nestlone-linux-x64";
   const assetPath = path.join(dir, assetName);
   const version = "0.8.25";
   const content = Buffer.from("official release binary");
@@ -200,7 +210,7 @@ test("ensureBinary adopts an official release-named binary placed in downloads",
   await fs.promises.writeFile(assetPath, content);
 
   const result = await withoutForcedDownload(() =>
-    _internal.ensureBinary(target, assetName, version, "Hmbown/CodeWhale", async () =>
+    _internal.ensureBinary(target, assetName, version, "bdugsj/nestlone", async () =>
       new Map([[assetName, sha256(content)]]),
     ),
   );
@@ -213,8 +223,8 @@ test("ensureBinary adopts an official release-named binary placed in downloads",
 
 test("manual binaries with mismatched checksums are not adopted", async (t) => {
   const dir = await makeTempDir(t);
-  const target = path.join(dir, process.platform === "win32" ? "codewhale.exe" : "codewhale");
-  const assetName = process.platform === "win32" ? "codewhale-windows-x64.exe" : "codewhale-linux-x64";
+  const target = path.join(dir, process.platform === "win32" ? "nestlone.exe" : "nestlone");
+  const assetName = process.platform === "win32" ? "nestlone-windows-x64.exe" : "nestlone-linux-x64";
   const content = Buffer.from("wrong binary bytes");
 
   await fs.promises.writeFile(target, content);
@@ -231,14 +241,14 @@ test("manual binaries with mismatched checksums are not adopted", async (t) => {
   assert.equal(await exists(`${target}.version`), false);
 });
 
-test("resolvePackageVersion honors codewhaleBinaryVersion precedence (#3769)", () => {
+test("resolvePackageVersion honors nestloneBinaryVersion precedence (#3769)", () => {
   const { resolvePackageVersion } = _internal;
 
-  // codewhaleBinaryVersion wins over deepseekBinaryVersion and pkg.version.
+  // nestloneBinaryVersion wins over deepseekBinaryVersion and pkg.version.
   assert.equal(
     resolvePackageVersion(
       {
-        codewhaleBinaryVersion: "1.2.3",
+        nestloneBinaryVersion: "1.2.3",
         deepseekBinaryVersion: "0.0.1",
         version: "9.9.9",
       },
@@ -257,14 +267,14 @@ test("resolvePackageVersion honors codewhaleBinaryVersion precedence (#3769)", (
   // Legacy env vars still take precedence over package fields, unchanged.
   assert.equal(
     resolvePackageVersion(
-      { codewhaleBinaryVersion: "1.2.3", version: "9.9.9" },
+      { nestloneBinaryVersion: "1.2.3", version: "9.9.9" },
       { DEEPSEEK_TUI_VERSION: "7.7.7" },
     ),
     "7.7.7",
   );
   assert.equal(
     resolvePackageVersion(
-      { codewhaleBinaryVersion: "1.2.3" },
+      { nestloneBinaryVersion: "1.2.3" },
       { DEEPSEEK_VERSION: "8.8.8" },
     ),
     "8.8.8",

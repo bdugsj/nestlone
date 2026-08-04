@@ -101,7 +101,7 @@ if [ ! -f ".env" ]; then
     cat > .env << 'ENVEOF'
 DEEPSEEK_API_KEY=sk-your-key-here
 DEEPSEEK_BASE_URL=https://api.deepseek.com
-CODEWHALE_SESSION_MODEL=deepseek-v4-pro
+NESTLONE_SESSION_MODEL=deepseek-v4-pro
 NVD_API_KEY=
 GITHUB_TOKEN=
 ENVEOF
@@ -132,11 +132,27 @@ install_to_path() {
         BIN_TARGET="$HOME/.local/bin"
         mkdir -p "$BIN_TARGET"
     fi
-    # nestlone is the real TUI binary; nestlone-cli aliases the CLI facade
-    ln -sf "$SCRIPT_DIR/CodeWhale/target/release/nestlone" "$BIN_TARGET/nestlone"
-    ln -sf "$SCRIPT_DIR/CodeWhale/target/release/codewhale" "$BIN_TARGET/nestlone-cli"
-    ln -sf "$SCRIPT_DIR/CodeWhale/target/release/codewhale" "$BIN_TARGET/codewhale"
-    ln -sf "$SCRIPT_DIR/CodeWhale/target/release/nestlone"  "$BIN_TARGET/codewhale-tui"
+    # Resolve where the built/downloaded binaries live: an extracted release
+    # tarball keeps them beside install.sh; a source checkout keeps them in
+    # target/release.
+    BIN_SOURCE_DIR=""
+    if [ -f "$SCRIPT_DIR/nestlone" ] && [ -f "$SCRIPT_DIR/nestlone-tui" ]; then
+        BIN_SOURCE_DIR="$SCRIPT_DIR"
+    elif [ -f "$SCRIPT_DIR/target/release/nestlone" ] && [ -f "$SCRIPT_DIR/target/release/nestlone-tui" ]; then
+        BIN_SOURCE_DIR="$SCRIPT_DIR/target/release"
+    else
+        warn "Cannot locate nestlone/nestlone-tui binaries — skipping PATH install."
+        return 1
+    fi
+    # nestlone is the CLI dispatcher; nestlone-tui is the terminal UI; nest is
+    # the short-form alias (falls back to the dispatcher when absent).
+    ln -sf "$BIN_SOURCE_DIR/nestlone" "$BIN_TARGET/nestlone"
+    ln -sf "$BIN_SOURCE_DIR/nestlone-tui" "$BIN_TARGET/nestlone-tui"
+    if [ -f "$BIN_SOURCE_DIR/nest" ]; then
+        ln -sf "$BIN_SOURCE_DIR/nest" "$BIN_TARGET/nest"
+    else
+        ln -sf "$BIN_SOURCE_DIR/nestlone" "$BIN_TARGET/nest"
+    fi
     # Ensure the target dir is on PATH for future shells (bash + zsh)
     case ":$PATH:" in
         *":$BIN_TARGET:"*) ;;
@@ -149,7 +165,7 @@ install_to_path() {
             done
             ;;
     esac
-    log "Installed: nestlone, nestlone-cli, codewhale → $BIN_TARGET"
+    log "Installed: nestlone, nestlone-tui, nest → $BIN_TARGET"
 }
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -164,13 +180,15 @@ if [ "$MODE" = "docker" ] || [ "$MODE" = "both" ]; then
         exit 1
     fi
 
-    # Ensure build context has required files
-    mkdir -p CodeWhale/.codewhale
-    cp -f .codewhale/mcp.json CodeWhale/.codewhale/mcp.json 2>/dev/null || true
+    # docker-compose.yml lives one level up (beside the CodeWhale checkout)
+    COMPOSE_DIR="$SCRIPT_DIR"
+    if [ -f "$SCRIPT_DIR/../docker-compose.yml" ]; then
+        COMPOSE_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+    fi
 
     # Build
     info "Building Docker image (10-30 min on first run)..."
-    if docker compose build; then
+    if (cd "$COMPOSE_DIR" && docker compose build); then
         log "Docker image built: nestlone-kali:latest"
     else
         warn "Docker build failed. Check Docker Desktop:"
@@ -181,9 +199,9 @@ if [ "$MODE" = "docker" ] || [ "$MODE" = "both" ]; then
 
     # Start
     info "Starting container..."
-    docker compose up -d 2>&1 | tail -3
+    (cd "$COMPOSE_DIR" && docker compose up -d 2>&1 | tail -3)
     log "Container running — access at:"
-    echo "       TUI:    docker exec -it nestlone nestlone"
+    echo "       TUI:    docker exec -it nestlone nestlone-tui"
     echo "       Web UI: http://localhost:7878"
 fi
 
@@ -280,11 +298,15 @@ if [ "$MODE" = "native" ] || [ "$MODE" = "both" ]; then
 
     # ── Try pre-built binary from GitHub Releases ──────────────────
     PREBUILT_OK=false
-    if [ "$USE_MIRRORS" != "true" ] && [ -z "${NESTLONE_NO_PREBUILT:-}" ]; then
+    # Running from an extracted release tarball already has the binaries.
+    if [ -x "$SCRIPT_DIR/nestlone" ] && [ -x "$SCRIPT_DIR/nestlone-tui" ]; then
+        PREBUILT_OK=true
+        log "Using binaries shipped beside install.sh"
+    elif [ "$USE_MIRRORS" != "true" ] && [ -z "${NESTLONE_NO_PREBUILT:-}" ]; then
         info "Checking GitHub Releases for a pre-built binary..."
         case "$(uname -m)" in
-            x86_64) PREBUILT_ASSET="nestlone-x86_64-unknown-linux-gnu.tar.gz" ;;
-            aarch64|arm64) PREBUILT_ASSET="nestlone-aarch64-unknown-linux-gnu.tar.gz" ;;
+            x86_64) PREBUILT_ASSET="nestlone-linux-x64.tar.gz" ;;
+            aarch64|arm64) PREBUILT_ASSET="nestlone-linux-arm64.tar.gz" ;;
             *) PREBUILT_ASSET="" ;;
         esac
         if [ -n "$PREBUILT_ASSET" ]; then
@@ -293,11 +315,11 @@ if [ "$MODE" = "native" ] || [ "$MODE" = "both" ]; then
             TMP_TAR="$(mktemp -d)"
             if curl -fL --connect-timeout 10 --max-time 300 "$PREBUILT_URL" -o "$TMP_TAR/nestlone.tar.gz"; then
                 if tar -xzf "$TMP_TAR/nestlone.tar.gz" -C "$TMP_TAR" && \
-                   [ -f "$TMP_TAR/nestlone" ] && [ -f "$TMP_TAR/codewhale" ]; then
-                    mkdir -p CodeWhale/target/release
-                    cp -f "$TMP_TAR/nestlone" CodeWhale/target/release/nestlone
-                    cp -f "$TMP_TAR/codewhale" CodeWhale/target/release/codewhale
-                    chmod +x CodeWhale/target/release/nestlone CodeWhale/target/release/codewhale
+                   [ -f "$TMP_TAR/nestlone" ] && [ -f "$TMP_TAR/nestlone-tui" ]; then
+                    mkdir -p "$SCRIPT_DIR/target/release"
+                    cp -f "$TMP_TAR/nestlone" "$SCRIPT_DIR/target/release/nestlone"
+                    cp -f "$TMP_TAR/nestlone-tui" "$SCRIPT_DIR/target/release/nestlone-tui"
+                    chmod +x "$SCRIPT_DIR/target/release/nestlone" "$SCRIPT_DIR/target/release/nestlone-tui"
                     PREBUILT_OK=true
                     log "Pre-built binary downloaded ($RELEASE_VER)"
                 else
@@ -313,9 +335,7 @@ if [ "$MODE" = "native" ] || [ "$MODE" = "both" ]; then
     # Build from source only if no pre-built binary is available
     if [ "$PREBUILT_OK" != "true" ]; then
         info "Compiling Nestlone from source (10-20 min)..."
-        cd CodeWhale
-        cargo build --release -p codewhale-cli -p codewhale-tui
-        cd "$SCRIPT_DIR"
+        cargo build --release -p nestlone-cli -p nestlone-tui
         log "Native build complete"
     fi
 
@@ -324,8 +344,8 @@ if [ "$MODE" = "native" ] || [ "$MODE" = "both" ]; then
     log "Install complete — you can now run: nestlone"
 
     # MCP config
-    mkdir -p "$HOME/.codewhale"
-    cat > "$HOME/.codewhale/mcp.json" << MCPEOF
+    mkdir -p "$HOME/.nestlone"
+    cat > "$HOME/.nestlone/mcp.json" << MCPEOF
 {
   "mcpServers": {
     "nestlone-vuln": {
@@ -341,7 +361,7 @@ if [ "$MODE" = "native" ] || [ "$MODE" = "both" ]; then
   }
 }
 MCPEOF
-    log "MCP config: ~/.codewhale/mcp.json"
+    log "MCP config: ~/.nestlone/mcp.json"
 fi
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -354,9 +374,7 @@ if [ "$MODE" = "dev" ]; then
         source "$HOME/.cargo/env"
     fi
     pip3 install --break-system-packages mcp 2>/dev/null || true
-    cd CodeWhale
-    cargo build --release -p codewhale-cli -p codewhale-tui
-    cd "$SCRIPT_DIR"
+    cargo build --release -p nestlone-cli -p nestlone-tui
     log "Dev build complete"
     install_to_path
     log "Install complete — you can now run: nestlone"
@@ -374,13 +392,13 @@ echo "  Scope:     workspace/.nestlone/scope.json"
 echo ""
 if [ "$MODE" = "docker" ] || [ "$MODE" = "both" ]; then
     echo "  Docker:"
-    echo "    TUI:    docker exec -it nestlone nestlone"
+    echo "    TUI:    docker exec -it nestlone nestlone-tui"
     echo "    Web:    http://localhost:7878"
     echo "    Stop:   docker compose down"
 fi
 if [ "$MODE" = "native" ] || [ "$MODE" = "both" ] || [ "$MODE" = "dev" ]; then
     echo "  Native:"
-    echo "    TUI:    CodeWhale/target/release/nestlone"
-    echo "    Web:    CodeWhale/target/release/codewhale app-server --http --host 0.0.0.0 --port 7878"
+    echo "    TUI:    nestlone-tui"
+    echo "    Web:    nestlone app-server --http --host 0.0.0.0 --port 7878"
 fi
 echo ""

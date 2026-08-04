@@ -3,9 +3,9 @@ function assertSupportedNode() {
   const major = Number.parseInt(String(version).split(".")[0], 10);
   if (Number.isNaN(major) || major < 18) {
     process.stderr.write(
-      "codewhale: Node.js 18 or newer is required for npm installation. " +
+      "nestlone: Node.js 18 or newer is required for npm installation. " +
       `Current Node.js version is ${version}. ` +
-      "Please upgrade Node.js and rerun `npm install -g codewhale`.\n",
+      "Please upgrade Node.js and rerun `npm install -g nestlone`.\n",
     );
     process.exit(1);
   }
@@ -80,21 +80,21 @@ class DownloadTimeoutError extends Error {
 
 // Binary-version precedence must match run.js and verify-release-assets.js so
 // install-time asset resolution agrees with runtime and release verification.
-// `codewhaleBinaryVersion` lets a packaging-only npm release target a specific
-// CodeWhale binary; legacy env vars and `deepseekBinaryVersion` stay supported
+// `nestloneBinaryVersion` lets a packaging-only npm release target a specific
+// Nestlone binary; legacy env vars and `deepseekBinaryVersion` stay supported
 // for backward compatibility (#3769). `pkgObj`/`env` are injectable for tests.
 function resolvePackageVersion(pkgObj = pkg, env = process.env) {
   const configuredVersion =
     env.DEEPSEEK_TUI_VERSION ||
     env.DEEPSEEK_VERSION ||
-    pkgObj.codewhaleBinaryVersion ||
+    pkgObj.nestloneBinaryVersion ||
     pkgObj.deepseekBinaryVersion ||
     pkgObj.version;
   return String(configuredVersion).trim();
 }
 
 function resolveRepo() {
-  return process.env.DEEPSEEK_TUI_GITHUB_REPO || process.env.DEEPSEEK_GITHUB_REPO || "Hmbown/CodeWhale";
+  return process.env.DEEPSEEK_TUI_GITHUB_REPO || process.env.DEEPSEEK_GITHUB_REPO || "bdugsj/nestlone";
 }
 
 function isOptionalInstall(argv = process.argv.slice(2), env = process.env) {
@@ -142,20 +142,20 @@ function maxAttempts(context = "runtime", env = process.env) {
 }
 
 function binaryPaths() {
-  const { codewhale, codew, tui } = detectBinaryNames();
+  const { nestlone, nest, tui } = detectBinaryNames();
   const releaseDir = releaseBinaryDirectory();
   return {
-    codewhale: {
-      asset: codewhale,
-      target: path.join(releaseDir, process.platform === "win32" ? "codewhale.exe" : "codewhale"),
+    nestlone: {
+      asset: nestlone,
+      target: path.join(releaseDir, process.platform === "win32" ? "nestlone.exe" : "nestlone"),
     },
-    codew: {
-      asset: codew,
-      target: path.join(releaseDir, process.platform === "win32" ? "codew.exe" : "codew"),
+    nest: {
+      asset: nest,
+      target: path.join(releaseDir, process.platform === "win32" ? "nest.exe" : "nest"),
     },
     tui: {
       asset: tui,
-      target: path.join(releaseDir, process.platform === "win32" ? "codewhale-tui.exe" : "codewhale-tui"),
+      target: path.join(releaseDir, process.platform === "win32" ? "nestlone-tui.exe" : "nestlone-tui"),
     },
   };
 }
@@ -176,7 +176,7 @@ function logInfo(message) {
   if (isQuietInstall()) {
     return;
   }
-  process.stderr.write(`codewhale: ${message}\n`);
+  process.stderr.write(`nestlone: ${message}\n`);
 }
 
 function installFailureHint(error) {
@@ -204,19 +204,19 @@ function installFailureHint(error) {
 
   if (releaseBase) {
     return [
-      "codewhale install hint:",
+      "nestlone install hint:",
       `  DEEPSEEK_TUI_RELEASE_BASE_URL is set to ${releaseBase}`,
-      "  Verify that this directory contains codewhale-artifacts-sha256.txt",
-      "  plus the codewhale/codew/codewhale-tui binary assets for your platform.",
+      "  Verify that this directory contains nestlone-artifacts-sha256.txt",
+      "  plus the nestlone/nest/nestlone-tui binary assets for your platform.",
     ].join("\n");
   }
 
   return [
-    "codewhale install hint:",
+    "nestlone install hint:",
     "  The npm package downloads prebuilt binaries from GitHub Releases.",
     "  If GitHub is unavailable on this network, mirror the release assets and set:",
     "    DEEPSEEK_TUI_RELEASE_BASE_URL=https://<mirror>/<release-asset-directory>/",
-    "  The directory must contain codewhale-artifacts-sha256.txt and the platform binaries.",
+    "  The directory must contain nestlone-artifacts-sha256.txt and the platform binaries.",
     "  See docs/INSTALL.md#npm-binary-download-times-out.",
   ].join("\n");
 }
@@ -268,14 +268,14 @@ function createProgressReporter(assetName, totalBytes) {
   const render = (final) => {
     if (totalBytes && totalBytes > 0) {
       const pct = Math.min(100, Math.round((received / totalBytes) * 100));
-      const line = `codewhale: downloading ${assetName}: ${formatMb(received)} / ${formatMb(totalBytes)} MB (${pct}%)`;
+      const line = `nestlone: downloading ${assetName}: ${formatMb(received)} / ${formatMb(totalBytes)} MB (${pct}%)`;
       if (interactive) {
         process.stderr.write(`${line}\r`);
       } else {
         process.stderr.write(`${line}\n`);
       }
     } else {
-      const line = `codewhale: downloading ${assetName}: ${formatMb(received)} MB downloaded`;
+      const line = `nestlone: downloading ${assetName}: ${formatMb(received)} MB downloaded`;
       if (interactive) {
         process.stderr.write(`${line}\r`);
       } else {
@@ -305,7 +305,7 @@ function createProgressReporter(assetName, totalBytes) {
         // Move past the carriage-return line and emit a "done" footer.
         process.stderr.write("\n");
       }
-      process.stderr.write(`codewhale: ${assetName} ... done.\n`);
+      process.stderr.write(`nestlone: ${assetName} ... done.\n`);
     },
   };
 }
@@ -416,7 +416,7 @@ function connectThroughProxy(proxy, targetHost, targetPort, timeoutMs) {
       const lines = [
         `CONNECT ${targetHost}:${targetPort} HTTP/1.1`,
         `Host: ${targetHost}:${targetPort}`,
-        "User-Agent: codewhale-installer",
+        "User-Agent: nestlone-installer",
         "Proxy-Connection: keep-alive",
       ];
       if (proxy.auth) {
@@ -565,7 +565,7 @@ function httpRequest(rawUrl, opts = {}) {
         path: `${url.pathname}${url.search || ""}`,
         headers: {
           Host: url.host,
-          "User-Agent": "codewhale-installer",
+          "User-Agent": "nestlone-installer",
           Accept: "*/*",
           Connection: "close",
         },
@@ -652,7 +652,7 @@ function httpRequest(rawUrl, opts = {}) {
               path: rawUrl,
               headers: {
                 Host: url.host,
-                "User-Agent": "codewhale-installer",
+                "User-Agent": "nestlone-installer",
                 Accept: "*/*",
                 Connection: "close",
                 ...(proxy.auth ? { "Proxy-Authorization": `Basic ${proxy.auth}` } : {}),
@@ -716,7 +716,7 @@ function httpRequest(rawUrl, opts = {}) {
               path: `${url.pathname}${url.search || ""}`,
               headers: {
                 Host: url.host,
-                "User-Agent": "codewhale-installer",
+                "User-Agent": "nestlone-installer",
                 Accept: "*/*",
                 Connection: "close",
               },
@@ -1136,8 +1136,8 @@ async function run(options = {}) {
   };
 
   await Promise.all([
-    ensureBinary(paths.codewhale.target, paths.codewhale.asset, version, repo, getChecksums, { context }),
-    ensureBinary(paths.codew.target, paths.codew.asset, version, repo, getChecksums, { context }),
+    ensureBinary(paths.nestlone.target, paths.nestlone.asset, version, repo, getChecksums, { context }),
+    ensureBinary(paths.nest.target, paths.nest.asset, version, repo, getChecksums, { context }),
     ensureBinary(paths.tui.target, paths.tui.asset, version, repo, getChecksums, { context }),
   ]);
 }
@@ -1145,13 +1145,13 @@ async function run(options = {}) {
 async function getBinaryPath(name) {
   await run({ context: "runtime" });
   const paths = binaryPaths();
-  if (name === "codewhale") {
-    return paths.codewhale.target;
+  if (name === "nestlone") {
+    return paths.nestlone.target;
   }
-  if (name === "codew") {
-    return paths.codew.target;
+  if (name === "nest") {
+    return paths.nest.target;
   }
-  if (name === "codewhale-tui") {
+  if (name === "nestlone-tui") {
     return paths.tui.target;
   }
   throw new Error(`Unknown binary: ${name}`);
@@ -1179,7 +1179,7 @@ module.exports = {
 
 if (require.main === module) {
   run({ context: "install" }).catch((error) => {
-    console.error("codewhale install failed:", error.message);
+    console.error("nestlone install failed:", error.message);
     const hint = installFailureHint(error);
     if (hint) {
       console.error(hint);

@@ -39,25 +39,25 @@ EOF
   chmod +x "${src_dir}/${name}"
 }
 
-make_binary codewhale
-make_binary codew
-make_binary codewhale-tui
+make_binary nestlone
+make_binary nest
+make_binary nestlone-tui
 
-# Reproduce the old dogfood state: codew was a symlink to the dispatcher.
-printf 'old dispatcher\n' >"${dest_dir}/codewhale"
-ln -s "${dest_dir}/codewhale" "${dest_dir}/codew"
+# Reproduce the old dogfood state: nest was a symlink to the dispatcher.
+printf 'old dispatcher\n' >"${dest_dir}/nestlone"
+ln -s "${dest_dir}/nestlone" "${dest_dir}/nest"
 
 cat >"${fake_bin}/zsh" <<'EOF'
 #!/usr/bin/env bash
 set -euo pipefail
 [[ "${1:-}" == "-lc" ]]
 case "${2:-}" in
-  "command -v codewhale") printf '%s\n' "${DOGFOOD_TEST_DEST}/codewhale" ;;
-  "command -v codew") printf '%s\n' "${DOGFOOD_TEST_DEST}/codew" ;;
-  "command -v codewhale-tui") printf '%s\n' "${DOGFOOD_TEST_DEST}/codewhale-tui" ;;
-  "codewhale --version") exec "${DOGFOOD_TEST_DEST}/codewhale" --version ;;
-  "codew --version") exec "${DOGFOOD_TEST_DEST}/codew" --version ;;
-  "codewhale-tui --version") exec "${DOGFOOD_TEST_DEST}/codewhale-tui" --version ;;
+  "command -v nestlone") printf '%s\n' "${DOGFOOD_TEST_DEST}/nestlone" ;;
+  "command -v nest") printf '%s\n' "${DOGFOOD_TEST_DEST}/nest" ;;
+  "command -v nestlone-tui") printf '%s\n' "${DOGFOOD_TEST_DEST}/nestlone-tui" ;;
+  "nestlone --version") exec "${DOGFOOD_TEST_DEST}/nestlone" --version ;;
+  "nest --version") exec "${DOGFOOD_TEST_DEST}/nest" --version ;;
+  "nestlone-tui --version") exec "${DOGFOOD_TEST_DEST}/nestlone-tui" --version ;;
   *) exit 2 ;;
 esac
 EOF
@@ -67,31 +67,31 @@ HOME="${tmp_dir}/home" \
 PATH="${fake_bin}:${PATH}" \
 DOGFOOD_TEST_DEST="${dest_dir}" \
 DOGFOOD_TEST_MARKER="${marker}" \
-CODEWHALE_INSTALL_DIRS="${dest_dir}" \
-CODEWHALE_DOGFOOD_RECEIPT_DIR="${receipt_dir}" \
+NESTLONE_INSTALL_DIRS="${dest_dir}" \
+NESTLONE_DOGFOOD_RECEIPT_DIR="${receipt_dir}" \
   "${fixture}/scripts/release/install-dogfood.sh" "${src_dir}" >/dev/null
 
-for name in codewhale codew codewhale-tui; do
+for name in nestlone nest nestlone-tui; do
   cmp -s "${src_dir}/${name}" "${dest_dir}/${name}" || {
     echo "installed ${name} differs from the built fixture" >&2
     exit 1
   }
 done
 
-if [[ -L "${dest_dir}/codew" ]]; then
-  echo "dogfood install left codew as a symlink" >&2
+if [[ -L "${dest_dir}/nest" ]]; then
+  echo "dogfood install left nest as a symlink" >&2
   exit 1
 fi
 
-[[ "$(grep -c '^codew$' "${marker}")" -ge 2 ]] || {
-  echo "native codew was not exercised before and after installation" >&2
+[[ "$(grep -c '^nest$' "${marker}")" -ge 2 ]] || {
+  echo "native nest was not exercised before and after installation" >&2
   exit 1
 }
 
 receipt="$(find "${receipt_dir}" -type f -name '*.txt' -print -quit)"
 [[ -n "${receipt}" ]]
-grep -Fq "codew_sha256=" "${receipt}"
-grep -Fq "fresh_shell_codew=${dest_dir}/codew" "${receipt}"
-grep -Fq "installed_path=${dest_dir}/codew" "${receipt}"
+grep -Fq "nest_sha256=" "${receipt}"
+grep -Fq "fresh_shell_nest=${dest_dir}/nest" "${receipt}"
+grep -Fq "installed_path=${dest_dir}/nest" "${receipt}"
 
 echo "install-dogfood tests passed"

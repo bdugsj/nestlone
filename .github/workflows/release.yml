@@ -14,8 +14,12 @@ jobs:
         include:
           - target: x86_64-unknown-linux-gnu
             os: ubuntu-latest
+            release_os: linux
+            release_arch: x64
           - target: aarch64-unknown-linux-gnu
             os: ubuntu-24.04-arm
+            release_os: linux
+            release_arch: arm64
 
     steps:
       - uses: actions/checkout@v5
@@ -31,21 +35,37 @@ jobs:
           sudo apt-get install -y pkg-config libssl-dev libdbus-1-dev
 
       - name: Build
-        run: cargo build --release -p codewhale-cli -p codewhale-tui --target ${{ matrix.target }}
+        run: cargo build --release -p nestlone-cli -p nestlone-tui --target ${{ matrix.target }}
 
       - name: Package
         run: |
+          set -euo pipefail
+          os_arch="${{ matrix.release_os }}-${{ matrix.release_arch }}"
+          # Tarball keeps plain binary names for install.sh.
           mkdir -p dist
-          cp target/${{ matrix.target }}/release/codewhale dist/
           cp target/${{ matrix.target }}/release/nestlone dist/
+          cp target/${{ matrix.target }}/release/nest dist/
+          cp target/${{ matrix.target }}/release/nestlone-tui dist/
           cp install.sh dist/ 2>/dev/null || true
-          tar -czf nestlone-${{ matrix.target }}.tar.gz -C dist .
+          tar -czf "nestlone-${os_arch}.tar.gz" -C dist .
+
+          # Standalone self-update assets use {prefix}-{os}-{arch} naming.
+          cp target/${{ matrix.target }}/release/nestlone "nestlone-${os_arch}"
+          cp target/${{ matrix.target }}/release/nest "nest-${os_arch}"
+          cp target/${{ matrix.target }}/release/nestlone-tui "nestlone-tui-${os_arch}"
+          sha256sum "nestlone-${os_arch}" "nestlone-tui-${os_arch}" "nest-${os_arch}" \
+            > "nestlone-artifacts-sha256-${{ matrix.target }}.txt"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: nestlone-${{ matrix.target }}
-          path: nestlone-${{ matrix.target }}.tar.gz
+          path: |
+            nestlone-${{ matrix.release_os }}-${{ matrix.release_arch }}.tar.gz
+            nestlone-${{ matrix.release_os }}-${{ matrix.release_arch }}
+            nest-${{ matrix.release_os }}-${{ matrix.release_arch }}
+            nestlone-tui-${{ matrix.release_os }}-${{ matrix.release_arch }}
+            nestlone-artifacts-sha256-${{ matrix.target }}.txt
 
   release:
     needs: build
@@ -59,8 +79,19 @@ jobs:
           pattern: nestlone-*
           merge-multiple: true
 
+      - name: Merge checksum manifests
+        run: cat nestlone-artifacts-sha256-*.txt > nestlone-artifacts-sha256.txt
+
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          files: nestlone-*.tar.gz
+          files: |
+            nestlone-*.tar.gz
+            nestlone-linux-x64
+            nest-linux-x64
+            nestlone-tui-linux-x64
+            nestlone-linux-arm64
+            nest-linux-arm64
+            nestlone-tui-linux-arm64
+            nestlone-artifacts-sha256.txt
           generate_release_notes: true

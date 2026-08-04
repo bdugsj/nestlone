@@ -1,4 +1,4 @@
-# Nestlone + CodeWhale — Kali-based security analysis & pentest container.
+# Nestlone — Kali-based security analysis & pentest container.
 #
 # Build:  docker compose build
 # Run:    docker compose up -d
@@ -8,7 +8,7 @@
 
 ARG RUST_VERSION=1.88
 
-# ── Stage 1: Build CodeWhale ───────────────────────────────────────────
+# ── Stage 1: Build Nestlone ────────────────────────────────────────────
 FROM rust:${RUST_VERSION}-slim-bookworm AS builder
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -21,11 +21,11 @@ COPY . .
 # Limit build parallelism to avoid OOM in Docker Desktop (default uses all cores)
 ENV CARGO_BUILD_JOBS=2
 RUN cargo build --release \
-    -p codewhale-cli -p codewhale-tui \
+    -p nestlone-cli -p nestlone-tui \
     && mkdir -p /out \
-    && cp target/release/codewhale /out/ \
-    && cp target/release/codew /out/ \
-    && cp target/release/nestlone /out/
+    && cp target/release/nestlone /out/ \
+    && cp target/release/nest /out/ \
+    && cp target/release/nestlone-tui /out/
 
 # ── Stage 2: Kali Runtime ─────────────────────────────────────────────
 FROM kalilinux/kali-rolling
@@ -63,20 +63,20 @@ RUN pip3 install --break-system-packages mcp
 # Non-root user
 RUN groupadd --gid 1000 nestlone \
     && useradd --create-home --shell /bin/bash --uid 1000 --gid 1000 nestlone \
-    && install -d -m 0700 -o nestlone -g nestlone /home/nestlone/.codewhale \
+    && install -d -m 0700 -o nestlone -g nestlone /home/nestlone/.nestlone \
     && install -d -m 0755 -o nestlone -g nestlone /opt/nestlone/mcp \
     && install -d -m 0755 -o nestlone -g nestlone /workspace
 
-# Copy CodeWhale binaries
-COPY --from=builder --chown=nestlone:nestlone /out/codewhale /usr/local/bin/codewhale
-COPY --from=builder --chown=nestlone:nestlone /out/codew /usr/local/bin/codew
+# Copy Nestlone binaries
 COPY --from=builder --chown=nestlone:nestlone /out/nestlone /usr/local/bin/nestlone
+COPY --from=builder --chown=nestlone:nestlone /out/nest /usr/local/bin/nest
+COPY --from=builder --chown=nestlone:nestlone /out/nestlone-tui /usr/local/bin/nestlone-tui
 
 # Copy MCP servers
 COPY --chown=nestlone:nestlone mcp/ /opt/nestlone/mcp/
 
-# Copy MCP config for CodeWhale
-COPY --chown=nestlone:nestlone .codewhale/mcp.json /home/nestlone/.codewhale/mcp.json
+# Copy MCP config for Nestlone
+COPY --chown=nestlone:nestlone .nestlone/mcp.json /home/nestlone/.nestlone/mcp.json
 
 # Copy entrypoint
 COPY --chown=nestlone:nestlone entrypoint.sh /entrypoint.sh

@@ -11,7 +11,7 @@
 #      the workspace `version` in the root `Cargo.toml`.
 #      (`npm/deepseek-tui/` still exists only as an unpublished compatibility
 #      notice and must stay private.)
-#   4. Internal `codewhale-*` path dependency pins match the workspace version.
+#   4. Internal `nestlone-*` path dependency pins match the workspace version.
 #   5. The TUI crate's packaged changelog copy matches root `CHANGELOG.md`.
 #   6. The current version has either an explicit source-candidate entry or a
 #      dated Keep a Changelog release entry and a matching compare link.
@@ -19,8 +19,8 @@
 #   8. `SECURITY.md` keeps the dedicated security contact.
 #   9. Generated website facts carry the workspace version.
 #  10. Public install and version snippets point at the current release.
-#  11. `codewhale-app-server` stays library-only; the shipped app-server
-#      entrypoint belongs to `codewhale-cli`.
+#  11. `nestlone-app-server` stays library-only; the shipped app-server
+#      entrypoint belongs to `nestlone-cli`.
 #  12. `Cargo.lock` is in sync with the manifests (`cargo metadata --locked`
 #      fails if not).
 set -euo pipefail
@@ -90,11 +90,11 @@ fi
 
 # 4) Internal path dependency pins.
 internal_dep_drift="$(
-  grep -nE 'codewhale-[a-z-]+[[:space:]]*=[[:space:]]*\{[^}]*version[[:space:]]*=[[:space:]]*"' crates/*/Cargo.toml \
+  grep -nE 'nestlone-[a-z-]+[[:space:]]*=[[:space:]]*\{[^}]*version[[:space:]]*=[[:space:]]*"' crates/*/Cargo.toml \
     | grep -v "version[[:space:]]*=[[:space:]]*\"${workspace_version}\"" || true
 )"
 if [[ -n "${internal_dep_drift}" ]]; then
-  echo "::error::Internal codewhale-* path dependency versions must match workspace version ${workspace_version}:" >&2
+  echo "::error::Internal nestlone-* path dependency versions must match workspace version ${workspace_version}:" >&2
   echo "${internal_dep_drift}" >&2
   fail=1
 fi
@@ -143,7 +143,7 @@ if [[ -z "${compare_line}" ]]; then
   echo "::error::CHANGELOG.md must include a compare link for ${workspace_version}." >&2
   fail=1
 elif [[ "${require_dated_release}" == "1" ]] &&
-  ! grep -qE "^\\[${workspace_version}\\]: https://github.com/Hmbown/CodeWhale/compare/v[0-9]+\\.[0-9]+\\.[0-9]+\\.\\.\\.v${workspace_version}$" <<<"${compare_line}"; then
+  ! grep -qE "^\\[${workspace_version}\\]: https://github.com/bdugsj/nestlone/compare/v[0-9]+\\.[0-9]+\\.[0-9]+\\.\\.\\.v${workspace_version}$" <<<"${compare_line}"; then
   echo "::error::Publication requires the ${workspace_version} compare link to end at v${workspace_version}." >&2
   fail=1
 fi
@@ -228,16 +228,16 @@ for readme in README.md README.zh-CN.md README.ja-JP.md README.vi.md README.ko-K
 done
 
 # 10b) Public install/version snippets stay on the current release (#3767).
-# `codewhale --version   # X.Y.Z` verify-your-install lines across README
+# `nestlone --version   # X.Y.Z` verify-your-install lines across README
 # locales and docs/INSTALL.md, plus the docs/INSTALL.md npm-wrapper publish
 # pointer ("published at vX.Y.Z"). These drifted while this gate still passed
 # on a prior lane, so guard them explicitly. Narrowly scoped to those two
 # snippet shapes to avoid flagging unrelated prose.
 for doc in README.md README.zh-CN.md README.ja-JP.md README.vi.md README.ko-KR.md docs/INSTALL.md; do
   [[ -f "${doc}" ]] || continue
-  stale_version_comments="$(grep -nE -- "codewhale --version[[:space:]]+#[[:space:]]*[0-9]+\.[0-9]+\.[0-9]+" "${doc}" | grep -vE -- "#[[:space:]]*${workspace_version}([^0-9]|$)" || true)"
+  stale_version_comments="$(grep -nE -- "nestlone --version[[:space:]]+#[[:space:]]*[0-9]+\.[0-9]+\.[0-9]+" "${doc}" | grep -vE -- "#[[:space:]]*${workspace_version}([^0-9]|$)" || true)"
   if [[ -n "${stale_version_comments}" ]]; then
-    echo "::error::${doc} has 'codewhale --version # X' snippet(s) not on ${workspace_version}:" >&2
+    echo "::error::${doc} has 'nestlone --version # X' snippet(s) not on ${workspace_version}:" >&2
     echo "${stale_version_comments}" >&2
     fail=1
   fi
@@ -262,7 +262,7 @@ app_server_bins="$(
     | node -e '
 const fs = require("fs");
 const metadata = JSON.parse(fs.readFileSync(0, "utf8"));
-const pkg = metadata.packages.find((p) => p.name === "codewhale-app-server");
+const pkg = metadata.packages.find((p) => p.name === "nestlone-app-server");
 if (!pkg) {
   process.exit(2);
 }
@@ -273,14 +273,14 @@ process.stdout.write(bins.join("\n"));
 '
 )"
 if [[ -n "${app_server_bins}" ]]; then
-  echo "::error::codewhale-app-server must stay library-only; use the codewhale-cli-owned 'codewhale app-server' entrypoint instead. Unexpected binary target(s):" >&2
+  echo "::error::nestlone-app-server must stay library-only; use the nestlone-cli-owned 'nestlone app-server' entrypoint instead. Unexpected binary target(s):" >&2
   echo "${app_server_bins}" >&2
   fail=1
 fi
 
 # 12) Cargo.lock in sync.
 if ! cargo metadata --locked --format-version 1 --no-deps >/dev/null 2>&1; then
-  echo "::error::Cargo.lock is out of sync with the manifests. Run 'cargo update -p codewhale-tui' or 'cargo build' and commit the result." >&2
+  echo "::error::Cargo.lock is out of sync with the manifests. Run 'cargo update -p nestlone-tui' or 'cargo build' and commit the result." >&2
   fail=1
 fi
 

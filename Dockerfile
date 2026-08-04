@@ -1,16 +1,16 @@
 # syntax=docker/dockerfile:1
-# Codewhale multi-arch Docker image (#501)
+# Nestlone multi-arch Docker image (#501)
 #
-# Build:  docker buildx build --platform linux/amd64,linux/arm64 -t codewhale:latest .
-# Run:    docker run --rm -it -e DEEPSEEK_API_KEY -v codewhale-home:/home/codewhale/.codewhale codewhale
+# Build:  docker buildx build --platform linux/amd64,linux/arm64 -t nestlone:latest .
+# Run:    docker run --rm -it -e DEEPSEEK_API_KEY -v nestlone-home:/home/nestlone/.nestlone nestlone
 #
-# The image ships the canonical binaries (`codewhale`, `codew`, and
-# `codewhale-tui`) in a minimal runtime layer.
+# The image ships the canonical binaries (`nestlone`, `nest`, and
+# `nestlone-tui`) in a minimal runtime layer.
 #
 # API keys MUST be passed at runtime (never baked into the image):
-#   docker run --rm -it -e DEEPSEEK_API_KEY codewhale
+#   docker run --rm -it -e DEEPSEEK_API_KEY nestlone
 # Or mount an env file:
-#   docker run --rm -it --env-file .env codewhale
+#   docker run --rm -it --env-file .env nestlone
 
 ARG RUST_VERSION=1.88
 
@@ -55,16 +55,16 @@ COPY . .
 
 # Build both binaries for the target platform.  --locked ensures
 # reproducible builds from the committed lockfile.
-RUN --mount=type=cache,id=codewhale-target-${TARGETARCH},target=/build/target,sharing=locked \
-    --mount=type=cache,id=codewhale-cargo-registry-${TARGETARCH},target=/usr/local/cargo/registry,sharing=locked \
-    --mount=type=cache,id=codewhale-cargo-git-${TARGETARCH},target=/usr/local/cargo/git,sharing=locked \
+RUN --mount=type=cache,id=nestlone-target-${TARGETARCH},target=/build/target,sharing=locked \
+    --mount=type=cache,id=nestlone-cargo-registry-${TARGETARCH},target=/usr/local/cargo/registry,sharing=locked \
+    --mount=type=cache,id=nestlone-cargo-git-${TARGETARCH},target=/usr/local/cargo/git,sharing=locked \
     rustup target add "$(cat /rust-target)" \
     && cargo build --release --locked --target "$(cat /rust-target)" \
-      -p codewhale-cli -p codewhale-tui \
+      -p nestlone-cli -p nestlone-tui \
     && mkdir -p /out \
-    && cp target/$(cat /rust-target)/release/codewhale /out/ \
-    && cp target/$(cat /rust-target)/release/codew /out/ \
-    && cp target/$(cat /rust-target)/release/codewhale-tui /out/
+    && cp target/$(cat /rust-target)/release/nestlone /out/ \
+    && cp target/$(cat /rust-target)/release/nest /out/ \
+    && cp target/$(cat /rust-target)/release/nestlone-tui /out/
 
 # ── Stage 2: Runtime ──────────────────────────────────────────────────
 FROM debian:bookworm-slim
@@ -74,22 +74,22 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libdbus-1-3 \
     && rm -rf /var/lib/apt/lists/*
 
-# Non-root user with explicit UID/GID for filesystem ownership clarity. Keep
-# the legacy state directory for read-fallback migration; v0.9.0 no longer
-# ships legacy deepseek command shims.
-RUN groupadd --gid 1000 codewhale \
-    && useradd --create-home --shell /bin/bash --uid 1000 --gid 1000 codewhale \
-    && install -d -m 0700 -o codewhale -g codewhale /home/codewhale/.codewhale \
-    && install -d -m 0700 -o codewhale -g codewhale /home/codewhale/.deepseek
-USER codewhale
-WORKDIR /home/codewhale
+# Non-root user with explicit UID/GID for filesystem ownership clarity. The
+# primary state directory is `.nestlone`; the legacy `.deepseek` directory is
+# kept for provider-config read-fallback.
+RUN groupadd --gid 1000 nestlone \
+    && useradd --create-home --shell /bin/bash --uid 1000 --gid 1000 nestlone \
+    && install -d -m 0700 -o nestlone -g nestlone /home/nestlone/.nestlone \
+    && install -d -m 0700 -o nestlone -g nestlone /home/nestlone/.deepseek
+USER nestlone
+WORKDIR /home/nestlone
 
-COPY --from=builder --chown=codewhale:codewhale /out/codewhale /usr/local/bin/codewhale
-COPY --from=builder --chown=codewhale:codewhale /out/codew /usr/local/bin/codew
-COPY --from=builder --chown=codewhale:codewhale /out/codewhale-tui /usr/local/bin/codewhale-tui
+COPY --from=builder --chown=nestlone:nestlone /out/nestlone /usr/local/bin/nestlone
+COPY --from=builder --chown=nestlone:nestlone /out/nest /usr/local/bin/nest
+COPY --from=builder --chown=nestlone:nestlone /out/nestlone-tui /usr/local/bin/nestlone-tui
 
 # The dispatcher expects to find its companion binary next to it.
 # Both are in /usr/local/bin — no further path setup needed.
 
-ENTRYPOINT ["codewhale"]
+ENTRYPOINT ["nestlone"]
 CMD []

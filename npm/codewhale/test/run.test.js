@@ -14,12 +14,12 @@ test("version flags prefer the installed binary over package metadata", async ()
   let spawned = false;
   const exits = [];
 
-  await run("codewhale", {
+  await run("nestlone", {
     args: ["--version"],
-    getBinaryPath: async () => "/tmp/codewhale-test-binary",
+    getBinaryPath: async () => "/tmp/nestlone-test-binary",
     spawnSync: (binary, args, options) => {
       spawned = true;
-      assert.equal(binary, "/tmp/codewhale-test-binary");
+      assert.equal(binary, "/tmp/nestlone-test-binary");
       assert.deepEqual(args, ["--version"]);
       assert.deepEqual(options, { stdio: "inherit" });
       return { status: 0 };
@@ -33,15 +33,15 @@ test("version flags prefer the installed binary over package metadata", async ()
   assert.deepEqual(exits, [0]);
 });
 
-test("codew wrapper dispatches the native shortcut binary", async () => {
+test("nest wrapper dispatches the native shortcut binary", async () => {
   const resolvedNames = [];
   const spawned = [];
 
-  await run("codew", {
+  await run("nest", {
     args: ["--version"],
     getBinaryPath: async (name) => {
       resolvedNames.push(name);
-      return "/tmp/codew-test-binary";
+      return "/tmp/nest-test-binary";
     },
     spawnSync: (binary, args) => {
       spawned.push({ binary, args });
@@ -50,9 +50,9 @@ test("codew wrapper dispatches the native shortcut binary", async () => {
     exit: () => {},
   });
 
-  assert.deepEqual(resolvedNames, ["codew"]);
+  assert.deepEqual(resolvedNames, ["nest"]);
   assert.deepEqual(spawned, [
-    { binary: "/tmp/codew-test-binary", args: ["--version"] },
+    { binary: "/tmp/nest-test-binary", args: ["--version"] },
   ]);
 });
 
@@ -62,7 +62,7 @@ test("version flags fall back to package metadata when the binary is unavailable
   const exits = [];
   console.log = (line) => lines.push(line);
   try {
-    await run("codewhale", {
+    await run("nestlone", {
       args: ["--version"],
       getBinaryPath: async () => {
         throw new Error("download unavailable");
@@ -79,6 +79,6 @@ test("version flags fall back to package metadata when the binary is unavailable
   }
 
   assert.deepEqual(exits, [0]);
-  assert.match(lines.join("\n"), /codewhale \(npm wrapper\) v/);
+  assert.match(lines.join("\n"), /nestlone \(npm wrapper\) v/);
   assert.match(lines.join("\n"), /binary version: v/);
 });

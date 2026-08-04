@@ -20,8 +20,9 @@ Checks:
     and both required checksum manifests
 
 Set GH_BIN=/path/to/gh to choose a GitHub CLI binary. Set
-CODEWHALE_GITHUB_REPO=owner/repo or CODEWHALE_RELEASE_REMOTE=remote to override
-the default Hmbown/CodeWhale origin check.
+NESTLONE_GITHUB_REPO=owner/repo (legacy CODEWHALE_GITHUB_REPO) or
+NESTLONE_RELEASE_REMOTE=remote to override the default bdugsj/nestlone origin
+check.
 EOF
 }
 
@@ -61,8 +62,8 @@ if [[ -z "${version}" ]]; then
   exit 1
 fi
 
-repo="${CODEWHALE_GITHUB_REPO:-Hmbown/CodeWhale}"
-remote="${CODEWHALE_RELEASE_REMOTE:-origin}"
+repo="${NESTLONE_GITHUB_REPO:-${CODEWHALE_GITHUB_REPO:-bdugsj/nestlone}}"
+remote="${NESTLONE_RELEASE_REMOTE:-origin}"
 gh_bin="${GH_BIN:-gh}"
 
 if ! command -v "${gh_bin}" >/dev/null 2>&1; then
@@ -117,14 +118,14 @@ printf 'Release workflow OK: %s\n' "${run_summary}"
 
 npm_package_version="$(node -p "require('./npm/codewhale/package.json').version")"
 npm_binary_version="$(
-  node -p "const p=require('./npm/codewhale/package.json'); p.codewhaleBinaryVersion || p.deepseekBinaryVersion || p.version"
+  node -p "const p=require('./npm/codewhale/package.json'); p.nestloneBinaryVersion || p.deepseekBinaryVersion || p.version"
 )"
 if [[ "${npm_package_version}" != "${version}" ]]; then
   echo "npm/codewhale package version ${npm_package_version} does not match ${version}." >&2
   exit 1
 fi
 if [[ "${npm_binary_version}" != "${version}" && "${allow_npm_binary_mismatch}" != "1" ]]; then
-  echo "npm/codewhale codewhaleBinaryVersion ${npm_binary_version} does not match ${version}." >&2
+  echo "npm/codewhale nestloneBinaryVersion ${npm_binary_version} does not match ${version}." >&2
   echo "Use --allow-npm-binary-mismatch only for an intentional packaging-only npm release." >&2
   exit 1
 fi
@@ -132,13 +133,15 @@ fi
 (
   cd npm/codewhale
   env \
+    -u NESTLONE_RELEASE_BASE_URL \
+    -u NESTLONE_USE_CNB_MIRROR \
     -u CODEWHALE_RELEASE_BASE_URL \
     -u DEEPSEEK_TUI_RELEASE_BASE_URL \
     -u DEEPSEEK_RELEASE_BASE_URL \
     -u CODEWHALE_USE_CNB_MIRROR \
     DEEPSEEK_TUI_VERSION="${version}" \
     DEEPSEEK_TUI_GITHUB_REPO="${repo}" \
-    CODEWHALE_ALLOW_NPM_BINARY_MISMATCH="${allow_npm_binary_mismatch}" \
+    NESTLONE_ALLOW_NPM_BINARY_MISMATCH="${allow_npm_binary_mismatch}" \
     npm run release:check
 )
 

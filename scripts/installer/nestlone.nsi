@@ -1,19 +1,19 @@
-; codewhale.nsi — NSIS installer for CodeWhale (Windows)
+; nestlone.nsi — NSIS installer for Nestlone (Windows)
 ;
-; Requirements (see https://github.com/Hmbown/CodeWhale/issues/1983):
-;   - Install codewhale.exe, codew.exe, and codewhale-tui.exe side-by-side
-;   - Default to %LOCALAPPDATA%\Programs\CodeWhale\bin
+; Requirements (see https://github.com/bdugsj/nestlone):
+;   - Install nestlone.exe, nest.exe, and nestlone-tui.exe side-by-side
+;   - Default to %LOCALAPPDATA%\Programs\Nestlone\bin
 ;   - Add install dir to current-user PATH
 ;   - Uninstaller removes the PATH entry
 ;
 ; Usage:
 ;   1. Place all .exe files next to this script:
-;        codewhale.exe
-;        codew.exe
-;        codewhale-tui.exe
+;        nestlone.exe
+;        nest.exe
+;        nestlone-tui.exe
 ;   2. Build:
-;        makensis /DVERSION=1.2.3 codewhale.nsi
-;   3. Output: CodeWhaleSetup.exe (in current directory)
+;        makensis /DVERSION=1.2.3 nestlone.nsi
+;   3. Output: NestloneSetup.exe (in current directory)
 
 ;--------------------------------
 ; Includes
@@ -32,13 +32,13 @@ ${UnStrStr}
   !define VERSION "0.0.0"
 !endif
 
-!define PRODUCT_NAME "CodeWhale"
-!define PRODUCT_PUBLISHER "Hmbown"
-!define PRODUCT_WEB_SITE "https://github.com/Hmbown/CodeWhale"
+!define PRODUCT_NAME "Nestlone"
+!define PRODUCT_PUBLISHER "bdugsj"
+!define PRODUCT_WEB_SITE "https://github.com/bdugsj/nestlone"
 
 Name "${PRODUCT_NAME} ${VERSION}"
-OutFile "CodeWhaleSetup.exe"
-InstallDir "$LOCALAPPDATA\Programs\CodeWhale"
+OutFile "NestloneSetup.exe"
+InstallDir "$LOCALAPPDATA\Programs\Nestlone"
 RequestExecutionLevel user
 BrandingText "${PRODUCT_NAME} Installer"
 
@@ -74,9 +74,9 @@ Section "Install" SecInstall
   SetOutPath "$INSTDIR\bin"
 
   ; Copy binaries
-  File "codewhale.exe"
-  File "codew.exe"
-  File "codewhale-tui.exe"
+  File "nestlone.exe"
+  File "nest.exe"
+  File "nestlone-tui.exe"
 
   ; Write uninstaller
   WriteUninstaller "$INSTDIR\Uninstall.exe"
@@ -120,9 +120,9 @@ SectionEnd
 ;--------------------------------
 Section "Uninstall"
   ; Remove binaries
-  Delete "$INSTDIR\bin\codewhale.exe"
-  Delete "$INSTDIR\bin\codew.exe"
-  Delete "$INSTDIR\bin\codewhale-tui.exe"
+  Delete "$INSTDIR\bin\nestlone.exe"
+  Delete "$INSTDIR\bin\nest.exe"
+  Delete "$INSTDIR\bin\nestlone-tui.exe"
   Delete "$INSTDIR\Uninstall.exe"
   RMDir "$INSTDIR\bin"
   RMDir "$INSTDIR"

@@ -66,25 +66,26 @@ function detectBinaryRequiredGlibc(filePath) {
 
 function buildFromSourceHint() {
   return [
-    "You can still run codewhale by building from source with Cargo:",
+    "You can still run nestlone by building from source with Cargo:",
     "",
     "  # Requires Rust 1.88+ (https://rustup.rs)",
-    "  cargo install codewhale-cli --locked   # provides `codewhale` and `codew`",
-    "  cargo install codewhale-tui --locked   # provides `codewhale-tui`",
+    "  cargo install nestlone-cli --locked   # provides `nestlone` and `nest`",
+    "  cargo install nestlone-tui --locked   # provides `nestlone-tui`",
     "",
     "Or build from a checkout:",
     "",
-    "  git clone https://github.com/Hmbown/CodeWhale.git",
-    "  cd CodeWhale",
+    "  git clone https://github.com/bdugsj/nestlone.git",
+    "  cd Nestlone",
     "  cargo install --path crates/cli --locked",
     "  cargo install --path crates/tui --locked",
     "",
-    "See https://github.com/Hmbown/CodeWhale/blob/main/docs/INSTALL.md",
+    "See https://github.com/bdugsj/nestlone/blob/main/docs/INSTALL.md",
   ].join("\n");
 }
 
 function skipGlibcCheck() {
   return (
+    process.env.NESTLONE_SKIP_GLIBC_CHECK === "1" ||
     process.env.CODEWHALE_SKIP_GLIBC_CHECK === "1" ||
     process.env.DEEPSEEK_TUI_SKIP_GLIBC_CHECK === "1" ||
     process.env.DEEPSEEK_SKIP_GLIBC_CHECK === "1"
@@ -96,7 +97,7 @@ function glibcCompatibilityMessage(required, host) {
     ? `this system has glibc ${formatVersion(host)}, which is too old for that asset.`
     : "this system does not appear to provide GNU libc.";
   return [
-    `Prebuilt Codewhale Linux binaries require GLIBC_${formatVersion(required)}, but ${hostLine}`,
+    `Prebuilt Nestlone Linux binaries require GLIBC_${formatVersion(required)}, but ${hostLine}`,
     "",
     "The Linux x64 release asset is a static (musl) build that runs on any glibc,",
     "but the Linux arm64 asset is a GNU libc build linked against",
@@ -104,7 +105,7 @@ function glibcCompatibilityMessage(required, host) {
     "",
     buildFromSourceHint(),
     "",
-    "Set CODEWHALE_SKIP_GLIBC_CHECK=1 to bypass this check at your own risk.",
+    "Set NESTLONE_SKIP_GLIBC_CHECK=1 (legacy CODEWHALE_SKIP_GLIBC_CHECK) to bypass this check at your own risk.",
   ].join("\n");
 }
 

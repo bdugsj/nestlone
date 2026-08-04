@@ -4,8 +4,8 @@
 # Usage: ./scripts/release/prepare-release.sh <new-version>
 #
 # Touches: Cargo.toml (workspace version), crates/*/Cargo.toml (internal
-# codewhale-* dependency pins), npm/codewhale/package.json (version +
-# codewhaleBinaryVersion), the root npm lock workspace record, the remote-smoke
+# nestlone-* dependency pins), npm/codewhale/package.json (version +
+# nestloneBinaryVersion), the root npm lock workspace record, the remote-smoke
 # default tag, README*.md install-tag examples when present, the public fact
 # matrix's source-candidate version, Cargo.lock, crates/tui/CHANGELOG.md (via
 # sync-changelog.sh), and web/lib/facts.generated.ts (via derive-facts.mjs).
@@ -129,12 +129,12 @@ for readme in readmes:
 # 1) Workspace version.
 bump("Cargo.toml", rf'^version = "{old_re}"$', f'version = "{new}"', 1)
 
-# 2) Internal codewhale-* dependency pins in every crate manifest.
+# 2) Internal nestlone-* dependency pins in every crate manifest.
 total = 0
 for manifest in sorted(pathlib.Path("crates").glob("*/Cargo.toml")):
     text = manifest.read_text()
     out, n = re.subn(
-        rf'(codewhale-[a-z0-9-]+\s*=\s*\{{[^}}]*version = "){old_re}(")',
+        rf'(nestlone-[a-z0-9-]+\s*=\s*\{{[^}}]*version = "){old_re}(")',
         rf"\g<1>{new}\g<2>",
         text,
     )
@@ -148,7 +148,7 @@ if total == 0:
 # 3) npm wrapper.
 bump(
     "npm/codewhale/package.json",
-    rf'("(?:version|codewhaleBinaryVersion)": "){old_re}(")',
+    rf'("(?:version|nestloneBinaryVersion)": "){old_re}(")',
     rf"\g<1>{new}\g<2>",
     2,
 )
@@ -179,14 +179,14 @@ version_doc_files = [
 for doc in version_doc_files:
     p = pathlib.Path(doc)
     text = p.read_text()
-    versions = sorted(set(re.findall(r"codewhale --version\s+#\s*([0-9]+\.[0-9]+\.[0-9]+)\b", text)))
+    versions = sorted(set(re.findall(r"nestlone --version\s+#\s*([0-9]+\.[0-9]+\.[0-9]+)\b", text)))
     stale = [version for version in versions if version != old]
     if stale:
         sys.exit(
             f"error: {doc} has version-comment value(s) {', '.join(stale)}; expected {old}"
         )
     out, n = re.subn(
-        rf"(codewhale --version\s+#\s*){old_re}\b", rf"\g<1>{new}", text
+        rf"(nestlone --version\s+#\s*){old_re}\b", rf"\g<1>{new}", text
     )
     if n:
         p.write_text(out)

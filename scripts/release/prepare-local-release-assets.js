@@ -12,8 +12,8 @@ const {
   detectBinaryNames,
 } = require("../../npm/codewhale/scripts/artifacts");
 
-const WINDOWS_LAUNCHER = "codewhale.bat";
-const WINDOWS_CLI_ASSET = "codewhale-windows-x64.exe";
+const WINDOWS_LAUNCHER = "nestlone.bat";
+const WINDOWS_CLI_ASSET = "nestlone-windows-x64.exe";
 
 async function sha256(filePath) {
   const content = await fs.readFile(filePath);
@@ -30,20 +30,20 @@ async function main() {
   const buildDir = path.resolve(
     process.argv[3] || path.join("target", "release"),
   );
-  const { codewhale, tui, codew } = detectBinaryNames();
+  const { nestlone, tui, nest } = detectBinaryNames();
   const isWindows = process.platform === "win32";
 
   const assets = [
     {
-      source: path.join(buildDir, isWindows ? "codewhale.exe" : "codewhale"),
-      target: codewhale,
+      source: path.join(buildDir, isWindows ? "nestlone.exe" : "nestlone"),
+      target: nestlone,
     },
     {
-      source: path.join(buildDir, isWindows ? "codew.exe" : "codew"),
-      target: codew,
+      source: path.join(buildDir, isWindows ? "nest.exe" : "nest"),
+      target: nest,
     },
     {
-      source: path.join(buildDir, isWindows ? "codewhale-tui.exe" : "codewhale-tui"),
+      source: path.join(buildDir, isWindows ? "nestlone-tui.exe" : "nestlone-tui"),
       target: tui,
     },
   ];
@@ -61,11 +61,11 @@ async function main() {
         continue;
       }
       assets.push({
-        source: assetName.startsWith("codewhale-tui")
-          ? path.join(buildDir, isWindows ? "codewhale-tui.exe" : "codewhale-tui")
-          : assetName.startsWith("codew-")
-            ? path.join(buildDir, isWindows ? "codew.exe" : "codew")
-            : path.join(buildDir, isWindows ? "codewhale.exe" : "codewhale"),
+        source: assetName.startsWith("nestlone-tui")
+          ? path.join(buildDir, isWindows ? "nestlone-tui.exe" : "nestlone-tui")
+          : assetName.startsWith("nest-")
+            ? path.join(buildDir, isWindows ? "nest.exe" : "nest")
+            : path.join(buildDir, isWindows ? "nestlone.exe" : "nestlone"),
         target: assetName,
       });
     }
@@ -86,9 +86,9 @@ async function main() {
       "where wt >nul 2>nul",
       "set NO_ANIMATIONS=1",
       'if "%ERRORLEVEL%"=="0" (',
-      '    wt --title Codewhale cmd /k "%~dp0codewhale-windows-x64.exe"',
+      '    wt --title Nestlone cmd /k "%~dp0nestlone-windows-x64.exe"',
       ") else (",
-      '    "%~dp0codewhale-windows-x64.exe"',
+      '    "%~dp0nestlone-windows-x64.exe"',
       ")",
       "",
     ].join("\r\n");

@@ -3,13 +3,13 @@
 #
 # Two independent checks, both safe to run before every release:
 #
-#   1. app-server stdio probe (always): drives `codewhale app-server --stdio`
+#   1. app-server stdio probe (always): drives `nestlone app-server --stdio`
 #      with JSON-RPC health/capabilities requests and asserts the control
 #      surface answers. Spends no model tokens, makes no network calls, and runs
 #      against a throwaway config so it never reads the maintainer's real keys.
 #
 #   2. provider/model matrix (opt-in, --matrix): discovers configured providers
-#      from `codewhale auth list`, maps each to a cheap sentinel model, and
+#      from `nestlone auth list`, maps each to a cheap sentinel model, and
 #      either prints the plan (default, dry-run) or runs a tiny `exec` prompt per
 #      provider (--real). `auth list` reports presence flags only; secrets are
 #      never printed and exec output is passed through a redactor.
@@ -19,9 +19,9 @@
 #   scripts/release/app-server-smoke.sh --matrix              # + print provider matrix (dry-run)
 #   scripts/release/app-server-smoke.sh --matrix --real       # + exec a sentinel per provider
 #   scripts/release/app-server-smoke.sh --matrix --provider deepseek --provider zai
-#   scripts/release/app-server-smoke.sh --bin ./target/release/codewhale
+#   scripts/release/app-server-smoke.sh --bin ./target/release/nestlone
 #
-# Binary resolution order: --bin <path>, $CODEWHALE_BIN, ./target/release/codewhale, PATH.
+# Binary resolution order: --bin <path>, $NESTLONE_BIN (legacy $CODEWHALE_BIN), ./target/release/nestlone, PATH.
 # Per-provider cheap-model override: SMOKE_MODEL_<SLUG> with slug upper-cased and
 #   '-' replaced by '_', e.g. SMOKE_MODEL_XIAOMI_MIMO=mimo-7b.
 
@@ -29,7 +29,7 @@ set -euo pipefail
 
 PASS=0
 FAIL=0
-BIN="${CODEWHALE_BIN:-}"
+BIN="${NESTLONE_BIN:-${CODEWHALE_BIN:-}}"
 DO_MATRIX=0
 DRY_RUN=1
 SENTINEL="${SMOKE_SENTINEL:-Reply with exactly the single word: pong}"
@@ -86,17 +86,17 @@ parse_args() {
 
 resolve_bin() {
     if [[ -n "$BIN" ]]; then
-        [[ -x "$BIN" ]] || { echo "codewhale binary not executable: $BIN" >&2; exit 2; }
+        [[ -x "$BIN" ]] || { echo "nestlone binary not executable: $BIN" >&2; exit 2; }
         return
     fi
-    if [[ -x "./target/release/codewhale" ]]; then
-        BIN="./target/release/codewhale"
-    elif command -v codewhale >/dev/null 2>&1; then
-        BIN="$(command -v codewhale)"
+    if [[ -x "./target/release/nestlone" ]]; then
+        BIN="./target/release/nestlone"
+    elif command -v nestlone >/dev/null 2>&1; then
+        BIN="$(command -v nestlone)"
     else
-        echo "could not find a codewhale binary." >&2
-        echo "  build one: cargo build -p codewhale-cli --release" >&2
-        echo "  or pass:   --bin <path> / CODEWHALE_BIN=<path>" >&2
+        echo "could not find a nestlone binary." >&2
+        echo "  build one: cargo build -p nestlone-cli --release" >&2
+        echo "  or pass:   --bin <path> / NESTLONE_BIN=<path>" >&2
         exit 2
     fi
 }
@@ -145,7 +145,7 @@ probe_assert() {
 
 # ── Check 2: provider/model matrix ───────────────────────────────────────────
 
-# Echo configured provider slugs (active != missing) from `codewhale auth list`.
+# Echo configured provider slugs (active != missing) from `nestlone auth list`.
 configured_providers() {
     "$BIN" auth list 2>/dev/null \
         | awk 'NR > 1 && NF >= 2 && $NF != "missing" { print $1 }'

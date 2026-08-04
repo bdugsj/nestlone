@@ -10,18 +10,18 @@ script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 repo_root="$(cd "${script_dir}/../.." && pwd)"
 src_dir="${1:-${repo_root}/target/release}"
 
-if [[ ! -x "${src_dir}/codewhale" || ! -x "${src_dir}/codew" || ! -x "${src_dir}/codewhale-tui" ]]; then
-  echo "ERROR: expected executable codewhale, codew, and codewhale-tui in ${src_dir}" >&2
-  echo "Build first: cargo build --release -p codewhale-cli -p codewhale-tui --locked" >&2
+if [[ ! -x "${src_dir}/nestlone" || ! -x "${src_dir}/nest" || ! -x "${src_dir}/nestlone-tui" ]]; then
+  echo "ERROR: expected executable nestlone, nest, and nestlone-tui in ${src_dir}" >&2
+  echo "Build first: cargo build --release -p nestlone-cli -p nestlone-tui --locked" >&2
   exit 1
 fi
 
 source_sha="$(git -C "${repo_root}" rev-parse HEAD)"
 source_dirty="$(git -C "${repo_root}" status --porcelain --untracked-files=no)"
 if [[ -n "${source_dirty}" ]]; then
-  if [[ "${CODEWHALE_ALLOW_DIRTY_DOGFOOD:-0}" != "1" ]]; then
+  if [[ "${NESTLONE_ALLOW_DIRTY_DOGFOOD:-0}" != "1" && "${CODEWHALE_ALLOW_DIRTY_DOGFOOD:-0}" != "1" ]]; then
     echo "ERROR: refusing to install from a dirty source tree" >&2
-    echo "Commit/stash the source, or set CODEWHALE_ALLOW_DIRTY_DOGFOOD=1 explicitly." >&2
+    echo "Commit/stash the source, or set NESTLONE_ALLOW_DIRTY_DOGFOOD=1 explicitly." >&2
     exit 1
   fi
   source_identity="${source_sha}-dirty"
@@ -29,24 +29,24 @@ else
   source_identity="${source_sha}"
 fi
 
-cli_version="$("${src_dir}/codewhale" --version)"
-shim_version="$("${src_dir}/codew" --version)"
-tui_version="$("${src_dir}/codewhale-tui" --version)"
+cli_version="$("${src_dir}/nestlone" --version)"
+shim_version="$("${src_dir}/nest" --version)"
+tui_version="$("${src_dir}/nestlone-tui" --version)"
 short_sha="${source_sha:0:12}"
 if [[ "${cli_version}" != *"${short_sha}"* || "${shim_version}" != *"${short_sha}"* || "${tui_version}" != *"${short_sha}"* ]]; then
   echo "ERROR: release binaries do not embed current HEAD ${short_sha}" >&2
-  echo "  codewhale: ${cli_version}" >&2
-  echo "  codew: ${shim_version}" >&2
-  echo "  codewhale-tui: ${tui_version}" >&2
+  echo "  nestlone: ${cli_version}" >&2
+  echo "  nest: ${shim_version}" >&2
+  echo "  nestlone-tui: ${tui_version}" >&2
   echo "Rebuild this checkout before installing." >&2
   exit 1
 fi
-cli_sha="$(shasum -a 256 "${src_dir}/codewhale" | awk '{print $1}')"
-shim_sha="$(shasum -a 256 "${src_dir}/codew" | awk '{print $1}')"
-tui_sha="$(shasum -a 256 "${src_dir}/codewhale-tui" | awk '{print $1}')"
+cli_sha="$(shasum -a 256 "${src_dir}/nestlone" | awk '{print $1}')"
+shim_sha="$(shasum -a 256 "${src_dir}/nest" | awk '{print $1}')"
+tui_sha="$(shasum -a 256 "${src_dir}/nestlone-tui" | awk '{print $1}')"
 
 default_install_dirs="${HOME}/.cargo/bin:${HOME}/.local/bin"
-for command_name in codewhale codewhale-tui codew; do
+for command_name in nestlone nestlone-tui nest; do
   if command_path="$(command -v "${command_name}" 2>/dev/null)" \
     && [[ "${command_path}" == "${HOME}/"* ]]; then
     command_dir="$(dirname "${command_path}")"
@@ -55,7 +55,7 @@ for command_name in codewhale codewhale-tui codew; do
     fi
   fi
 done
-IFS=':' read -r -a dest_dirs <<< "${CODEWHALE_INSTALL_DIRS:-${default_install_dirs}}"
+IFS=':' read -r -a dest_dirs <<< "${NESTLONE_INSTALL_DIRS:-${CODEWHALE_INSTALL_DIRS:-${default_install_dirs}}}"
 
 install_binary() {
   local src="$1"
@@ -90,10 +90,10 @@ install_binary() {
 installed=()
 for dest in "${dest_dirs[@]}"; do
   mkdir -p "${dest}"
-  install_binary "${src_dir}/codewhale" "${dest}/codewhale"
-  install_binary "${src_dir}/codew" "${dest}/codew"
-  install_binary "${src_dir}/codewhale-tui" "${dest}/codewhale-tui"
-  installed+=("${dest}/codewhale" "${dest}/codewhale-tui" "${dest}/codew")
+  install_binary "${src_dir}/nestlone" "${dest}/nestlone"
+  install_binary "${src_dir}/nest" "${dest}/nest"
+  install_binary "${src_dir}/nestlone-tui" "${dest}/nestlone-tui"
+  installed+=("${dest}/nestlone" "${dest}/nestlone-tui" "${dest}/nest")
 done
 
 verify_fresh_shell_binary() {
@@ -126,18 +126,18 @@ verify_fresh_shell_binary() {
   printf '%s\n' "${command_path}"
 }
 
-path_cli="$(verify_fresh_shell_binary codewhale)"
-path_shim="$(verify_fresh_shell_binary codew)"
-path_tui="$(verify_fresh_shell_binary codewhale-tui)"
+path_cli="$(verify_fresh_shell_binary nestlone)"
+path_shim="$(verify_fresh_shell_binary nest)"
+path_tui="$(verify_fresh_shell_binary nestlone-tui)"
 installed_cli_sha="$(shasum -a 256 "${path_cli}" | awk '{print $1}')"
 installed_shim_sha="$(shasum -a 256 "${path_shim}" | awk '{print $1}')"
 installed_tui_sha="$(shasum -a 256 "${path_tui}" | awk '{print $1}')"
 
-default_receipt_root="${HOME}/.codewhale/dogfood-receipts"
+default_receipt_root="${HOME}/.nestlone/dogfood-receipts"
 if [[ -d "/Volumes/VIXinSSD/CW/backups" ]]; then
   default_receipt_root="/Volumes/VIXinSSD/CW/backups/dogfood-installs"
 fi
-receipt_root="${CODEWHALE_DOGFOOD_RECEIPT_DIR:-${default_receipt_root}}"
+receipt_root="${NESTLONE_DOGFOOD_RECEIPT_DIR:-${CODEWHALE_DOGFOOD_RECEIPT_DIR:-${default_receipt_root}}}"
 mkdir -p "${receipt_root}"
 timestamp="$(date -u +%Y%m%dT%H%M%SZ)"
 receipt="${receipt_root}/${timestamp}-${source_sha:0:12}.txt"
@@ -146,22 +146,22 @@ receipt="${receipt_root}/${timestamp}-${source_sha:0:12}.txt"
   echo "source_repo=${repo_root}"
   echo "source_commit=${source_identity}"
   echo "source_dir=${src_dir}"
-  echo "codewhale_version=${cli_version}"
-  echo "codewhale_sha256=${cli_sha}"
-  echo "installed_codewhale_sha256=${installed_cli_sha}"
-  echo "codew_version=${shim_version}"
-  echo "codew_sha256=${shim_sha}"
-  echo "installed_codew_sha256=${installed_shim_sha}"
-  echo "codewhale_tui_version=${tui_version}"
-  echo "codewhale_tui_sha256=${tui_sha}"
-  echo "installed_codewhale_tui_sha256=${installed_tui_sha}"
-  echo "fresh_shell_codewhale=${path_cli}"
-  echo "fresh_shell_codew=${path_shim}"
-  echo "fresh_shell_codewhale_tui=${path_tui}"
+  echo "nestlone_version=${cli_version}"
+  echo "nestlone_sha256=${cli_sha}"
+  echo "installed_nestlone_sha256=${installed_cli_sha}"
+  echo "nest_version=${shim_version}"
+  echo "nest_sha256=${shim_sha}"
+  echo "installed_nest_sha256=${installed_shim_sha}"
+  echo "nestlone_tui_version=${tui_version}"
+  echo "nestlone_tui_sha256=${tui_sha}"
+  echo "installed_nestlone_tui_sha256=${installed_tui_sha}"
+  echo "fresh_shell_nestlone=${path_cli}"
+  echo "fresh_shell_nest=${path_shim}"
+  echo "fresh_shell_nestlone_tui=${path_tui}"
   printf 'installed_path=%s\n' "${installed[@]}"
 } >"${receipt}"
 
 echo "Installed ${source_identity}:"
 printf '  %s\n' "${installed[@]}"
 echo "Receipt: ${receipt}"
-echo "Fresh-shell check: zsh -lc 'type -a codew codewhale codewhale-tui; codew --version; codewhale-tui --version'"
+echo "Fresh-shell check: zsh -lc 'type -a nest nestlone nestlone-tui; nest --version; nestlone-tui --version'"
