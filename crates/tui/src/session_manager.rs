@@ -1225,10 +1225,10 @@ fn is_git_metadata_entry(path: &Path) -> bool {
 
 /// Resolve the default session directory path.
 ///
-/// v0.8.44: prefers `~/.codewhale/sessions`, falls back to
+/// v0.8.44: prefers `~/.nestlone/sessions`, falls back to
 /// `~/.deepseek/sessions` for existing installs. Uses the write-path resolver
 /// so the first access relocates any legacy `~/.deepseek/sessions` into
-/// `~/.codewhale/sessions` when the primary directory is missing (#3240).
+/// `~/.nestlone/sessions` when the primary directory is missing (#3240).
 /// If an older build already created an empty primary sessions directory, copy
 /// missing legacy entries into it without overwriting newer CodeWhale data.
 pub fn default_sessions_dir() -> std::io::Result<PathBuf> {
@@ -1270,9 +1270,11 @@ fn merge_missing_legacy_session_entries(primary: &Path) -> io::Result<usize> {
 }
 
 fn nestlone_home_is_explicit() -> bool {
-    std::env::var("CODEWHALE_HOME")
-        .map(|value| !value.trim().is_empty())
-        .unwrap_or(false)
+    ["NESTLONE_HOME", "CODEWHALE_HOME"].into_iter().any(|var| {
+        std::env::var(var)
+            .map(|value| !value.trim().is_empty())
+            .unwrap_or(false)
+    })
 }
 
 fn copy_missing_dir_entries(src: &Path, dst: &Path) -> io::Result<usize> {
@@ -2137,7 +2139,7 @@ mod tests {
         let _home = crate::test_support::EnvVarGuard::set("HOME", &home);
         let _nestlone_home = crate::test_support::EnvVarGuard::remove("CODEWHALE_HOME");
 
-        let primary_sessions = home.join(".codewhale").join("sessions");
+        let primary_sessions = home.join(".nestlone").join("sessions");
         let legacy_sessions = home.join(".deepseek").join("sessions");
         fs::create_dir_all(&primary_sessions).expect("primary sessions");
         fs::create_dir_all(&legacy_sessions).expect("legacy sessions");
@@ -2182,7 +2184,7 @@ mod tests {
         let _home = crate::test_support::EnvVarGuard::set("HOME", &home);
         let _nestlone_home = crate::test_support::EnvVarGuard::remove("CODEWHALE_HOME");
 
-        let primary_sessions = home.join(".codewhale").join("sessions");
+        let primary_sessions = home.join(".nestlone").join("sessions");
         let legacy_sessions = home.join(".deepseek").join("sessions");
         fs::create_dir_all(&primary_sessions).expect("primary sessions");
         fs::create_dir_all(&legacy_sessions).expect("legacy sessions");

@@ -823,9 +823,9 @@ fn print_human(rollup: &Rollup) {
 // ──────────────────────────────────────────────────────────────────────────────
 
 fn deepseek_home() -> PathBuf {
-    // Respect CODEWHALE_HOME (canonical) then DEEPSEEK_HOME (legacy alias)
-    // env overrides; fall back to ~/.deepseek.
-    for var in ["CODEWHALE_HOME", "DEEPSEEK_HOME"] {
+    // Respect NESTLONE_HOME (canonical), then CODEWHALE_HOME/DEEPSEEK_HOME
+    // legacy aliases; fall back to ~/.nestlone.
+    for var in ["NESTLONE_HOME", "CODEWHALE_HOME", "DEEPSEEK_HOME"] {
         if let Ok(v) = std::env::var(var)
             && !v.trim().is_empty()
         {
@@ -834,7 +834,7 @@ fn deepseek_home() -> PathBuf {
     }
     dirs::home_dir()
         .unwrap_or_else(|| PathBuf::from("."))
-        .join(".deepseek")
+        .join(".nestlone")
 }
 
 /// Parse a timestamp from a JSON value field (tries RFC3339).

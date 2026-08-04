@@ -2210,7 +2210,7 @@ fn cached_skills_respect_nestlone_only_scan_config() {
     .expect("write claude skill");
 
     let nestlone_dir = workspace
-        .join(".codewhale")
+        .join(".nestlone")
         .join("skills")
         .join("nestlone-skill");
     std::fs::create_dir_all(&nestlone_dir).expect("nestlone skill dir");
@@ -2234,7 +2234,7 @@ fn cached_skills_respect_nestlone_only_scan_config() {
         },
     );
 
-    assert_eq!(app.skills_dir, workspace.join(".codewhale").join("skills"));
+    assert_eq!(app.skills_dir, workspace.join(".nestlone").join("skills"));
     assert!(
         app.cached_skills
             .iter()
@@ -2255,9 +2255,9 @@ fn cached_skills_respect_nestlone_only_scan_config() {
 fn resolve_skills_dir_requires_nestlone_skills_to_be_directory() {
     let tmp = tempfile::TempDir::new().expect("tempdir");
     let workspace = tmp.path().join("workspace");
-    std::fs::create_dir_all(workspace.join(".codewhale")).expect("nestlone dir");
+    std::fs::create_dir_all(workspace.join(".nestlone")).expect("nestlone dir");
     std::fs::write(
-        workspace.join(".codewhale").join("skills"),
+        workspace.join(".nestlone").join("skills"),
         "not a directory",
     )
     .expect("skills file");
@@ -2315,7 +2315,7 @@ fn cached_skills_preserve_configured_directory_in_nestlone_only_scan() {
     let workspace = tmp.path().join("workspace");
 
     let nestlone_skill_dir = workspace
-        .join(".codewhale")
+        .join(".nestlone")
         .join("skills")
         .join("workspace-nestlone");
     std::fs::create_dir_all(&nestlone_skill_dir).expect("workspace nestlone skill dir");
@@ -2370,7 +2370,7 @@ fn cached_skills_reject_nestlone_only_workspace_symlink_escape() {
     let workspace = tmp.path().join("workspace");
     let escape_target = tmp.path().join("escape-target");
     let escaped_skill_dir = escape_target.join("escaped-skill");
-    std::fs::create_dir_all(workspace.join(".codewhale")).expect("nestlone dir");
+    std::fs::create_dir_all(workspace.join(".nestlone")).expect("nestlone dir");
     std::fs::create_dir_all(&escaped_skill_dir).expect("escaped skill dir");
     std::fs::write(
         escaped_skill_dir.join("SKILL.md"),
@@ -2378,7 +2378,7 @@ fn cached_skills_reject_nestlone_only_workspace_symlink_escape() {
     )
     .expect("write escaped skill");
 
-    let link_path = workspace.join(".codewhale").join("skills");
+    let link_path = workspace.join(".nestlone").join("skills");
     if create_dir_symlink(&escape_target, &link_path).is_err() {
         return;
     }
@@ -2421,7 +2421,7 @@ fn paste_defers_oversized_text_consolidation_until_submit() {
 
     assert_eq!(app.input, full_content);
     assert_eq!(app.cursor_position, app.input.chars().count());
-    let pastes_dir = tmp.path().join(".codewhale/pastes");
+    let pastes_dir = tmp.path().join(".nestlone/pastes");
     assert!(
         !pastes_dir.exists() || std::fs::read_dir(&pastes_dir).unwrap().next().is_none(),
         "paste file should not be written before submit"
@@ -2443,7 +2443,7 @@ fn paste_defers_oversized_text_consolidation_until_submit() {
     );
     let mention_start = full_content.len();
     assert!(
-        submitted[mention_start..].starts_with("\n@.codewhale/pastes/paste-"),
+        submitted[mention_start..].starts_with("\n@.nestlone/pastes/paste-"),
         "expected @mention suffix, got: {}",
         &submitted[mention_start..]
     );
@@ -2474,9 +2474,9 @@ fn paste_under_threshold_does_not_consolidate() {
     app.insert_paste_text(&small);
 
     assert_eq!(app.input, small);
-    assert!(!app.input.starts_with("@.codewhale/pastes/"));
+    assert!(!app.input.starts_with("@.nestlone/pastes/"));
     // No paste file gets written for under-cap pastes.
-    let pastes_dir = tmp.path().join(".codewhale/pastes");
+    let pastes_dir = tmp.path().join(".nestlone/pastes");
     assert!(
         !pastes_dir.exists() || std::fs::read_dir(&pastes_dir).unwrap().next().is_none(),
         "no paste file should be written for under-cap content"
@@ -2545,7 +2545,7 @@ fn submit_input_consolidates_oversized_input_into_paste_file() {
     );
     let mention_start = full_content.len();
     assert!(
-        submitted[mention_start..].starts_with("\n@.codewhale/pastes/paste-"),
+        submitted[mention_start..].starts_with("\n@.nestlone/pastes/paste-"),
         "submitted text should end with @mention, got suffix: {}",
         &submitted[mention_start..]
     );
@@ -3391,7 +3391,7 @@ fn legacy_yolo_migrates_the_actual_fallback_config_not_a_missing_env_path() {
     let _env_lock = lock_test_env();
     let tmp = tempfile::tempdir().expect("tempdir");
     let home = tmp.path().join("home");
-    let home_config_dir = home.join(nestlone_config::CODEWHALE_APP_DIR);
+    let home_config_dir = home.join(nestlone_config::NESTLONE_APP_DIR);
     let override_dir = tmp.path().join("missing-override");
     let missing_override = override_dir.join("config.toml");
     let workspace = tmp.path().join("workspace");
@@ -5765,7 +5765,7 @@ fn sealed_settings_home(tmp: &std::path::Path) -> Vec<EnvVarGuard> {
     vec![
         EnvVarGuard::set("HOME", tmp),
         EnvVarGuard::set("USERPROFILE", tmp),
-        EnvVarGuard::set("CODEWHALE_HOME", tmp.join(".codewhale")),
+        EnvVarGuard::set("CODEWHALE_HOME", tmp.join(".nestlone")),
         EnvVarGuard::remove("DEEPSEEK_CONFIG_PATH"),
         EnvVarGuard::remove("CODEWHALE_CONFIG_PATH"),
     ]
@@ -5953,7 +5953,7 @@ fn failed_startup_default_write_is_reported_not_swallowed() {
         toast.text
     );
     assert!(
-        !toast.text.contains(".codewhale"),
+        !toast.text.contains(".nestlone"),
         "a failure toast must not carry the settings path, got {:?}",
         toast.text
     );
@@ -6337,7 +6337,7 @@ async fn rapid_mixed_writes_settle_on_the_last_value_for_every_field() {
 /// Almost every `App` test cycles modes without sealing `HOME`. Those calls have
 /// to be inert: not "usually inert because no other test happens to have opted
 /// in", but inert by construction, because the alternative is rewriting the
-/// developer's real `~/.codewhale/settings.toml` during `cargo test`.
+/// developer's real `~/.nestlone/settings.toml` during `cargo test`.
 #[test]
 fn mode_cycling_in_an_unsealed_test_writes_nothing() {
     let mut app = App::new(test_options(false), &Config::default());
@@ -6566,7 +6566,7 @@ async fn a_late_startup_default_failure_is_returned_not_only_logged() {
         "the shutdown notice must name what was lost, got {message:?}"
     );
     assert!(
-        !message.contains(".codewhale") && !message.contains(tmp.path().to_str().unwrap()),
+        !message.contains(".nestlone") && !message.contains(tmp.path().to_str().unwrap()),
         "the shutdown notice must not print the settings path, got {message:?}"
     );
 }

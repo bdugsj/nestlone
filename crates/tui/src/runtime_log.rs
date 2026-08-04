@@ -1,5 +1,5 @@
 //! TUI runtime logging. Initializes a `tracing-subscriber` that writes to a
-//! per-process file under `~/.codewhale/logs/tui-YYYY-MM-DD-PID.log`, and (on
+//! per-process file under `~/.nestlone/logs/tui-YYYY-MM-DD-PID.log`, and (on
 //! Unix and Windows) redirects the process's `stderr` handle/fd to that same
 //! file for the lifetime of the alt-screen TUI.
 //!
@@ -22,7 +22,7 @@
 //!
 //! Defence-in-depth:
 //!   1. A `tracing-subscriber` writes formatted logs to
-//!      `~/.codewhale/logs/tui-YYYY-MM-DD-PID.log` so `tracing::warn!` /
+//!      `~/.nestlone/logs/tui-YYYY-MM-DD-PID.log` so `tracing::warn!` /
 //!      `tracing::error!` calls go somewhere observable instead of
 //!      disappearing into the void (the TUI previously had no global
 //!      subscriber, so contributors reached for `eprintln!`).
@@ -214,13 +214,16 @@ pub(crate) fn log_directory() -> Option<PathBuf> {
     // back to the legacy ~/.deepseek path — silent fallback would defeat the
     // isolation the override promises (CI, containers, test harnesses). We
     // check the env var directly rather than nestlone_home()'s Ok/Err because
-    // that helper succeeds (returns $HOME/.codewhale) even when the override is
+    // that helper succeeds (returns $HOME/.nestlone) even when the override is
     // unset, which would short-circuit the legacy fallback below.
-    if let Some(home) = std::env::var_os("CODEWHALE_HOME").filter(|value| !value.is_empty()) {
+    if let Some(home) = std::env::var_os("NESTLONE_HOME")
+        .or_else(|| std::env::var_os("CODEWHALE_HOME"))
+        .filter(|value| !value.is_empty())
+    {
         return Some(PathBuf::from(home).join("logs"));
     }
     let resolve = |base: PathBuf| -> Option<PathBuf> {
-        let primary = base.join(".codewhale").join("logs");
+        let primary = base.join(".nestlone").join("logs");
         if primary.exists() {
             return Some(primary);
         }
@@ -389,7 +392,7 @@ mod tests {
         }
 
         let resolved = log_directory().expect("log_directory should resolve");
-        assert_eq!(resolved, tmp.path().join(".codewhale").join("logs"));
+        assert_eq!(resolved, tmp.path().join(".nestlone").join("logs"));
 
         // SAFETY: cleanup under the same lock.
         unsafe {
@@ -504,7 +507,7 @@ mod tests {
         unsafe {
             std::env::set_var("CODEWHALE_HOME", tmp.path());
         }
-        // $CODEWHALE_HOME IS the home dir (no ".codewhale" appended), and the
+        // $CODEWHALE_HOME IS the home dir (no ".nestlone" appended), and the
         // legacy ~/.deepseek fallback is bypassed entirely.
         let resolved = log_directory().expect("log_directory should resolve");
         assert_eq!(resolved, tmp.path().join("logs"));

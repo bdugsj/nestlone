@@ -17,7 +17,7 @@ pub use nestlone_config::{
 
 pub use super::roster::ProfileOrigin;
 
-pub const WORKSPACE_AGENT_PROFILE_DIR: &str = ".codewhale/agents";
+pub const WORKSPACE_AGENT_PROFILE_DIR: &str = ".nestlone/agents";
 pub const PERSONAL_AGENT_PROFILE_DIR: &str = "agents";
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

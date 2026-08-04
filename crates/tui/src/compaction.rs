@@ -1262,8 +1262,8 @@ fn read_workspace_anchors(workspace: Option<&Path>) -> Vec<String> {
         return Vec::new();
     };
 
-    // Prefer .codewhale, fall back to .deepseek
-    let primary = ws.join(".codewhale").join("anchors.md");
+    // Prefer .nestlone, fall back to .deepseek
+    let primary = ws.join(".nestlone").join("anchors.md");
     let anchors_path = if primary.exists() {
         primary
     } else {

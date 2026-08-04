@@ -10,8 +10,8 @@
 //!    process-global filesystem path.
 //!
 //! The default adaptive path writes immutable artifacts under
-//! `~/.codewhale/sessions/<session>/artifacts/`. The historical
-//! `~/.codewhale/tool_outputs/<sanitised-id>.txt` directory remains only for
+//! `~/.nestlone/sessions/<session>/artifacts/`. The historical
+//! `~/.nestlone/tool_outputs/<sanitised-id>.txt` directory remains only for
 //! classic-routing compatibility, protected by a digest-bound origin sidecar.
 //!
 //! Boot prune drops files whose mtime is older than [`SPILLOVER_MAX_AGE`]
@@ -66,7 +66,7 @@ pub(crate) struct LegacySpilloverOwnership {
 pub const SPILLOVER_THRESHOLD_BYTES: usize = 100 * 1024; // 100 KiB
 
 /// Default boot-prune age. Older spillover files are deleted on
-/// startup to keep `~/.codewhale/tool_outputs/` from growing without
+/// startup to keep `~/.nestlone/tool_outputs/` from growing without
 /// bound. Mirrors the workspace-snapshot 7-day default.
 pub const SPILLOVER_MAX_AGE: Duration = Duration::from_secs(7 * 24 * 60 * 60);
 
@@ -76,7 +76,7 @@ static TEST_SPILLOVER_ROOT: std::sync::Mutex<Option<PathBuf>> = std::sync::Mutex
 #[cfg(test)]
 pub(crate) static TEST_SPILLOVER_GUARD: std::sync::Mutex<()> = std::sync::Mutex::new(());
 
-/// Resolve `~/.codewhale/tool_outputs/`. Returns `None` if the home
+/// Resolve `~/.nestlone/tool_outputs/`. Returns `None` if the home
 /// directory can't be determined (CI containers occasionally hit
 /// this). Callers should treat `None` as "spillover unavailable" and
 /// degrade gracefully rather than fail the tool call.
@@ -92,7 +92,7 @@ pub fn spillover_root() -> Option<PathBuf> {
     }
 
     let home = crate::config::effective_home_dir()?;
-    let primary = home.join(".codewhale").join(SPILLOVER_DIR_NAME);
+    let primary = home.join(".nestlone").join(SPILLOVER_DIR_NAME);
     let legacy = home.join(".deepseek").join(SPILLOVER_DIR_NAME);
     if primary.exists() || !legacy.exists() {
         return Some(primary);
@@ -338,7 +338,7 @@ fn retained_tail(content: &str, max_bytes: usize) -> &str {
 
 /// Apply spillover to a tool result in place. If the result's
 /// content exceeds [`SPILLOVER_THRESHOLD_BYTES`], writes the full
-/// content to a sibling file under `~/.codewhale/tool_outputs/`,
+/// content to a sibling file under `~/.nestlone/tool_outputs/`,
 /// replaces `result.content` with a [`SPILLOVER_HEAD_BYTES`] head
 /// plus a footer pointing the model at the spillover file, and
 /// stamps `metadata.spillover_path` so the UI can render its
@@ -805,7 +805,7 @@ fn sanitise_id(id: &str) -> Option<String> {
 }
 
 /// Override the storage roots for tests so they don't pollute the
-/// user's real `~/.codewhale/` directory. This uses explicit test hooks instead
+/// user's real `~/.nestlone/` directory. This uses explicit test hooks instead
 /// of `$HOME` because Windows home-dir resolution can ignore environment
 /// overrides and return the runner profile directory.
 #[cfg(test)]
@@ -833,9 +833,9 @@ where
     // artifact guard above protects the session-artifact root shared with
     // artifacts.rs tests.
     let prior_spillover =
-        set_test_spillover_root(Some(home.join(".codewhale").join(SPILLOVER_DIR_NAME)));
+        set_test_spillover_root(Some(home.join(".nestlone").join(SPILLOVER_DIR_NAME)));
     let prior_artifacts = crate::artifacts::set_test_artifact_sessions_root(Some(
-        home.join(".codewhale").join("sessions"),
+        home.join(".nestlone").join("sessions"),
     ));
     let _restore = StorageRootOverride {
         prior_spillover,
@@ -866,7 +866,7 @@ mod tests {
         with_test_home(tmp.path(), || {
             assert_eq!(
                 spillover_root().as_deref(),
-                Some(tmp.path().join(".codewhale").join("tool_outputs").as_path())
+                Some(tmp.path().join(".nestlone").join("tool_outputs").as_path())
             );
             assert_eq!(
                 crate::artifacts::session_artifact_absolute_path(
@@ -876,7 +876,7 @@ mod tests {
                 .as_deref(),
                 Some(
                     tmp.path()
-                        .join(".codewhale")
+                        .join(".nestlone")
                         .join("sessions")
                         .join("session-123")
                         .join("artifacts")
@@ -907,7 +907,7 @@ mod tests {
             assert!(path.exists(), "{path:?} missing");
             let body = fs::read_to_string(&path).unwrap();
             assert_eq!(body, "hello world");
-            // Directory landed under `<HOME>/.codewhale/tool_outputs/`.
+            // Directory landed under `<HOME>/.nestlone/tool_outputs/`.
             // Compare components instead of a substring on `to_string_lossy`
             // — Windows uses `\` as the separator so a `/` substring match
             // would falsely fail there.
@@ -916,8 +916,8 @@ mod tests {
                 .filter_map(|c| c.as_os_str().to_str())
                 .collect();
             assert!(
-                components.contains(&".codewhale") && components.contains(&"tool_outputs"),
-                "spillover path missing expected `.codewhale/tool_outputs/...` segments: {path:?}"
+                components.contains(&".nestlone") && components.contains(&"tool_outputs"),
+                "spillover path missing expected `.nestlone/tool_outputs/...` segments: {path:?}"
             );
         });
     }
@@ -1145,7 +1145,7 @@ mod tests {
 
             let session_artifact = tmp
                 .path()
-                .join(".codewhale")
+                .join(".nestlone")
                 .join("sessions")
                 .join("session-123")
                 .join("artifacts")
@@ -1154,7 +1154,7 @@ mod tests {
             assert_eq!(fs::read_to_string(&session_artifact).unwrap(), big);
             assert!(
                 !tmp.path()
-                    .join(".codewhale/tool_outputs/call-big.txt")
+                    .join(".nestlone/tool_outputs/call-big.txt")
                     .exists(),
                 "adaptive evidence stores one exact origin-session copy"
             );
@@ -1266,7 +1266,7 @@ mod tests {
         with_test_home(tmp.path(), || {
             let session_dir = tmp
                 .path()
-                .join(".codewhale")
+                .join(".nestlone")
                 .join("sessions")
                 .join("session-blocked");
             std::fs::create_dir_all(&session_dir).unwrap();
@@ -1312,7 +1312,7 @@ mod tests {
         with_test_home(tmp.path(), || {
             let artifact_dir = tmp
                 .path()
-                .join(".codewhale")
+                .join(".nestlone")
                 .join("sessions")
                 .join("session-metadata-blocked")
                 .join("artifacts");

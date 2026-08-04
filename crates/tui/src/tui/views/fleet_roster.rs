@@ -5,7 +5,7 @@
 //! user picks a session model they are picking the operator, and the roster
 //! is that operator's team. Below it the merged [`FleetRoster`] (built-in <
 //! `[fleet.profiles]` config < `$CODEWHALE_HOME/agents/*.toml` personal <
-//! `.codewhale/agents/*.toml` project members)
+//! `.nestlone/agents/*.toml` project members)
 //! renders as a scrollable list with a detail pane for the selected row. The
 //! view never writes anything; `s` / Enter on a member hands off to the
 //! `/fleet setup` wizard for authoring and overrides (the operator row is
@@ -583,7 +583,7 @@ mod tests {
         // an instruction overlay.
         if let Some(reviewer) = members.iter_mut().find(|m| m.id == "reviewer") {
             reviewer.origin = ProfileOrigin::Workspace;
-            reviewer.source = PathBuf::from(".codewhale/agents/reviewer.toml");
+            reviewer.source = PathBuf::from(".nestlone/agents/reviewer.toml");
             reviewer.profile.model = Some("glm-5.2".to_string());
             reviewer.profile.role.instructions = Some("Review hard.".to_string());
             reviewer.profile.delegation.max_spawn_depth = Some(1);
@@ -812,7 +812,7 @@ mod tests {
             .join("\n");
         assert!(text.contains("project"), "{text}");
         assert!(
-            text.contains("custom overlay (.codewhale/agents/reviewer.toml)"),
+            text.contains("custom overlay (.nestlone/agents/reviewer.toml)"),
             "{text}"
         );
         assert!(text.contains("model glm-5.2 (pinned)"), "{text}");

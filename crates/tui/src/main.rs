@@ -252,7 +252,7 @@ struct Cli {
     #[arg(long = "fresh")]
     fresh: bool,
 
-    /// Skip loading project-level config from $WORKSPACE/.codewhale/config.toml
+    /// Skip loading project-level config from $WORKSPACE/.nestlone/config.toml
     #[arg(long = "no-project-config")]
     no_project_config: bool,
 }
@@ -1249,7 +1249,7 @@ enum McpCommand {
     /// For the HTTP/SSE runtime API, use `nestlone serve --http` directly instead.
     #[command(
         name = "add-self",
-        long_about = "Register this Nestlone binary as a local MCP stdio server.\n\nAdds a config entry to ~/.codewhale/mcp.json that launches `nestlone serve --mcp`\nvia the stdio transport. Other Codewhale sessions (or any MCP client) can then\ndiscover and call tools exposed by this server.\n\nUse `nestlone serve --http` instead if you need the HTTP/SSE runtime API."
+        long_about = "Register this Nestlone binary as a local MCP stdio server.\n\nAdds a config entry to ~/.nestlone/mcp.json that launches `nestlone serve --mcp`\nvia the stdio transport. Other Codewhale sessions (or any MCP client) can then\ndiscover and call tools exposed by this server.\n\nUse `nestlone serve --http` instead if you need the HTTP/SSE runtime API."
     )]
     AddSelf {
         /// Server name in mcp.json (default: "nestlone")
@@ -2464,7 +2464,7 @@ async fn run_fleet_command(workspace: &Path, config: &Config, args: FleetArgs) -
         config.subagent_token_budget_for_provider(provider),
     );
     // Probe the durable ledger *before* opening the manager: FleetManager::open
-    // creates `.codewhale/fleet.jsonl` as a side effect, so a later probe would
+    // creates `.nestlone/fleet.jsonl` as a side effect, so a later probe would
     // always find a ledger and the CLI would report availability differently
     // from the slash surface for the same workspace (#4022).
     let fleet_context = fleet_control::fleet_control_context(workspace);
@@ -2787,7 +2787,7 @@ fn tools_readme_template() -> &'static str {
      Drop self-describing scripts here so they can be discovered by\n\
      `nestlone-tui setup --status` and surfaced in `nestlone-tui doctor`.\n\n\
      When `[tools.plugin_dir]` is set in config.toml (or when the default\n\
-     `~/.codewhale/tools/` directory exists), they are auto-discovered and\n\
+     `~/.nestlone/tools/` directory exists), they are auto-discovered and\n\
      registered as model-visible tools.\n\n\
      Each script should start with a frontmatter-style header so the\n\
      description is visible without executing the file and the agent knows\n\
@@ -2827,7 +2827,7 @@ fn plugins_readme_template() -> &'static str {
     "# Local plugins\n\n\
      Each Codewhale plugin bundle lives in its own subdirectory with a\n\
      versioned `plugin.toml`. User bundles live here; workspace bundles live\n\
-     under `<workspace>/.codewhale/plugins/`. Both are discovered read-only,\n\
+     under `<workspace>/.nestlone/plugins/`. Both are discovered read-only,\n\
      untrusted, and disabled by default.\n\n\
      A v0.9.1 bundle layout looks like:\n\n\
      ```\n\
@@ -2955,7 +2955,7 @@ fn resolve_cors_origins(config: &Config, flag_origins: &[String]) -> Vec<String>
 fn deepseek_home_dir() -> PathBuf {
     nestlone_config::nestlone_home().unwrap_or_else(|_| {
         crate::config::effective_home_dir()
-            .map_or_else(|| PathBuf::from(".codewhale"), |h| h.join(".codewhale"))
+            .map_or_else(|| PathBuf::from(".nestlone"), |h| h.join(".nestlone"))
     })
 }
 
@@ -3359,7 +3359,7 @@ fn run_setup_status(
                 )
             };
             println!(
-                "  {} api_key: missing  (set {env_var} or {config_location} in ~/.codewhale/config.toml; or run `{login_hint}`)",
+                "  {} api_key: missing  (set {env_var} or {config_location} in ~/.nestlone/config.toml; or run `{login_hint}`)",
                 "✗".truecolor(red_r, red_g, red_b),
             );
         }
@@ -3649,7 +3649,7 @@ async fn run_doctor(
         .or_else(|| nestlone_config::resolve_config_path(None).ok())
         .unwrap_or_else(|| {
             nestlone_config::nestlone_home()
-                .unwrap_or_else(|_| PathBuf::from(".codewhale"))
+                .unwrap_or_else(|_| PathBuf::from(".nestlone"))
                 .join("config.toml")
         });
 
@@ -3758,7 +3758,7 @@ async fn run_doctor(
             if in_config { "yes" } else { "no" }
         );
     }
-    println!("  · credential precedence: ~/.codewhale/config.toml, OS keyring, then env");
+    println!("  · credential precedence: ~/.nestlone/config.toml, OS keyring, then env");
     println!();
     println!(
         "{}",
@@ -3803,7 +3803,7 @@ async fn run_doctor(
             "✗".truecolor(red_r, red_g, red_b)
         );
         println!(
-            "    Run 'nestlone auth set --provider <name>' to save a key to ~/.codewhale/config.toml."
+            "    Run 'nestlone auth set --provider <name>' to save a key to ~/.nestlone/config.toml."
         );
         false
     };
@@ -3978,7 +3978,7 @@ async fn run_doctor(
         Ok(cfg) if cfg.servers.is_empty() => {
             println!("  {} 0 merged server(s) configured", "·".dimmed());
             if !mcp_config_path.exists() && !project_mcp_config_path.exists() {
-                println!("    Run `nestlone mcp init` or add `.codewhale/mcp.json`.");
+                println!("    Run `nestlone mcp init` or add `.nestlone/mcp.json`.");
             }
         }
         Ok(cfg) => {
@@ -4682,7 +4682,7 @@ fn doctor_legacy_state_status(
 
 fn doctor_state_roots() -> (PathBuf, PathBuf) {
     let code_home =
-        nestlone_config::nestlone_home().unwrap_or_else(|_| PathBuf::from("~/.codewhale"));
+        nestlone_config::nestlone_home().unwrap_or_else(|_| PathBuf::from("~/.nestlone"));
     let legacy_home = if nestlone_config::nestlone_home_is_explicit() {
         code_home.join(nestlone_config::LEGACY_APP_DIR)
     } else {
@@ -5894,7 +5894,7 @@ fn run_doctor_json(
         .or_else(|| nestlone_config::resolve_config_path(None).ok())
         .unwrap_or_else(|| {
             nestlone_config::nestlone_home()
-                .unwrap_or_else(|_| PathBuf::from(".codewhale"))
+                .unwrap_or_else(|_| PathBuf::from(".nestlone"))
                 .join("config.toml")
         });
 
@@ -6549,7 +6549,7 @@ fn doctor_timeout_recovery_lines(config: &Config) -> Vec<String> {
                 && !target.base_url.contains("api.deepseeki.com") =>
         {
             lines.push(
-                "If this is a custom DeepSeek-compatible endpoint, set its HTTPS base URL in ~/.codewhale/config.toml and rerun `nestlone doctor`."
+                "If this is a custom DeepSeek-compatible endpoint, set its HTTPS base URL in ~/.nestlone/config.toml and rerun `nestlone doctor`."
                     .to_string(),
             );
         }
@@ -8433,7 +8433,7 @@ fn should_use_mouse_capture_with(
 /// Off elsewhere only for JetBrains' JediTerm, which advertises mouse
 /// support but forwards the same SGR escape sequences as raw input. The
 /// user can still opt back in with `[tui] mouse_capture = true` in
-/// `~/.codewhale/config.toml` or `--mouse-capture`.
+/// `~/.nestlone/config.toml` or `--mouse-capture`.
 fn default_mouse_capture_enabled(
     terminal_emulator: Option<&str>,
     wt_session: Option<&str>,
@@ -8641,7 +8641,7 @@ fn preserve_interrupted_checkpoint_for_explicit_resume(launch_workspace: &Path) 
     }
 }
 
-/// Load project-level config from `$WORKSPACE/.codewhale/config.toml`, with
+/// Load project-level config from `$WORKSPACE/.nestlone/config.toml`, with
 /// legacy `$WORKSPACE/.deepseek/config.toml` fallback, then apply its fields as
 /// overrides on top of the global config (#485).
 /// Only explicitly set fields in the project file are applied; everything
@@ -8674,9 +8674,9 @@ fn merge_project_config_with_approval_baseline(
         return;
     }
 
-    // v0.8.44: prefer .codewhale/config.toml, fall back to .deepseek/
+    // v0.8.44: prefer .nestlone/config.toml, fall back to .deepseek/
     let path = workspace
-        .join(nestlone_config::CODEWHALE_APP_DIR)
+        .join(nestlone_config::NESTLONE_APP_DIR)
         .join("config.toml");
     let raw = match read_project_config_file(&path) {
         Ok(Some(r)) => r,
@@ -8740,7 +8740,7 @@ fn merge_project_config_with_approval_baseline(
         if table.contains_key(*key) {
             eprintln!(
                 "warning: project-scope config key `{key}` is ignored — \
-                 set it in `~/.codewhale/config.toml` instead. \
+                 set it in `~/.nestlone/config.toml` instead. \
                  (See #417 for the deny-list rationale.)"
             );
         }
@@ -8985,7 +8985,7 @@ async fn run_interactive_with_notice(
         .clone()
         .unwrap_or_else(|| std::env::current_dir().unwrap_or_else(|_| PathBuf::from(".")));
 
-    // Merge project-level config from $WORKSPACE/.codewhale/config.toml
+    // Merge project-level config from $WORKSPACE/.nestlone/config.toml
     // or legacy $WORKSPACE/.deepseek/config.toml
     // unless --no-project-config was passed (#485).
     let mut merged_config = config.clone();
@@ -9013,7 +9013,7 @@ async fn run_interactive_with_notice(
         }
     }
 
-    // v0.8.44: migrate config from ~/.deepseek/ to ~/.codewhale/ on first
+    // v0.8.44: migrate config from ~/.deepseek/ to ~/.nestlone/ on first
     // launch. Non-fatal — existing installs keep working either way.
     match nestlone_config::migrate_config_if_needed() {
         Ok(Some(migration)) => {
@@ -9057,7 +9057,7 @@ async fn run_interactive_with_notice(
 
     // Boot janitors — snapshot prune (7-day default), spillover prune
     // (#422), and managed-session cleanup (v0.8.44) — are best-effort disk
-    // hygiene. On a large ~/.codewhale they were the dominant startup cost
+    // hygiene. On a large ~/.nestlone they were the dominant startup cost
     // (a git object walk plus thousands of stat/read calls), so they run on
     // a blocking worker while the TUI brings up its first frame (#3757).
     // All three were already documented as non-fatal.
@@ -11224,7 +11224,7 @@ mod doctor_legacy_state_tests {
     }
 
     fn roots(tmp: &TempDir) -> (PathBuf, PathBuf) {
-        (tmp.path().join(".codewhale"), tmp.path().join(".deepseek"))
+        (tmp.path().join(".nestlone"), tmp.path().join(".deepseek"))
     }
 
     fn entry<'a>(report: &'a [DoctorLegacyStateEntry], name: &str) -> &'a DoctorLegacyStateEntry {
@@ -11676,7 +11676,7 @@ mod doctor_setup_state_tests {
     use tempfile::TempDir;
 
     fn prepare_env(tmp: &TempDir) -> (crate::test_support::EnvVarGuard, PathBuf) {
-        let nestlone_home = tmp.path().join(".codewhale");
+        let nestlone_home = tmp.path().join(".nestlone");
         fs::create_dir_all(&nestlone_home).expect("nestlone home");
         (
             crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", nestlone_home.as_os_str()),
@@ -15099,7 +15099,7 @@ mod project_config_tests {
     fn project_overlay_rejects_symlinked_primary_config() {
         let workspace = tempdir().expect("workspace tempdir");
         let outside = tempdir().expect("outside tempdir");
-        let primary_dir = workspace.path().join(nestlone_config::CODEWHALE_APP_DIR);
+        let primary_dir = workspace.path().join(nestlone_config::NESTLONE_APP_DIR);
         let legacy_dir = workspace.path().join(nestlone_config::LEGACY_APP_DIR);
         fs::create_dir_all(&primary_dir).expect("mkdir primary");
         fs::create_dir_all(&legacy_dir).expect("mkdir legacy");
@@ -15148,8 +15148,8 @@ mod project_config_tests {
     fn project_overlay_skips_when_workspace_is_home_directory() {
         let _guard = crate::test_support::lock_test_env();
         let tmp = tempdir().expect("tempdir");
-        let project_dir = tmp.path().join(nestlone_config::CODEWHALE_APP_DIR);
-        fs::create_dir_all(&project_dir).expect("mkdir .codewhale");
+        let project_dir = tmp.path().join(nestlone_config::NESTLONE_APP_DIR);
+        fs::create_dir_all(&project_dir).expect("mkdir .nestlone");
         fs::write(
             project_dir.join("config.toml"),
             r#"model = "project-override-model""#,

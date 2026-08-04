@@ -394,7 +394,7 @@ const BINARY_ACCEPTANCE_TIMEOUT: std::time::Duration = std::time::Duration::from
 fn write_reviewed_bundle_fixture(workspace: &std::path::Path) -> PathBuf {
     use std::os::unix::fs::PermissionsExt as _;
 
-    let bundle = workspace.join(".codewhale/plugins/demo");
+    let bundle = workspace.join(".nestlone/plugins/demo");
     std::fs::create_dir_all(bundle.join("skills/review")).expect("plugin fixture directories");
     std::fs::write(
         bundle.join("plugin.toml"),
@@ -693,7 +693,7 @@ async fn plugin_toml_binary_lifecycle_skill_and_stdio_mcp_acceptance() {
         .unwrap_or_else(|lock| lock.into_inner());
     let workspace = make_sealed_workspace().expect("sealed workspace");
     let bundle = write_reviewed_bundle_fixture(workspace.workspace());
-    let mcp_log = workspace.home().join(".codewhale/plugin-acceptance.log");
+    let mcp_log = workspace.home().join(".nestlone/plugin-acceptance.log");
     let (base_url, shutdown_tx, model_thread) = spawn_hermetic_model_server();
     let mut tui = Harness::builder(Harness::cargo_bin("nestlone-tui"))
         .cwd(workspace.workspace())
@@ -724,7 +724,7 @@ async fn plugin_toml_binary_lifecycle_skill_and_stdio_mcp_acceptance() {
     assert!(
         !workspace
             .home()
-            .join(".codewhale/plugins/state.json")
+            .join(".nestlone/plugins/state.json")
             .exists(),
         "show must remain read-only"
     );
@@ -775,7 +775,7 @@ async fn plugin_toml_binary_lifecycle_skill_and_stdio_mcp_acceptance() {
     .expect("bundle trust revoked");
     wait_for_log(&mut tui, &mcp_log, "signal:");
 
-    let state = std::fs::read_to_string(workspace.home().join(".codewhale/plugins/state.json"))
+    let state = std::fs::read_to_string(workspace.home().join(".nestlone/plugins/state.json"))
         .expect("durable plugin state");
     assert!(state.contains("\"enabled\": true"));
     assert!(state.contains("\"trust\": null"));

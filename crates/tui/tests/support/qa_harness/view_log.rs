@@ -10,7 +10,7 @@
 //!
 //! Enable it by spawning the binary with
 //! `RUST_LOG=warn,nestlone_tui::view_stack=debug` and a sealed `HOME`; the
-//! subscriber writes to `$HOME/.codewhale/logs/tui-<date>-<pid>.log`.
+//! subscriber writes to `$HOME/.nestlone/logs/tui-<date>-<pid>.log`.
 
 use std::path::{Path, PathBuf};
 use std::time::{Duration, Instant};
@@ -44,7 +44,7 @@ impl ViewEvent {
 /// recently modified `tui-*.log` so a re-spawned process in the same sealed
 /// home does not resolve to a stale file.
 pub fn log_path(home: &Path) -> Result<PathBuf> {
-    let dir = home.join(".codewhale").join("logs");
+    let dir = home.join(".nestlone").join("logs");
     let mut newest: Option<(std::time::SystemTime, PathBuf)> = None;
     for entry in
         std::fs::read_dir(&dir).with_context(|| format!("read sealed log dir {}", dir.display()))?

@@ -4854,7 +4854,7 @@ mod tests {
     #[test]
     fn slash_completion_debt_aliases_prefer_user_command_shadows() {
         let tmp = tempfile::TempDir::new().unwrap();
-        let commands_dir = tmp.path().join(".codewhale").join("commands");
+        let commands_dir = tmp.path().join(".nestlone").join("commands");
         std::fs::create_dir_all(&commands_dir).unwrap();
         std::fs::write(
             commands_dir.join("slop.md"),
@@ -5059,7 +5059,7 @@ mod tests {
     #[test]
     fn slash_completion_uses_frontmatter_name_and_usage() {
         let tmp = tempfile::TempDir::new().unwrap();
-        let commands_dir = tmp.path().join(".codewhale").join("commands");
+        let commands_dir = tmp.path().join(".nestlone").join("commands");
         std::fs::create_dir_all(&commands_dir).unwrap();
         std::fs::write(
             commands_dir.join("workflow-file.md"),
@@ -5087,7 +5087,7 @@ mod tests {
     #[test]
     fn slash_completion_uses_arguments_when_usage_and_legacy_hint_are_absent() {
         let tmp = tempfile::TempDir::new().unwrap();
-        let commands_dir = tmp.path().join(".codewhale").join("commands");
+        let commands_dir = tmp.path().join(".nestlone").join("commands");
         std::fs::create_dir_all(&commands_dir).unwrap();
         std::fs::write(
             commands_dir.join("deploy.md"),
@@ -5114,7 +5114,7 @@ mod tests {
     #[test]
     fn slash_completion_hints_exclude_hidden_user_commands() {
         let tmp = tempfile::TempDir::new().unwrap();
-        let commands_dir = tmp.path().join(".codewhale").join("commands");
+        let commands_dir = tmp.path().join(".nestlone").join("commands");
         std::fs::create_dir_all(&commands_dir).unwrap();
         std::fs::write(
             commands_dir.join("secret.md"),
@@ -5137,7 +5137,7 @@ mod tests {
     #[test]
     fn hidden_name_override_filters_shadowed_builtin_from_slash_completion() {
         let tmp = tempfile::TempDir::new().unwrap();
-        let commands_dir = tmp.path().join(".codewhale").join("commands");
+        let commands_dir = tmp.path().join(".nestlone").join("commands");
         std::fs::create_dir_all(&commands_dir).unwrap();
         std::fs::write(
             commands_dir.join("private-help.md"),
@@ -5160,7 +5160,7 @@ mod tests {
     #[test]
     fn slash_completion_hints_match_user_command_aliases() {
         let tmp = tempfile::TempDir::new().unwrap();
-        let commands_dir = tmp.path().join(".codewhale").join("commands");
+        let commands_dir = tmp.path().join(".nestlone").join("commands");
         std::fs::create_dir_all(&commands_dir).unwrap();
         std::fs::write(
             commands_dir.join("deploy-target.md"),
@@ -5188,7 +5188,7 @@ mod tests {
     #[test]
     fn slash_completion_omits_rejected_user_alias_collisions() {
         let tmp = tempfile::TempDir::new().unwrap();
-        let commands_dir = tmp.path().join(".codewhale").join("commands");
+        let commands_dir = tmp.path().join(".nestlone").join("commands");
         std::fs::create_dir_all(&commands_dir).unwrap();
         std::fs::write(
             commands_dir.join("alpha.md"),
@@ -5220,7 +5220,7 @@ mod tests {
     #[test]
     fn slash_completion_hints_keep_builtin_canonical_when_only_builtin_alias_is_shadowed() {
         let tmp = tempfile::TempDir::new().unwrap();
-        let commands_dir = tmp.path().join(".codewhale").join("commands");
+        let commands_dir = tmp.path().join(".nestlone").join("commands");
         std::fs::create_dir_all(&commands_dir).unwrap();
         std::fs::write(
             commands_dir.join("attach-review.md"),
@@ -5270,7 +5270,7 @@ mod tests {
     #[test]
     fn slash_completion_hints_hide_shadowed_debt_aliases_from_canonical_copy() {
         let tmp = tempfile::TempDir::new().unwrap();
-        let commands_dir = tmp.path().join(".codewhale").join("commands");
+        let commands_dir = tmp.path().join(".nestlone").join("commands");
         std::fs::create_dir_all(&commands_dir).unwrap();
         std::fs::write(
             commands_dir.join("slop.md"),
@@ -5305,7 +5305,7 @@ mod tests {
     #[test]
     fn slash_completion_hints_prefer_user_metadata_for_shadowed_builtin() {
         let tmp = tempfile::TempDir::new().unwrap();
-        let commands_dir = tmp.path().join(".codewhale").join("commands");
+        let commands_dir = tmp.path().join(".nestlone").join("commands");
         std::fs::create_dir_all(&commands_dir).unwrap();
         std::fs::write(
             commands_dir.join("help.md"),
@@ -7061,7 +7061,7 @@ mod tests {
         let request = crate::tui::approval::ApprovalRequest::new(
             "approval-law",
             "edit_file",
-            "Repo law holds this write: \"manifest review\" protects Cargo.toml (matched Cargo.toml, .codewhale/constitution.json)",
+            "Repo law holds this write: \"manifest review\" protects Cargo.toml (matched Cargo.toml, .nestlone/constitution.json)",
             &serde_json::json!({ "path": "Cargo.toml", "old": "a", "new": "b" }),
             "edit_file:Cargo.toml",
         );

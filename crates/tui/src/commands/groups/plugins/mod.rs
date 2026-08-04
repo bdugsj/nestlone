@@ -772,7 +772,7 @@ mod tests {
     }
 
     fn write_bundle(root: &Path) {
-        let bundle = root.join(".codewhale/plugins/demo");
+        let bundle = root.join(".nestlone/plugins/demo");
         fs::create_dir_all(bundle.join("skills/hello")).unwrap();
         fs::write(
             bundle.join("plugin.toml"),
@@ -787,7 +787,7 @@ mod tests {
     }
 
     fn write_mcp_review_bundle(root: &Path) {
-        let bundle = root.join(".codewhale/plugins/review-mcp");
+        let bundle = root.join(".nestlone/plugins/review-mcp");
         fs::create_dir_all(&bundle).unwrap();
         fs::write(bundle.join("server.js"), "// reviewed entrypoint\n").unwrap();
         fs::write(

@@ -1340,7 +1340,7 @@ mod tests {
     fn no_prompt_message_secret_or_path_reaches_any_surface() {
         let home = std::env::var("HOME").unwrap_or_else(|_| "/root".to_string());
         let mut body = chat_body();
-        body["messages"][1]["content"] = json!(format!("look at {home}/.codewhale/config.toml"));
+        body["messages"][1]["content"] = json!(format!("look at {home}/.nestlone/config.toml"));
         let manifest = manifest(body);
 
         for surface in [

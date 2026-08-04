@@ -2684,7 +2684,7 @@ impl McpPool {
     }
 
     /// Create a pool from global MCP config plus workspace-local
-    /// `.codewhale/mcp.json`. Project servers override same-name global
+    /// `.nestlone/mcp.json`. Project servers override same-name global
     /// servers and default stdio `cwd` to the workspace root.
     #[cfg(test)]
     pub fn from_config_path_with_workspace(
@@ -3868,7 +3868,7 @@ fn open_mcp_config_file(path: &Path) -> std::io::Result<fs::File> {
 
 pub fn workspace_mcp_config_path(workspace: &Path) -> PathBuf {
     normalize_workspace_path(workspace)
-        .join(".codewhale")
+        .join(".nestlone")
         .join("mcp.json")
 }
 
@@ -4073,7 +4073,7 @@ fn workspace_allows_project_mcp_config(workspace: &Path) -> bool {
 
 fn checked_workspace_mcp_config_path(workspace: &Path) -> Result<PathBuf> {
     Ok(checked_workspace_path(workspace)?
-        .join(".codewhale")
+        .join(".nestlone")
         .join("mcp.json"))
 }
 

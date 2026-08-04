@@ -198,7 +198,7 @@ const ASK_RULE_SAVE_PREVIEW_MAX_ENTRIES: usize = 4;
 impl ApprovalRequest {
     /// Mechanical repo-law asks are a distinct authority boundary, not an
     /// ordinary risk prompt. The engine stamps this stable prefix when a
-    /// `.codewhale/constitution.json` ask rule forces review.
+    /// `.nestlone/constitution.json` ask rule forces review.
     #[must_use]
     pub fn is_repo_law_prompt(&self) -> bool {
         description_is_repo_law_prompt(&self.description)
@@ -375,7 +375,7 @@ impl ApprovalRequest {
 
 fn description_is_repo_law_prompt(description: &str) -> bool {
     description.starts_with("Repo law holds this write:")
-        && description.contains(".codewhale/constitution.json")
+        && description.contains(".nestlone/constitution.json")
 }
 
 #[must_use]
@@ -3098,7 +3098,7 @@ diff --git a/src/b.rs b/src/b.rs
         let request = ApprovalRequest::new(
             "test-id",
             "edit_file",
-            "Repo law holds this write: protected path (matched Cargo.toml, .codewhale/constitution.json)",
+            "Repo law holds this write: protected path (matched Cargo.toml, .nestlone/constitution.json)",
             &json!({"path": "Cargo.toml", "old": "a", "new": "b"}),
             "tool:edit_file",
         );

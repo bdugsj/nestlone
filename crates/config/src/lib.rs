@@ -2121,7 +2121,7 @@ impl ConfigToml {
         Ok(())
     }
 
-    /// Merge safe project-level overrides from `$WORKSPACE/.codewhale/config.toml`
+    /// Merge safe project-level overrides from `$WORKSPACE/.nestlone/config.toml`
     /// or legacy `$WORKSPACE/.deepseek/config.toml`.
     ///
     /// Repo-local config is untrusted input. This helper intentionally ignores
@@ -2441,7 +2441,7 @@ impl ConfigToml {
         } else if let Some(provider) = env.provider {
             (
                 provider,
-                ProviderSource::Env(env.provider_source.unwrap_or("CODEWHALE_PROVIDER")),
+                ProviderSource::Env(env.provider_source.unwrap_or("NESTLONE_PROVIDER")),
             )
         } else {
             (self.provider, ProviderSource::Config)
@@ -2845,10 +2845,10 @@ impl ProjectConfigOutcome {
 /// Load a project-level config from the workspace, reporting why a file that
 /// exists could not be used.
 ///
-/// Checks `$WORKSPACE/.codewhale/config.toml` first, falling back to
+/// Checks `$WORKSPACE/.nestlone/config.toml` first, falling back to
 /// `$WORKSPACE/.deepseek/config.toml` for backward compatibility.
 pub fn load_project_config_outcome(workspace: &Path) -> ProjectConfigOutcome {
-    for dir in [CODEWHALE_APP_DIR, LEGACY_APP_DIR] {
+    for dir in [NESTLONE_APP_DIR, LEGACY_APP_DIR] {
         let path = workspace.join(dir).join(CONFIG_FILE_NAME);
         if !project_config_candidate_exists(&path) {
             continue;
@@ -4384,44 +4384,48 @@ pub fn default_secrets() -> &'static Secrets {
     })
 }
 
-// ── CodeWhale state root (v0.8.44) ──────────────────────────────────
+// ── Nestlone state root (v0.8.44) ──────────────────────────────────
 //
-// v0.8.44 migrates product-owned app state from ~/.deepseek/ to
-// ~/.codewhale/ while keeping ~/.deepseek/ as a compatibility fallback.
-// New installs write to ~/.codewhale/. Existing installs with only
-// ~/.deepseek/ continue working without data loss.
+// v0.8.44 migrated product-owned app state from ~/.deepseek/ to
+// ~/.codewhale/; the v0.0.3 rebrand moves it again to ~/.nestlone/ while
+// keeping ~/.deepseek/ as a compatibility fallback. New installs write to
+// ~/.nestlone/. Existing installs with only ~/.deepseek/ continue working
+// without data loss.
 
-/// Canonical CodeWhale app directory name under $HOME.
-pub const CODEWHALE_APP_DIR: &str = ".codewhale";
+/// Canonical Nestlone app directory name under $HOME.
+pub const NESTLONE_APP_DIR: &str = ".nestlone";
 
 /// Legacy DeepSeek-branded app directory name (compatibility fallback).
 pub const LEGACY_APP_DIR: &str = ".deepseek";
 
-/// Resolve the primary CodeWhale home directory.
+/// Resolve the primary Nestlone home directory.
 ///
-/// `$CODEWHALE_HOME` takes precedence when set. Otherwise defaults to
-/// `$HOME/.codewhale`. This is the write target for new product state.
+/// `$NESTLONE_HOME` takes precedence when set (with `$CODEWHALE_HOME` kept
+/// as a legacy alias). Otherwise defaults to `$HOME/.nestlone`. This is the
+/// write target for new product state.
 pub fn nestlone_home() -> Result<PathBuf> {
     if let Some(path) = nestlone_home_env_override() {
         return Ok(path);
     }
     let home = effective_home_dir().context("failed to resolve home directory")?;
-    Ok(home.join(CODEWHALE_APP_DIR))
+    Ok(home.join(NESTLONE_APP_DIR))
 }
 
 fn nestlone_home_env_override() -> Option<PathBuf> {
-    let val = std::env::var("CODEWHALE_HOME").ok()?;
-    let trimmed = val.trim();
-    if trimmed.is_empty() {
-        None
-    } else {
-        Some(PathBuf::from(trimmed))
+    for var in ["NESTLONE_HOME", "CODEWHALE_HOME"] {
+        if let Ok(val) = std::env::var(var) {
+            let trimmed = val.trim();
+            if !trimmed.is_empty() {
+                return Some(PathBuf::from(trimmed));
+            }
+        }
     }
+    None
 }
 
-/// Whether `$CODEWHALE_HOME` is set to a non-empty value.
+/// Whether `$NESTLONE_HOME` is set to a non-empty value.
 ///
-/// An explicit CodeWhale home is an isolation boundary: state/config resolvers
+/// An explicit Nestlone home is an isolation boundary: state/config resolvers
 /// must not fall back to ambient legacy `~/.deepseek` data outside that root.
 pub fn nestlone_home_is_explicit() -> bool {
     nestlone_home_env_override().is_some()
@@ -4500,7 +4504,7 @@ pub fn resolve_state_dir(subdir: &str) -> Result<PathBuf> {
 ///
 /// On the first creation of a real subdirectory (not the root sentinel `"."`),
 /// if a legacy `~/.deepseek/<subdir>` exists but the primary
-/// `~/.codewhale/<subdir>` does not, the legacy directory is relocated into
+/// `~/.nestlone/<subdir>` does not, the legacy directory is relocated into
 /// the primary location so the user keeps their data and the legacy tree
 /// stops growing (#3240). After migration, [`resolve_state_dir`] finds the
 /// data in the primary location; the read resolver itself is unchanged.
@@ -4542,7 +4546,7 @@ impl StateMigration {
         };
 
         format!(
-            "Codewhale migrated legacy state ({action}):\n  {} -> {}\nYour data was preserved. Use .codewhale as the canonical state location from now on.\n{legacy_detail}\nIf no other apps use it, you can remove the legacy .deepseek tree after confirming everything looks right.",
+            "Codewhale migrated legacy state ({action}):\n  {} -> {}\nYour data was preserved. Use .nestlone as the canonical state location from now on.\n{legacy_detail}\nIf no other apps use it, you can remove the legacy .deepseek tree after confirming everything looks right.",
             self.legacy_path.display(),
             self.primary_path.display(),
         )
@@ -4567,7 +4571,7 @@ pub fn ensure_state_dir_with_migration(subdir: &str) -> Result<(PathBuf, Option<
 }
 
 /// One-time relocation of a legacy `~/.deepseek/<subdir>` state directory into
-/// the primary `~/.codewhale/<subdir>` location (#3240). No-op once the primary
+/// the primary `~/.nestlone/<subdir>` location (#3240). No-op once the primary
 /// exists, for the root sentinel `"."` (a whole-tree move is owned by the
 /// config-file migration), or when no legacy directory is present.
 fn migrate_legacy_state_dir(primary: &Path, subdir: &str) -> Result<Option<StateMigration>> {
@@ -4581,7 +4585,7 @@ fn migrate_legacy_state_dir(primary: &Path, subdir: &str) -> Result<Option<State
     if !legacy.exists() {
         return Ok(None);
     }
-    // The primary's parent (the ~/.codewhale root) must exist for the rename.
+    // The primary's parent (the ~/.nestlone root) must exist for the rename.
     if let Some(parent) = primary.parent()
         && let Err(err) = std::fs::create_dir_all(parent)
     {
@@ -4667,16 +4671,16 @@ fn copy_dir_recursive(src: &Path, dst: &Path) -> Result<()> {
     Ok(())
 }
 
-/// Resolve a project-local state subdirectory, preferring `.codewhale/`
+/// Resolve a project-local state subdirectory, preferring `.nestlone/`
 /// when it exists, falling back to `.deepseek/` for legacy projects.
 ///
-/// Returns `(true, path)` when the primary `.codewhale/` path is used,
+/// Returns `(true, path)` when the primary `.nestlone/` path is used,
 /// `(false, path)` for the legacy fallback. The boolean helps callers
 /// emit a deprecation notice on legacy paths.
 pub fn resolve_project_state_dir(workspace: &Path, subdir: &str) -> Result<(bool, PathBuf)> {
     ensure_safe_state_subdir(subdir)?;
     let workspace = normalize_project_workspace(workspace)?;
-    let primary = workspace.join(CODEWHALE_APP_DIR).join(subdir);
+    let primary = workspace.join(NESTLONE_APP_DIR).join(subdir);
     if primary.exists() {
         return Ok((true, primary));
     }
@@ -4684,12 +4688,12 @@ pub fn resolve_project_state_dir(workspace: &Path, subdir: &str) -> Result<(bool
     Ok((false, legacy))
 }
 
-/// Ensure a project-local state subdirectory exists under `.codewhale/`,
+/// Ensure a project-local state subdirectory exists under `.nestlone/`,
 /// creating it if necessary. Returns the directory path.
 pub fn ensure_project_state_dir(workspace: &Path, subdir: &str) -> Result<PathBuf> {
     ensure_safe_state_subdir(subdir)?;
     let workspace = normalize_project_workspace(workspace)?;
-    let dir = workspace.join(CODEWHALE_APP_DIR).join(subdir);
+    let dir = workspace.join(NESTLONE_APP_DIR).join(subdir);
     std::fs::create_dir_all(&dir)
         .with_context(|| format!("failed to create {}/", dir.display()))?;
     Ok(dir)
@@ -4699,17 +4703,13 @@ pub fn resolve_config_path(explicit: Option<PathBuf>) -> Result<PathBuf> {
     if let Some(path) = explicit {
         return normalize_config_file_path(path);
     }
-    if let Ok(path) = std::env::var("CODEWHALE_CONFIG_PATH") {
-        if let Some(path) = config_path_from_env_value(&path)? {
-            return Ok(path);
+    for var in ["NESTLONE_CONFIG_PATH", "CODEWHALE_CONFIG_PATH", "DEEPSEEK_CONFIG_PATH"] {
+        if let Ok(path) = std::env::var(var) {
+            if let Some(path) = config_path_from_env_value(&path)? {
+                return Ok(path);
+            }
+            return default_config_path();
         }
-        return default_config_path();
-    }
-    if let Ok(path) = std::env::var("DEEPSEEK_CONFIG_PATH") {
-        if let Some(path) = config_path_from_env_value(&path)? {
-            return Ok(path);
-        }
-        return default_config_path();
     }
     default_config_path()
 }
@@ -5056,7 +5056,7 @@ fn write_permissions_atomic(path: &Path, body: &[u8]) -> Result<()> {
 }
 
 pub fn default_config_path() -> Result<PathBuf> {
-    // Prefer ~/.codewhale/config.toml when it exists (fresh install or
+    // Prefer ~/.nestlone/config.toml when it exists (fresh install or
     // migrated), otherwise fall back to ~/.deepseek/config.toml.
     let primary = nestlone_home()?.join(CONFIG_FILE_NAME);
     if nestlone_home_is_explicit() || primary.exists() {
@@ -5079,7 +5079,7 @@ pub struct ConfigMigration {
 impl ConfigMigration {
     pub fn user_notice(&self) -> String {
         format!(
-            "Migrated legacy config from {} to {}. Use the .codewhale path for future edits; the .deepseek file remains only as a compatibility fallback.",
+            "Migrated legacy config from {} to {}. Use the .nestlone path for future edits; the .deepseek file remains only as a compatibility fallback.",
             self.legacy_path.display(),
             self.primary_path.display()
         )
@@ -5087,7 +5087,7 @@ impl ConfigMigration {
 }
 
 /// v0.8.44: one-time migration from `~/.deepseek/config.toml` to
-/// `~/.codewhale/config.toml`. Called on first launch after the config
+/// `~/.nestlone/config.toml`. Called on first launch after the config
 /// is loaded; copies the legacy file if the primary doesn't exist yet.
 /// Never overwrites an existing primary config.
 pub fn migrate_config_if_needed() -> Result<Option<ConfigMigration>> {
@@ -5505,7 +5505,8 @@ impl EnvRuntimeOverrides {
         Self {
             provider,
             provider_source,
-            model: std::env::var("CODEWHALE_MODEL")
+            model: std::env::var("NESTLONE_MODEL")
+                .or_else(|_| std::env::var("CODEWHALE_MODEL"))
                 .or_else(|_| std::env::var("DEEPSEEK_MODEL"))
                 .or_else(|_| std::env::var("DEEPSEEK_DEFAULT_TEXT_MODEL"))
                 .ok()
@@ -5544,56 +5545,66 @@ impl EnvRuntimeOverrides {
             arcee_model: std::env::var("ARCEE_MODEL")
                 .ok()
                 .filter(|v| !v.trim().is_empty()),
-            verbosity: std::env::var("CODEWHALE_VERBOSITY")
+            verbosity: std::env::var("NESTLONE_VERBOSITY")
+                .or_else(|_| std::env::var("CODEWHALE_VERBOSITY"))
                 .or_else(|_| std::env::var("DEEPSEEK_VERBOSITY"))
                 .ok(),
-            output_mode: std::env::var("CODEWHALE_OUTPUT_MODE")
+            output_mode: std::env::var("NESTLONE_OUTPUT_MODE")
+                .or_else(|_| std::env::var("CODEWHALE_OUTPUT_MODE"))
                 .or_else(|_| std::env::var("DEEPSEEK_OUTPUT_MODE"))
                 .ok(),
-            auth_mode: std::env::var("CODEWHALE_AUTH_MODE")
+            auth_mode: std::env::var("NESTLONE_AUTH_MODE")
+                .or_else(|_| std::env::var("CODEWHALE_AUTH_MODE"))
                 .or_else(|_| std::env::var("DEEPSEEK_AUTH_MODE"))
                 .ok(),
-            log_level: std::env::var("CODEWHALE_LOG_LEVEL")
+            log_level: std::env::var("NESTLONE_LOG_LEVEL")
+                .or_else(|_| std::env::var("CODEWHALE_LOG_LEVEL"))
                 .or_else(|_| std::env::var("DEEPSEEK_LOG_LEVEL"))
                 .ok(),
-            telemetry: std::env::var("CODEWHALE_TELEMETRY")
+            telemetry: std::env::var("NESTLONE_TELEMETRY")
+                .or_else(|_| std::env::var("CODEWHALE_TELEMETRY"))
                 .or_else(|_| std::env::var("DEEPSEEK_TELEMETRY"))
                 .ok()
                 .and_then(|v| match parse_bool(&v) {
                     Ok(b) => Some(b),
                     Err(_) => {
-                        tracing::warn!("Invalid CODEWHALE_TELEMETRY/DEEPSEEK_TELEMETRY value '{v}', expected true/false");
+                        tracing::warn!("Invalid NESTLONE_TELEMETRY/CODEWHALE_TELEMETRY/DEEPSEEK_TELEMETRY value '{v}', expected true/false");
                         None
                     }
                 }),
-            approval_policy: std::env::var("CODEWHALE_APPROVAL_POLICY")
+            approval_policy: std::env::var("NESTLONE_APPROVAL_POLICY")
+                .or_else(|_| std::env::var("CODEWHALE_APPROVAL_POLICY"))
                 .or_else(|_| std::env::var("DEEPSEEK_APPROVAL_POLICY"))
                 .ok(),
-            sandbox_mode: std::env::var("CODEWHALE_SANDBOX_MODE")
+            sandbox_mode: std::env::var("NESTLONE_SANDBOX_MODE")
+                .or_else(|_| std::env::var("CODEWHALE_SANDBOX_MODE"))
                 .or_else(|_| std::env::var("DEEPSEEK_SANDBOX_MODE"))
                 .ok(),
-            yolo: std::env::var("CODEWHALE_YOLO")
+            yolo: std::env::var("NESTLONE_YOLO")
+                .or_else(|_| std::env::var("CODEWHALE_YOLO"))
                 .or_else(|_| std::env::var("DEEPSEEK_YOLO"))
                 .ok()
                 .and_then(|v| match parse_bool(&v) {
                     Ok(b) => Some(b),
                     Err(_) => {
-                        tracing::warn!("Invalid CODEWHALE_YOLO/DEEPSEEK_YOLO value '{v}', expected true/false");
+                        tracing::warn!("Invalid NESTLONE_YOLO/CODEWHALE_YOLO/DEEPSEEK_YOLO value '{v}', expected true/false");
                         None
                     }
                 }),
-            http_headers: std::env::var("CODEWHALE_HTTP_HEADERS")
+            http_headers: std::env::var("NESTLONE_HTTP_HEADERS")
+                .or_else(|_| std::env::var("CODEWHALE_HTTP_HEADERS"))
                 .or_else(|_| std::env::var("DEEPSEEK_HTTP_HEADERS"))
                 .ok()
                 .and_then(|value| match parse_http_headers(&value) {
                     Ok(h) => Some(h),
                     Err(_) => {
-                        tracing::warn!("Invalid CODEWHALE_HTTP_HEADERS/DEEPSEEK_HTTP_HEADERS value, expected format: header1=val1,header2=val2");
+                        tracing::warn!("Invalid NESTLONE_HTTP_HEADERS/CODEWHALE_HTTP_HEADERS/DEEPSEEK_HTTP_HEADERS value, expected format: header1=val1,header2=val2");
                         None
                     }
                 })
                 .filter(|headers| !headers.is_empty()),
-            deepseek_base_url: std::env::var("CODEWHALE_BASE_URL")
+            deepseek_base_url: std::env::var("NESTLONE_BASE_URL")
+                .or_else(|_| std::env::var("CODEWHALE_BASE_URL"))
                 .or_else(|_| std::env::var("DEEPSEEK_BASE_URL"))
                 .ok()
                 .filter(|v| !v.trim().is_empty()),
@@ -5801,14 +5812,15 @@ impl EnvRuntimeOverrides {
     }
 
     fn load_provider() -> (Option<ProviderKind>, Option<&'static str>) {
-        if let Ok(value) = std::env::var("CODEWHALE_PROVIDER") {
-            let parsed = ProviderKind::parse(&value);
-            return (parsed, parsed.map(|_| "CODEWHALE_PROVIDER"));
-        }
-
-        if let Ok(value) = std::env::var("DEEPSEEK_PROVIDER") {
-            let parsed = ProviderKind::parse(&value);
-            return (parsed, parsed.map(|_| "DEEPSEEK_PROVIDER"));
+        for (var, label) in [
+            ("NESTLONE_PROVIDER", "NESTLONE_PROVIDER"),
+            ("CODEWHALE_PROVIDER", "CODEWHALE_PROVIDER"),
+            ("DEEPSEEK_PROVIDER", "DEEPSEEK_PROVIDER"),
+        ] {
+            if let Ok(value) = std::env::var(var) {
+                let parsed = ProviderKind::parse(&value);
+                return (parsed, parsed.map(|_| label));
+            }
         }
 
         (None, None)

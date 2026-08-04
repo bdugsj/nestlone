@@ -7,7 +7,7 @@
 //! - built-in members (the default party, always available),
 //! - `[fleet.profiles]` entries from config.toml,
 //! - personal `$CODEWHALE_HOME/agents/*.toml` profile files,
-//! - workspace `.codewhale/agents/*.toml` profile files.
+//! - workspace `.nestlone/agents/*.toml` profile files.
 //!
 //! Precedence is Workspace > Personal > Config > BuiltIn, merged by id. Loading never
 //! fails the session: an unreadable workspace profile dir degrades to the
@@ -83,7 +83,7 @@ impl FleetRoster {
     ///
     /// Config members come from `[fleet.profiles]` (id = map key). Personal
     /// members come from `$CODEWHALE_HOME/agents/*.toml`, and workspace members
-    /// come from `.codewhale/agents/*.toml`. A load failure is logged and
+    /// come from `.nestlone/agents/*.toml`. A load failure is logged and
     /// skipped so one broken profile layer cannot take down the session.
     #[must_use]
     pub fn load(fleet_config: &FleetConfigToml, workspace: &Path) -> Self {

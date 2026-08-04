@@ -35,7 +35,7 @@ fn help_text() -> String {
         "Usage: /fleet [roster|setup|list|status|workers|interrupt <worker-id>|resume <run-id>]\n\n\
          Fleet is who. /fleet (or /fleet roster) opens Fleet workers and orchestration state — \
          each member's posture, routing, and origin. /fleet setup opens the authoring wizard.\n\n\
-         /fleet list, status, interrupt, and resume act on the durable .codewhale/fleet.jsonl \
+         /fleet list, status, interrupt, and resume act on the durable .nestlone/fleet.jsonl \
          ledger for this workspace — the same records `nestlone fleet` reads and writes. \
          /fleet workers (and /subagents) shows sub-agents in the current TUI session only, which \
          is a different set: it does not include durable Fleet runs.\n",
@@ -193,7 +193,7 @@ mod tests {
         assert!(
             !workspace
                 .path()
-                .join(".codewhale")
+                .join(".nestlone")
                 .join("fleet.jsonl")
                 .exists(),
             "a read verb must not create the durable ledger"
@@ -236,7 +236,7 @@ mod tests {
         for truth in [
             "current TUI session",
             "nestlone fleet status",
-            ".codewhale/fleet.jsonl",
+            ".nestlone/fleet.jsonl",
         ] {
             assert!(message.contains(truth), "help must distinguish {truth}");
         }

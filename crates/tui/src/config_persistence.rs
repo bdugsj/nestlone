@@ -588,7 +588,7 @@ mod tests {
 
         assert_eq!(
             config_toml_path(None).unwrap(),
-            temp_root.join(".codewhale").join("config.toml")
+            temp_root.join(".nestlone").join("config.toml")
         );
     }
 
@@ -646,7 +646,7 @@ mod tests {
     #[test]
     fn config_toml_path_uses_existing_home_fallback_when_env_target_is_missing() {
         let temp_root = temp_root("nestlone-config-path-missing-env-fallback");
-        let home_config = temp_root.join(".codewhale").join("config.toml");
+        let home_config = temp_root.join(".nestlone").join("config.toml");
         fs::create_dir_all(home_config.parent().unwrap()).unwrap();
         fs::write(&home_config, "# existing fallback\n").unwrap();
         let _guard = EnvGuard::new(&temp_root);
@@ -777,7 +777,7 @@ mod tests {
         fs::create_dir_all(&temp_root).unwrap();
         let _guard = EnvGuard::new(&temp_root);
 
-        let path = temp_root.join(".codewhale").join("config.toml");
+        let path = temp_root.join(".nestlone").join("config.toml");
         let written = persist_custom_provider(
             Some(&path),
             "acme_ai",
@@ -833,7 +833,7 @@ mod tests {
         let temp_root = temp_root("nestlone-custom-provider-invalid");
         fs::create_dir_all(&temp_root).unwrap();
         let _guard = EnvGuard::new(&temp_root);
-        let path = temp_root.join(".codewhale").join("config.toml");
+        let path = temp_root.join(".nestlone").join("config.toml");
 
         let builtin = persist_custom_provider(
             Some(&path),
@@ -873,7 +873,7 @@ mod tests {
         }];
         let path = persist_hotbar_bindings(None, &bindings).expect("persist should succeed");
 
-        assert_eq!(path, temp_root.join(".codewhale").join("config.toml"));
+        assert_eq!(path, temp_root.join(".nestlone").join("config.toml"));
         let body = fs::read_to_string(&path).expect("written file should be readable");
         assert!(body.contains("[[hotbar]]"), "hotbar table missing: {body}");
         let parsed: nestlone_config::ConfigToml =
@@ -914,7 +914,7 @@ mod tests {
         fs::create_dir_all(&temp_root).unwrap();
         let _guard = EnvGuard::new(&temp_root);
 
-        let path = temp_root.join(".codewhale").join("config.toml");
+        let path = temp_root.join(".nestlone").join("config.toml");
         fs::create_dir_all(path.parent().unwrap()).unwrap();
         fs::write(
             &path,
@@ -967,7 +967,7 @@ enabled = true
         fs::create_dir_all(&temp_root).unwrap();
         let _guard = EnvGuard::new(&temp_root);
 
-        let path = temp_root.join(".codewhale").join("config.toml");
+        let path = temp_root.join(".nestlone").join("config.toml");
         fs::create_dir_all(path.parent().unwrap()).unwrap();
 
         let written = persist_hotbar_bindings(Some(&path), &[]).expect("persist should succeed");
@@ -1215,7 +1215,7 @@ slot = 1
         let temp_root = temp_root("nestlone-custom-provider-unset");
         fs::create_dir_all(&temp_root).unwrap();
         let _guard = EnvGuard::new(&temp_root);
-        let path = temp_root.join(".codewhale").join("config.toml");
+        let path = temp_root.join(".nestlone").join("config.toml");
 
         persist_custom_provider(
             Some(&path),

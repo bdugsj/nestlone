@@ -162,13 +162,13 @@ fn checked_real_directory(path: &Path) -> Result<bool> {
 }
 
 /// Validate the complete owned-root chain without following a symlink in the
-/// workspace/home anchor, `.codewhale`, or `skills` component.
+/// workspace/home anchor, `.nestlone`, or `skills` component.
 fn validate_owned_target_chain(
     anchor: &Path,
     skills_dir: &Path,
     require_existing: bool,
 ) -> Result<()> {
-    let expected = anchor.join(".codewhale").join("skills");
+    let expected = anchor.join(".nestlone").join("skills");
     if skills_dir != expected {
         bail!(
             "refusing to mutate non-canonical CodeWhale skills root {}",
@@ -184,7 +184,7 @@ fn validate_owned_target_chain(
         return Ok(());
     }
 
-    let nestlone_dir = anchor.join(".codewhale");
+    let nestlone_dir = anchor.join(".nestlone");
     let nestlone_exists = checked_real_directory(&nestlone_dir)?;
     if !nestlone_exists {
         if require_existing {
@@ -247,7 +247,7 @@ fn prepare_owned_target(
         bail!("owned skill anchor {} does not exist", anchor.display());
     }
 
-    let nestlone_dir = anchor.join(".codewhale");
+    let nestlone_dir = anchor.join(".nestlone");
     if !checked_real_directory(&nestlone_dir)? {
         create_owned_directory(&nestlone_dir)?;
     }
@@ -1057,8 +1057,8 @@ mod tests {
             resolve_owned_target(&workspace, Some(&home), SkillTargetScope::Project).unwrap();
         let global =
             resolve_owned_target(&workspace, Some(&home), SkillTargetScope::Global).unwrap();
-        assert_eq!(project, workspace.join(".codewhale").join("skills"));
-        assert_eq!(global, home.join(".codewhale").join("skills"));
+        assert_eq!(project, workspace.join(".nestlone").join("skills"));
+        assert_eq!(global, home.join(".nestlone").join("skills"));
     }
 
     #[cfg(unix)]
@@ -1077,15 +1077,15 @@ mod tests {
 
             let outside_parent = tmp.path().join("outside-parent");
             fs::create_dir_all(&outside_parent).unwrap();
-            std::os::unix::fs::symlink(&outside_parent, anchor.join(".codewhale")).unwrap();
+            std::os::unix::fs::symlink(&outside_parent, anchor.join(".nestlone")).unwrap();
             let err = resolve_owned_target(&workspace, Some(&home), target).unwrap_err();
             assert!(err.to_string().contains("symlinked"), "got: {err}");
 
-            fs::remove_file(anchor.join(".codewhale")).unwrap();
-            fs::create_dir(anchor.join(".codewhale")).unwrap();
+            fs::remove_file(anchor.join(".nestlone")).unwrap();
+            fs::create_dir(anchor.join(".nestlone")).unwrap();
             let outside_root = tmp.path().join("outside-root");
             fs::create_dir_all(&outside_root).unwrap();
-            std::os::unix::fs::symlink(&outside_root, anchor.join(".codewhale").join("skills"))
+            std::os::unix::fs::symlink(&outside_root, anchor.join(".nestlone").join("skills"))
                 .unwrap();
             let err = resolve_owned_target(&workspace, Some(&home), target).unwrap_err();
             assert!(err.to_string().contains("symlinked"), "got: {err}");
@@ -1099,11 +1099,11 @@ mod tests {
         let workspace = tmp.path().join("ws");
         let home = tmp.path().join("home");
         let outside = tmp.path().join("outside");
-        fs::create_dir_all(workspace.join(".codewhale")).unwrap();
+        fs::create_dir_all(workspace.join(".nestlone")).unwrap();
         fs::create_dir_all(&home).unwrap();
         fs::create_dir_all(&outside).unwrap();
         fs::write(outside.join("SENTINEL"), "untouched").unwrap();
-        std::os::unix::fs::symlink(&outside, workspace.join(".codewhale").join("skills")).unwrap();
+        std::os::unix::fs::symlink(&outside, workspace.join(".nestlone").join("skills")).unwrap();
 
         let network = NetworkPolicy::default();
         let c = ctx(&workspace, &home, &network);
@@ -1141,7 +1141,7 @@ mod tests {
             "from-claude",
             "import me",
         );
-        std::os::unix::fs::symlink(&outside_parent, workspace.join(".codewhale")).unwrap();
+        std::os::unix::fs::symlink(&outside_parent, workspace.join(".nestlone")).unwrap();
 
         let network = NetworkPolicy::default();
         let c = ctx(&workspace, &home, &network);
@@ -1185,11 +1185,11 @@ mod tests {
         let workspace = tmp.path().join("ws");
         let home = tmp.path().join("home");
         let outside_root = tmp.path().join("outside-root");
-        fs::create_dir_all(workspace.join(".codewhale")).unwrap();
+        fs::create_dir_all(workspace.join(".nestlone")).unwrap();
         fs::create_dir_all(&home).unwrap();
         fs::create_dir_all(&outside_root).unwrap();
         let digest = write_managed_skill(&outside_root, "managed");
-        std::os::unix::fs::symlink(&outside_root, workspace.join(".codewhale").join("skills"))
+        std::os::unix::fs::symlink(&outside_root, workspace.join(".nestlone").join("skills"))
             .unwrap();
 
         let network = NetworkPolicy::default();
@@ -1226,7 +1226,7 @@ mod tests {
         fs::create_dir_all(&home).unwrap();
         fs::create_dir_all(&outside_root).unwrap();
         let digest = write_managed_skill(&outside_root, "managed");
-        std::os::unix::fs::symlink(&outside_parent, workspace.join(".codewhale")).unwrap();
+        std::os::unix::fs::symlink(&outside_parent, workspace.join(".nestlone")).unwrap();
 
         let network = NetworkPolicy::default();
         let c = ctx(&workspace, &home, &network);
@@ -1264,7 +1264,7 @@ mod tests {
         let c = ctx(&workspace, &home, &network);
 
         write_skill(
-            &workspace.join(".codewhale").join("skills"),
+            &workspace.join(".nestlone").join("skills"),
             "manual",
             "body",
         );
@@ -1292,7 +1292,7 @@ mod tests {
         let network = NetworkPolicy::default();
         let c = ctx(&workspace, &home, &network);
 
-        fs::create_dir_all(workspace.join(".codewhale").join("skills")).unwrap();
+        fs::create_dir_all(workspace.join(".nestlone").join("skills")).unwrap();
         write_skill(
             &workspace.join(".claude").join("skills"),
             "from-claude",
@@ -1328,7 +1328,7 @@ mod tests {
         assert_eq!(receipt.outcome, SkillMutationOutcome::Imported);
         assert!(
             workspace
-                .join(".codewhale")
+                .join(".nestlone")
                 .join("skills")
                 .join("from-claude")
                 .join("SKILL.md")
@@ -1355,7 +1355,7 @@ mod tests {
         let c = ctx(&workspace, &home, &network);
 
         let content = "---\nname: shared\ndescription: d\n---\nbody\n";
-        let owned = workspace.join(".codewhale").join("skills").join("shared");
+        let owned = workspace.join(".nestlone").join("skills").join("shared");
         let external = workspace.join(".claude").join("skills").join("shared");
         fs::create_dir_all(&owned).unwrap();
         fs::create_dir_all(&external).unwrap();
@@ -1396,7 +1396,7 @@ mod tests {
         let home = tmp.path().join("home");
         let network = NetworkPolicy::default();
         let c = ctx(&workspace, &home, &network);
-        let root = workspace.join(".codewhale").join("skills");
+        let root = workspace.join(".nestlone").join("skills");
         write_skill(&root, "managed", "body");
         let digest = package_digest::compute_package_digest(&root.join("managed")).unwrap();
         write_installed_from_v2(
@@ -1432,7 +1432,7 @@ mod tests {
         let home = tmp.path().join("home");
         let network = NetworkPolicy::default();
         let c = ctx(&workspace, &home, &network);
-        let root = workspace.join(".codewhale").join("skills");
+        let root = workspace.join(".nestlone").join("skills");
         write_skill(&root, "managed", "body");
         let digest = package_digest::compute_package_digest(&root.join("managed")).unwrap();
         write_installed_from_v2(
@@ -1465,7 +1465,7 @@ mod tests {
         let home = tmp.path().join("home");
         let network = NetworkPolicy::default();
         let c = ctx(&workspace, &home, &network);
-        let root = workspace.join(".codewhale").join("skills");
+        let root = workspace.join(".nestlone").join("skills");
         write_skill(&root, "Hello_World", "body");
         let digest = package_digest::compute_package_digest(&root.join("Hello_World")).unwrap();
         write_installed_from_v2(
@@ -1498,7 +1498,7 @@ mod tests {
         let home = tmp.path().join("home");
         let network = NetworkPolicy::default();
         let c = ctx(&workspace, &home, &network);
-        let root = workspace.join(".codewhale").join("skills");
+        let root = workspace.join(".nestlone").join("skills");
         let dir_name = "Hello_World";
         write_skill(&root, dir_name, "body");
         let digest = package_digest::compute_package_digest(&root.join(dir_name)).unwrap();
@@ -1543,7 +1543,7 @@ mod tests {
         let network = NetworkPolicy::default();
         let c = ctx(&workspace, &home, &network);
 
-        fs::create_dir_all(workspace.join(".codewhale").join("skills")).unwrap();
+        fs::create_dir_all(workspace.join(".nestlone").join("skills")).unwrap();
         write_skill(
             &workspace.join(".claude").join("skills"),
             "from-claude",
@@ -1574,7 +1574,7 @@ mod tests {
         .unwrap();
 
         let owned = workspace
-            .join(".codewhale")
+            .join(".nestlone")
             .join("skills")
             .join("from-claude");
         assert!(ensure_remote_updatable(&owned).is_err());
@@ -1592,7 +1592,7 @@ mod tests {
         let network = NetworkPolicy::default();
         let c = ctx(&workspace, &home, &network);
 
-        let owned_root = workspace.join(".codewhale").join("skills");
+        let owned_root = workspace.join(".nestlone").join("skills");
         write_skill(&owned_root, "Hello_World", "original-owned");
         let original_digest =
             package_digest::compute_package_digest(&owned_root.join("Hello_World")).unwrap();
@@ -1669,7 +1669,7 @@ mod tests {
         let network = NetworkPolicy::default();
         let c = ctx(&workspace, &home, &network);
 
-        let owned_root = workspace.join(".codewhale").join("skills");
+        let owned_root = workspace.join(".nestlone").join("skills");
         write_skill(&owned_root, "shared", "original-owned");
         let original_digest =
             package_digest::compute_package_digest(&owned_root.join("shared")).unwrap();
@@ -1736,7 +1736,7 @@ mod tests {
         let home = tmp.path().join("home");
         let network = NetworkPolicy::default();
         let c = ctx(&workspace, &home, &network);
-        let root = workspace.join(".codewhale").join("skills");
+        let root = workspace.join(".nestlone").join("skills");
         write_skill(&root, "managed", "body");
         let digest = package_digest::compute_package_digest(&root.join("managed")).unwrap();
         write_installed_from_v2(
@@ -1770,11 +1770,11 @@ mod tests {
         let c = ctx(&workspace, &home, &network);
 
         write_skill(
-            &workspace.join(".codewhale").join("skills"),
+            &workspace.join(".nestlone").join("skills"),
             "dup",
             "project",
         );
-        write_skill(&home.join(".codewhale").join("skills"), "dup", "global");
+        write_skill(&home.join(".nestlone").join("skills"), "dup", "global");
 
         let err = resolve_owned_skill_by_name(&c, "dup", None).unwrap_err();
         assert!(
@@ -1799,7 +1799,7 @@ mod tests {
         let network = NetworkPolicy::default();
         let c = ctx(&workspace, &home, &network);
 
-        fs::create_dir_all(workspace.join(".codewhale").join("skills")).unwrap();
+        fs::create_dir_all(workspace.join(".nestlone").join("skills")).unwrap();
         write_skill(
             &workspace.join(".claude").join("skills"),
             "only-ext",

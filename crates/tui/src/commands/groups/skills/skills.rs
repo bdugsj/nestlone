@@ -152,7 +152,7 @@ fn inspect_skills(app: &mut App) -> CommandResult {
 /// List all available skills. Pass `--remote` (or `remote`) to fetch the
 /// curated registry instead of scanning the local skills directory.
 /// Pass `sync` to pull the registry index and download all skills to the
-/// local cache (`~/.codewhale/cache/skills/`). Pass `inspect` to show local
+/// local cache (`~/.nestlone/cache/skills/`). Pass `inspect` to show local
 /// discovery mode, searched directories, and skill source paths.
 fn list_skills(app: &mut App, arg: Option<&str>) -> CommandResult {
     let mut prefix: Option<String> = None;
@@ -723,7 +723,7 @@ fn list_remote_skills(app: &mut App) -> CommandResult {
 // ─── /skills sync ──────────────────────────────────────────────────────────
 
 /// Fetch the remote registry index and download every listed skill into the
-/// local cache (`~/.codewhale/cache/skills/<name>/`).
+/// local cache (`~/.nestlone/cache/skills/<name>/`).
 ///
 /// For each skill the sync checks the cached ETag / SHA-256 before
 /// downloading so unchanged skills are skipped in O(1) network round-trips.
@@ -845,14 +845,14 @@ fn path_or_default(path: &std::path::Path) -> String {
 fn needs_approval_message(host: &str) -> String {
     format!(
         "Network policy requires approval for {host}.\n\
-         Add it to your allow list with `/network allow {host}` (or set [network].default = \"allow\" in ~/.codewhale/config.toml), then retry."
+         Add it to your allow list with `/network allow {host}` (or set [network].default = \"allow\" in ~/.nestlone/config.toml), then retry."
     )
 }
 
 fn network_denied_message(host: &str) -> String {
     format!(
         "Network policy denied access to {host}.\n\
-         Remove the deny entry from ~/.codewhale/config.toml under [network] or contact your administrator."
+         Remove the deny entry from ~/.nestlone/config.toml under [network] or contact your administrator."
     )
 }
 
@@ -869,7 +869,7 @@ fn registry_fetch_error_hint(err: &anyhow::Error) -> Option<&'static str> {
         || msg.contains("nodename nor servname")
     {
         Some(
-            "Hint: DNS lookup failed. Check internet/DNS connectivity, or override the registry URL in [skills] of ~/.codewhale/config.toml.",
+            "Hint: DNS lookup failed. Check internet/DNS connectivity, or override the registry URL in [skills] of ~/.nestlone/config.toml.",
         )
     } else if msg.contains("connection refused")
         || msg.contains("connection reset")
@@ -888,7 +888,7 @@ fn registry_fetch_error_hint(err: &anyhow::Error) -> Option<&'static str> {
         )
     } else if msg.contains(" 404") || msg.contains("not found") {
         Some(
-            "Hint: registry URL returned 404. Verify the registry URL in [skills] of ~/.codewhale/config.toml.",
+            "Hint: registry URL returned 404. Verify the registry URL in [skills] of ~/.nestlone/config.toml.",
         )
     } else if msg.contains(" 401") || msg.contains(" 403") || msg.contains("forbidden") {
         Some(
@@ -1383,7 +1383,7 @@ mod tests {
         .unwrap();
         let nestlone_skill_dir = tmpdir
             .path()
-            .join(".codewhale")
+            .join(".nestlone")
             .join("skills")
             .join("nestlone-skill");
         std::fs::create_dir_all(&nestlone_skill_dir).unwrap();
@@ -1394,7 +1394,7 @@ mod tests {
         .unwrap();
 
         let mut app = create_test_app_with_tmpdir(&tmpdir);
-        app.skills_dir = tmpdir.path().join(".codewhale").join("skills");
+        app.skills_dir = tmpdir.path().join(".nestlone").join("skills");
         app.skills_scan_nestlone_only = true;
         let result = list_skills(&mut app, Some(""));
         let msg = result.message.unwrap();
@@ -1420,7 +1420,7 @@ mod tests {
         .unwrap();
         let nestlone_skill_dir = tmpdir
             .path()
-            .join(".codewhale")
+            .join(".nestlone")
             .join("skills")
             .join("nestlone-skill");
         std::fs::create_dir_all(&nestlone_skill_dir).unwrap();
@@ -1431,7 +1431,7 @@ mod tests {
         .unwrap();
 
         let mut app = create_test_app_with_tmpdir(&tmpdir);
-        app.skills_dir = tmpdir.path().join(".codewhale").join("skills");
+        app.skills_dir = tmpdir.path().join(".nestlone").join("skills");
         app.skills_scan_nestlone_only = true;
         let result = list_skills(&mut app, Some("--inspect"));
         let msg = result.message.expect("inspect should return a message");
@@ -1477,7 +1477,7 @@ mod tests {
         // Mutations only touch CodeWhale-owned roots; place under project scope.
         let skill_dir = tmpdir
             .path()
-            .join(".codewhale")
+            .join(".nestlone")
             .join("skills")
             .join("trusted-skill");
         std::fs::create_dir_all(&skill_dir).unwrap();

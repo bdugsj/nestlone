@@ -8694,7 +8694,7 @@ fn recover_engine_event_disconnect(app: &mut App) -> bool {
     }
 
     app.add_message(HistoryCell::Error {
-        message: "Engine stopped before completing the turn. Check ~/.codewhale/crashes and retry."
+        message: "Engine stopped before completing the turn. Check ~/.nestlone/crashes and retry."
             .to_string(),
         severity: crate::error_taxonomy::ErrorSeverity::Error,
     });
@@ -8889,7 +8889,7 @@ pub(crate) fn apply_engine_error_to_app(
         let provider = app.api_provider;
         let config_path = crate::config::resolve_load_config_path(app.config_path.clone())
             .map_or_else(
-                || "~/.codewhale/config.toml".to_string(),
+                || "~/.nestlone/config.toml".to_string(),
                 |path| path.display().to_string(),
             );
         app.status_message = Some(
@@ -10862,7 +10862,7 @@ async fn drain_web_config_events(
 
 /// Apply the choice made in the `/model` picker (#39): mutate App state so
 /// the next turn uses the new model/effort, persist the selection to
-/// `~/.codewhale/settings.toml` (legacy: `~/.deepseek/settings.toml`) so it survives a restart, push the change to
+/// `~/.nestlone/settings.toml` (legacy: `~/.deepseek/settings.toml`) so it survives a restart, push the change to
 /// the running engine via `Op::SetModel`/`Op::SetCompaction`, and surface
 /// a one-line status describing what changed.
 // The model/effort transition needs both the previous and next model+effort
@@ -11635,7 +11635,7 @@ fn launch_worktree_spec(
     let slug = launch_worktree_slug(requested);
     let parent = repo_root.parent().unwrap_or(repo_root.as_path());
     let path = parent
-        .join(".codewhale-worktrees")
+        .join(".nestlone-worktrees")
         .join(format!("{repo_name}-{slug}"));
     if path.exists() {
         anyhow::bail!("worktree path already exists: {}", path.display());
@@ -16262,7 +16262,7 @@ fn apply_backtrack(app: &mut App, depth: usize) {
     app.needs_redraw = true;
 }
 
-/// Persist the typed API key to `~/.codewhale/config.toml`, refresh the
+/// Persist the typed API key to `~/.nestlone/config.toml`, refresh the
 /// in-memory config so the engine can see it, then switch to the provider.
 fn set_active_custom_provider_in_memory(config: &mut Config, provider_id: &str) {
     let provider_id = provider_id.trim();
@@ -18302,7 +18302,7 @@ mod provider_key_validation_tests {
         fn new() -> Self {
             let lock = crate::test_support::lock_test_env();
             let tmp = TempDir::new().expect("config tempdir");
-            let config_path = tmp.path().join(".codewhale").join("config.toml");
+            let config_path = tmp.path().join(".nestlone").join("config.toml");
             std::fs::create_dir_all(config_path.parent().expect("config parent"))
                 .expect("config dir");
             let previous = std::env::var_os("DEEPSEEK_CONFIG_PATH");

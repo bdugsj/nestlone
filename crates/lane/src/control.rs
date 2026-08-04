@@ -131,7 +131,7 @@ impl ControlExecution {
 pub enum ControlDomain {
     /// One running Workflow, recorded in `$CODEWHALE_HOME/lanes/`.
     Lane,
-    /// Fleet workers and runs, recorded in `<workspace>/.codewhale/fleet.jsonl`.
+    /// Fleet workers and runs, recorded in `<workspace>/.nestlone/fleet.jsonl`.
     Fleet,
 }
 
@@ -181,7 +181,7 @@ pub enum PersistenceScope {
     Session,
     /// `$CODEWHALE_HOME/lanes/` records and logs.
     LaneRegistry,
-    /// `<workspace>/.codewhale/fleet.jsonl`.
+    /// `<workspace>/.nestlone/fleet.jsonl`.
     FleetLedger,
 }
 
@@ -381,7 +381,7 @@ pub enum UnavailableReason {
     BackendNotImplemented,
     /// `$CODEWHALE_HOME/lanes/` has no records yet.
     NoLaneRegistry,
-    /// This workspace has no `.codewhale/fleet.jsonl`.
+    /// This workspace has no `.nestlone/fleet.jsonl`.
     NoFleetLedger,
 }
 
@@ -573,7 +573,7 @@ impl OperationDescriptor {
             PersistenceScope::FleetLedger if !ctx.fleet_ledger_present => {
                 Availability::unavailable(
                     UnavailableReason::NoFleetLedger,
-                    "this workspace has no .codewhale/fleet.jsonl; create it with \
+                    "this workspace has no .nestlone/fleet.jsonl; create it with \
                      `nestlone fleet init`",
                 )
             }

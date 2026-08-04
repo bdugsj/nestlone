@@ -16,7 +16,7 @@ use anyhow::{Context, Result, bail};
 use nestlone_protocol::fleet::*;
 use serde::{Deserialize, Serialize};
 
-const FLEET_DIR: &str = ".codewhale";
+const FLEET_DIR: &str = ".nestlone";
 const FLEET_LEDGER_FILE: &str = "fleet.jsonl";
 const FLEET_LEDGER_LOCK_FILE: &str = "fleet.lock";
 const PARTIAL_SUFFIX: &str = ".tmp";
@@ -207,7 +207,7 @@ pub struct FleetLedger {
 }
 
 impl FleetLedger {
-    /// Open (or create) the ledger under `workspace/.codewhale/fleet.jsonl`.
+    /// Open (or create) the ledger under `workspace/.nestlone/fleet.jsonl`.
     pub fn open(workspace: &Path) -> Result<Self> {
         let dir = workspace.join(FLEET_DIR);
         std::fs::create_dir_all(&dir)
@@ -2102,7 +2102,7 @@ mod tests {
                         FleetWorkerEventPayload::Starting,
                         FleetWorkerEventPayload::Artifact(FleetArtifactRef {
                             kind: FleetArtifactKind::Log,
-                            path: PathBuf::from(".codewhale/fleet/run-1/task-a/worker-1.log"),
+                            path: PathBuf::from(".nestlone/fleet/run-1/task-a/worker-1.log"),
                             checksum: None,
                             mime_type: Some("text/plain".to_string()),
                             size_bytes: Some(0),

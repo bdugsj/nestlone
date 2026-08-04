@@ -16,13 +16,13 @@ use tempfile::TempDir;
 /// Run `model resolve` against a sealed HOME containing `config`.
 ///
 /// `env_clear` plus a temporary HOME keeps this off the real
-/// `~/.codewhale/config.toml`; the suite has written to real user state before
+/// `~/.nestlone/config.toml`; the suite has written to real user state before
 /// (#4831) and this test must never be the one that does it again.
 fn resolve_with_config(config: &str, args: &[&str]) -> BTreeMap<String, String> {
     let fixture = TempDir::new().expect("fixture root");
     let home = fixture.path().join("sealed-home");
-    fs::create_dir_all(home.join(".codewhale")).expect("sealed config dir");
-    fs::write(home.join(".codewhale").join("config.toml"), config).expect("seed config");
+    fs::create_dir_all(home.join(".nestlone")).expect("sealed config dir");
+    fs::write(home.join(".nestlone").join("config.toml"), config).expect("seed config");
 
     let mut command = Command::new(nestlone_binary());
     command.arg("model").arg("resolve").args(args);
@@ -30,7 +30,7 @@ fn resolve_with_config(config: &str, args: &[&str]) -> BTreeMap<String, String> 
         .env_clear()
         .env("HOME", &home)
         .env("USERPROFILE", &home)
-        .env("CODEWHALE_HOME", home.join(".codewhale"))
+        .env("CODEWHALE_HOME", home.join(".nestlone"))
         .env("CODEWHALE_SECRET_BACKEND", "file")
         .output()
         .expect("run model resolve");
@@ -166,8 +166,8 @@ fn resolve_with_global_flags(
 ) -> BTreeMap<String, String> {
     let fixture = TempDir::new().expect("fixture root");
     let home = fixture.path().join("sealed-home");
-    fs::create_dir_all(home.join(".codewhale")).expect("sealed config dir");
-    fs::write(home.join(".codewhale").join("config.toml"), config).expect("seed config");
+    fs::create_dir_all(home.join(".nestlone")).expect("sealed config dir");
+    fs::write(home.join(".nestlone").join("config.toml"), config).expect("seed config");
 
     let mut command = Command::new(nestlone_binary());
     command.args(global).arg("model").arg("resolve").args(args);
@@ -175,7 +175,7 @@ fn resolve_with_global_flags(
         .env_clear()
         .env("HOME", &home)
         .env("USERPROFILE", &home)
-        .env("CODEWHALE_HOME", home.join(".codewhale"))
+        .env("CODEWHALE_HOME", home.join(".nestlone"))
         .env("CODEWHALE_SECRET_BACKEND", "file")
         .output()
         .expect("run model resolve");

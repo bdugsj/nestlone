@@ -57,8 +57,8 @@ fn init(app: &mut App) -> CommandResult {
 /// If `workspace` is inside a git repository, ensure workspace-local CodeWhale
 /// state is listed in the nearest `.gitignore` so snapshots, auto-generated
 /// instructions, and other runtime state are not accidentally committed — while
-/// keeping the authored `.codewhale/constitution.json` repo authority policy
-/// committable (a directory exclude cannot be overridden, so `.codewhale/*` plus
+/// keeping the authored `.nestlone/constitution.json` repo authority policy
+/// committable (a directory exclude cannot be overridden, so `.nestlone/*` plus
 /// a negation is required).
 fn ensure_deepseek_gitignored(workspace: &Path) {
     let Some(git_root) = git_root(workspace) else {
@@ -67,8 +67,8 @@ fn ensure_deepseek_gitignored(workspace: &Path) {
 
     let gitignore = git_root.join(".gitignore");
     let entries = [
-        "**/.codewhale/*",
-        "!**/.codewhale/constitution.json",
+        "**/.nestlone/*",
+        "!**/.nestlone/constitution.json",
         ".deepseek/",
     ];
 
@@ -1331,10 +1331,10 @@ mod tests {
         ensure_deepseek_gitignored(tmpdir.path());
         let content = std::fs::read_to_string(tmpdir.path().join(".gitignore")).unwrap();
         assert!(content.contains(".deepseek/"));
-        // .codewhale/ is ignored at any depth, but the committed
+        // .nestlone/ is ignored at any depth, but the committed
         // constitution.json is kept.
-        assert!(content.contains("**/.codewhale/*"));
-        assert!(content.contains("!**/.codewhale/constitution.json"));
+        assert!(content.contains("**/.nestlone/*"));
+        assert!(content.contains("!**/.nestlone/constitution.json"));
     }
 
     #[test]

@@ -3040,7 +3040,7 @@ struct CoordinationProcessLock {
 impl CoordinationProcessLock {
     fn acquire(workspace: &Path) -> Result<Self> {
         let lock_path = normalize_subagent_workspace(workspace)
-            .join(".codewhale")
+            .join(".nestlone")
             .join("state")
             .join(SUBAGENT_STATE_LOCK_FILE);
         if let Some(parent) = lock_path.parent() {
@@ -3870,7 +3870,7 @@ impl SubAgentManager {
         let path = checked_subagent_state_path(&self.workspace, path)?;
 
         // If canonical path doesn't exist, try legacy .deepseek/ path for one-time
-        // migration. The next persist will write to the canonical .codewhale/ path.
+        // migration. The next persist will write to the canonical .nestlone/ path.
         let path = if path.exists() {
             path
         } else {
@@ -6256,7 +6256,7 @@ fn json_line(value: &Value) -> Result<Vec<u8>> {
 
 fn subagent_transcript_artifact_relative_path(agent_id: &str) -> PathBuf {
     let digest = crate::hashing::sha256_hex(agent_id.as_bytes());
-    Path::new(".codewhale")
+    Path::new(".nestlone")
         .join("state")
         .join(SUBAGENT_TRANSCRIPT_ARTIFACT_DIR)
         .join(format!("{digest}.jsonl"))
@@ -6360,7 +6360,7 @@ fn default_state_path(workspace: &Path) -> Result<PathBuf> {
     // is migrated on load (see load_state).
     checked_subagent_state_path(
         &workspace,
-        &Path::new(".codewhale")
+        &Path::new(".nestlone")
             .join("state")
             .join(SUBAGENT_STATE_FILE),
     )
@@ -6814,7 +6814,7 @@ impl ToolSpec for AgentTool {
                 },
                 "profile": {
                     "type": "string",
-                    "description": "Optional Fleet roster member to run this child as (e.g. reviewer, scout, builder, verifier, synthesizer, manager, or a custom member from project .codewhale/agents/, personal $CODEWHALE_HOME/agents/, or [fleet.profiles] config). The member supplies role posture, model routing, instruction overlay, and delegation bounds; explicit type/model/model_strength/max_depth here override the member's defaults. See /fleet."
+                    "description": "Optional Fleet roster member to run this child as (e.g. reviewer, scout, builder, verifier, synthesizer, manager, or a custom member from project .nestlone/agents/, personal $CODEWHALE_HOME/agents/, or [fleet.profiles] config). The member supplies role posture, model routing, instruction overlay, and delegation bounds; explicit type/model/model_strength/max_depth here override the member's defaults. See /fleet."
                 },
                 "model_strength": {
                     "type": "string",
@@ -6848,7 +6848,7 @@ impl ToolSpec for AgentTool {
                 },
                 "worktree_path": {
                     "type": "string",
-                    "description": "Optional worktree checkout path. Relative paths are created under the default sibling .codewhale-worktrees directory, not inside the parent checkout."
+                    "description": "Optional worktree checkout path. Relative paths are created under the default sibling .nestlone-worktrees directory, not inside the parent checkout."
                 },
                 "fork_context": {
                     "type": "boolean",

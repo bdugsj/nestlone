@@ -275,7 +275,7 @@ pub struct StateStore {
 impl StateStore {
     /// Open (or create) a state store at the given database path.
     ///
-    /// If `path` is `None`, the default location (`~/.codewhale/state.db`, with
+    /// If `path` is `None`, the default location (`~/.nestlone/state.db`, with
     /// `~/.deepseek/state.db` as a legacy fallback) is used.
     /// The database schema is created automatically if it does not exist.
     pub fn open(path: Option<PathBuf>) -> Result<Self> {
@@ -1789,7 +1789,7 @@ impl StateStore {
 }
 
 fn default_state_db_path() -> PathBuf {
-    // $CODEWHALE_HOME is a hard override of the base data directory
+    // $NESTLONE_HOME is a hard override of the base data directory
     // (docs/CONFIGURATION.md): when set, the state DB lives under it and we do
     // NOT fall back to the legacy ~/.deepseek path — silent fallback would
     // defeat the isolation the override promises (CI, containers, multi-project,
@@ -1799,9 +1799,9 @@ fn default_state_db_path() -> PathBuf {
         return overridden.join("state.db");
     }
     let home = dirs::home_dir().unwrap_or_else(|| PathBuf::from("."));
-    // Prefer the CodeWhale directory, falling back to legacy DeepSeek path
+    // Prefer the Nestlone directory, falling back to legacy DeepSeek path
     // so existing installs don't lose their session history.
-    let primary = home.join(".codewhale").join("state.db");
+    let primary = home.join(".nestlone").join("state.db");
     if primary.exists() || !home.join(".deepseek").join("state.db").exists() {
         primary
     } else {
@@ -1809,19 +1809,24 @@ fn default_state_db_path() -> PathBuf {
     }
 }
 
-/// Resolve `$CODEWHALE_HOME` as a hard override of the data directory root.
+/// Resolve `$NESTLONE_HOME` as a hard override of the data directory root.
 ///
 /// Returns the path verbatim (the env var IS the home dir, matching
-/// `nestlone_home()` in config — `$CODEWHALE_HOME=/data/cw` means the home is
-/// `/data/cw`, not `/data/cw/.codewhale`). Returns `None` when unset/empty so
+/// `nestlone_home()` in config — `$NESTLONE_HOME=/data/cw` means the home is
+/// `/data/cw`, not `/data/cw/.nestlone`). Returns `None` when unset/empty so
 /// callers can branch on "explicit override" vs "default home + legacy
 /// fallback." Mirrors config's helper without taking a dependency on it (state
 /// is a low-level leaf crate; config cannot be a dependency here without
 /// inverting the layering).
 fn nestlone_home_override() -> Option<PathBuf> {
-    std::env::var_os("CODEWHALE_HOME")
-        .filter(|value| !value.is_empty())
-        .map(PathBuf::from)
+    for var in ["NESTLONE_HOME", "CODEWHALE_HOME"] {
+        if let Ok(value) = std::env::var_os(var)
+            && !value.is_empty()
+        {
+            return Some(PathBuf::from(value));
+        }
+    }
+    None
 }
 
 fn bool_to_i64(value: bool) -> i64 {
@@ -2382,38 +2387,38 @@ mod tests {
         assert_eq!(persisted.continuation_count, 2);
     }
 
-    // ── $CODEWHALE_HOME override tests ──────────────────────────────
+    // ── $NESTLONE_HOME override tests ────────────────────────────────
     //
     // These touch a process-global env var, so they serialize against each
     // other (and restore the prior value) to stay hermetic under parallel test
     // runs — the same concern AGENTS.md flags for config_command_allow_shell_*.
 
-    static CODEWHALE_HOME_TEST_LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
+    static NESTLONE_HOME_TEST_LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
 
-    struct CodeWhaleHomeGuard {
+    struct NestloneHomeGuard {
         prior: Option<std::ffi::OsString>,
     }
-    impl CodeWhaleHomeGuard {
+    impl NestloneHomeGuard {
         fn set(value: &str) -> Self {
-            let prior = std::env::var_os("CODEWHALE_HOME");
-            // SAFETY: serialised by CODEWHALE_HOME_TEST_LOCK.
-            unsafe { std::env::set_var("CODEWHALE_HOME", value) };
+            let prior = std::env::var_os("NESTLONE_HOME");
+            // SAFETY: serialised by NESTLONE_HOME_TEST_LOCK.
+            unsafe { std::env::set_var("NESTLONE_HOME", value) };
             Self { prior }
         }
         fn remove() -> Self {
-            let prior = std::env::var_os("CODEWHALE_HOME");
-            // SAFETY: serialised by CODEWHALE_HOME_TEST_LOCK.
-            unsafe { std::env::remove_var("CODEWHALE_HOME") };
+            let prior = std::env::var_os("NESTLONE_HOME");
+            // SAFETY: serialised by NESTLONE_HOME_TEST_LOCK.
+            unsafe { std::env::remove_var("NESTLONE_HOME") };
             Self { prior }
         }
     }
-    impl Drop for CodeWhaleHomeGuard {
+    impl Drop for NestloneHomeGuard {
         fn drop(&mut self) {
-            // SAFETY: serialised by CODEWHALE_HOME_TEST_LOCK.
+            // SAFETY: serialised by NESTLONE_HOME_TEST_LOCK.
             unsafe {
                 match &self.prior {
-                    Some(value) => std::env::set_var("CODEWHALE_HOME", value),
-                    None => std::env::remove_var("CODEWHALE_HOME"),
+                    Some(value) => std::env::set_var("NESTLONE_HOME", value),
+                    None => std::env::remove_var("NESTLONE_HOME"),
                 }
             }
         }
@@ -2421,10 +2426,10 @@ mod tests {
 
     #[test]
     fn nestlone_home_override_returns_the_env_value_verbatim() {
-        let _lock = CODEWHALE_HOME_TEST_LOCK.lock().unwrap();
-        let _g = CodeWhaleHomeGuard::set("/tmp/cw-isolated-state");
-        // The env var IS the home dir — no ".codewhale" appended. This matches
-        // nestlone_home() in config ($CODEWHALE_HOME=/x means home is /x).
+        let _lock = NESTLONE_HOME_TEST_LOCK.lock().unwrap();
+        let _g = NestloneHomeGuard::set("/tmp/cw-isolated-state");
+        // The env var IS the home dir — no ".nestlone" appended. This matches
+        // nestlone_home() in config ($NESTLONE_HOME=/x means home is /x).
         assert_eq!(
             nestlone_home_override().as_deref(),
             Some(std::path::Path::new("/tmp/cw-isolated-state"))
@@ -2433,15 +2438,15 @@ mod tests {
 
     #[test]
     fn nestlone_home_override_none_when_unset() {
-        let _lock = CODEWHALE_HOME_TEST_LOCK.lock().unwrap();
-        let _g = CodeWhaleHomeGuard::remove();
+        let _lock = NESTLONE_HOME_TEST_LOCK.lock().unwrap();
+        let _g = NestloneHomeGuard::remove();
         assert!(nestlone_home_override().is_none());
     }
 
     #[test]
     fn nestlone_home_override_none_when_empty() {
-        let _lock = CODEWHALE_HOME_TEST_LOCK.lock().unwrap();
-        let _g = CodeWhaleHomeGuard::set("   ");
+        let _lock = NESTLONE_HOME_TEST_LOCK.lock().unwrap();
+        let _g = NestloneHomeGuard::set("   ");
         // The helper filters empty values (after the OsString check). Note:
         // var_os returns the raw "   ", and our filter only catches truly-empty,
         // so this documents that whitespace-only is NOT treated as unset at the
@@ -2454,8 +2459,27 @@ mod tests {
     }
 
     #[test]
+    fn nestlone_home_override_legacy_codewhale_alias_is_read() {
+        let _lock = NESTLONE_HOME_TEST_LOCK.lock().unwrap();
+        let prior = std::env::var_os("CODEWHALE_HOME");
+        // SAFETY: serialised by NESTLONE_HOME_TEST_LOCK.
+        unsafe { std::env::set_var("CODEWHALE_HOME", "/legacy/cw-home") };
+        assert_eq!(
+            nestlone_home_override().as_deref(),
+            Some(std::path::Path::new("/legacy/cw-home"))
+        );
+        // SAFETY: serialised by NESTLONE_HOME_TEST_LOCK.
+        unsafe {
+            match prior {
+                Some(v) => std::env::set_var("CODEWHALE_HOME", v),
+                None => std::env::remove_var("CODEWHALE_HOME"),
+            }
+        }
+    }
+
+    #[test]
     fn default_state_db_path_uses_nestlone_home_when_set() {
-        let _lock = CODEWHALE_HOME_TEST_LOCK.lock().unwrap();
+        let _lock = NESTLONE_HOME_TEST_LOCK.lock().unwrap();
         let dir = std::env::temp_dir().join(format!(
             "cw-home-state-{}-{}",
             std::process::id(),
@@ -2464,9 +2488,9 @@ mod tests {
                 .unwrap()
                 .as_nanos()
         ));
-        let _g = CodeWhaleHomeGuard::set(dir.to_str().unwrap());
-        // Hard override: the DB is <CODEWHALE_HOME>/state.db, NOT
-        // <CODEWHALE_HOME>/.codewhale/state.db, and the legacy ~/.deepseek
+        let _g = NestloneHomeGuard::set(dir.to_str().unwrap());
+        // Hard override: the DB is <NESTLONE_HOME>/state.db, NOT
+        // <NESTLONE_HOME>/.nestlone/state.db, and the legacy ~/.deepseek
         // fallback is bypassed entirely.
         assert_eq!(default_state_db_path(), dir.join("state.db"));
     }

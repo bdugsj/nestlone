@@ -4186,8 +4186,8 @@ exit 7
         let config_path = dir.path().join("user-config.toml");
         let _config = trust_workspace_for_project_hooks(dir.path(), &config_path);
         let _legacy_config = EnvVarGuard::remove("DEEPSEEK_CONFIG_PATH");
-        let project_dir = dir.path().join(".codewhale");
-        std::fs::create_dir_all(&project_dir).expect("mkdir .codewhale");
+        let project_dir = dir.path().join(".nestlone");
+        std::fs::create_dir_all(&project_dir).expect("mkdir .nestlone");
         std::fs::write(
             project_dir.join("hooks.toml"),
             r#"
@@ -4222,8 +4222,8 @@ command = "echo project"
         let dir = tempfile::tempdir().expect("tempdir");
         let _config = EnvVarGuard::set("CODEWHALE_CONFIG_PATH", dir.path().join("config.toml"));
         let _legacy_config = EnvVarGuard::remove("DEEPSEEK_CONFIG_PATH");
-        let project_dir = dir.path().join(".codewhale");
-        std::fs::create_dir_all(&project_dir).expect("mkdir .codewhale");
+        let project_dir = dir.path().join(".nestlone");
+        std::fs::create_dir_all(&project_dir).expect("mkdir .nestlone");
         std::fs::write(
             project_dir.join("hooks.toml"),
             r#"
@@ -4251,9 +4251,9 @@ command = "echo project"
         let dir = tempfile::tempdir().expect("tempdir");
         let _config = EnvVarGuard::set("CODEWHALE_CONFIG_PATH", dir.path().join("config.toml"));
         let _legacy_config = EnvVarGuard::remove("DEEPSEEK_CONFIG_PATH");
-        let project_dir = dir.path().join(".codewhale");
+        let project_dir = dir.path().join(".nestlone");
         let legacy_trust_dir = dir.path().join(".deepseek");
-        std::fs::create_dir_all(&project_dir).expect("mkdir .codewhale");
+        std::fs::create_dir_all(&project_dir).expect("mkdir .nestlone");
         std::fs::create_dir_all(&legacy_trust_dir).expect("mkdir .deepseek");
         std::fs::write(legacy_trust_dir.join("trusted"), "").expect("write legacy trust marker");
         std::fs::write(
@@ -4284,8 +4284,8 @@ command = "echo project"
         let config_path = dir.path().join("user-config.toml");
         let _config = trust_workspace_for_project_hooks(dir.path(), &config_path);
         let _legacy_config = EnvVarGuard::remove("DEEPSEEK_CONFIG_PATH");
-        let project_dir = dir.path().join(".codewhale");
-        std::fs::create_dir_all(&project_dir).expect("mkdir .codewhale");
+        let project_dir = dir.path().join(".nestlone");
+        std::fs::create_dir_all(&project_dir).expect("mkdir .nestlone");
         std::fs::write(project_dir.join("hooks.toml"), "this is [ not toml")
             .expect("write hooks.toml");
 

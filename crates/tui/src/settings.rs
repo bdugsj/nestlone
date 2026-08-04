@@ -1,6 +1,6 @@
 //! Settings system - Persistent user preferences
 //!
-//! Settings are stored at ~/.codewhale/settings.toml, with legacy fallbacks.
+//! Settings are stored at ~/.nestlone/settings.toml, with legacy fallbacks.
 //!
 //! TUI-specific preferences (theme, keybinds, font_size) that survive project
 //! switches are stored separately in tui.toml. See [`TuiPrefs`].
@@ -52,19 +52,19 @@ impl InlineDiffMode {
 }
 
 // ============================================================================
-// TuiPrefs — ~/.codewhale/tui.toml
+// TuiPrefs — ~/.nestlone/tui.toml
 // ============================================================================
 
 /// TUI-specific preferences that are decoupled from agent/project config so
 /// they survive project switches (issue #437).
 ///
-/// Stored at `~/.codewhale/tui.toml` on new installs, with
+/// Stored at `~/.nestlone/tui.toml` on new installs, with
 /// `~/.deepseek/tui.toml` retained as a legacy read fallback. When the file is
 /// absent the values fall back to the `[tui]` section of the normal
 /// `config.toml` (via [`TuiPrefs::load`]), and then to the struct's own
 /// defaults.
 ///
-/// # Example `~/.codewhale/tui.toml`
+/// # Example `~/.nestlone/tui.toml`
 ///
 /// ```toml
 /// theme    = "dark"        # "system" | "dark" | "light" | "grayscale" | "catppuccin-mocha" | ...
@@ -128,7 +128,7 @@ pub struct KeybindPrefs {
 #[allow(dead_code)] // see TuiPrefs note above; deferred to a later settings pass (#657).
 impl TuiPrefs {
     /// Return the canonical path of the TUI preferences file:
-    /// `~/.codewhale/tui.toml`, or legacy `~/.deepseek/tui.toml` when present.
+    /// `~/.nestlone/tui.toml`, or legacy `~/.deepseek/tui.toml` when present.
     ///
     /// Tests may override the home directory through the
     /// `DEEPSEEK_CONFIG_PATH` environment variable (the parent directory of
@@ -151,7 +151,7 @@ impl TuiPrefs {
         tui_prefs_path_from_environment()
     }
 
-    /// Load TUI preferences from `~/.codewhale/tui.toml` or a legacy fallback.
+    /// Load TUI preferences from `~/.nestlone/tui.toml` or a legacy fallback.
     ///
     /// If the file does not exist the struct defaults are returned — no error
     /// is produced. Parse errors surface as `Err` so the caller can warn the
@@ -182,7 +182,7 @@ impl TuiPrefs {
         Ok(prefs)
     }
 
-    /// Save TUI preferences to `~/.codewhale/tui.toml` (or a legacy file when
+    /// Save TUI preferences to `~/.nestlone/tui.toml` (or a legacy file when
     /// it already exists), creating the target directory if needed.
     pub fn save(&self) -> Result<()> {
         let path = Self::path()?;
@@ -642,7 +642,7 @@ pub fn preset_fields(name: &str) -> Option<&'static [(&'static str, &'static str
 impl Settings {
     /// Get the canonical settings file path.
     ///
-    /// New writes should target `~/.codewhale/settings.toml`. Legacy
+    /// New writes should target `~/.nestlone/settings.toml`. Legacy
     /// DeepSeek-branded paths remain readable as fallbacks during load, but we
     /// no longer surface them as the primary path in `/config`.
     pub fn path() -> Result<PathBuf> {
@@ -663,7 +663,7 @@ impl Settings {
     ///
     /// This preserves the same candidate precedence, parser normalization, and
     /// environment overlays as [`Settings::load`]. Unlike an interactive
-    /// startup, diagnostics must not create `~/.codewhale/settings.toml` just
+    /// startup, diagnostics must not create `~/.nestlone/settings.toml` just
     /// because they inspected a legacy `~/.deepseek/settings.toml` file.
     pub(crate) fn load_read_only() -> Result<Self> {
         let mut settings = Self::load_persisted_read_only()?;
@@ -2820,7 +2820,7 @@ mod tests {
             .env(CHILD_SIGNAL_ENV, signal)
             .env("HOME", home)
             .env("USERPROFILE", home)
-            .env("CODEWHALE_HOME", home.join(".codewhale"))
+            .env("CODEWHALE_HOME", home.join(".nestlone"))
             .env_remove("DEEPSEEK_CONFIG_PATH")
             .env_remove("CODEWHALE_CONFIG_PATH")
             .stdout(std::process::Stdio::null())
@@ -2836,7 +2836,7 @@ mod tests {
         vec![
             EnvVarGuard::set("HOME", home),
             EnvVarGuard::set("USERPROFILE", home),
-            EnvVarGuard::set("CODEWHALE_HOME", home.join(".codewhale")),
+            EnvVarGuard::set("CODEWHALE_HOME", home.join(".nestlone")),
             EnvVarGuard::remove("DEEPSEEK_CONFIG_PATH"),
             EnvVarGuard::remove("CODEWHALE_CONFIG_PATH"),
         ]
@@ -4577,7 +4577,7 @@ mod tests {
     fn legacy_startup_modes_migrate_without_losing_permission_intent() {
         let _g = config_path_test_guard();
         let tmp = tempfile::tempdir().expect("tempdir");
-        let nestlone_home = tmp.path().join(".codewhale");
+        let nestlone_home = tmp.path().join(".nestlone");
         std::fs::create_dir_all(&nestlone_home).expect("nestlone home");
         std::fs::write(
             nestlone_home.join("settings.toml"),
@@ -4608,12 +4608,12 @@ mod tests {
         let _g = config_path_test_guard();
         let tmp = tempfile::tempdir().expect("tempdir");
         let _config_override = EnvVarRestore::remove("DEEPSEEK_CONFIG_PATH");
-        let _nestlone_home = EnvVarRestore::set("CODEWHALE_HOME", tmp.path().join(".codewhale"));
+        let _nestlone_home = EnvVarRestore::set("CODEWHALE_HOME", tmp.path().join(".nestlone"));
         let _home = EnvVarRestore::set("HOME", tmp.path());
 
         let got = Settings::path().expect("settings path");
 
-        assert_eq!(got, tmp.path().join(".codewhale").join("settings.toml"));
+        assert_eq!(got, tmp.path().join(".nestlone").join("settings.toml"));
     }
 
     #[test]
@@ -4625,19 +4625,19 @@ mod tests {
         std::fs::write(legacy_dir.join("settings.toml"), "low_motion = true\n")
             .expect("legacy settings");
         let _config_override = EnvVarRestore::remove("DEEPSEEK_CONFIG_PATH");
-        let _nestlone_home = EnvVarRestore::set("CODEWHALE_HOME", tmp.path().join(".codewhale"));
+        let _nestlone_home = EnvVarRestore::set("CODEWHALE_HOME", tmp.path().join(".nestlone"));
         let _home = EnvVarRestore::set("HOME", tmp.path());
 
         let got = Settings::path().expect("settings path");
 
-        assert_eq!(got, tmp.path().join(".codewhale").join("settings.toml"));
+        assert_eq!(got, tmp.path().join(".nestlone").join("settings.toml"));
     }
 
     #[test]
     fn settings_load_migrates_legacy_deepseek_home_into_nestlone_home_without_explicit_home() {
         let _g = config_path_test_guard();
         let tmp = tempfile::tempdir().expect("tempdir");
-        let primary = tmp.path().join(".codewhale").join("settings.toml");
+        let primary = tmp.path().join(".nestlone").join("settings.toml");
         let legacy_dir = tmp.path().join(".deepseek");
         let legacy_home = legacy_dir.join("settings.toml");
         std::fs::create_dir_all(&legacy_dir).expect("legacy dir");
@@ -4664,7 +4664,7 @@ mod tests {
     fn settings_load_read_only_reads_legacy_home_without_creating_primary() {
         let _g = config_path_test_guard();
         let tmp = tempfile::tempdir().expect("tempdir");
-        let primary = tmp.path().join(".codewhale").join("settings.toml");
+        let primary = tmp.path().join(".nestlone").join("settings.toml");
         let legacy = tmp.path().join(".deepseek").join("settings.toml");
         let legacy_bytes =
             b"default_mode = \"plan\"\nlow_motion = false\nfancy_animations = true\n";
@@ -4698,7 +4698,7 @@ mod tests {
     fn settings_load_migrates_platform_legacy_fallback_into_nestlone_home_without_explicit_home() {
         let _g = config_path_test_guard();
         let tmp = tempfile::tempdir().expect("tempdir");
-        let primary = tmp.path().join(".codewhale").join("settings.toml");
+        let primary = tmp.path().join(".nestlone").join("settings.toml");
         let _config_override = EnvVarRestore::remove("DEEPSEEK_CONFIG_PATH");
         let _nestlone_home =
             EnvVarRestore::set("CODEWHALE_HOME", primary.parent().expect("primary parent"));
@@ -4809,12 +4809,12 @@ mod tests {
         let _g = config_path_test_guard();
         let tmp = tempfile::tempdir().expect("tempdir");
         let _config_override = EnvVarRestore::remove("DEEPSEEK_CONFIG_PATH");
-        let _nestlone_home = EnvVarRestore::set("CODEWHALE_HOME", tmp.path().join(".codewhale"));
+        let _nestlone_home = EnvVarRestore::set("CODEWHALE_HOME", tmp.path().join(".nestlone"));
         let _home = EnvVarRestore::set("HOME", tmp.path());
 
         let got = TuiPrefs::path().expect("tui prefs path");
 
-        assert_eq!(got, tmp.path().join(".codewhale").join("tui.toml"));
+        assert_eq!(got, tmp.path().join(".nestlone").join("tui.toml"));
     }
 
     #[test]
@@ -4838,7 +4838,7 @@ mod tests {
     fn tui_prefs_path_reads_legacy_deepseek_home_when_present() {
         let _g = config_path_test_guard();
         let tmp = tempfile::tempdir().expect("tempdir");
-        let primary = tmp.path().join(".codewhale").join("tui.toml");
+        let primary = tmp.path().join(".nestlone").join("tui.toml");
         let legacy_dir = tmp.path().join(".deepseek");
         std::fs::create_dir_all(&legacy_dir).expect("legacy dir");
         let legacy_home = legacy_dir.join("tui.toml");
@@ -5075,12 +5075,12 @@ mod tests {
         let _g = config_path_test_guard();
         let tmp = tempfile::tempdir().expect("tempdir");
         let _config_override = EnvVarRestore::remove("DEEPSEEK_CONFIG_PATH");
-        let _nestlone_home = EnvVarRestore::set("CODEWHALE_HOME", tmp.path().join(".codewhale"));
+        let _nestlone_home = EnvVarRestore::set("CODEWHALE_HOME", tmp.path().join(".nestlone"));
         let _home = EnvVarRestore::set("HOME", tmp.path());
 
         let got = TuiPrefs::path().expect("path should resolve");
 
-        assert_eq!(got, tmp.path().join(".codewhale").join("tui.toml"));
+        assert_eq!(got, tmp.path().join(".nestlone").join("tui.toml"));
     }
 
     #[test]

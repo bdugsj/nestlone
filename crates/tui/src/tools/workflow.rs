@@ -55,7 +55,7 @@ use crate::work_graph::{
 const WORKFLOW_HANDOFF_MAX_CHARS: usize = 4_000;
 
 /// Model-facing run-record payloads carry only the newest events; the full
-/// stream persists per-event in `.codewhale/workflow-runs.jsonl` (#2974).
+/// stream persists per-event in `.nestlone/workflow-runs.jsonl` (#2974).
 const WORKFLOW_RESULT_EVENTS_TAIL: usize = 50;
 /// Bounded tail for free-form progress lines in model-facing payloads.
 const WORKFLOW_RESULT_PROGRESS_TAIL: usize = 20;
@@ -605,7 +605,7 @@ impl WorkflowRunRecord {
     /// Record one event, bounding retention to the newest
     /// `WORKFLOW_RUN_EVENTS_MAX_RETAINED` entries (#2974). Every event is
     /// journaled per-line at record time, so evicted entries remain
-    /// available in `.codewhale/workflow-runs.jsonl`.
+    /// available in `.nestlone/workflow-runs.jsonl`.
     fn push_event(&mut self, event: WorkflowUiEvent) {
         self.events_total = self.events_total.saturating_add(1);
         self.events.push(event);
@@ -1675,7 +1675,7 @@ async fn run_workflow_vm(
     }
 }
 
-/// Persist a durable per-run report under `.codewhale/reports/<run_id>.md`
+/// Persist a durable per-run report under `.nestlone/reports/<run_id>.md`
 /// so a settled background run leaves one synthesized artifact even after
 /// the session ends. Best-effort: report IO never affects the run outcome.
 fn write_run_report_artifact(workspace: &Path, record: &WorkflowRunRecord) {
@@ -1694,7 +1694,7 @@ fn write_run_report_artifact(workspace: &Path, record: &WorkflowRunRecord) {
     if safe_id.is_empty() {
         return;
     }
-    let dir = workspace.join(".codewhale").join("reports");
+    let dir = workspace.join(".nestlone").join("reports");
     if let Err(err) = std::fs::create_dir_all(&dir) {
         crate::logging::warn(format!(
             "workflow report dir {} not created: {err}",
@@ -1839,7 +1839,7 @@ impl RunPayloadBounds {
 /// - `execution.leaf_results[*].output`: per-leaf preview capped at
 ///   `WORKFLOW_RESULT_LEAF_OUTPUT_MAX_CHARS`.
 ///
-/// Full detail remains available in `.codewhale/workflow-runs.jsonl`; every
+/// Full detail remains available in `.nestlone/workflow-runs.jsonl`; every
 /// clip adds an explicit note/pointer so the model can fetch more on demand.
 fn bounded_run_record_value(
     record: &WorkflowRunRecord,
@@ -2345,18 +2345,18 @@ fn read_workflow_source_path(
             .canonicalize()
             .unwrap_or_else(|_| context.workspace.clone());
         // The user-global saved-workflow store is a first-class source
-        // alongside the workspace: `~/.codewhale/workflows/*.workflow.js`
+        // alongside the workspace: `~/.nestlone/workflows/*.workflow.js`
         // definitions surface as slash commands and must launch from any
         // workspace without trust_mode.
         let home_store = crate::config::effective_home_dir()
-            .map(|home| home.join(".codewhale").join("workflows"))
+            .map(|home| home.join(".nestlone").join("workflows"))
             .and_then(|dir| dir.canonicalize().ok());
         let inside_home_store = home_store
             .as_deref()
             .is_some_and(|dir| canonical.starts_with(dir));
         if !canonical.starts_with(&workspace) && !inside_home_store {
             return Err(ToolError::permission_denied(format!(
-                "workflow source_path must stay inside the workspace or ~/.codewhale/workflows: {}",
+                "workflow source_path must stay inside the workspace or ~/.nestlone/workflows: {}",
                 canonical.display()
             )));
         }
@@ -4274,7 +4274,7 @@ mod journal {
     use std::sync::{Arc, Mutex, OnceLock};
     use tracing::warn;
 
-    const CODEWHALE_DIR: &str = ".codewhale";
+    const NESTLONE_DIR: &str = ".nestlone";
     const WORKFLOW_RUNS_FILE: &str = "workflow-runs.jsonl";
 
     /// Per-workspace workflow state shared across tool-registry rebuilds.
@@ -4438,7 +4438,7 @@ mod journal {
 
     impl WorkflowRunJournal {
         fn open(workspace: &Path) -> Self {
-            let dir = workspace.join(CODEWHALE_DIR);
+            let dir = workspace.join(NESTLONE_DIR);
             if let Err(err) = std::fs::create_dir_all(&dir) {
                 warn!(
                     "workflow journal dir create failed ({}): {err}",
@@ -4877,7 +4877,7 @@ mod tests {
 
         let path = tmp
             .path()
-            .join(".codewhale")
+            .join(".nestlone")
             .join("reports")
             .join("workflow_report_1.md");
         let body = std::fs::read_to_string(&path).expect("report written");
@@ -4894,7 +4894,7 @@ mod tests {
         let record = WorkflowRunRecord::new("workflow_report_2".to_string(), None, None, None);
         write_run_report_artifact(tmp.path(), &record);
         assert!(
-            !tmp.path().join(".codewhale").join("reports").exists(),
+            !tmp.path().join(".nestlone").join("reports").exists(),
             "running runs must not leave report files"
         );
     }
@@ -4904,7 +4904,7 @@ mod tests {
         let _lock = crate::test_support::lock_test_env();
         let tmp = tempfile::tempdir().expect("tempdir");
         let home = tmp.path().join("home");
-        let store = home.join(".codewhale").join("workflows");
+        let store = home.join(".nestlone").join("workflows");
         std::fs::create_dir_all(&store).expect("store");
         let _home_guard = crate::test_support::EnvVarGuard::set("HOME", &home);
         let _userprofile_guard = crate::test_support::EnvVarGuard::set("USERPROFILE", &home);
@@ -4926,7 +4926,7 @@ mod tests {
             .expect_err("arbitrary outside paths stay denied");
         assert!(
             err.to_string()
-                .contains("workspace or ~/.codewhale/workflows"),
+                .contains("workspace or ~/.nestlone/workflows"),
             "{err}"
         );
     }
@@ -8125,7 +8125,7 @@ reviewer = "reviewer"
         let run_payload: Value = serde_json::from_str(&run.content).expect("run json");
         let run_id = run_payload["run_id"].as_str().expect("run id");
 
-        let journal_path = tmp.path().join(".codewhale/workflow-runs.jsonl");
+        let journal_path = tmp.path().join(".nestlone/workflow-runs.jsonl");
         assert!(
             journal_path.exists(),
             "journal should be created under workspace"

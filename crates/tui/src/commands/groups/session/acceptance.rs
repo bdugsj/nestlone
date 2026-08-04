@@ -702,7 +702,7 @@ fn execute_isolated(world: &mut SessionCommandWorld, command: &str) -> CommandRe
 
     let _lock = lock_test_env();
     let _home = EnvVarGuard::set("HOME", &home);
-    let _nestlone_home = EnvVarGuard::set("CODEWHALE_HOME", home.join(".codewhale"));
+    let _nestlone_home = EnvVarGuard::set("CODEWHALE_HOME", home.join(".nestlone"));
 
     let app = world.app.as_deref_mut().expect("app should exist");
     commands::user_registry::reload(Some(&app.workspace));
@@ -740,7 +740,7 @@ fn persist_active_session(world: &SessionCommandWorld) {
 
     let _lock = lock_test_env();
     let _home = EnvVarGuard::set("HOME", &home);
-    let _nestlone_home = EnvVarGuard::set("CODEWHALE_HOME", home.join(".codewhale"));
+    let _nestlone_home = EnvVarGuard::set("CODEWHALE_HOME", home.join(".nestlone"));
     let manager = SessionManager::default_location().expect("open isolated session manager");
 
     manager
@@ -773,7 +773,7 @@ fn persist_session_with_age(world: &SessionCommandWorld, session_id: &str, title
 
     let _lock = lock_test_env();
     let _home = EnvVarGuard::set("HOME", &home);
-    let _nestlone_home = EnvVarGuard::set("CODEWHALE_HOME", home.join(".codewhale"));
+    let _nestlone_home = EnvVarGuard::set("CODEWHALE_HOME", home.join(".nestlone"));
     let manager = SessionManager::default_location().expect("open isolated session manager");
 
     manager.save_session(&session).expect("persist session");
@@ -797,7 +797,7 @@ fn try_load_saved_session(
 
     let _lock = lock_test_env();
     let _home = EnvVarGuard::set("HOME", &home);
-    let _nestlone_home = EnvVarGuard::set("CODEWHALE_HOME", home.join(".codewhale"));
+    let _nestlone_home = EnvVarGuard::set("CODEWHALE_HOME", home.join(".nestlone"));
     let manager = SessionManager::default_location().expect("open isolated session manager");
 
     manager.load_session(session_id)

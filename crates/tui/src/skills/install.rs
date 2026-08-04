@@ -58,12 +58,12 @@ fn reqwest_client() -> reqwest::Client {
 
 /// Cache directory for registry-synced skills.
 ///
-/// Lives at `~/.codewhale/cache/skills/` so it's separate from user-installed
+/// Lives at `~/.nestlone/cache/skills/` so it's separate from user-installed
 /// skills and can be blown away without losing anything irreplaceable.
 pub fn default_cache_skills_dir() -> PathBuf {
     crate::config::effective_home_dir().map_or_else(
         || PathBuf::from("/tmp/nestlone/cache/skills"),
-        |p| p.join(".codewhale").join("cache").join("skills"),
+        |p| p.join(".nestlone").join("cache").join("skills"),
     )
 }
 

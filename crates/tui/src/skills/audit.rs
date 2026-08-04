@@ -1015,7 +1015,7 @@ mod tests {
         let workspace = tmp.path().join("ws");
         let home = tmp.path().join("home");
         write_skill(
-            &workspace.join(".codewhale").join("skills"),
+            &workspace.join(".nestlone").join("skills"),
             "owned",
             "owned skill",
             "body",
@@ -1048,7 +1048,7 @@ mod tests {
         let workspace = tmp.path().join("ws");
         let home = tmp.path().join("home");
         write_skill(
-            &workspace.join(".codewhale").join("skills"),
+            &workspace.join(".nestlone").join("skills"),
             "shared",
             "owned",
             "owned-body",
@@ -1089,7 +1089,7 @@ mod tests {
         let workspace = tmp.path().join("ws");
         let home = tmp.path().join("home");
         write_skill(
-            &workspace.join(".codewhale").join("skills"),
+            &workspace.join(".nestlone").join("skills"),
             "shared",
             "owned",
             "owned-body",
@@ -1175,7 +1175,7 @@ mod tests {
         let tmp = TempDir::new().unwrap();
         let workspace = tmp.path().join("ws");
         let home = tmp.path().join("home");
-        fs::create_dir_all(workspace.join(".codewhale").join("skills")).unwrap();
+        fs::create_dir_all(workspace.join(".nestlone").join("skills")).unwrap();
         write_skill(
             &workspace.join(".claude").join("skills"),
             "from-claude",
@@ -1200,7 +1200,7 @@ mod tests {
         let workspace = tmp.path().join("ws");
         let home = tmp.path().join("home");
         write_skill(
-            &workspace.join(".codewhale").join("skills"),
+            &workspace.join(".nestlone").join("skills"),
             "shared",
             "desc",
             "owned-body",
@@ -1228,7 +1228,7 @@ mod tests {
         let tmp = TempDir::new().unwrap();
         let workspace = tmp.path().join("ws");
         let home = tmp.path().join("home");
-        let root = workspace.join(".codewhale").join("skills");
+        let root = workspace.join(".nestlone").join("skills");
         write_skill(&root, "managed", "desc", "body");
         fs::write(
             root.join("managed").join(INSTALLED_FROM_MARKER),
@@ -1257,7 +1257,7 @@ mod tests {
         let tmp = TempDir::new().unwrap();
         let workspace = tmp.path().join("ws");
         let home = tmp.path().join("home");
-        let root = workspace.join(".codewhale").join("skills");
+        let root = workspace.join(".nestlone").join("skills");
         write_skill(&root, "managed", "desc", "body");
 
         // First scan to learn digest, then write matching v2 marker.
@@ -1287,7 +1287,7 @@ mod tests {
         let tmp = TempDir::new().unwrap();
         let workspace = tmp.path().join("ws");
         let home = tmp.path().join("home");
-        let root = workspace.join(".codewhale").join("skills");
+        let root = workspace.join(".nestlone").join("skills");
         write_skill(&root, "managed", "desc", "body");
         fs::write(
             root.join("managed").join(INSTALLED_FROM_MARKER),
@@ -1327,7 +1327,7 @@ mod tests {
         let tmp = TempDir::new().unwrap();
         let workspace = tmp.path().join("ws");
         let home = tmp.path().join("home");
-        let skill_dir = workspace.join(".codewhale").join("skills").join("big");
+        let skill_dir = workspace.join(".nestlone").join("skills").join("big");
         fs::create_dir_all(&skill_dir).unwrap();
         let huge = format!(
             "---\nname: big\ndescription: x\n---\n{}",
@@ -1345,7 +1345,7 @@ mod tests {
         let tmp = TempDir::new().unwrap();
         let workspace = tmp.path().join("ws");
         let home = tmp.path().join("home");
-        write_skill(&workspace.join(".codewhale").join("skills"), "a", "d", "b");
+        write_skill(&workspace.join(".nestlone").join("skills"), "a", "d", "b");
         let snap = scan(&workspace, Some(&home), SkillAuditMode::OwnedOnly, None);
         assert_eq!(snap.skills[0].readiness, ReadinessState::Unknown);
     }
@@ -1357,7 +1357,7 @@ mod tests {
         let home = tmp.path().join("home");
         // `pdf` is a bundled name, but custom body must not classify as BuiltIn.
         write_skill(
-            &workspace.join(".codewhale").join("skills"),
+            &workspace.join(".nestlone").join("skills"),
             "pdf",
             "user override",
             "not-the-bundled-body",
@@ -1372,7 +1372,7 @@ mod tests {
         let tmp = TempDir::new().unwrap();
         let workspace = tmp.path().join("ws");
         let home = tmp.path().join("home");
-        let root = workspace.join(".codewhale").join("skills");
+        let root = workspace.join(".nestlone").join("skills");
         // Bundled command name + different body + install marker → managed.
         write_skill(&root, "pdf", "registry pdf", "community-body");
         fs::write(
@@ -1408,7 +1408,7 @@ mod tests {
         let tmp = TempDir::new().unwrap();
         let workspace = tmp.path().join("ws");
         let home = tmp.path().join("home");
-        let root = workspace.join(".codewhale").join("skills");
+        let root = workspace.join(".nestlone").join("skills");
         fs::create_dir_all(root.join("pdf")).unwrap();
         fs::write(
             root.join("pdf").join("SKILL.md"),
@@ -1427,7 +1427,7 @@ mod tests {
         let tmp = TempDir::new().unwrap();
         let workspace = tmp.path().join("ws");
         let home = tmp.path().join("home");
-        let root = workspace.join(".codewhale").join("skills");
+        let root = workspace.join(".nestlone").join("skills");
         write_skill(&root, "managed", "desc", "body");
         let outside = tmp.path().join("outside-marker.json");
         fs::write(&outside, r#"{"spec":"github:o/r","checksum":"x"}"#).unwrap();
@@ -1467,7 +1467,7 @@ mod tests {
         let tmp = TempDir::new().unwrap();
         let workspace = tmp.path().join("ws");
         let home = tmp.path().join("home");
-        write_skill(&workspace.join(".codewhale").join("skills"), "a", "d", "b");
+        write_skill(&workspace.join(".nestlone").join("skills"), "a", "d", "b");
         let snap = scan(
             &workspace,
             Some(&home),

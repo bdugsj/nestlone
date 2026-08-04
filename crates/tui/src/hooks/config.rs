@@ -375,7 +375,7 @@ fn default_enabled() -> bool {
 }
 
 impl HooksConfig {
-    /// Load global hooks merged with project-local `.codewhale/hooks.toml` (#3026).
+    /// Load global hooks merged with project-local `.nestlone/hooks.toml` (#3026).
     ///
     /// Project hooks are executable repository configuration, so they are only
     /// honored after the workspace has been trusted in user-owned config.
@@ -383,7 +383,7 @@ impl HooksConfig {
     /// trusted project file logs a warning and falls back to global-only.
     pub fn load_with_project(global: HooksConfig, workspace: &Path) -> HooksConfig {
         let mut merged = global;
-        let project_path = workspace.join(".codewhale").join("hooks.toml");
+        let project_path = workspace.join(".nestlone").join("hooks.toml");
         if project_path.exists() && workspace_allows_project_hooks(workspace) {
             match read_project_hooks_file(&project_path) {
                 Ok(contents) => match toml::from_str::<HooksConfig>(&contents) {

@@ -117,7 +117,7 @@ pub fn build_bwrap_command(
     }
 
     // Re-apply protected descendants after all writable parents so a broad
-    // writable root cannot make .codewhale/.deepseek exceptions writable.
+    // writable root cannot make .nestlone/.deepseek exceptions writable.
     for root in read_only_mounts {
         let root = root.to_string_lossy().into_owned();
         cmd.push("--ro-bind".to_string());
@@ -256,7 +256,7 @@ mod tests {
         let dir = tempfile::tempdir().expect("tempdir");
         let workspace = dir.path().join("workspace");
         let extra = dir.path().join("extra");
-        let protected = workspace.join(".codewhale");
+        let protected = workspace.join(".nestlone");
         std::fs::create_dir_all(&protected).expect("protected directory");
         std::fs::create_dir_all(&extra).expect("extra directory");
 

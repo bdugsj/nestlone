@@ -6678,7 +6678,7 @@ fn persist_state_rejects_symlinked_state_directory() {
     let tmp = tempdir().expect("tempdir");
     let workspace = tmp.path().join("workspace");
     let outside = tmp.path().join("outside-state");
-    let nestlone_dir = workspace.join(".codewhale");
+    let nestlone_dir = workspace.join(".nestlone");
     let state_dir = nestlone_dir.join("state");
     std::fs::create_dir_all(&nestlone_dir).expect("mkdir nestlone");
     std::fs::create_dir_all(&outside).expect("mkdir outside");
@@ -6839,7 +6839,7 @@ fn git_repo_root_reports_attempted_paths_when_no_repo_found() {
     let repo_root = git_repo_root(&std::env::current_dir().expect("current dir"))
         .expect("test should run inside the checkout");
     let harness = TempDirBuilder::new()
-        .prefix(".codewhale-no-repo-")
+        .prefix(".nestlone-no-repo-")
         .tempdir_in(repo_root.parent().expect("repo parent"))
         .expect("empty harness outside checkout");
     let empty = harness
@@ -7072,7 +7072,7 @@ fn fresh_forked_and_nested_subagents_share_authority_bound_skill_catalogs() {
     let _home = crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", tmp.path().join("home"));
     let workspace = tmp.path().join("workspace");
     let native_skill = workspace.join(".agents/skills/native-review");
-    let plugin_root = workspace.join(".codewhale/plugins/demo");
+    let plugin_root = workspace.join(".nestlone/plugins/demo");
     std::fs::create_dir_all(&native_skill).expect("native Skill dir");
     std::fs::create_dir_all(plugin_root.join("skills/review")).expect("plugin Skill dir");
     std::fs::write(
@@ -7093,7 +7093,7 @@ fn fresh_forked_and_nested_subagents_share_authority_bound_skill_catalogs() {
     let config = crate::plugins::discovery::DiscoveryConfig {
         workspace: workspace.clone(),
         user_plugins_dir: tmp.path().join("user-plugins"),
-        workspace_plugins_dir: workspace.join(".codewhale/plugins"),
+        workspace_plugins_dir: workspace.join(".nestlone/plugins"),
         builtin_plugin_dirs: Vec::new(),
         state_path: tmp.path().join("plugin-state/state.json"),
     };
@@ -11986,7 +11986,7 @@ fn write_json_atomic_survives_concurrent_writers() {
     // symlink); otherwise the workspace-relative path check would reject it.
     let base = dir.path().canonicalize().expect("canonicalize tempdir");
     let workspace = Arc::new(base.clone());
-    let path = Arc::new(base.join(".codewhale").join("subagents").join("state.json"));
+    let path = Arc::new(base.join(".nestlone").join("subagents").join("state.json"));
     let mut handles = Vec::new();
     for i in 0..16 {
         let ws = Arc::clone(&workspace);

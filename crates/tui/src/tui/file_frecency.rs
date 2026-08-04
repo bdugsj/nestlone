@@ -5,7 +5,7 @@
 //! one mentioned 5 minutes ago, and re-orders mention-popup completions by
 //! the resulting score. Persisted as a single JSONL file at
 //! `$CODEWHALE_HOME/file-frecency.jsonl` (normally
-//! `~/.codewhale/file-frecency.jsonl`) so frecency survives restarts.
+//! `~/.nestlone/file-frecency.jsonl`) so frecency survives restarts.
 //!
 //! Append-only on the wire, compacted in memory: the loader replays every
 //! line into a `HashMap<String, FrecencyEntry>` keyed by repo-relative path,

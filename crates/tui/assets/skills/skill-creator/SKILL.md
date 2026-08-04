@@ -1,6 +1,6 @@
 ---
 name: skill-creator
-description: Create or improve codewhale skills. Use when the user wants a new skill, wants to update an existing skill, or needs guidance on when a skill should be a skill versus MCP, hooks, tools, or a plugin scaffold.
+description: Create or improve nestlone skills. Use when the user wants a new skill, wants to update an existing skill, or needs guidance on when a skill should be a skill versus MCP, hooks, tools, or a plugin scaffold.
 metadata:
   short-description: Create DeepSeek skills
 aliases-for: create-skill
@@ -8,7 +8,7 @@ aliases-for: create-skill
 
 # Skill Creator
 
-Use this skill to create small, useful codewhale skills that match the
+Use this skill to create small, useful nestlone skills that match the
 runtime this repository actually ships.
 
 ## What A Skill Is
@@ -95,7 +95,7 @@ plain single-line values. Use lower-case hyphen-case names.
   unless the user asked for a rewrite.
 - Tighten descriptions when the skill is under-triggering or over-triggering.
 - Remove stale tool names, unavailable dependencies, and copied instructions
-  from other agents that do not apply to codewhale.
+  from other agents that do not apply to nestlone.
 - Keep examples short and directly tied to this runtime's commands and tools.
 
 ## Validation Checklist

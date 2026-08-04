@@ -235,7 +235,7 @@ pub fn write_fleet_artifact_ref(
     contents: &[u8],
     mime_type: Option<&str>,
 ) -> Result<FleetArtifactRef> {
-    let rel_path = PathBuf::from(".codewhale")
+    let rel_path = PathBuf::from(".nestlone")
         .join("fleet")
         .join(safe_path_segment(&run_id.0))
         .join(safe_path_segment(task_id))
@@ -678,7 +678,7 @@ mod tests {
             workspace: Some(FleetWorkspaceRequirements {
                 root: Some(PathBuf::from(".")),
                 required_files: vec![PathBuf::from("Cargo.toml")],
-                writable_paths: vec![PathBuf::from(".codewhale/fleet")],
+                writable_paths: vec![PathBuf::from(".nestlone/fleet")],
                 environment: Some(FleetEnvironmentRequirements {
                     required: vec!["PATH".to_string()],
                     allowlist: vec!["RUST_LOG".to_string()],

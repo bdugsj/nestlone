@@ -1003,15 +1003,15 @@ mod tests {
             result: "overall=off".into(),
             overall_status: InventoryStatus::Off,
             needs_action: false,
-            mcp_path_display: "~/.codewhale/mcp.json".into(),
-            skills_path_display: "~/.codewhale/skills".into(),
-            plugins_path_display: "~/.codewhale/plugins".into(),
+            mcp_path_display: "~/.nestlone/mcp.json".into(),
+            skills_path_display: "~/.nestlone/skills".into(),
+            plugins_path_display: "~/.nestlone/plugins".into(),
         };
         let text = on_ramp_text(Locale::En, &facts);
         assert!(text.contains("nestlone mcp init") || text.contains("/mcp"));
         assert!(text.contains("/skills") || text.contains("setup --skills"));
         assert!(text.contains("does not") || text.contains("never") || text.contains("not run"));
-        assert!(text.contains("~/.codewhale/mcp.json"));
+        assert!(text.contains("~/.nestlone/mcp.json"));
         assert!(!text.contains("sk-"));
     }
 

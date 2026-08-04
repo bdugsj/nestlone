@@ -173,7 +173,7 @@ impl FleetDocument {
     /// Load a fleet document by name from labelled search roots.
     ///
     /// A bare `name` that exists under more than one origin is **ambiguous**
-    /// once any candidate is an exact fleet: a personal `~/.codewhale` Fleet
+    /// once any candidate is an exact fleet: a personal `~/.nestlone` Fleet
     /// silently shadowing (or being shadowed by) a project Fleet would change
     /// which exact provider/model actually runs, so the caller is asked for a
     /// qualified `origin/name` instead. Purely legacy collisions keep the

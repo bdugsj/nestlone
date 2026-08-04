@@ -1,22 +1,22 @@
 ---
 name: fleet-manager
-description: Use when managing, triaging, restarting, escalating, or summarizing Codewhale Agent Fleet runs and workers.
+description: Use when managing, triaging, restarting, escalating, or summarizing Nestlone Agent Fleet runs and workers.
 metadata:
-  short-description: Triage Codewhale Agent Fleet runs
+  short-description: Triage Nestlone Agent Fleet runs
 ---
 
 # Fleet Manager
 
-Use this skill when acting as a manager agent for Codewhale Agent Fleet runs.
+Use this skill when acting as a manager agent for Nestlone Agent Fleet runs.
 Your job is to classify worker state, choose the narrowest safe typed action,
 and leave a ledgered receipt or a safe escalation draft.
 
 ## Authority Boundary
 
-- Prefer typed fleet surfaces over shell spelunking: `codewhale fleet status`,
+- Prefer typed fleet surfaces over shell spelunking: `nestlone fleet status`,
   `inspect`, `logs`, `artifacts`, `interrupt`, `restart`, `stop`, and the
   Runtime API fleet endpoints.
-- Do not read `.codewhale/fleet.jsonl`, host logs, or remote files directly
+- Do not read `.nestlone/fleet.jsonl`, host logs, or remote files directly
   unless the typed command or API is missing required evidence.
 - Do not send Slack, webhook, PagerDuty, email, or chat messages unless the
   user or run config explicitly authorizes sending. Draft the message instead.
@@ -26,11 +26,11 @@ and leave a ledgered receipt or a safe escalation draft.
 ## Triage Loop
 
 1. Identify the run and worker from the user request, run receipt, or fleet
-   status output. If no worker is named, start with `codewhale fleet status`.
-2. Inspect the worker with `codewhale fleet inspect <worker-id>` or the matching
+   status output. If no worker is named, start with `nestlone fleet status`.
+2. Inspect the worker with `nestlone fleet inspect <worker-id>` or the matching
    Runtime API worker endpoint.
-3. Review bounded evidence with `codewhale fleet logs <worker-id>` and
-   `codewhale fleet artifacts <worker-id>`. Summarize artifact refs, not full
+3. Review bounded evidence with `nestlone fleet logs <worker-id>` and
+   `nestlone fleet artifacts <worker-id>`. Summarize artifact refs, not full
    payloads.
 4. Classify the state before acting:
    - `transient failure`: transport error, timeout, stale heartbeat, host
@@ -43,7 +43,7 @@ and leave a ledgered receipt or a safe escalation draft.
      action, repeated restart exhaustion, ambiguous product decision, or
      conflict between artifacts and verifier.
 5. Choose one typed action:
-   - transient and retry budget remains: `codewhale fleet restart <worker-id>`.
+   - transient and retry budget remains: `nestlone fleet restart <worker-id>`.
    - transient but unsafe to retry: draft escalation and mark needs-human.
    - task failure: preserve artifacts, summarize the failure, and avoid restart
      unless the task spec says retrying can produce new evidence.
@@ -79,13 +79,13 @@ Use this shape for Slack/PagerDuty drafts. Keep logs to three short lines or an
 artifact ref.
 
 ```text
-Codewhale fleet needs attention
+Nestlone fleet needs attention
 Run: <run-id>
 Worker: <worker-id>
 Task: <task-id or unknown>
 Classification: <transient failure | task failure | verifier failure | needs-human>
 Reason: <one sentence, no secrets>
-Latest typed evidence: codewhale fleet inspect <worker-id>; codewhale fleet artifacts <worker-id>
+Latest typed evidence: nestlone fleet inspect <worker-id>; nestlone fleet artifacts <worker-id>
 Safe log excerpt: <3 lines max or "see artifact <ref>">
 Requested decision: <restart approval | verifier review | task owner review | permission decision>
 ```

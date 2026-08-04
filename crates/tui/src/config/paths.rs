@@ -43,10 +43,15 @@ fn default_config_path_from_environment() -> Option<PathBuf> {
 }
 
 pub(crate) fn nestlone_home_dir() -> Option<PathBuf> {
-    std::env::var_os("CODEWHALE_HOME").and_then(|path| {
-        let path = PathBuf::from(path);
-        (!path.as_os_str().is_empty()).then_some(path)
-    })
+    for var in ["NESTLONE_HOME", "CODEWHALE_HOME"] {
+        if let Ok(path) = std::env::var(var) {
+            let path = PathBuf::from(path);
+            if !path.as_os_str().is_empty() {
+                return Some(path);
+            }
+        }
+    }
+    None
 }
 
 pub(crate) fn home_config_path() -> Option<PathBuf> {
@@ -55,7 +60,7 @@ pub(crate) fn home_config_path() -> Option<PathBuf> {
     }
 
     effective_home_dir().map(|home| {
-        let primary = home.join(".codewhale").join("config.toml");
+        let primary = home.join(".nestlone").join("config.toml");
         if primary.exists() {
             return primary;
         }
@@ -89,16 +94,12 @@ pub(crate) fn env_config_path() -> Option<PathBuf> {
 }
 
 fn env_config_path_unlocked() -> Option<PathBuf> {
-    if let Ok(path) = std::env::var("CODEWHALE_CONFIG_PATH") {
-        let trimmed = path.trim();
-        if !trimmed.is_empty() {
-            return Some(expand_path(trimmed));
-        }
-    }
-    if let Ok(path) = std::env::var("DEEPSEEK_CONFIG_PATH") {
-        let trimmed = path.trim();
-        if !trimmed.is_empty() {
-            return Some(expand_path(trimmed));
+    for var in ["NESTLONE_CONFIG_PATH", "CODEWHALE_CONFIG_PATH", "DEEPSEEK_CONFIG_PATH"] {
+        if let Ok(path) = std::env::var(var) {
+            let trimmed = path.trim();
+            if !trimmed.is_empty() {
+                return Some(expand_path(trimmed));
+            }
         }
     }
     None
@@ -119,7 +120,7 @@ pub(crate) fn default_managed_config_path() -> Option<PathBuf> {
     #[cfg(not(unix))]
     {
         effective_home_dir().map(|home| {
-            let primary = home.join(".codewhale").join("managed_config.toml");
+            let primary = home.join(".nestlone").join("managed_config.toml");
             if primary.exists() {
                 return primary;
             }
@@ -136,7 +137,7 @@ pub(crate) fn default_requirements_path() -> Option<PathBuf> {
     #[cfg(not(unix))]
     {
         effective_home_dir().map(|home| {
-            let primary = home.join(".codewhale").join("requirements.toml");
+            let primary = home.join(".nestlone").join("requirements.toml");
             if primary.exists() {
                 return primary;
             }
@@ -162,12 +163,12 @@ pub(crate) fn expand_path(path: &str) -> PathBuf {
 }
 
 pub(crate) fn default_skills_dir() -> Option<PathBuf> {
-    effective_home_dir().map(|home| home.join(".codewhale").join("skills"))
+    effective_home_dir().map(|home| home.join(".nestlone").join("skills"))
 }
 
 pub(crate) fn default_mcp_config_path() -> Option<PathBuf> {
     effective_home_dir().map(|home| {
-        let primary = home.join(".codewhale").join("mcp.json");
+        let primary = home.join(".nestlone").join("mcp.json");
         if primary.exists() {
             return primary;
         }
@@ -181,7 +182,7 @@ pub(crate) fn default_mcp_config_path() -> Option<PathBuf> {
 
 pub(crate) fn default_notes_path() -> Option<PathBuf> {
     effective_home_dir().map(|home| {
-        let primary = home.join(".codewhale").join("notes.txt");
+        let primary = home.join(".nestlone").join("notes.txt");
         if primary.exists() {
             return primary;
         }
@@ -195,7 +196,7 @@ pub(crate) fn default_notes_path() -> Option<PathBuf> {
 
 pub(crate) fn default_memory_path() -> Option<PathBuf> {
     effective_home_dir().map(|home| {
-        let primary = home.join(".codewhale").join("memory.md");
+        let primary = home.join(".nestlone").join("memory.md");
         if primary.exists() {
             return primary;
         }

@@ -36,7 +36,7 @@ use crate::tui::views::{
     render_modal_footer_with_gutter, render_modal_surface, truncate_view_text,
 };
 
-const PROFILE_DIR: &str = ".codewhale/agents";
+const PROFILE_DIR: &str = ".nestlone/agents";
 
 /// A selectable choice in a wizard step: a short identifier `label`, a one-line
 /// `summary`, and a longer `description` shown (wrapped) in the detail pane.
@@ -114,7 +114,7 @@ const ROLES: [Choice; 9] = [
         label: Cow::Borrowed("custom"),
         summary: Cow::Borrowed("Author a profile by hand"),
         description: Cow::Borrowed(
-            "Define the posture yourself in a workspace agent TOML profile under .codewhale/agents/.",
+            "Define the posture yourself in a workspace agent TOML profile under .nestlone/agents/.",
         ),
     },
 ];
@@ -1397,7 +1397,7 @@ impl FleetSetupView {
 
     fn review_policy_summary(&self) -> String {
         format!(
-            "Workers run without a token cap by default · {}s api, {}s heartbeat. Launch with Fleet → exec; /fleet workers (or /subagents) shows sub-agents in the current interactive session; /fleet status and nestlone fleet status both read the persistent .codewhale/fleet.jsonl ledger.",
+            "Workers run without a token cap by default · {}s api, {}s heartbeat. Launch with Fleet → exec; /fleet workers (or /subagents) shows sub-agents in the current interactive session; /fleet status and nestlone fleet status both read the persistent .nestlone/fleet.jsonl ledger.",
             self.snapshot.api_timeout_secs, self.snapshot.heartbeat_timeout_secs
         )
     }
@@ -2090,7 +2090,7 @@ mod tests {
             profile_file_status(FleetProfileScope::Project, temp.path()),
             (
                 "0 files".to_string(),
-                "create .codewhale/agents/*.toml".to_string()
+                "create .nestlone/agents/*.toml".to_string()
             )
         );
 
@@ -2689,7 +2689,7 @@ mod tests {
         for truth in [
             "current interactive session",
             "nestlone fleet status",
-            ".codewhale/fleet.jsonl",
+            ".nestlone/fleet.jsonl",
         ] {
             assert!(policy.contains(truth), "review policy missing: {truth}");
         }

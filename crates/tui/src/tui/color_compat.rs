@@ -826,7 +826,7 @@ mod tests {
 
         let log_path = tmp
             .path()
-            .join(".codewhale")
+            .join(".nestlone")
             .join("logs")
             .join("tui-render.log");
         let body = fs::read_to_string(log_path).expect("render debug log");

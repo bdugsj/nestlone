@@ -573,7 +573,7 @@ impl ToolContext {
     #[must_use]
     pub fn new(workspace: impl Into<PathBuf>) -> Self {
         let workspace = workspace.into();
-        // Prefer .codewhale, fall back to .deepseek for project-local state
+        // Prefer .nestlone, fall back to .deepseek for project-local state
         let notes_path = nestlone_config::resolve_project_state_dir(&workspace, "notes.md")
             .expect("hardcoded project notes state path is valid")
             .1;

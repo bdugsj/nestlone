@@ -317,7 +317,7 @@ fn build_entries(
 
     // Workspace commands (#3912). The registry was already consulted above to
     // suppress shadowed built-ins; until now it never contributed a row of its
-    // own, so `.codewhale/commands/*.md` authors could not find their own work
+    // own, so `.nestlone/commands/*.md` authors could not find their own work
     // in the surface that teaches the product. `hidden` entries stay out.
     for command in registry.iter().filter(|command| !command.hidden) {
         let label = format!("/{}", command.name);
@@ -686,7 +686,7 @@ mod tests {
     #[test]
     fn workspace_help_hides_user_shadowed_debt_aliases_from_copy_and_search() {
         let tmp = tempfile::TempDir::new().unwrap();
-        let commands_dir = tmp.path().join(".codewhale").join("commands");
+        let commands_dir = tmp.path().join(".nestlone").join("commands");
         std::fs::create_dir_all(&commands_dir).unwrap();
         std::fs::write(
             commands_dir.join("slop.md"),
@@ -732,7 +732,7 @@ mod tests {
         // #3912: both surfaces executed and autocompleted but were absent
         // from the surface that teaches the product.
         let tmp = tempfile::TempDir::new().unwrap();
-        let commands_dir = tmp.path().join(".codewhale").join("commands");
+        let commands_dir = tmp.path().join(".nestlone").join("commands");
         std::fs::create_dir_all(&commands_dir).unwrap();
         std::fs::write(
             commands_dir.join("shipit.md"),

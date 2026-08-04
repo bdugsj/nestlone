@@ -128,7 +128,7 @@ fn composer_newline_and_stash_chords_keep_stable_roles() -> anyhow::Result<()> {
     h.send(keys::key::ctrl_g())?;
     h.wait_for_text("Draft stashed", KEY_TIMEOUT)?;
     h.wait_for_text(COMPOSER_READY_TEXT, KEY_TIMEOUT)?;
-    let stash_path = ws.home().join(".codewhale/composer_stash.jsonl");
+    let stash_path = ws.home().join(".nestlone/composer_stash.jsonl");
     let first_stash = std::fs::read_to_string(&stash_path)?;
     assert!(first_stash.contains("shift-line\\nalt-line\\nctrl-j-line\\nlast-line"));
 
@@ -510,7 +510,7 @@ fn v091_real_pty_visual_matrix_preserves_control_grammar() -> anyhow::Result<()>
 
     for (cols, rows, theme, ascii_safe) in cases {
         let ws = make_sealed_workspace()?;
-        let nestlone_home = ws.home().join(".codewhale");
+        let nestlone_home = ws.home().join(".nestlone");
         let codex_home = ws.home().join(".codex");
         std::fs::create_dir_all(&codex_home)?;
         std::fs::write(
@@ -732,7 +732,7 @@ fn v091_real_pty_visual_matrix_preserves_control_grammar() -> anyhow::Result<()>
 fn returning_missing_kimi_code_key_opens_picker() -> anyhow::Result<()> {
     let _guard = qa_pty_test_lock();
     let ws = make_sealed_workspace()?;
-    let config_path = ws.home().join(".codewhale").join("config.toml");
+    let config_path = ws.home().join(".nestlone").join("config.toml");
     let config_before = r#"provider = "moonshot"
 
 [providers.moonshot]
@@ -740,7 +740,7 @@ base_url = "https://api.kimi.com/coding/v1"
 model = "k3"
 "#;
     std::fs::write(&config_path, config_before)?;
-    std::fs::write(ws.home().join(".codewhale").join(".onboarded"), "")?;
+    std::fs::write(ws.home().join(".nestlone").join(".onboarded"), "")?;
     // This is a returning user who has already settled the independent setup
     // checkpoint. Keep that checkpoint out of the scenario so the assertion is
     // about missing-key recovery rather than a constitution-update modal.
@@ -769,7 +769,7 @@ model = "k3"
     setup_state.constitution_source = nestlone_config::ConstitutionSource::Bundled;
     setup_state.save_to(
         &ws.home()
-            .join(".codewhale")
+            .join(".nestlone")
             .join(nestlone_config::setup_state::SETUP_STATE_FILE_NAME),
     )?;
     std::fs::create_dir_all(ws.workspace().join(".deepseek"))?;
@@ -818,7 +818,7 @@ model = "k3"
 fn returning_missing_kimi_code_key_esc_preserves_route() -> anyhow::Result<()> {
     let _guard = qa_pty_test_lock();
     let ws = make_sealed_workspace()?;
-    let config_path = ws.home().join(".codewhale").join("config.toml");
+    let config_path = ws.home().join(".nestlone").join("config.toml");
     let config_before = r#"provider = "moonshot"
 
 [providers.moonshot]
@@ -826,7 +826,7 @@ base_url = "https://api.kimi.com/coding/v1"
 model = "k3"
 "#;
     std::fs::write(&config_path, config_before)?;
-    std::fs::write(ws.home().join(".codewhale").join(".onboarded"), "")?;
+    std::fs::write(ws.home().join(".nestlone").join(".onboarded"), "")?;
 
     let mut h = Harness::builder(Harness::cargo_bin("nestlone-tui"))
         .cwd(ws.workspace())
@@ -866,7 +866,7 @@ fn interactive_init_accepts_input_with_dispatcher_written_config() -> anyhow::Re
     let _guard = qa_pty_test_lock();
     let ws = make_sealed_workspace()?;
     std::fs::write(
-        ws.home().join(".codewhale").join("config.toml"),
+        ws.home().join(".nestlone").join("config.toml"),
         r#"
 provider = "zai"
 fallbackProviders = []
@@ -1150,7 +1150,7 @@ fn work_surface_real_rows_own_click_wheel_and_resize() -> anyhow::Result<()> {
 fn real_coordination_details_use_typed_persisted_receipts_in_a_unix_pty() -> anyhow::Result<()> {
     let _guard = qa_pty_test_lock();
     let ws = make_sealed_workspace()?;
-    let state_dir = ws.workspace().join(".codewhale").join("state");
+    let state_dir = ws.workspace().join(".nestlone").join("state");
     std::fs::create_dir_all(&state_dir)?;
     std::fs::write(
         state_dir.join("subagents.v1.json"),
@@ -1242,7 +1242,7 @@ fn real_coordination_details_use_typed_persisted_receipts_in_a_unix_pty() -> any
     let _ = h.shutdown();
 
     std::fs::write(
-        ws.home().join(".codewhale").join("settings.toml"),
+        ws.home().join(".nestlone").join("settings.toml"),
         "work_surface_placement = \"right\"\n",
     )?;
     let (_ws, mut h) = spawn_minimal_with_env(ws, &[])?;
@@ -1364,7 +1364,7 @@ fn approval_modal_keeps_wheel_for_review_and_denies_without_side_effect() -> any
     h.wait_for_text("❯ [3 / d / n]", KEY_TIMEOUT)?;
     h.send(keys::mouse::click(deny_row, deny_col))?;
     if let Err(err) = h.wait_for_text("DENIAL-HONORED", Duration::from_secs(10)) {
-        let logs = std::fs::read_dir(ws.home().join(".codewhale/logs"))
+        let logs = std::fs::read_dir(ws.home().join(".nestlone/logs"))
             .ok()
             .into_iter()
             .flatten()
@@ -1394,7 +1394,7 @@ fn work_and_permission_are_visible_at_release_terminal_sizes() -> anyhow::Result
 
     for (cols, rows) in [(120_u16, 32_u16), (100, 30), (80, 24), (60, 16), (40, 12)] {
         let ws = make_sealed_workspace()?;
-        let nestlone_home = ws.home().join(".codewhale");
+        let nestlone_home = ws.home().join(".nestlone");
         let codex_home = ws.home().join(".codex");
         std::fs::create_dir_all(&codex_home)?;
         std::fs::write(
@@ -1535,7 +1535,7 @@ fn work_and_permission_are_visible_at_release_terminal_sizes() -> anyhow::Result
 fn legacy_work_ctrl_t_save_export_and_restart_are_consistent() -> anyhow::Result<()> {
     let _guard = qa_pty_test_lock();
     let ws = make_sealed_workspace()?;
-    let nestlone_home = ws.home().join(".codewhale");
+    let nestlone_home = ws.home().join(".nestlone");
     let codex_home = ws.home().join(".codex");
     std::fs::create_dir_all(&codex_home)?;
     std::fs::write(
@@ -2498,7 +2498,7 @@ fn spawn_file_mutation_harness(
     cols: u16,
     ascii_safe: bool,
 ) -> anyhow::Result<Harness> {
-    let nestlone_home = ws.home().join(".codewhale");
+    let nestlone_home = ws.home().join(".nestlone");
     let codex_home = ws.home().join(".codex");
     let mut builder = Harness::builder(Harness::cargo_bin("nestlone-tui"))
         .cwd(ws.workspace())
@@ -2573,7 +2573,7 @@ fn work_surface_file_mutation_modes_are_truthful_in_real_pty_frames() -> anyhow:
     ) in cases
     {
         let ws = make_sealed_workspace()?;
-        let nestlone_home = ws.home().join(".codewhale");
+        let nestlone_home = ws.home().join(".nestlone");
         let codex_home = ws.home().join(".codex");
         std::fs::create_dir_all(&codex_home)?;
         std::fs::write(
@@ -3556,7 +3556,7 @@ fn real_tool_lifecycle_crosses_work_status_resize_and_scroll_in_a_unix_pty() -> 
         spawn_tool_lifecycle_screen_fixture(RELEASE_SIGNAL, answer_lines.join("\n"))?;
 
     let ws = make_sealed_workspace()?;
-    let nestlone_home = ws.home().join(".codewhale");
+    let nestlone_home = ws.home().join(".nestlone");
     let codex_home = ws.home().join(".codex");
     std::fs::create_dir_all(&codex_home)?;
     std::fs::write(
@@ -3848,7 +3848,7 @@ fn real_tool_lifecycle_crosses_work_status_resize_and_scroll_in_a_unix_pty() -> 
         let frame = h.frame();
         assert_real_pty_frame_geometry(frame, cols, rows);
         assert!(!frame.contains("/artifacts/"));
-        assert!(!frame.contains(".codewhale/sessions"));
+        assert!(!frame.contains(".nestlone/sessions"));
         assert!(!frame.contains(ws.home().to_string_lossy().as_ref()));
         write_real_pty_evidence(
             &format!("tool-lifecycle-evidence-detail-{cols}x{rows}"),
@@ -3896,7 +3896,7 @@ fn real_tool_lifecycle_crosses_work_status_resize_and_scroll_in_a_unix_pty() -> 
         );
     }
 
-    let artifact_dir = std::fs::read_dir(ws.home().join(".codewhale/sessions"))?
+    let artifact_dir = std::fs::read_dir(ws.home().join(".nestlone/sessions"))?
         .filter_map(Result::ok)
         .map(|entry| entry.path().join("artifacts"))
         .find(|path| path.join("art_call_bash_pty.txt").is_file())
@@ -4029,7 +4029,7 @@ fn semantic_activity_motion_crosses_reasoning_reading_and_tool_use_in_a_real_uni
             BASH_RELEASE,
         )?;
 
-        let nestlone_home = ws.home().join(".codewhale");
+        let nestlone_home = ws.home().join(".nestlone");
         let codex_home = ws.home().join(".codex");
         std::fs::create_dir_all(&codex_home)?;
         std::fs::write(

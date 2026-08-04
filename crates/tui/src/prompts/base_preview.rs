@@ -546,7 +546,7 @@ mod tests {
             &prompt,
             &PreviewSources {
                 base_prompt: Some(BasePromptSource::ConfigOverride {
-                    path: "/home/u/.codewhale/prompts/constitution.md".to_string(),
+                    path: "/home/u/.nestlone/prompts/constitution.md".to_string(),
                 }),
                 ..PreviewSources::default()
             },
@@ -584,7 +584,7 @@ mod tests {
         let known = preview(
             &prompt,
             &PreviewSources {
-                user_constitution_path: Some(Path::new("/home/u/.codewhale/constitution.json")),
+                user_constitution_path: Some(Path::new("/home/u/.nestlone/constitution.json")),
                 ..PreviewSources::default()
             },
         );
@@ -616,7 +616,7 @@ mod tests {
 
     #[test]
     fn home_paths_are_masked_in_display_only() {
-        let raw = "constitution at /Users/someone/.codewhale/constitution.json";
+        let raw = "constitution at /Users/someone/.nestlone/constitution.json";
         let prompt = blocks(&[raw]);
         let preview = preview(
             &prompt,
@@ -625,7 +625,7 @@ mod tests {
                 ..PreviewSources::default()
             },
         );
-        assert!(preview.segments[0].text.contains("~/.codewhale"));
+        assert!(preview.segments[0].text.contains("~/.nestlone"));
         assert!(!preview.segments[0].text.contains("/Users/someone"));
         assert_eq!(preview.segments[0].measures.byte_len, raw.len());
     }

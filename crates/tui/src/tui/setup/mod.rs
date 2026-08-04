@@ -533,8 +533,8 @@ impl SetupRuntimeFacts {
 fn setup_nestlone_home_dir() -> std::path::PathBuf {
     nestlone_config::nestlone_home().unwrap_or_else(|_| {
         crate::config::effective_home_dir().map_or_else(
-            || std::path::PathBuf::from(".codewhale"),
-            |home| home.join(".codewhale"),
+            || std::path::PathBuf::from(".nestlone"),
+            |home| home.join(".nestlone"),
         )
     })
 }
@@ -5514,7 +5514,7 @@ mod tests {
         let tmp = tempfile::TempDir::new().expect("tempdir");
         let workspace = tmp.path().join("workspace");
         std::fs::create_dir_all(&workspace).expect("workspace dir");
-        let nestlone_home = tmp.path().join(".codewhale");
+        let nestlone_home = tmp.path().join(".nestlone");
         let _home = crate::test_support::EnvVarGuard::set("HOME", tmp.path());
         let _userprofile = crate::test_support::EnvVarGuard::set("USERPROFILE", tmp.path());
         let _nestlone_home =
@@ -5547,7 +5547,7 @@ mod tests {
         let tmp = tempfile::TempDir::new().expect("tempdir");
         let workspace = tmp.path().join("workspace");
         std::fs::create_dir_all(&workspace).expect("workspace dir");
-        let nestlone_home = tmp.path().join(".codewhale");
+        let nestlone_home = tmp.path().join(".nestlone");
         let _home = crate::test_support::EnvVarGuard::set("HOME", tmp.path());
         let _userprofile = crate::test_support::EnvVarGuard::set("USERPROFILE", tmp.path());
         let _nestlone_home =
@@ -5607,7 +5607,7 @@ mod tests {
         let tmp = tempfile::TempDir::new().expect("tempdir");
         let workspace = tmp.path().join("workspace");
         std::fs::create_dir_all(&workspace).expect("workspace dir");
-        let nestlone_home = tmp.path().join(".codewhale");
+        let nestlone_home = tmp.path().join(".nestlone");
         let _home = crate::test_support::EnvVarGuard::set("HOME", tmp.path());
         let _userprofile = crate::test_support::EnvVarGuard::set("USERPROFILE", tmp.path());
         let _nestlone_home =
@@ -5641,7 +5641,7 @@ mod tests {
         let tmp = tempfile::TempDir::new().expect("tempdir");
         let workspace = tmp.path().join("workspace");
         std::fs::create_dir_all(&workspace).expect("workspace dir");
-        let nestlone_home = tmp.path().join(".codewhale");
+        let nestlone_home = tmp.path().join(".nestlone");
         let _home = crate::test_support::EnvVarGuard::set("HOME", tmp.path());
         let _userprofile = crate::test_support::EnvVarGuard::set("USERPROFILE", tmp.path());
         let _nestlone_home =
@@ -5783,7 +5783,7 @@ mod tests {
         let tmp = tempfile::TempDir::new().expect("tempdir");
         let workspace = tmp.path().join("workspace");
         std::fs::create_dir_all(&workspace).expect("workspace dir");
-        let nestlone_home = tmp.path().join(".codewhale");
+        let nestlone_home = tmp.path().join(".nestlone");
         let _home = crate::test_support::EnvVarGuard::set("HOME", tmp.path());
         let _userprofile = crate::test_support::EnvVarGuard::set("USERPROFILE", tmp.path());
         let _nestlone_home =
@@ -5815,7 +5815,7 @@ mod tests {
         let tmp = tempfile::TempDir::new().expect("tempdir");
         let workspace = tmp.path().join("workspace");
         std::fs::create_dir_all(&workspace).expect("workspace dir");
-        let nestlone_home = tmp.path().join(".codewhale");
+        let nestlone_home = tmp.path().join(".nestlone");
         let _home = crate::test_support::EnvVarGuard::set("HOME", tmp.path());
         let _userprofile = crate::test_support::EnvVarGuard::set("USERPROFILE", tmp.path());
         let _nestlone_home =
@@ -6885,7 +6885,7 @@ mod tests {
         let tmp = tempfile::TempDir::new().expect("tempdir");
         let workspace = tmp.path().join("workspace");
         std::fs::create_dir_all(&workspace).expect("workspace");
-        let nestlone_home = tmp.path().join(".codewhale");
+        let nestlone_home = tmp.path().join(".nestlone");
         let _home = crate::test_support::EnvVarGuard::set("HOME", tmp.path());
         let _userprofile = crate::test_support::EnvVarGuard::set("USERPROFILE", tmp.path());
         let _nestlone_home =
@@ -6962,7 +6962,7 @@ mod tests {
         let tmp = tempfile::TempDir::new().expect("tempdir");
         let workspace = tmp.path().join("workspace");
         std::fs::create_dir_all(&workspace).expect("workspace dir");
-        let nestlone_home = tmp.path().join(".codewhale");
+        let nestlone_home = tmp.path().join(".nestlone");
         let _home = crate::test_support::EnvVarGuard::set("HOME", tmp.path());
         let _userprofile = crate::test_support::EnvVarGuard::set("USERPROFILE", tmp.path());
         let _nestlone_home =
@@ -7069,7 +7069,7 @@ mod tests {
     #[test]
     fn runtime_posture_detail_lines_warn_about_project_overrides() {
         let tmp = tempfile::TempDir::new().expect("workspace");
-        let project_dir = tmp.path().join(nestlone_config::CODEWHALE_APP_DIR);
+        let project_dir = tmp.path().join(nestlone_config::NESTLONE_APP_DIR);
         std::fs::create_dir_all(&project_dir).expect("project config dir");
         std::fs::write(
             project_dir.join("config.toml"),
@@ -7234,7 +7234,7 @@ mod tests {
     #[test]
     fn tools_mcp_detail_lines_show_read_only_inventory_facts() {
         let facts = SetupRuntimeFacts {
-            tools_mcp_servers_result: "configured — 2 configured (2 configuration valid, 0 needs_config, 0 off; global present at /tmp/mcp.json; project missing at /tmp/project/.codewhale/mcp.json); live health not checked — servers not started; configuration valid: docs, search".to_string(),
+            tools_mcp_servers_result: "configured — 2 configured (2 configuration valid, 0 needs_config, 0 off; global present at /tmp/mcp.json; project missing at /tmp/project/.nestlone/mcp.json); live health not checked — servers not started; configuration valid: docs, search".to_string(),
             tools_mcp_skills_result: "healthy — 3 discovered (hotbar skill sources), 3 on disk at /tmp/skills".to_string(),
             tools_mcp_tools_result: "healthy — 1 entries, 0 script-plugin tools at /tmp/tools".to_string(),
             tools_mcp_plugins_result: "off — nothing configured yet (missing at /tmp/plugins); optional".to_string(),
@@ -7254,7 +7254,7 @@ mod tests {
         assert!(text.contains("configured"));
         assert!(text.contains("live health not checked"));
         assert!(text.contains("/tmp/mcp.json"));
-        assert!(text.contains("/tmp/project/.codewhale/mcp.json"));
+        assert!(text.contains("/tmp/project/.nestlone/mcp.json"));
         assert!(text.contains("Skills:"));
         assert!(text.contains("/tmp/skills"));
         assert!(text.contains("Tools dir:"));
@@ -7345,9 +7345,9 @@ mod tests {
             tools_mcp_tools_result: "off — missing".into(),
             tools_mcp_plugins_result: "off — missing".into(),
             tools_mcp_hotbar_result: "off — shared adapters".into(),
-            tools_mcp_path_display: "~/.codewhale/mcp.json".into(),
-            tools_mcp_skills_path_display: "~/.codewhale/skills".into(),
-            tools_mcp_plugins_path_display: "~/.codewhale/plugins".into(),
+            tools_mcp_path_display: "~/.nestlone/mcp.json".into(),
+            tools_mcp_skills_path_display: "~/.nestlone/skills".into(),
+            tools_mcp_plugins_path_display: "~/.nestlone/plugins".into(),
             ..SetupRuntimeFacts::default()
         };
         let mut view = SetupWizardView::new_at_with_facts(

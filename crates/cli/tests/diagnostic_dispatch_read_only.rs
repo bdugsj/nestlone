@@ -29,7 +29,7 @@ fn dispatcher_diagnostics_leave_legacy_secret_state_unchanged() {
         let fixture = TempDir::new().expect("fixture root");
         let sealed_home = fixture.path().join("sealed-home");
         let nestlone_home = fixture.path().join("sealed-nestlone-home");
-        let primary_home = sealed_home.join(".codewhale");
+        let primary_home = sealed_home.join(".nestlone");
         let legacy = sealed_home
             .join(".deepseek")
             .join("secrets")

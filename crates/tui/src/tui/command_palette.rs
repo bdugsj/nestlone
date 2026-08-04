@@ -1255,7 +1255,7 @@ mod tests {
         )
         .expect("write claude skill");
         let nestlone_skill_dir = workspace
-            .join(".codewhale")
+            .join(".nestlone")
             .join("skills")
             .join("nestlone-skill");
         std::fs::create_dir_all(&nestlone_skill_dir).expect("create nestlone skill dir");
@@ -1267,7 +1267,7 @@ mod tests {
 
         let entries = build_entries(
             Locale::En,
-            workspace.join(".codewhale").join("skills").as_path(),
+            workspace.join(".nestlone").join("skills").as_path(),
             true,
             workspace.as_path(),
             Path::new("mcp.json"),
@@ -1305,7 +1305,7 @@ mod tests {
         let config = crate::plugins::discovery::DiscoveryConfig {
             workspace: workspace.clone(),
             user_plugins_dir: tmp.path().join("plugins"),
-            workspace_plugins_dir: workspace.join(".codewhale/plugins"),
+            workspace_plugins_dir: workspace.join(".nestlone/plugins"),
             builtin_plugin_dirs: Vec::new(),
             state_path: tmp.path().join("plugin-state/state.json"),
         };
@@ -1373,7 +1373,7 @@ mod tests {
     fn command_palette_includes_workspace_user_commands() {
         let tmp = TempDir::new().expect("tempdir");
         let workspace = tmp.path().join("workspace");
-        let commands_dir = workspace.join(".codewhale").join("commands");
+        let commands_dir = workspace.join(".nestlone").join("commands");
         std::fs::create_dir_all(&commands_dir).expect("create commands dir");
         std::fs::write(
             commands_dir.join("review.md"),
@@ -1406,7 +1406,7 @@ mod tests {
     fn command_palette_uses_frontmatter_name_usage_and_arguments() {
         let tmp = TempDir::new().expect("tempdir");
         let workspace = tmp.path().join("workspace");
-        let commands_dir = workspace.join(".codewhale").join("commands");
+        let commands_dir = workspace.join(".nestlone").join("commands");
         std::fs::create_dir_all(&commands_dir).expect("create commands dir");
         std::fs::write(
             commands_dir.join("workflow-file.md"),
@@ -1441,7 +1441,7 @@ mod tests {
     fn command_palette_excludes_hidden_user_commands() {
         let tmp = TempDir::new().expect("tempdir");
         let workspace = tmp.path().join("workspace");
-        let commands_dir = workspace.join(".codewhale").join("commands");
+        let commands_dir = workspace.join(".nestlone").join("commands");
         std::fs::create_dir_all(&commands_dir).expect("create commands dir");
         std::fs::write(
             commands_dir.join("secret.md"),
@@ -1469,7 +1469,7 @@ mod tests {
     fn hidden_frontmatter_name_override_suppresses_shadowed_builtin() {
         let tmp = TempDir::new().expect("tempdir");
         let workspace = tmp.path().join("workspace");
-        let commands_dir = workspace.join(".codewhale").join("commands");
+        let commands_dir = workspace.join(".nestlone").join("commands");
         std::fs::create_dir_all(&commands_dir).expect("create commands dir");
         std::fs::write(
             commands_dir.join("private-help.md"),
@@ -1496,7 +1496,7 @@ mod tests {
     fn command_palette_filters_shadowed_builtin_aliases_from_description() {
         let tmp = TempDir::new().expect("tempdir");
         let workspace = tmp.path().join("workspace");
-        let commands_dir = workspace.join(".codewhale").join("commands");
+        let commands_dir = workspace.join(".nestlone").join("commands");
         std::fs::create_dir_all(&commands_dir).expect("create commands dir");
         std::fs::write(
             commands_dir.join("image-review.md"),

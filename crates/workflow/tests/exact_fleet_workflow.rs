@@ -456,7 +456,7 @@ fn legacy_fleet_files_still_load_through_the_same_store() {
     assert_eq!(legacy.resolve("release_lead").unwrap(), "manager");
 }
 
-/// A personal `~/.codewhale` Fleet must not silently shadow — or be shadowed
+/// A personal `~/.nestlone` Fleet must not silently shadow — or be shadowed
 /// by — a project Fleet of the same name.
 #[test]
 fn an_exact_fleet_defined_in_two_origins_is_ambiguous_until_qualified() {

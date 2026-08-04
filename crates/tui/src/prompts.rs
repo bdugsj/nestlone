@@ -87,7 +87,7 @@ impl Default for PromptSessionContext<'_> {
 /// A previous session writes it on exit / `/compact`; the next session reads
 /// it back on startup and prepends it to the system prompt so a fresh agent
 /// doesn't have to re-discover open blockers from scratch.
-pub const HANDOFF_RELATIVE_PATH: &str = ".codewhale/handoff.md";
+pub const HANDOFF_RELATIVE_PATH: &str = ".nestlone/handoff.md";
 /// Legacy handoff path for reading from existing installs.
 const LEGACY_HANDOFF_RELATIVE_PATH: &str = ".deepseek/handoff.md";
 
@@ -1418,7 +1418,7 @@ pub fn system_prompt_for_mode_with_context_skills_session_and_approval(
     full_prompt.push_str(CORE_EXECUTION_PROFILE_PROMPT.trim());
 
     // 5. Compaction relay template — so the model knows the format to use
-    //    when writing `.codewhale/handoff.md` on exit / `/compact`.
+    //    when writing `.nestlone/handoff.md` on exit / `/compact`.
     full_prompt.push_str("\n\n");
     full_prompt.push_str(COMPACT_TEMPLATE);
 
@@ -1612,7 +1612,7 @@ mod tests {
 
     /// Discriminator unique to the injected relay block (not present in the
     /// agent prompt's own discussion of the convention).
-    const HANDOFF_BLOCK_MARKER: &str = "left a relay artifact at `.codewhale/handoff.md`";
+    const HANDOFF_BLOCK_MARKER: &str = "left a relay artifact at `.nestlone/handoff.md`";
 
     // Config-directory prompt override resolution (#3638). These exercise the
     // pure file resolver only; the global install path is intentionally not

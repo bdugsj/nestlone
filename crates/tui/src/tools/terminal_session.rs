@@ -173,7 +173,7 @@ fn durable_path(name: &str, workspace: &Path) -> Result<PathBuf, String> {
         .map(|byte| format!("{byte:02x}"))
         .collect::<String>();
     #[cfg(test)]
-    let state_dir = workspace.join(".codewhale-test-terminal-sessions");
+    let state_dir = workspace.join(".nestlone-test-terminal-sessions");
     #[cfg(not(test))]
     let state_dir = nestlone_config::ensure_state_dir("terminal-sessions")
         .map_err(|error| format!("failed to resolve terminal session state directory: {error}"))?;

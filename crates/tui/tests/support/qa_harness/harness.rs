@@ -111,7 +111,7 @@ impl HarnessBuilder {
         }
         if let Some(home) = self.seal_home.as_deref() {
             std::fs::create_dir_all(home).context("create sealed HOME")?;
-            let nestlone_config = home.join(".codewhale").join("config.toml");
+            let nestlone_config = home.join(".nestlone").join("config.toml");
             let deepseek_config = home.join(".deepseek").join("config.toml");
             builder = builder
                 .env("HOME", home.to_string_lossy())
@@ -297,11 +297,11 @@ pub fn make_sealed_workspace() -> Result<SealedWorkspace> {
     let workspace = tmp.path().join("workspace");
     let home = tmp.path().join("home");
     std::fs::create_dir_all(&workspace).context("mkdir workspace")?;
-    std::fs::create_dir_all(home.join(".codewhale")).context("mkdir home/.codewhale")?;
+    std::fs::create_dir_all(home.join(".nestlone")).context("mkdir home/.nestlone")?;
     std::fs::create_dir_all(home.join(".deepseek")).context("mkdir home/.deepseek")?;
     let silent_notifications = "[notifications]\nmethod = \"off\"\ncompletion_sound = \"off\"\n";
     std::fs::write(
-        home.join(".codewhale").join("config.toml"),
+        home.join(".nestlone").join("config.toml"),
         silent_notifications,
     )
     .context("write silent CodeWhale PTY config")?;

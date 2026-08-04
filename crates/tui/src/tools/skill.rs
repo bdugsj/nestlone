@@ -138,10 +138,10 @@ impl ToolSpec for LoadSkillTool {
                     .collect();
                 if dirs.is_empty() {
                     if context.skills_scan_nestlone_only {
-                        "no skills directories found; install skills under `<workspace>/.codewhale/skills/<name>/SKILL.md` or `~/.codewhale/skills/<name>/SKILL.md`"
+                        "no skills directories found; install skills under `<workspace>/.nestlone/skills/<name>/SKILL.md` or `~/.nestlone/skills/<name>/SKILL.md`"
                             .to_string()
                     } else {
-                        "no skills directories found; install skills under `<workspace>/.agents/skills/<name>/SKILL.md`, `~/.codewhale/skills/<name>/SKILL.md`, or `~/.deepseek/skills/<name>/SKILL.md`"
+                        "no skills directories found; install skills under `<workspace>/.agents/skills/<name>/SKILL.md`, `~/.nestlone/skills/<name>/SKILL.md`, or `~/.deepseek/skills/<name>/SKILL.md`"
                             .to_string()
                     }
                 } else {
@@ -398,7 +398,7 @@ mod tests {
         let tmp = tempdir().unwrap();
         let home = tmp.path().join("home");
         let _home = crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", &home);
-        let bundle = tmp.path().join(".codewhale/plugins/demo");
+        let bundle = tmp.path().join(".nestlone/plugins/demo");
         let skill_dir = bundle.join("skills/hello");
         fs::create_dir_all(&skill_dir).unwrap();
         fs::write(
@@ -487,7 +487,7 @@ mod tests {
         let _cw_home =
             crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", tmp.path().join("cw-home"));
         let workspace = tmp.path().to_path_buf();
-        let skills_dir = workspace.join(".codewhale").join("skills");
+        let skills_dir = workspace.join(".nestlone").join("skills");
         write_skill(&skills_dir, "alpha-skill", "First demo skill", "Body A.");
         write_skill(&skills_dir, "beta-skill", "", "Body B.");
 
@@ -600,7 +600,7 @@ mod tests {
             "Claude skill",
             "Body content marker.",
         );
-        let nestlone_dir = workspace.join(".codewhale").join("skills");
+        let nestlone_dir = workspace.join(".nestlone").join("skills");
         write_skill(
             &nestlone_dir,
             "nestlone-only",
@@ -633,7 +633,7 @@ mod tests {
         let tmp = tempdir().unwrap();
         let workspace = tmp.path().join("workspace");
         let home = tmp.path().join("home");
-        let global_skills = home.join(".codewhale/skills");
+        let global_skills = home.join(".nestlone/skills");
         fs::create_dir_all(&workspace).unwrap();
         write_skill(
             &global_skills,
@@ -645,7 +645,7 @@ mod tests {
         // Keep this test independent of the process-native home directory:
         // `crate::config::effective_home_dir()` cannot be redirected reliably after process start
         // on Windows. The injected-home discovery test in `skills::tests`
-        // separately proves that ~/.codewhale/skills enters the default catalog.
+        // separately proves that ~/.nestlone/skills enters the default catalog.
         let context = ToolContext::new(&workspace).with_skills_config(global_skills.clone(), false);
         assert!(!context.trust_mode);
         assert!(

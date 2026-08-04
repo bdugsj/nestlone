@@ -346,7 +346,7 @@ async fn underwater_theme_picker_emits_each_live_palette_to_the_terminal() -> Re
     std::thread::sleep(Duration::from_millis(300));
     tui.pump();
     if let Some(status) = tui.wait_for_exit(Duration::from_millis(1)) {
-        let logs = std::fs::read_dir(ws.home().join(".codewhale/logs"))
+        let logs = std::fs::read_dir(ws.home().join(".nestlone/logs"))
             .ok()
             .into_iter()
             .flatten()
@@ -419,7 +419,7 @@ async fn underwater_theme_picker_emits_each_live_palette_to_the_terminal() -> Re
             std::thread::sleep(Duration::from_millis(250));
             tui.pump();
             if let Some(status) = tui.wait_for_exit(Duration::from_millis(1)) {
-                let logs = std::fs::read_dir(ws.home().join(".codewhale/logs"))
+                let logs = std::fs::read_dir(ws.home().join(".nestlone/logs"))
                     .ok()
                     .into_iter()
                     .flatten()
@@ -625,7 +625,7 @@ async fn release_six_worker_fanout_keeps_typing_render_and_esc_cancel_live() -> 
 
     let ws = make_sealed_workspace()?;
     std::fs::write(
-        ws.home().join(".codewhale").join("config.toml"),
+        ws.home().join(".nestlone").join("config.toml"),
         "[subagents]\nmax_concurrent = 6\nlaunch_concurrency = 6\nmax_admitted = 6\n",
     )?;
     let mut tui = common_tui_builder(&ws)
@@ -723,7 +723,7 @@ async fn release_four_read_only_fleet_roles_launch_with_canonical_prompts() -> R
 
     let ws = make_sealed_workspace()?;
     std::fs::write(
-        ws.home().join(".codewhale").join("config.toml"),
+        ws.home().join(".nestlone").join("config.toml"),
         "[subagents]\nmax_concurrent = 4\nlaunch_concurrency = 4\nmax_admitted = 4\n",
     )?;
     let mut tui = common_tui_builder(&ws)
@@ -1167,7 +1167,7 @@ async fn release_bench_thirty_two_worker_fanout_stays_live() -> Result<()> {
 
     let ws = make_sealed_workspace()?;
     std::fs::write(
-        ws.home().join(".codewhale").join("config.toml"),
+        ws.home().join(".nestlone").join("config.toml"),
         format!(
             "[subagents]\nmax_concurrent = {WORKERS}\nlaunch_concurrency = {WORKERS}\nmax_admitted = {WORKERS}\n"
         ),

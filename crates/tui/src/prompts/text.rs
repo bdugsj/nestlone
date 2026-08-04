@@ -372,7 +372,7 @@ The write-block is a runtime setting the user may change at any time — not a p
 
 // ── Runtime templates ──────────────────────────────────────────────
 /// Compaction relay template — written into the system prompt so the
-/// model knows the format to use when writing `.codewhale/handoff.md`.
+/// model knows the format to use when writing `.nestlone/handoff.md`.
 pub const COMPACT_TEMPLATE: &str = r#"## Compaction Relay
 
 The conversation above this point has been compacted. Below is a structured summary of what was discussed and decided. Read this first — it replaces re-reading the compressed transcript.

@@ -1,7 +1,7 @@
 //! Clipboard handling for paste support in TUI
 //!
 //! Supports text and image paste operations. Images on the clipboard are
-//! encoded as PNG and persisted under `~/.codewhale/clipboard-images/` so the
+//! encoded as PNG and persisted under `~/.nestlone/clipboard-images/` so the
 //! model can reach them via the existing `@`-mention / file tools (DeepSeek
 //! V4 does not currently accept inline image input on its Chat Completions
 //! endpoint, so we materialize the bytes to disk instead of base64-embedding
@@ -370,7 +370,7 @@ impl ClipboardHandler {
 
     /// Read the clipboard and return the parsed content.
     ///
-    /// `workspace` is used as a fallback location when `~/.codewhale/` cannot
+    /// `workspace` is used as a fallback location when `~/.nestlone/` cannot
     /// be resolved (e.g. running with a stripped HOME in CI sandboxes).
     pub fn read(&mut self, workspace: &Path) -> Option<ClipboardContent> {
         // With no display exported over SSH there is no synchronously readable
@@ -676,7 +676,7 @@ fn osc52_sequence(text: &str) -> Result<String> {
 }
 
 /// Resolve the directory pasted images should land in. Prefers
-/// `~/.codewhale/clipboard-images/` so the path is stable across worktrees and
+/// `~/.nestlone/clipboard-images/` so the path is stable across worktrees and
 /// matches the location described in user-facing docs; falls back to
 /// `<workspace>/clipboard-images/` if the home dir is unavailable.
 pub(crate) fn clipboard_images_dir(workspace: &Path) -> PathBuf {
@@ -686,7 +686,7 @@ pub(crate) fn clipboard_images_dir(workspace: &Path) -> PathBuf {
 
 fn clipboard_images_dir_for_home(workspace: &Path, home: Option<&Path>) -> PathBuf {
     if let Some(home) = home {
-        return home.join(".codewhale").join("clipboard-images");
+        return home.join(".nestlone").join("clipboard-images");
     }
     workspace.join("clipboard-images")
 }
@@ -895,7 +895,7 @@ mod tests {
 
         assert_eq!(
             clipboard_images_dir_for_home(workspace.path(), Some(home.path())),
-            home.path().join(".codewhale").join("clipboard-images")
+            home.path().join(".nestlone").join("clipboard-images")
         );
     }
 

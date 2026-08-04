@@ -3,7 +3,7 @@
 //!
 //! The full picker / persisted enable-disable surface in #460 is
 //! still M-sized. This MVP gives the user a no-typing view of what's
-//! actually configured in `~/.codewhale/config.toml`'s `[hooks]`
+//! actually configured in `~/.nestlone/config.toml`'s `[hooks]`
 //! table — the most-asked question once hooks start firing.
 
 use crate::commands::traits::{CommandInfo, RegisterCommand};
@@ -119,7 +119,7 @@ fn list(app: &App) -> CommandResult {
     let config = app.hooks.config();
     if config.hooks.is_empty() && config.problems.is_empty() {
         return CommandResult::message(
-            "No hooks configured. Add a `[[hooks.hooks]]` entry to `~/.codewhale/config.toml` to define one.",
+            "No hooks configured. Add a `[[hooks.hooks]]` entry to `~/.nestlone/config.toml` to define one.",
         );
     }
     if config.hooks.is_empty() {

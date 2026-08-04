@@ -288,7 +288,7 @@ RestartSec=5\n\
 NoNewPrivileges=true\n\
 PrivateTmp=true\n\
 ProtectSystem=full\n\
-ReadWritePaths=/home/nestlone/.codewhale /home/nestlone/.deepseek {workspace}\n\n\
+ReadWritePaths=/home/nestlone/.nestlone /home/nestlone/.deepseek {workspace}\n\n\
 [Install]\n\
 WantedBy=multi-user.target\n",
         workspace = i.workspace,

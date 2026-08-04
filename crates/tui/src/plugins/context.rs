@@ -177,7 +177,7 @@ mod tests {
         let temp = tempfile::tempdir().unwrap();
         let workspace = temp.path().join("workspace");
         let next_workspace = temp.path().join("next-workspace");
-        let bundle = next_workspace.join(".codewhale/plugins/ambient");
+        let bundle = next_workspace.join(".nestlone/plugins/ambient");
         fs::create_dir_all(&bundle).unwrap();
         fs::write(
             bundle.join("plugin.toml"),

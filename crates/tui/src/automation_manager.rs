@@ -2,7 +2,7 @@
 //!
 //! Automations are local-first recurring jobs that enqueue standard background
 //! tasks. This module stores automation definitions and run history under
-//! `~/.codewhale/automations` (or `DEEPSEEK_AUTOMATIONS_DIR` override).
+//! `~/.nestlone/automations` (or `DEEPSEEK_AUTOMATIONS_DIR` override).
 
 use std::collections::BTreeMap;
 use std::fs;
@@ -1162,24 +1162,28 @@ pub fn default_automations_dir() -> PathBuf {
             }
         }
     }
-    // $CODEWHALE_HOME is a hard override of the base data directory
-    // (docs/CONFIGURATION.md): when SET, automations live under it and we do
-    // NOT fall back to the legacy ~/.deepseek path — silent fallback would
-    // defeat the isolation the override promises. Check the env var directly
-    // (not nestlone_home()'s Ok/Err, which succeeds for the default home too).
-    if let Some(home) = std::env::var_os("CODEWHALE_HOME").filter(|value| !value.is_empty()) {
+    // $NESTLONE_HOME (legacy alias: $CODEWHALE_HOME) is a hard override of the
+    // base data directory (docs/CONFIGURATION.md): when SET, automations live
+    // under it and we do NOT fall back to the legacy ~/.deepseek path — silent
+    // fallback would defeat the isolation the override promises. Check the env
+    // var directly (not nestlone_home()'s Ok/Err, which succeeds for the
+    // default home too).
+    if let Some(home) = std::env::var_os("NESTLONE_HOME")
+        .or_else(|| std::env::var_os("CODEWHALE_HOME"))
+        .filter(|value| !value.is_empty())
+    {
         return PathBuf::from(home).join("automations");
     }
     crate::config::effective_home_dir()
         .map(|home| {
-            let primary = home.join(".codewhale").join("automations");
+            let primary = home.join(".nestlone").join("automations");
             let legacy = home.join(".deepseek").join("automations");
             if primary.exists() || !legacy.exists() {
                 return primary;
             }
             legacy
         })
-        .unwrap_or_else(|| PathBuf::from(".codewhale").join("automations"))
+        .unwrap_or_else(|| PathBuf::from(".nestlone").join("automations"))
 }
 
 pub type SharedAutomationManager = Arc<Mutex<AutomationManager>>;
@@ -2045,7 +2049,7 @@ mod tests {
             std::env::remove_var("DEEPSEEK_AUTOMATIONS_DIR");
             std::env::set_var("CODEWHALE_HOME", tmp.path());
         }
-        // $CODEWHALE_HOME IS the home dir (no ".codewhale" appended); the
+        // $CODEWHALE_HOME IS the home dir (no ".nestlone" appended); the
         // legacy ~/.deepseek fallback is bypassed entirely.
         assert_eq!(default_automations_dir(), tmp.path().join("automations"));
         // SAFETY: cleanup under the same lock.

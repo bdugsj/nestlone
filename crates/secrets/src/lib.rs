@@ -28,7 +28,7 @@ pub const DEFAULT_SERVICE: &str = "deepseek";
 pub const SECRET_BACKEND_ENV: &str = "CODEWHALE_SECRET_BACKEND";
 /// Legacy alias for [`SECRET_BACKEND_ENV`].
 pub const LEGACY_SECRET_BACKEND_ENV: &str = "DEEPSEEK_SECRET_BACKEND";
-const FILE_BACKEND_LABEL: &str = "file-based (~/.codewhale/secrets/)";
+const FILE_BACKEND_LABEL: &str = "file-based (~/.nestlone/secrets/)";
 
 /// Errors that may arise from a [`KeyringStore`] backend.
 #[derive(Debug, Error)]
@@ -58,7 +58,7 @@ pub enum SecretsError {
 /// Abstract secret store trait.
 ///
 /// Concrete implementations may use the OS keyring ([`DefaultKeyringStore`]),
-/// a JSON file under `~/.codewhale/secrets/` ([`FileKeyringStore`]), or an
+/// a JSON file under `~/.nestlone/secrets/` ([`FileKeyringStore`]), or an
 /// in-memory map for tests ([`InMemoryKeyringStore`]).
 ///
 /// All implementations must be [`Send`] + [`Sync`] so they can be shared
@@ -85,7 +85,7 @@ pub trait KeyringStore: Send + Sync {
     /// Short, human-readable label for this backend.
     ///
     /// Used by diagnostic output (e.g. `doctor` command) to indicate which
-    /// storage backend is active. Examples: `"file-based (~/.codewhale/secrets/)"`,
+    /// storage backend is active. Examples: `"file-based (~/.nestlone/secrets/)"`,
     /// `"system keyring"`, `"in-memory (test)"`.
     fn backend_name(&self) -> &'static str;
 }
@@ -346,7 +346,7 @@ impl KeyringStore for InMemoryKeyringStore {
 /// JSON-on-disk secret store for headless environments.
 ///
 /// This is the default backend. Secrets are serialised as a JSON object
-/// at `<home>/.codewhale/secrets/secrets.json` with Unix file mode `0600`
+/// at `<home>/.nestlone/secrets/secrets.json` with Unix file mode `0600`
 /// (owner read/write only). The parent directory is created with mode `0700`
 /// if it does not exist.
 ///
@@ -390,7 +390,7 @@ impl FileKeyringStore {
         Self { path: path.into() }
     }
 
-    /// Default path: `<home>/.codewhale/secrets/secrets.json`. Honours
+    /// Default path: `<home>/.nestlone/secrets/secrets.json`. Honours
     /// `CODEWHALE_HOME`, then `HOME`, `USERPROFILE`, and finally the platform
     /// home directory from the `dirs` crate. On first use, non-conflicting
     /// entries from the legacy `<home>/.deepseek/secrets/secrets.json` file are
@@ -671,14 +671,16 @@ impl KeyringStore for FileKeyringStore {
 }
 
 fn default_nestlone_secrets_path() -> Result<PathBuf, SecretsError> {
-    if let Ok(value) = std::env::var("CODEWHALE_HOME") {
-        let trimmed = value.trim();
-        if !trimmed.is_empty() {
-            return Ok(PathBuf::from(trimmed).join("secrets").join("secrets.json"));
+    for var in ["NESTLONE_HOME", "CODEWHALE_HOME"] {
+        if let Ok(value) = std::env::var(var) {
+            let trimmed = value.trim();
+            if !trimmed.is_empty() {
+                return Ok(PathBuf::from(trimmed).join("secrets").join("secrets.json"));
+            }
         }
     }
     Ok(FileKeyringStore::home_dir()?
-        .join(".codewhale")
+        .join(".nestlone")
         .join("secrets")
         .join("secrets.json"))
 }
@@ -693,7 +695,9 @@ fn legacy_deepseek_secrets_path() -> Result<PathBuf, SecretsError> {
 /// Match the state/config isolation boundary: an explicit Codewhale home must
 /// not fall back to ambient legacy data under `$HOME/.deepseek`.
 fn nestlone_home_is_explicit() -> bool {
-    std::env::var("CODEWHALE_HOME").is_ok_and(|value| !value.trim().is_empty())
+    ["NESTLONE_HOME", "CODEWHALE_HOME"]
+        .into_iter()
+        .any(|var| std::env::var(var).is_ok_and(|value| !value.trim().is_empty()))
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -901,7 +905,7 @@ impl Secrets {
     #[must_use]
     pub fn file_backed_read_only() -> Self {
         let store = ReadOnlyFileKeyringStore::default_for_diagnostics().unwrap_or_else(|_| {
-            ReadOnlyFileKeyringStore::new(PathBuf::from(".codewhale-secrets.json"), None)
+            ReadOnlyFileKeyringStore::new(PathBuf::from(".nestlone-secrets.json"), None)
         });
         Self::new(Arc::new(store))
     }
@@ -1258,7 +1262,7 @@ mod tests {
             .join("secrets.json");
         let primary = tmp
             .path()
-            .join(".codewhale")
+            .join(".nestlone")
             .join("secrets")
             .join("secrets.json");
         FileKeyringStore::new(&legacy)
@@ -1383,7 +1387,7 @@ mod tests {
         assert_eq!(
             path,
             tmp.path()
-                .join(".codewhale")
+                .join(".nestlone")
                 .join("secrets")
                 .join("secrets.json")
         );
@@ -1426,7 +1430,7 @@ mod tests {
         assert_eq!(
             primary,
             tmp.path()
-                .join(".codewhale")
+                .join(".nestlone")
                 .join("secrets")
                 .join("secrets.json")
         );
@@ -1454,7 +1458,7 @@ mod tests {
             .join("secrets.json");
         let primary = tmp
             .path()
-            .join(".codewhale")
+            .join(".nestlone")
             .join("secrets")
             .join("secrets.json");
         FileKeyringStore::new(legacy)
@@ -2016,7 +2020,7 @@ mod tests {
         assert_eq!(
             path,
             tmp.path()
-                .join(".codewhale")
+                .join(".nestlone")
                 .join("secrets")
                 .join("secrets.json")
         );
@@ -2062,7 +2066,7 @@ mod tests {
         // FR003-C002: a relative fallback would resolve against the workspace
         // and risk committing credentials. It must be write-refusing instead.
         let secrets =
-            Secrets::file_backed_from_default_path(Ok(PathBuf::from(".codewhale-secrets.json")));
+            Secrets::file_backed_from_default_path(Ok(PathBuf::from(".nestlone-secrets.json")));
         assert!(matches!(
             secrets.set("deepseek", "must-not-land-relative"),
             Err(SecretsError::ReadOnly)

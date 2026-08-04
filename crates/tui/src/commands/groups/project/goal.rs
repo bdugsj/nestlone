@@ -266,7 +266,7 @@ fn parse_hunt_budget(text: &str) -> (String, Option<u32>) {
     }
 }
 
-/// Write a legacy trophy card to `~/.codewhale/trophies/<date>-<time>-<slug>.md`
+/// Write a legacy trophy card to `~/.nestlone/trophies/<date>-<time>-<slug>.md`
 /// for the current goal result (#2092).
 fn write_trophy_card(app: &App, verdict: HuntVerdict) -> Result<std::path::PathBuf, String> {
     let quarry = app

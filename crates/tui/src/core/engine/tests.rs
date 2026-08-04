@@ -7149,7 +7149,7 @@ async fn full_access_blocks_non_bypassable_registered_tools_at_engine_boundary()
 async fn full_access_blocks_repo_law_ask_without_prompt_or_write() {
     let _lock = lock_test_env();
     let workspace = tempdir().expect("tempdir");
-    let law_dir = workspace.path().join(".codewhale");
+    let law_dir = workspace.path().join(".nestlone");
     fs::create_dir_all(&law_dir).expect("create law directory");
     fs::write(
         law_dir.join("constitution.json"),
@@ -10467,7 +10467,7 @@ fn task_gate_run_results_are_structured_before_context_insertion() {
                 "classification": "compile_failure",
                 "duration_ms": 5000,
                 "summary": "warning promoted to error in verifier.rs",
-                "log_path": "/repo/.codewhale/runtime/gate.log",
+                "log_path": "/repo/.nestlone/runtime/gate.log",
                 "recorded_at": "2026-06-01T12:00:00Z"
             },
             "stdout_summary": "",
@@ -10482,7 +10482,7 @@ fn task_gate_run_results_are_structured_before_context_insertion() {
     assert!(context.contains("gate: clippy, status: failed, exit_code: 1"));
     assert!(context.contains("cargo clippy -p nestlone-tui"));
     assert!(context.contains("summary: warning promoted to error"));
-    assert!(context.contains("log_path: /repo/.codewhale/runtime/gate.log"));
+    assert!(context.contains("log_path: /repo/.nestlone/runtime/gate.log"));
 }
 
 #[test]

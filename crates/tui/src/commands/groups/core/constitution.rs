@@ -820,7 +820,7 @@ fn help_text(locale: Locale) -> String {
 - /constitution edit：打开 /setup 的引导式协作准则步骤；用 1-6 调整，按 G 预览，再按 G 保存。
 - /constitution repair：说明当前文件状态，然后打开同一个引导式修复步骤。
 - /constitution bundled：记录使用内置/默认准则，不创建自定义文件。
-- /constitution repo：查看 .codewhale/constitution.json 仓库本地准则。
+- /constitution repo：查看 .nestlone/constitution.json 仓库本地准则。
 - /constitution explain：解释内置基础准则、用户全局协作准则、仓库协作准则、AGENTS.md、记忆和交接的区别。
 - /constitution base：显示下一轮实际组装的确切基础提示词，附来源、摘要和字节/词元度量；只读，不发送请求，也不展开工具目录。
 - /constitution suggestions：查看待批准的建议条款；它们不会注入模型，也不影响提示词缓存。
@@ -837,7 +837,7 @@ Common commands:
 - /constitution edit: open the guided /setup Constitution step; tune 1-6, press G to preview, then G again to save.
 - /constitution repair: explain the current file state, then open the same guided repair step.
 - /constitution bundled: record bundled/default law without creating a custom file.
-- /constitution repo: inspect repo-local .codewhale/constitution.json law.
+- /constitution repo: inspect repo-local .nestlone/constitution.json law.
 - /constitution explain: compare Constitution, user-global law, repo law, AGENTS.md, memory, and handoff.
 - /constitution base: show the exact effective base prompt assembled for the next turn, with per-block provenance, digests, and byte/token measures. Read-only: no provider request, no tool-catalog expansion.
 - /constitution suggestions: review suggested clauses awaiting ratification; they are not injected and do not move the prompt-cache digest.
@@ -936,8 +936,8 @@ fn explanation_title(locale: Locale) -> &'static str {
 
 fn no_repo_law_text(locale: Locale) -> &'static str {
     match locale {
-        Locale::ZhHans => "此工作区未找到仓库本地协作准则 .codewhale/constitution.json。",
-        _ => "No repo-local constitution found at .codewhale/constitution.json for this workspace.",
+        Locale::ZhHans => "此工作区未找到仓库本地协作准则 .nestlone/constitution.json。",
+        _ => "No repo-local constitution found at .nestlone/constitution.json for this workspace.",
     }
 }
 
@@ -1026,11 +1026,11 @@ AGENTS.md 与协作准则
 
 用户全局协作准则是个人长期偏好。它是结构化数据，确定性渲染，并低于当前用户请求和内置基础准则。
 
-.codewhale/constitution.json 是仓库本地协作准则。它属于某个工作区，并作为独立的仓库协作准则块渲染。
+.nestlone/constitution.json 是仓库本地协作准则。它属于某个工作区，并作为独立的仓库协作准则块渲染。
 
 AGENTS.md 和项目说明是项目规则/实现指导。它们可以描述构建命令、仓库规范和本地流程；按优先级顺序，它们低于当前用户请求和内置基础准则，高于用户全局长期偏好、记忆和交接。
 
-WHALE.md 已忽略。将普通项目说明迁移到 AGENTS.md，将 Codewhale 专属权限策略迁移到 .codewhale/constitution.json。
+WHALE.md 已忽略。将普通项目说明迁移到 AGENTS.md，将 Codewhale 专属权限策略迁移到 .nestlone/constitution.json。
 
 运行时姿态是独立设置。协作准则可以建议主动性，但不会改变批准策略、沙盒、Shell、网络、信任、MCP 权限或默认模式。使用 /constitution posture 查看这些控制。"
         }
@@ -1042,11 +1042,11 @@ The bundled Constitution is the compact global judgment contract: identity, grou
 
 The user-global constitution is personal standing preference law. It is structured, rendered deterministically, and subordinate to the current user request and the bundled Constitution.
 
-.codewhale/constitution.json is repo-local law. It belongs to a workspace and is rendered as a separate repo constitution block.
+.nestlone/constitution.json is repo-local law. It belongs to a workspace and is rendered as a separate repo constitution block.
 
 AGENTS.md and project instructions are project law / implementation guidance. They can describe build commands, repository norms, and local workflows. Under “Whose word wins,” they sit below the current user request and bundled Constitution, and above user-global standing preferences, memory, and handoff.
 
-WHALE.md is ignored. Move ordinary project instructions to AGENTS.md and security authority policy to .codewhale/constitution.json.
+WHALE.md is ignored. Move ordinary project instructions to AGENTS.md and security authority policy to .nestlone/constitution.json.
 
 Runtime posture is separate. A constitution can recommend autonomy, but it does not change approval policy, sandbox, shell, network, trust, MCP permissions, or default mode. Use /constitution posture to review those controls."
         }
@@ -1114,7 +1114,7 @@ impl ConstitutionManagerCopy {
                 checkpoint_label: "准则检查点代次",
                 preview_header: "预览",
                 preview_action: "/constitution preview 会在存在时打开精确渲染的用户全局块。",
-                repo_action: "/constitution repo 会在存在时显示 .codewhale/constitution.json 本地准则。",
+                repo_action: "/constitution repo 会在存在时显示 .nestlone/constitution.json 本地准则。",
                 maintenance_header: "维护",
                 maintenance_actions: &[
                     "编辑引导式协作准则：/constitution edit",
@@ -1162,7 +1162,7 @@ impl ConstitutionManagerCopy {
                 checkpoint_label: "Constitution checkpoint generation",
                 preview_header: "Preview",
                 preview_action: "/constitution preview opens the exact rendered user-global block when present.",
-                repo_action: "/constitution repo shows .codewhale/constitution.json local law when present.",
+                repo_action: "/constitution repo shows .nestlone/constitution.json local law when present.",
                 maintenance_header: "Maintenance",
                 maintenance_actions: &[
                     "Edit guided constitution: /constitution edit",
@@ -1576,7 +1576,7 @@ mod tests {
         assert!(result.message.is_none());
         let body = pop_pager_body(&mut app);
         assert!(body.contains("AGENTS.md 与协作准则"));
-        assert!(body.contains(".codewhale/constitution.json"));
+        assert!(body.contains(".nestlone/constitution.json"));
         assert!(body.contains("运行时姿态是独立设置"));
         assert!(!body.contains("宪法"));
         assert!(!body.contains("项目法律"));

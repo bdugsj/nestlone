@@ -203,7 +203,7 @@ impl SkillRootCatalog {
         // CodeWhale project root — always listed for ownership; runtime
         // CodeWhale-only mode additionally requires the path stay inside the
         // workspace (symlink escape check happens in path selection helpers).
-        let project_owned = workspace.join(".codewhale").join("skills");
+        let project_owned = workspace.join(".nestlone").join("skills");
         push_descriptor(
             &mut roots,
             &mut precedence,
@@ -254,7 +254,7 @@ impl SkillRootCatalog {
                 "global-claude",
             );
 
-            let global_owned = home.join(".codewhale").join("skills");
+            let global_owned = home.join(".nestlone").join("skills");
             push_descriptor(
                 &mut roots,
                 &mut precedence,
@@ -294,7 +294,7 @@ impl SkillRootCatalog {
             );
 
             // Registry cache is never an active skill root.
-            let cache = home.join(".codewhale").join("cache").join("skills");
+            let cache = home.join(".nestlone").join("cache").join("skills");
             push_descriptor(
                 &mut roots,
                 &mut precedence,
@@ -440,7 +440,7 @@ pub fn skills_directories_with_home_and_mode(
 /// CodeWhale project skills dir when it exists and stays inside the workspace.
 #[must_use]
 pub fn nestlone_workspace_skills_dir(workspace: &Path) -> Option<PathBuf> {
-    let skills_dir = workspace.join(".codewhale").join("skills");
+    let skills_dir = workspace.join(".nestlone").join("skills");
     nestlone_project_root_is_inside_workspace(workspace, &skills_dir).then_some(skills_dir)
 }
 
@@ -470,7 +470,7 @@ pub fn classify_configured_skills_dir(
     home_dir: Option<&Path>,
     skills_dir: &Path,
 ) -> (SkillRootKind, SkillRootAccess, SkillScope) {
-    let project_owned = workspace.join(".codewhale").join("skills");
+    let project_owned = workspace.join(".nestlone").join("skills");
     if paths_refer_to_same_dir(&project_owned, skills_dir) {
         return (
             SkillRootKind::CodeWhaleProject,
@@ -479,7 +479,7 @@ pub fn classify_configured_skills_dir(
         );
     }
     if let Some(home) = home_dir {
-        let global_owned = home.join(".codewhale").join("skills");
+        let global_owned = home.join(".nestlone").join("skills");
         if paths_refer_to_same_dir(&global_owned, skills_dir) {
             return (
                 SkillRootKind::CodeWhaleGlobal,
@@ -761,9 +761,9 @@ mod tests {
         write_dir(&workspace.join("skills"));
         write_dir(&workspace.join(".claude").join("skills"));
         write_dir(&workspace.join(".cursor").join("skills"));
-        write_dir(&workspace.join(".codewhale").join("skills"));
+        write_dir(&workspace.join(".nestlone").join("skills"));
         write_dir(&workspace.join(".codex").join("skills"));
-        write_dir(&home.join(".codewhale").join("skills"));
+        write_dir(&home.join(".nestlone").join("skills"));
 
         let catalog = SkillRootCatalog::build(&workspace, Some(&home), None);
         let dirs = catalog.runtime_directories(&workspace, SkillDiscoveryMode::Compatible);
@@ -775,8 +775,8 @@ mod tests {
                 workspace.join("skills"),
                 workspace.join(".claude").join("skills"),
                 workspace.join(".cursor").join("skills"),
-                workspace.join(".codewhale").join("skills"),
-                home.join(".codewhale").join("skills"),
+                workspace.join(".nestlone").join("skills"),
+                home.join(".nestlone").join("skills"),
             ]
         );
         assert!(
@@ -792,9 +792,9 @@ mod tests {
         let tmp = TempDir::new().unwrap();
         let workspace = tmp.path().join("ws");
         let home = tmp.path().join("home");
-        write_dir(&workspace.join(".codewhale").join("skills"));
+        write_dir(&workspace.join(".nestlone").join("skills"));
         write_dir(&workspace.join(".codex").join("skills"));
-        write_dir(&home.join(".codewhale").join("skills"));
+        write_dir(&home.join(".nestlone").join("skills"));
         write_dir(&home.join(".codex").join("skills"));
 
         let catalog = SkillRootCatalog::build(&workspace, Some(&home), None);
@@ -817,8 +817,8 @@ mod tests {
         let workspace = tmp.path().join("ws");
         let home = tmp.path().join("home");
         write_dir(&workspace.join(".agents").join("skills"));
-        write_dir(&workspace.join(".codewhale").join("skills"));
-        write_dir(&home.join(".codewhale").join("skills"));
+        write_dir(&workspace.join(".nestlone").join("skills"));
+        write_dir(&home.join(".nestlone").join("skills"));
         write_dir(&home.join(".agents").join("skills"));
 
         let catalog = SkillRootCatalog::build(&workspace, Some(&home), None);
@@ -830,8 +830,8 @@ mod tests {
         assert_eq!(
             runtime,
             vec![
-                workspace.join(".codewhale").join("skills"),
-                home.join(".codewhale").join("skills"),
+                workspace.join(".nestlone").join("skills"),
+                home.join(".nestlone").join("skills"),
             ]
         );
     }
@@ -859,15 +859,15 @@ mod tests {
     fn safe_display_path_prefers_home_then_workspace() {
         let home = PathBuf::from("/home/user");
         let workspace = home.join("proj");
-        let path = home.join(".codewhale").join("skills");
+        let path = home.join(".nestlone").join("skills");
         assert_eq!(
             safe_display_path(&path, Some(&workspace), Some(&home)),
-            "~/.codewhale/skills"
+            "~/.nestlone/skills"
         );
-        let project = workspace.join(".codewhale").join("skills");
+        let project = workspace.join(".nestlone").join("skills");
         assert_eq!(
             safe_display_path(&project, Some(&workspace), Some(&home)),
-            "<workspace>/.codewhale/skills"
+            "<workspace>/.nestlone/skills"
         );
     }
 }

@@ -1545,7 +1545,7 @@ mod tests {
     fn persisted_config_ui_reasoning_updates_the_startup_precedence_layer() {
         let _lock = lock_test_env();
         let temp_root = tempfile::tempdir().expect("isolated Codewhale home");
-        let nestlone_home = temp_root.path().join(".codewhale");
+        let nestlone_home = temp_root.path().join(".nestlone");
         fs::create_dir_all(&nestlone_home).expect("settings dir");
         fs::write(
             nestlone_home.join("settings.toml"),
@@ -1691,7 +1691,7 @@ background_color = "#1A1B26"
     fn build_document_accepts_every_shipped_locale_from_settings() {
         let _lock = lock_test_env();
         let temp_root = tempfile::tempdir().expect("isolated Codewhale home");
-        let nestlone_home = temp_root.path().join(".codewhale");
+        let nestlone_home = temp_root.path().join(".nestlone");
         fs::create_dir_all(&nestlone_home).expect("settings dir");
         let settings_path = nestlone_home.join("settings.toml");
         fs::write(&settings_path, "").expect("seed settings");
@@ -1720,7 +1720,7 @@ background_color = "#1A1B26"
     fn custom_theme_round_trips_through_typed_config_document() {
         let _lock = lock_test_env();
         let temp_root = tempfile::tempdir().expect("isolated Codewhale home");
-        let nestlone_home = temp_root.path().join(".codewhale");
+        let nestlone_home = temp_root.path().join(".nestlone");
         let themes_dir = nestlone_home.join("themes");
         fs::create_dir_all(&themes_dir).expect("themes dir");
         fs::write(

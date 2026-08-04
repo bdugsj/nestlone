@@ -23,7 +23,7 @@ use crate::{
     models::{ContentBlock, Message},
 };
 
-const PRODUCTION_CONTROL_PLANE: &str = "https://api.codewhale.net/";
+const PRODUCTION_CONTROL_PLANE: &str = "https://api.nestlone.net/";
 const ENROLLMENT_SECRET_SLOT: &str = "cwc-remote-control-enrollment-v1";
 const HEARTBEAT_INTERVAL: Duration = Duration::from_secs(25);
 const SYNC_INTERVAL: Duration = Duration::from_millis(1_200);

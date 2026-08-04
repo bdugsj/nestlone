@@ -6,7 +6,7 @@
 //! tools, TUI surfaces, sub-agents, and the API. Plugin trust/enablement stays
 //! a separate bundle lifecycle gate.
 //!
-//! Storage shape (TOML at `~/.codewhale/skills_state.toml`, legacy `~/.deepseek/skills_state.toml`):
+//! Storage shape (TOML at `~/.nestlone/skills_state.toml`, legacy `~/.deepseek/skills_state.toml`):
 //!
 //! ```toml
 //! disabled = ["skill-name-1", "skill-name-2"]

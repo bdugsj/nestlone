@@ -363,7 +363,7 @@ pub enum FleetHostSpec {
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord, Default)]
 #[serde(rename_all = "snake_case")]
 pub enum FleetTrustLevel {
-    /// Fully isolated: no network, no secrets, no writes outside `.codewhale/fleet/`.
+    /// Fully isolated: no network, no secrets, no writes outside `.nestlone/fleet/`.
     /// Suitable for untrusted code review, community PR checks, or third-party tool runs.
     #[default]
     Sandbox = 0,
@@ -388,7 +388,7 @@ impl FleetTrustLevel {
         matches!(self, Self::Operator | Self::RemoteVerified | Self::Local)
     }
 
-    /// Whether this trust level is allowed to write outside `.codewhale/fleet/`.
+    /// Whether this trust level is allowed to write outside `.nestlone/fleet/`.
     #[must_use]
     pub fn may_write_workspace(&self) -> bool {
         matches!(self, Self::Operator | Self::Local)
@@ -468,7 +468,7 @@ pub struct FleetSecretRef {
     /// Optional source hint for resolution order.
     /// - `"env"` — resolve from environment variable
     /// - `"keyring"` — resolve from OS keyring
-    /// - `"file"` — resolve from `~/.codewhale/secrets/`
+    /// - `"file"` — resolve from `~/.nestlone/secrets/`
     /// - absent / null — try all sources in default order
     #[serde(skip_serializing_if = "Option::is_none")]
     pub source: Option<String>,

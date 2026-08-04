@@ -46,7 +46,7 @@ fn thread_route_credential_error_is_bad_request_not_not_found() {
 fn runtime_tui_settings_reject_legacy_modes_and_do_not_save_env_overlays() -> Result<()> {
     let _lock = lock_test_env();
     let tmp = tempfile::tempdir()?;
-    let settings_dir = tmp.path().join(".codewhale");
+    let settings_dir = tmp.path().join(".nestlone");
     fs::create_dir_all(&settings_dir)?;
     fs::write(
         settings_dir.join("settings.toml"),
@@ -1862,7 +1862,7 @@ async fn agent_runs_runtime_api_exposes_persisted_worker_receipts() -> Result<()
 
     let root = std::env::temp_dir().join(format!("nestlone-agent-runs-api-{}", Uuid::new_v4()));
     let workspace = root.join("workspace");
-    fs::create_dir_all(workspace.join(".codewhale/state"))?;
+    fs::create_dir_all(workspace.join(".nestlone/state"))?;
 
     let record = AgentWorkerRecord {
         spec: AgentWorkerSpec {
@@ -1960,7 +1960,7 @@ async fn agent_runs_runtime_api_exposes_persisted_worker_receipts() -> Result<()
         "workers": [record],
     });
     fs::write(
-        workspace.join(".codewhale/state/subagents.v1.json"),
+        workspace.join(".nestlone/state/subagents.v1.json"),
         serde_json::to_vec_pretty(&state_payload)?,
     )?;
 
@@ -5296,7 +5296,7 @@ async fn skills_endpoint_exposes_safe_plugin_provenance_and_shared_toggle() -> R
     let plugin_config = crate::plugins::discovery::DiscoveryConfig {
         workspace: workspace.clone(),
         user_plugins_dir: tmp.path().join("plugins"),
-        workspace_plugins_dir: workspace.join(".codewhale/plugins"),
+        workspace_plugins_dir: workspace.join(".nestlone/plugins"),
         builtin_plugin_dirs: Vec::new(),
         state_path: tmp.path().join("plugin-state/state.json"),
     };
@@ -5426,7 +5426,7 @@ fn resolve_skills_dir_respects_nestlone_only_scan() {
     let tmp = tempfile::tempdir().expect("tempdir");
     let workspace = tmp.path();
     let agents_skills = workspace.join(".agents").join("skills");
-    let nestlone_skills = workspace.join(".codewhale").join("skills");
+    let nestlone_skills = workspace.join(".nestlone").join("skills");
     fs::create_dir_all(&agents_skills).expect("create agents skills dir");
     fs::create_dir_all(&nestlone_skills).expect("create nestlone skills dir");
 
@@ -5447,7 +5447,7 @@ fn resolve_skills_dir_respects_nestlone_only_scan() {
 fn resolve_skills_dir_preserves_explicit_dir_in_nestlone_only_scan() {
     let tmp = tempfile::tempdir().expect("tempdir");
     let workspace = tmp.path().join("workspace");
-    let nestlone_skills = workspace.join(".codewhale").join("skills");
+    let nestlone_skills = workspace.join(".nestlone").join("skills");
     let configured_skills = tmp.path().join("configured-skills");
     fs::create_dir_all(&nestlone_skills).expect("create nestlone skills dir");
     fs::create_dir_all(&configured_skills).expect("create configured skills dir");
@@ -5591,8 +5591,8 @@ fn resolve_skills_dir_rejects_nestlone_only_symlink_escaping_workspace() {
     fs::create_dir_all(&workspace_root).expect("create workspace");
     fs::create_dir_all(&escape_target).expect("create escape target");
 
-    let dotnestlone = workspace_root.join(".codewhale");
-    fs::create_dir_all(&dotnestlone).expect("create .codewhale");
+    let dotnestlone = workspace_root.join(".nestlone");
+    fs::create_dir_all(&dotnestlone).expect("create .nestlone");
     let bad_link = dotnestlone.join("skills");
     std::os::unix::fs::symlink(&escape_target, &bad_link).expect("symlink");
 

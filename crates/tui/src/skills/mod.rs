@@ -47,7 +47,7 @@ const MAX_SKILL_NAME_CHARS: usize = 64;
 pub fn default_skills_dir() -> PathBuf {
     crate::config::effective_home_dir().map_or_else(
         || PathBuf::from("/tmp/nestlone/skills"),
-        |p| p.join(".codewhale").join("skills"),
+        |p| p.join(".nestlone").join("skills"),
     )
 }
 
@@ -745,10 +745,10 @@ fn normalize_skill_name_segment(name: &str) -> String {
 /// 3. `<workspace>/.opencode/skills` — OpenCode interop.
 /// 4. `<workspace>/.claude/skills` — Claude Code interop.
 /// 5. `<workspace>/.cursor/skills` — Cursor interop.
-/// 6. `<workspace>/.codewhale/skills` — CodeWhale workspace skills.
+/// 6. `<workspace>/.nestlone/skills` — CodeWhale workspace skills.
 /// 7. [`agents_global_skills_dir`] — agentskills.io global.
 /// 8. `~/.claude/skills` — Claude-ecosystem global (#902).
-/// 9. `~/.codewhale/skills` — CodeWhale global, primary install target.
+/// 9. `~/.nestlone/skills` — CodeWhale global, primary install target.
 /// 10. `~/.deepseek/skills` — legacy DeepSeek global fallback.
 ///
 /// Compatible audit may also observe `.codex/skills`, but that root is
@@ -1973,7 +1973,7 @@ body";
         let tmpdir = TempDir::new().unwrap();
         let workspace = tmpdir.path().join("workspace");
         let home = tmpdir.path().join("home");
-        let configured_dir = home.join(".codewhale").join("skills");
+        let configured_dir = home.join(".nestlone").join("skills");
         std::fs::create_dir_all(&workspace).unwrap();
         write_skill(
             &workspace.join(".claude").join("skills"),
@@ -1982,7 +1982,7 @@ body";
             "body",
         );
         write_skill(
-            &workspace.join(".codewhale").join("skills"),
+            &workspace.join(".nestlone").join("skills"),
             "from-nestlone",
             "nestlone skill",
             "body",
@@ -2047,10 +2047,10 @@ body";
         let workspace = tmpdir.path().join("workspace");
         let home = tmpdir.path().join("home");
         let escape_target = tmpdir.path().join("escape-target");
-        std::fs::create_dir_all(workspace.join(".codewhale")).unwrap();
+        std::fs::create_dir_all(workspace.join(".nestlone")).unwrap();
         write_skill(&escape_target, "escaped-skill", "escaped skill", "body");
 
-        let link_path = workspace.join(".codewhale").join("skills");
+        let link_path = workspace.join(".nestlone").join("skills");
         if let Err(err) = create_dir_symlink(&escape_target, &link_path) {
             eprintln!("skipping symlink escape assertion: {err}");
             return;
@@ -2065,7 +2065,7 @@ body";
 
         assert!(
             registry.get("escaped-skill").is_none(),
-            "CodeWhale-only mode must not follow workspace .codewhale/skills outside the workspace"
+            "CodeWhale-only mode must not follow workspace .nestlone/skills outside the workspace"
         );
     }
 
@@ -2321,7 +2321,7 @@ body";
 
     /// Mirrors the qa_pty `skills_menu_shows_local_and_global_skills`
     /// scenario without the PTY harness: a workspace-level skill in
-    /// `.agents/skills/` and a global skill in `~/.codewhale/skills/`
+    /// `.agents/skills/` and a global skill in `~/.nestlone/skills/`
     /// must both be discoverable.
     #[test]
     fn discover_finds_both_workspace_and_global_skills() {
@@ -2337,7 +2337,7 @@ body";
             "body",
         );
         write_skill(
-            &home.join(".codewhale").join("skills"),
+            &home.join(".nestlone").join("skills"),
             "global-alpha",
             "Global alpha skill",
             "body",
@@ -2354,7 +2354,7 @@ body";
         );
         assert!(
             names.contains(&"global-alpha"),
-            "global-alpha from ~/.codewhale/skills must be discovered: {names:?}",
+            "global-alpha from ~/.nestlone/skills must be discovered: {names:?}",
         );
     }
 

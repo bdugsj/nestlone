@@ -174,7 +174,7 @@ fn effective_config_path_display(app: &App) -> String {
         .config_path
         .clone()
         .or_else(|| crate::config_persistence::config_toml_path(None).ok())
-        .unwrap_or_else(|| std::path::PathBuf::from("~/.codewhale/config.toml"));
+        .unwrap_or_else(|| std::path::PathBuf::from("~/.nestlone/config.toml"));
     collapse_home_prefix(&path)
 }
 
@@ -211,7 +211,7 @@ mod tests {
     #[test]
     fn api_key_saved_hint_uses_effective_config_path() {
         // Isolated installs set CODEWHALE_CONFIG_PATH; the UI must not hardcode
-        // ~/.codewhale/config.toml (#3986).
+        // ~/.nestlone/config.toml (#3986).
         let _lock = crate::test_support::lock_test_env();
         let tmp = tempfile::tempdir().expect("tempdir");
         let config = tmp.path().join("isolated-config.toml");
@@ -232,7 +232,7 @@ mod tests {
             "saved hint should show effective path, body was:\n{body}"
         );
         assert!(
-            !body.contains("~/.codewhale/config.toml"),
+            !body.contains("~/.nestlone/config.toml"),
             "must not hardcode default home path when isolated: {body}"
         );
     }

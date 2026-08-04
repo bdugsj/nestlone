@@ -418,7 +418,7 @@ mod tests {
     fn hostile_route_and_model_identifiers_never_reach_a_surface() {
         let hostile = [
             "/Users/someone/models/private-weights.gguf".to_string(),
-            "~/.codewhale/config.toml".to_string(),
+            "~/.nestlone/config.toml".to_string(),
             "https://internal.example.com/v1/deployments/prod".to_string(),
             "C:\\Users\\someone\\models\\weights.bin".to_string(),
             ["sk", "-fixture-not-a-real-key-00000000"].concat(),
@@ -505,8 +505,8 @@ mod tests {
         let home = std::env::var("HOME").unwrap_or_else(|_| "/root".to_string());
         let hostile: Vec<String> = vec![
             "route 'prod-key-8f2a' rejected key sk-live-abcdef0123456789abcdef".to_string(),
-            "cannot read C:\\Users\\someone\\.codewhale\\config.toml".to_string(),
-            format!("cannot read {home}/.codewhale/config.toml"),
+            "cannot read C:\\Users\\someone\\.nestlone\\config.toml".to_string(),
+            format!("cannot read {home}/.nestlone/config.toml"),
             "GET https://gw.example.com/v1/deployments/prod-key-8f2a?api_key=sk-1234567890abcdef failed".to_string(),
             "server \"my secret server\" refused: password=hunter2".to_string(),
             "model /Users/someone/models/private.gguf is unavailable".to_string(),
@@ -522,7 +522,7 @@ mod tests {
                 "sk-1234567890",
                 "/Users/someone",
                 "C:\\Users",
-                ".codewhale",
+                ".nestlone",
                 "api_key=",
                 "hunter2",
                 "password=",

@@ -7,7 +7,7 @@
 //!
 //! ## On-disk format
 //!
-//! `~/.codewhale/composer_stash.jsonl` — one JSON object per line:
+//! `~/.nestlone/composer_stash.jsonl` — one JSON object per line:
 //!
 //! ```jsonl
 //! {"ts":"2026-05-04T01:23:45Z","text":"draft here"}
@@ -71,7 +71,7 @@ pub struct StashedDraft {
 
 fn default_stash_path() -> Option<PathBuf> {
     crate::config::effective_home_dir().map(|home| {
-        let primary = home.join(".codewhale").join(STASH_FILE_NAME);
+        let primary = home.join(".nestlone").join(STASH_FILE_NAME);
         let legacy = home.join(".deepseek").join(STASH_FILE_NAME);
         if primary.exists() || !legacy.exists() {
             return primary;
@@ -85,7 +85,7 @@ fn default_stash_path() -> Option<PathBuf> {
 /// Ordinary composer reads retain their historical legacy fallback behavior.
 /// Diagnostics follow the same behavior only when no explicit
 /// `CODEWHALE_HOME` is configured; an explicit home is an isolation boundary
-/// and must not cause doctor to inspect an ambient `$HOME/.codewhale` or
+/// and must not cause doctor to inspect an ambient `$HOME/.nestlone` or
 /// `$HOME/.deepseek` stash.
 pub(crate) fn diagnostic_stash_report() -> DiagnosticStashReport {
     let primary = match nestlone_config::nestlone_home() {

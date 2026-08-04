@@ -73,8 +73,11 @@ project_overhaul_prompt.md
 .wrangler/
 
 # Local runtime state
-# Ignore everything under any .codewhale/ (snapshots, auto-generated
+# Ignore everything under any .nestlone/ (snapshots, auto-generated
 # instructions.md, etc.) at any depth EXCEPT the committed repo authority policy.
+**/.nestlone/*
+!**/.nestlone/constitution.json
+# Legacy pre-rebrand state dirs remain ignored until fully cleaned up.
 **/.codewhale/*
 !**/.codewhale/constitution.json
 .deepseek/

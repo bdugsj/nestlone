@@ -4193,7 +4193,7 @@ mod tests {
     fn setup_provider_key_entry_matrix_keeps_hosted_codex_and_local_hints_distinct() {
         let _guard = crate::test_support::lock_test_env();
         let tmp = tempfile::TempDir::new().expect("tempdir");
-        let nestlone_home = tmp.path().join(".codewhale");
+        let nestlone_home = tmp.path().join(".nestlone");
         let _home = crate::test_support::EnvVarGuard::set("HOME", tmp.path());
         let _userprofile = crate::test_support::EnvVarGuard::set("USERPROFILE", tmp.path());
         let _nestlone_home =

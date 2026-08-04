@@ -50,13 +50,13 @@ struct Fixture {
 
 impl Fixture {
     /// Seal HOME before anything writes config. The suite has written to the
-    /// real `~/.codewhale/config.toml` before (#4831); this test must never be
+    /// real `~/.nestlone/config.toml` before (#4831); this test must never be
     /// the one that does it again.
     fn new() -> Self {
         let root = TempDir::new().expect("fixture root");
         let home = root.path().join("sealed-home");
-        fs::create_dir_all(home.join(".codewhale")).expect("sealed config dir");
-        fs::write(home.join(".codewhale").join("config.toml"), "").expect("seed config");
+        fs::create_dir_all(home.join(".nestlone")).expect("sealed config dir");
+        fs::write(home.join(".nestlone").join("config.toml"), "").expect("seed config");
         Self { _root: root, home }
     }
 
@@ -67,7 +67,7 @@ impl Fixture {
             .env("PATH", std::env::var("PATH").unwrap_or_default())
             .env("HOME", &self.home)
             .env("USERPROFILE", &self.home)
-            .env("CODEWHALE_HOME", self.home.join(".codewhale"))
+            .env("CODEWHALE_HOME", self.home.join(".nestlone"))
             .env("CODEWHALE_SECRET_BACKEND", "file");
         command
     }

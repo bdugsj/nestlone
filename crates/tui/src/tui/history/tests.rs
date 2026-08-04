@@ -466,7 +466,7 @@ fn specialized_bash_and_mcp_cells_share_the_calm_evidence_receipt() {
 fn adaptive_evidence_receipt_is_calm_path_free_and_width_bounded() {
     use std::path::Path;
 
-    let secret_path = Path::new("/Users/private/.codewhale/sessions/session-a/artifacts/hash.txt");
+    let secret_path = Path::new("/Users/private/.nestlone/sessions/session-a/artifacts/hash.txt");
     for width in [18_u16, 40, 80, 120] {
         let rendered = line_to_plain(&render_spillover_annotation(secret_path, width));
         assert!(

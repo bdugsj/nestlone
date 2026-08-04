@@ -10,7 +10,7 @@ use crate::tools::spec::ToolError;
 
 use super::FleetRole;
 
-const SUBAGENT_WORKTREE_ROOT_DIR: &str = ".codewhale-worktrees";
+const SUBAGENT_WORKTREE_ROOT_DIR: &str = ".nestlone-worktrees";
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(super) struct SubAgentWorktreeRequest {

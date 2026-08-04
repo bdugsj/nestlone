@@ -210,7 +210,7 @@ fn diagnostics_read_home_legacy_settings_without_migrating_them() {
         let workspace = fixture.path().join("workspace");
         let home = fixture.path().join("home");
         let legacy = home.join(".deepseek").join("settings.toml");
-        let primary_home = home.join(".codewhale");
+        let primary_home = home.join(".nestlone");
         let legacy_bytes = b"default_mode = \"plan\"\nprefer_external_pdftotext = true\n";
         fs::create_dir_all(&workspace).expect("workspace");
         fs::create_dir_all(legacy.parent().expect("legacy parent")).expect("legacy directory");
@@ -335,7 +335,7 @@ fn doctor_text_probe_uses_a_legacy_key_without_migrating_it() {
     let home = fixture.path().join("home");
     fs::create_dir_all(&workspace).expect("workspace");
     let legacy = home.join(".deepseek").join("secrets").join("secrets.json");
-    let primary = home.join(".codewhale").join("secrets").join("secrets.json");
+    let primary = home.join(".nestlone").join("secrets").join("secrets.json");
     FileKeyringStore::new(&legacy)
         .set("deepseek", "diagnostic-legacy-key")
         .expect("seed legacy secret");
@@ -403,7 +403,7 @@ fn doctor_json_auth_scheme_reads_a_legacy_key_without_migrating_it() {
     let home = fixture.path().join("home");
     fs::create_dir_all(&workspace).expect("workspace");
     let legacy = home.join(".deepseek").join("secrets").join("secrets.json");
-    let primary = home.join(".codewhale").join("secrets").join("secrets.json");
+    let primary = home.join(".nestlone").join("secrets").join("secrets.json");
     FileKeyringStore::new(&legacy)
         .set("xiaomi-mimo", "tp-diagnostic-legacy-key")
         .expect("seed legacy Xiaomi secret");
@@ -453,7 +453,7 @@ fn setup_status_reads_a_legacy_key_without_migrating_it() {
     let home = fixture.path().join("home");
     fs::create_dir_all(&workspace).expect("workspace");
     let legacy = home.join(".deepseek").join("secrets").join("secrets.json");
-    let primary = home.join(".codewhale").join("secrets").join("secrets.json");
+    let primary = home.join(".nestlone").join("secrets").join("secrets.json");
     FileKeyringStore::new(&legacy)
         .set("deepseek", "setup-status-legacy-key")
         .expect("seed legacy secret");
@@ -492,7 +492,7 @@ fn doctor_json_stash_honors_an_explicit_nestlone_home() {
     let home = fixture.path().join("home");
     let nestlone_home = fixture.path().join("isolated-nestlone-home");
     fs::create_dir_all(&workspace).expect("workspace");
-    let ambient_stash = home.join(".codewhale").join("composer_stash.jsonl");
+    let ambient_stash = home.join(".nestlone").join("composer_stash.jsonl");
     fs::create_dir_all(ambient_stash.parent().expect("ambient stash parent"))
         .expect("ambient stash parent");
     fs::write(

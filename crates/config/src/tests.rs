@@ -2691,7 +2691,7 @@ fn app_homes_prefer_home_env_before_platform_home_fallback() {
 
     assert_eq!(
         nestlone_home().expect("nestlone home"),
-        home.join(CODEWHALE_APP_DIR)
+        home.join(NESTLONE_APP_DIR)
     );
     assert_eq!(
         legacy_deepseek_home().expect("legacy home"),
@@ -2748,7 +2748,7 @@ fn migrate_config_reports_copied_legacy_path() {
         std::process::id()
     ));
     let legacy_dir = home.join(LEGACY_APP_DIR);
-    let primary_dir = home.join(CODEWHALE_APP_DIR);
+    let primary_dir = home.join(NESTLONE_APP_DIR);
     let legacy_config = legacy_dir.join(CONFIG_FILE_NAME);
     let _legacy = LegacyConfigGuard::install(legacy_config.clone(), b"provider = \"deepseek\"\n");
 
@@ -2773,7 +2773,7 @@ fn migrate_config_reports_copied_legacy_path() {
     let notice = migration.user_notice();
     assert!(notice.contains(&legacy_dir.join(CONFIG_FILE_NAME).display().to_string()));
     assert!(notice.contains(&primary_dir.join(CONFIG_FILE_NAME).display().to_string()));
-    assert!(notice.contains(".codewhale path for future edits"));
+    assert!(notice.contains(".nestlone path for future edits"));
     assert!(notice.contains(".deepseek file remains only as a compatibility fallback"));
     assert_eq!(
         fs::read_to_string(primary_dir.join(CONFIG_FILE_NAME)).expect("primary config"),
@@ -2860,7 +2860,7 @@ impl Drop for StateEnvRestore {
 }
 
 /// Points `HOME`/`USERPROFILE` at a fresh temp tree and clears
-/// `CODEWHALE_HOME` so `nestlone_home()` -> `<home>/.codewhale` and
+/// `CODEWHALE_HOME` so `nestlone_home()` -> `<home>/.nestlone` and
 /// `legacy_deepseek_home()` -> `<home>/.deepseek`. Env is restored on drop.
 struct StateDirEnv {
     home: PathBuf,
@@ -2893,7 +2893,7 @@ impl StateDirEnv {
         self.home.join(LEGACY_APP_DIR).join(sub)
     }
     fn primary(&self, sub: &str) -> PathBuf {
-        self.home.join(CODEWHALE_APP_DIR).join(sub)
+        self.home.join(NESTLONE_APP_DIR).join(sub)
     }
 }
 
@@ -2945,7 +2945,7 @@ fn state_migration_notice_explains_preserved_data_and_canonical_root() {
     let migration = StateMigration {
         subdir: "sessions".to_string(),
         legacy_path: PathBuf::from("/home/alice/.deepseek/sessions"),
-        primary_path: PathBuf::from("/home/alice/.codewhale/sessions"),
+        primary_path: PathBuf::from("/home/alice/.nestlone/sessions"),
         kind: StateMigrationKind::Relocated,
     };
 
@@ -2953,9 +2953,9 @@ fn state_migration_notice_explains_preserved_data_and_canonical_root() {
 
     assert!(notice.contains("Codewhale migrated legacy state"));
     assert!(notice.contains("/home/alice/.deepseek/sessions"));
-    assert!(notice.contains("/home/alice/.codewhale/sessions"));
+    assert!(notice.contains("/home/alice/.nestlone/sessions"));
     assert!(notice.contains("Your data was preserved"));
-    assert!(notice.contains("Use .codewhale as the canonical state location"));
+    assert!(notice.contains("Use .nestlone as the canonical state location"));
     assert!(notice.contains("remove the legacy .deepseek tree"));
 }
 
@@ -2964,7 +2964,7 @@ fn copied_state_migration_notice_says_legacy_copy_remains() {
     let migration = StateMigration {
         subdir: "catalog".to_string(),
         legacy_path: PathBuf::from("/home/alice/.deepseek/catalog"),
-        primary_path: PathBuf::from("/home/alice/.codewhale/catalog"),
+        primary_path: PathBuf::from("/home/alice/.nestlone/catalog"),
         kind: StateMigrationKind::Copied,
     };
 
@@ -3122,7 +3122,7 @@ fn project_state_resolvers_reject_path_traversal_subdirs() {
         ensure_project_state_dir(&workspace, "a/b").expect("safe nested project state dir");
     assert_eq!(
         created,
-        canonical_workspace.join(CODEWHALE_APP_DIR).join("a/b")
+        canonical_workspace.join(NESTLONE_APP_DIR).join("a/b")
     );
 }
 
@@ -3229,7 +3229,7 @@ fn normalize_config_file_path_rejects_symlink_file() {
 fn load_project_config_rejects_symlinked_primary_config() {
     let workspace = tempfile::tempdir().expect("workspace tempdir");
     let outside = tempfile::tempdir().expect("outside tempdir");
-    let primary_dir = workspace.path().join(CODEWHALE_APP_DIR);
+    let primary_dir = workspace.path().join(NESTLONE_APP_DIR);
     let legacy_dir = workspace.path().join(LEGACY_APP_DIR);
     fs::create_dir_all(&primary_dir).expect("mkdir primary");
     fs::create_dir_all(&legacy_dir).expect("mkdir legacy");
@@ -3254,7 +3254,7 @@ fn load_project_config_rejects_symlinked_primary_config() {
 #[test]
 fn load_project_config_keeps_unknown_provider_names_strict() {
     let workspace = tempfile::tempdir().expect("workspace tempdir");
-    let config_dir = workspace.path().join(CODEWHALE_APP_DIR);
+    let config_dir = workspace.path().join(NESTLONE_APP_DIR);
     fs::create_dir_all(&config_dir).expect("mkdir project config");
     fs::write(
         config_dir.join(CONFIG_FILE_NAME),
@@ -3296,7 +3296,7 @@ fn malformed_project_config_is_distinguishable_from_a_missing_one() {
         "a workspace with no project config must report Missing"
     );
 
-    let config_dir = workspace.path().join(CODEWHALE_APP_DIR);
+    let config_dir = workspace.path().join(NESTLONE_APP_DIR);
     fs::create_dir_all(&config_dir).expect("mkdir project config");
     fs::write(
         config_dir.join(CONFIG_FILE_NAME),
@@ -3325,7 +3325,7 @@ fn malformed_project_config_is_distinguishable_from_a_missing_one() {
 #[test]
 fn well_formed_project_config_still_loads() {
     let workspace = tempfile::tempdir().expect("workspace tempdir");
-    let config_dir = workspace.path().join(CODEWHALE_APP_DIR);
+    let config_dir = workspace.path().join(NESTLONE_APP_DIR);
     fs::create_dir_all(&config_dir).expect("mkdir project config");
     fs::write(
         config_dir.join(CONFIG_FILE_NAME),

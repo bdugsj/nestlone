@@ -1,7 +1,7 @@
 //! One-shot model drafting for fleet agent profiles (`/fleet setup` → `m`).
 //!
 //! Generalizes the constitution drafting contract (see `model_draft.rs`) to
-//! the `.codewhale/agents/<id>.toml` profile surface:
+//! the `.nestlone/agents/<id>.toml` profile surface:
 //!
 //! - **Minimal payload out.** The request carries exactly the two wizard
 //!   answers (role, target model), the UI language tag, and an optional

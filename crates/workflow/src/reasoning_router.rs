@@ -194,7 +194,7 @@ impl ReasoningRouterProfile {
     /// Load one profile from a labelled search root set.
     ///
     /// A bare name present under more than one origin is **ambiguous**: a
-    /// personal `~/.codewhale` Router silently shadowing a project Router would
+    /// personal `~/.nestlone` Router silently shadowing a project Router would
     /// change which provider sees every task's routing summary. Naming the
     /// origin (`nestlone_home/fast`) resolves it.
     pub fn load_by_name(

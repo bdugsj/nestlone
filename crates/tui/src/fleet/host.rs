@@ -294,7 +294,7 @@ impl LocalProcessFleetHostAdapter {
             FleetHostKind::Ssh => "ssh",
         };
         self.workspace
-            .join(".codewhale")
+            .join(".nestlone")
             .join("fleet-host")
             .join(host_dir)
             .join(format!("{}.log", safe_path_segment(worker_id)))

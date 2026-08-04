@@ -1032,7 +1032,7 @@ impl SettingsHomeGuard {
         let previous_xdg_config_home = std::env::var_os("XDG_CONFIG_HOME");
         let previous_appdata = std::env::var_os("APPDATA");
         let previous_localappdata = std::env::var_os("LOCALAPPDATA");
-        let nestlone_home = tmp.path().join(".codewhale");
+        let nestlone_home = tmp.path().join(".nestlone");
         // Safety: test-only environment mutation guarded by a global mutex.
         unsafe {
             std::env::set_var("HOME", tmp.path());
@@ -3086,7 +3086,7 @@ fn render_underwater_test_app(app: &mut App, width: u16, height: u16) -> String 
 #[tokio::test]
 async fn session_denied_cache_auto_deny_explains_the_cached_rejection() {
     let home = SettingsHomeGuard::new();
-    let audit_path = home._tmp.path().join(".codewhale").join("audit.log");
+    let audit_path = home._tmp.path().join(".nestlone").join("audit.log");
     let mut app = create_test_app();
     let mut engine = mock_engine_handle();
     let approval_key = "shell:exec_shell:git push secret-token";
@@ -3967,7 +3967,7 @@ fn setup_high_trust_cannot_override_project_approval_policy() {
         .and_then(std::path::Path::parent)
         .expect("temporary home")
         .join("project");
-    let project_dir = workspace.join(nestlone_config::CODEWHALE_APP_DIR);
+    let project_dir = workspace.join(nestlone_config::NESTLONE_APP_DIR);
     std::fs::create_dir_all(&project_dir).expect("project config dir");
     std::fs::write(
         project_dir.join("config.toml"),
@@ -4019,7 +4019,7 @@ fn project_runtime_provenance_only_blocks_values_startup_would_accept() {
         .parent()
         .expect("temporary home")
         .join("project");
-    let project_dir = workspace.join(nestlone_config::CODEWHALE_APP_DIR);
+    let project_dir = workspace.join(nestlone_config::NESTLONE_APP_DIR);
     std::fs::create_dir_all(&project_dir).expect("project config dir");
     let project_path = project_dir.join("config.toml");
     std::fs::write(
@@ -4083,7 +4083,7 @@ fn saved_full_access_baseline_allows_project_approval_tightening() {
         .parent()
         .expect("temporary home")
         .join("project");
-    let project_dir = workspace.join(nestlone_config::CODEWHALE_APP_DIR);
+    let project_dir = workspace.join(nestlone_config::NESTLONE_APP_DIR);
     std::fs::create_dir_all(&project_dir).expect("project config dir");
     std::fs::write(
         project_dir.join("config.toml"),
@@ -11188,7 +11188,7 @@ fn apply_slash_menu_selection_appends_space_for_arg_commands() {
 #[test]
 fn apply_slash_menu_selection_honors_user_argument_metadata_and_builtin_override() {
     let tmp = TempDir::new().expect("tempdir");
-    let commands_dir = tmp.path().join(".codewhale").join("commands");
+    let commands_dir = tmp.path().join(".nestlone").join("commands");
     std::fs::create_dir_all(&commands_dir).expect("create commands dir");
     std::fs::write(
         commands_dir.join("custom-model.md"),

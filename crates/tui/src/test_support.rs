@@ -489,7 +489,7 @@ mod tests {
         }
 
         let sentinel = tempfile::tempdir().expect("sentinel home");
-        let user_state = sentinel.path().join(".codewhale");
+        let user_state = sentinel.path().join(".nestlone");
         std::fs::create_dir_all(&user_state).expect("create sentinel state");
         let config_path = user_state.join("config.toml");
         let settings_path = user_state.join("settings.toml");

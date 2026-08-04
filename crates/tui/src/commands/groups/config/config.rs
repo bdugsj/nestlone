@@ -3359,10 +3359,10 @@ mod tests {
         let root_config = temp_root.join(".deepseek").join("config.toml");
         fs::write(&root_config, "# user root\n").unwrap();
         let workspace = temp_root.join("workspace");
-        fs::create_dir_all(workspace.join(nestlone_config::CODEWHALE_APP_DIR)).unwrap();
+        fs::create_dir_all(workspace.join(nestlone_config::NESTLONE_APP_DIR)).unwrap();
         fs::write(
             workspace
-                .join(nestlone_config::CODEWHALE_APP_DIR)
+                .join(nestlone_config::NESTLONE_APP_DIR)
                 .join("config.toml"),
             "allow_shell = false\n",
         )
@@ -3430,10 +3430,10 @@ mod tests {
         let root_config = temp_root.join(".deepseek").join("config.toml");
         fs::write(&root_config, "# root\n").unwrap();
         let workspace = temp_root.join("workspace");
-        fs::create_dir_all(workspace.join(nestlone_config::CODEWHALE_APP_DIR)).unwrap();
+        fs::create_dir_all(workspace.join(nestlone_config::NESTLONE_APP_DIR)).unwrap();
         fs::write(
             workspace
-                .join(nestlone_config::CODEWHALE_APP_DIR)
+                .join(nestlone_config::NESTLONE_APP_DIR)
                 .join("config.toml"),
             "approval_policy = \"never\"\n",
         )

@@ -4400,19 +4400,19 @@ fn default_user_paths_use_nestlone_home_for_fresh_installs() -> Result<()> {
     let config = Config::default();
     assert_eq!(
         default_config_path().unwrap(),
-        temp_root.join(".codewhale").join("config.toml")
+        temp_root.join(".nestlone").join("config.toml")
     );
     assert_eq!(
         config.mcp_config_path(),
-        temp_root.join(".codewhale").join("mcp.json")
+        temp_root.join(".nestlone").join("mcp.json")
     );
     assert_eq!(
         config.notes_path(),
-        temp_root.join(".codewhale").join("notes.txt")
+        temp_root.join(".nestlone").join("notes.txt")
     );
     assert_eq!(
         config.memory_path(),
-        temp_root.join(".codewhale").join("memory.md")
+        temp_root.join(".nestlone").join("memory.md")
     );
 
     Ok(())

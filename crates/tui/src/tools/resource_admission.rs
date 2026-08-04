@@ -265,14 +265,15 @@ fn configured_heavy_command_limit() -> usize {
 }
 
 fn admission_root() -> PathBuf {
-    if let Some(home) = std::env::var_os("CODEWHALE_HOME")
+    if let Some(home) = std::env::var_os("NESTLONE_HOME")
+        .or_else(|| std::env::var_os("CODEWHALE_HOME"))
         .map(PathBuf::from)
         .filter(|path| !path.as_os_str().is_empty())
     {
         return home.join("resource-admission");
     }
     if let Some(home) = crate::config::effective_home_dir() {
-        return home.join(".codewhale").join("resource-admission");
+        return home.join(".nestlone").join("resource-admission");
     }
     std::env::temp_dir().join("nestlone-resource-admission")
 }

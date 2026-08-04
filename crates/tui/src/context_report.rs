@@ -946,9 +946,9 @@ mod tests {
     fn context_report_surfaces_repo_constitution_source_and_warnings() {
         let tmp = tempdir().expect("tempdir");
         fs::create_dir(tmp.path().join(".git")).expect("mkdir .git");
-        fs::create_dir(tmp.path().join(".codewhale")).expect("mkdir .codewhale");
+        fs::create_dir(tmp.path().join(".nestlone")).expect("mkdir .nestlone");
         fs::write(
-            tmp.path().join(".codewhale").join("constitution.json"),
+            tmp.path().join(".nestlone").join("constitution.json"),
             r#"{
                 "schema_version": 1,
                 "authority": ["current user request"],
@@ -963,7 +963,7 @@ mod tests {
                 entry.source_kind == SourceKind::RepoConstitution
                     && entry.source_path.as_deref().is_some_and(|path| {
                         path.replace('\\', "/")
-                            .ends_with(".codewhale/constitution.json")
+                            .ends_with(".nestlone/constitution.json")
                     })
             }),
             "repo constitution source should be an explicit source-map entry: {:?}",

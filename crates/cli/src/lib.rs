@@ -621,7 +621,7 @@ enum LaneCommand {
         /// Branch name for the worktree (requires `--worktree-repo`).
         #[arg(long)]
         branch: Option<String>,
-        /// Worktree path (defaults to `<repo>/.codewhale/lanes/<lane-id>`).
+        /// Worktree path (defaults to `<repo>/.nestlone/lanes/<lane-id>`).
         #[arg(long, value_name = "DIR")]
         worktree_path: Option<PathBuf>,
         /// Worktree cleanup TTL seconds after stop (0 = immediate on stop).
@@ -673,7 +673,7 @@ enum WorkflowCommand {
         /// Branch name for the worktree (requires `--worktree-repo`).
         #[arg(long)]
         branch: Option<String>,
-        /// Worktree path (defaults to `<repo>/.codewhale/lanes/<lane-id>`).
+        /// Worktree path (defaults to `<repo>/.nestlone/lanes/<lane-id>`).
         #[arg(long, value_name = "DIR")]
         worktree_path: Option<PathBuf>,
         /// Worktree cleanup TTL seconds after stop (0 = immediate on stop).
@@ -722,7 +722,7 @@ fn start_lane(request: LaneStartRequest) -> Result<()> {
     let worktree = match (worktree_repo, branch) {
         (Some(repo_root), Some(branch_name)) => {
             let path = worktree_path
-                .unwrap_or_else(|| repo_root.join(".codewhale").join("lanes").join(&record.id));
+                .unwrap_or_else(|| repo_root.join(".nestlone").join("lanes").join(&record.id));
             Some(WorktreeProvision {
                 repo_root,
                 branch: branch_name,
@@ -3921,9 +3921,12 @@ fn web_serve_passthrough(args: &WebArgs) -> Vec<String> {
 }
 
 fn app_server_token_from_env() -> Option<String> {
-    std::env::var("CODEWHALE_APP_SERVER_TOKEN")
-        .ok()
-        .or_else(|| std::env::var("DEEPSEEK_APP_SERVER_TOKEN").ok())
+    for var in ["NESTLONE_APP_SERVER_TOKEN", "CODEWHALE_APP_SERVER_TOKEN", "DEEPSEEK_APP_SERVER_TOKEN"] {
+        if let Ok(value) = std::env::var(var) {
+            return Some(value);
+        }
+    }
+    None
 }
 
 fn run_mcp_server_command(store: &mut ConfigStore) -> Result<()> {

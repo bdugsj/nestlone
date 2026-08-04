@@ -1766,7 +1766,7 @@ pub struct ToolsConfig {
     /// frontmatter header (`# name:`, `# description:`, `# schema:`) are
     /// auto-discovered and registered as tools.
     ///
-    /// Defaults to `~/.codewhale/tools/` when `None`.
+    /// Defaults to `~/.nestlone/tools/` when `None`.
     #[serde(default)]
     pub plugin_dir: Option<String>,
 
@@ -2694,7 +2694,7 @@ pub enum ToolOverride {
     /// Run a local script file. The script receives the tool's JSON input
     /// on stdin and must return a JSON `ToolResult` on stdout.
     Script {
-        /// Path to the script (absolute, or relative to `~/.codewhale/tools/`).
+        /// Path to the script (absolute, or relative to `~/.nestlone/tools/`).
         path: String,
         /// Optional static arguments prepended before the tool's JSON input.
         #[serde(default)]
@@ -3293,7 +3293,7 @@ fn allow_shell_env_is_set() -> bool {
 fn project_config_root_bool(workspace: &Path, key: &str) -> Option<bool> {
     [
         workspace
-            .join(nestlone_config::CODEWHALE_APP_DIR)
+            .join(nestlone_config::NESTLONE_APP_DIR)
             .join("config.toml"),
         workspace
             .join(nestlone_config::LEGACY_APP_DIR)
@@ -5586,11 +5586,11 @@ impl Config {
                    • export DEEPSEEK_API_KEY=<your-key>      (current shell only;\n\
                      also note: zsh users — exports in ~/.zshrc only reach interactive\n\
                      shells, prefer ~/.zshenv for everything)\n\
-                   • api_key = \"<your-key>\"  in ~/.codewhale/config.toml"
+                   • api_key = \"<your-key>\"  in ~/.nestlone/config.toml"
             ),
             ApiProvider::SiliconflowCn => anyhow::bail!(
                 "SiliconFlow China API key not found. Get a key: {}. Run 'nestlone auth set --provider siliconflow-CN', \
-                 set {}, or add [{}] api_key in ~/.codewhale/config.toml. \
+                 set {}, or add [{}] api_key in ~/.nestlone/config.toml. \
                  [providers.siliconflow] remains a fallback when the CN table omits api_key.",
                 provider
                     .credential_url()
@@ -5670,7 +5670,7 @@ impl Config {
                     None => anyhow::bail!(
                         "Custom provider '{provider_name}' has no auth configured.\n\
                          Add api_key_env = \"YOUR_ENV_VAR\" (or api_key) to \
-                         [providers.{provider_name}] in ~/.codewhale/config.toml."
+                         [providers.{provider_name}] in ~/.nestlone/config.toml."
                     ),
                 }
             }
@@ -6325,7 +6325,7 @@ pub(crate) fn workspace_trust_config_candidate_paths() -> Vec<PathBuf> {
         return Vec::new();
     };
     vec![
-        home.join(".codewhale").join("config.toml"),
+        home.join(".nestlone").join("config.toml"),
         home.join(".deepseek").join("config.toml"),
     ]
 }
@@ -9018,7 +9018,7 @@ pub enum SavedCredential {
     /// entry removed. The `backend` label is the value of
     /// [`nestlone_secrets::Secrets::backend_name`] at write time so the toast
     /// text can name the actual backend (`"system keyring"`,
-    /// `"file-based (~/.codewhale/secrets/)"`).
+    /// `"file-based (~/.nestlone/secrets/)"`).
     KeyringAndConfigFile {
         /// `Secrets::backend_name()` at write time.
         backend: String,
@@ -9574,7 +9574,7 @@ fn provider_config_is_explicit(entry: &ProviderConfig) -> bool {
 
 /// Save an API key to the appropriate place for the given provider.
 /// DeepSeek goes through [`save_api_key`]. Other providers write
-/// `[providers.<name>] api_key = "..."` to `~/.codewhale/config.toml`.
+/// `[providers.<name>] api_key = "..."` to `~/.nestlone/config.toml`.
 /// Returns the config file path.
 pub fn save_api_key_for(provider: ApiProvider, api_key: &str) -> Result<PathBuf> {
     save_api_key_for_identity(
@@ -10169,7 +10169,7 @@ fn missing_provider_api_key_message(provider: ApiProvider) -> Result<String> {
         .map(|url| format!(" Get a key: {url}."))
         .unwrap_or_default();
     Ok(format!(
-        "{} API key not found.{} Run 'nestlone auth set --provider {}', set {}, or add [{}] api_key in ~/.codewhale/config.toml.",
+        "{} API key not found.{} Run 'nestlone auth set --provider {}', set {}, or add [{}] api_key in ~/.nestlone/config.toml.",
         provider.display_name(),
         credential_hint,
         provider.as_str(),

@@ -286,7 +286,7 @@ impl FleetManager {
 
     fn manager_lock_path(&self, run_id: &FleetRunId) -> PathBuf {
         self.workspace
-            .join(".codewhale")
+            .join(".nestlone")
             .join("fleet")
             .join(format!("manager-{}.lock", safe_path_segment(&run_id.0)))
     }
@@ -1727,7 +1727,7 @@ impl FleetManager {
         worker_id: &str,
         task_spec: &FleetTaskSpec,
     ) -> Result<FleetArtifactRef> {
-        let rel_path = PathBuf::from(".codewhale")
+        let rel_path = PathBuf::from(".nestlone")
             .join("fleet")
             .join(safe_path_segment(&run_id.0))
             .join(safe_path_segment(&task_spec.id))
@@ -4060,7 +4060,7 @@ esac
             });
             if role == "builder" {
                 task.workspace = Some(FleetWorkspaceRequirements {
-                    writable_paths: vec![PathBuf::from(".codewhale/fleet")],
+                    writable_paths: vec![PathBuf::from(".nestlone/fleet")],
                     ..FleetWorkspaceRequirements::default()
                 });
             }
@@ -4427,7 +4427,7 @@ esac
                 workspace: Some(FleetWorkspaceRequirements {
                     root: None,
                     required_files: vec![PathBuf::from("Cargo.toml")],
-                    writable_paths: vec![PathBuf::from(".codewhale/fleet")],
+                    writable_paths: vec![PathBuf::from(".nestlone/fleet")],
                     environment: Some(FleetEnvironmentRequirements {
                         required: vec!["PATH".to_string()],
                         allowlist: vec![],

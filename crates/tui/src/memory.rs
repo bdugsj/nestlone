@@ -15,7 +15,7 @@
 //! ### Migration
 //!
 //! 1. Install Moraine: `uv tool install moraine-cli && moraine setup && moraine up`
-//! 2. Enable `moraine-mcp` in `~/.codewhale/mcp.json` (set `disabled` to `false`)
+//! 2. Enable `moraine-mcp` in `~/.nestlone/mcp.json` (set `disabled` to `false`)
 //! 3. Set `[memory] moraine_fallback = true` in `config.toml` to skip the legacy
 //!    `<user_memory>` block, `remember` tool, and `# foo` quick-add.
 //!
@@ -24,7 +24,7 @@
 //! v0.8.8 shipped an MVP that let the user keep a persistent personal
 //! note file the model sees on every turn:
 //!
-//! - **Load** `~/.codewhale/memory.md` (path is configurable via
+//! - **Load** `~/.nestlone/memory.md` (path is configurable via
 //!   `memory_path` in `config.toml` and `DEEPSEEK_MEMORY_PATH` env),
 //!   wrap it in a `<user_memory>` block, and prepend it to the system
 //!   prompt alongside the existing `<project_instructions>` block.

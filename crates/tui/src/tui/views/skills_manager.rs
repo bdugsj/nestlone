@@ -849,7 +849,7 @@ mod tests {
         let tmp = TempDir::new().unwrap();
         let _home = IsolatedHome::new(&tmp);
         let workspace = tmp.path().join("ws");
-        let skill_dir = workspace.join(".codewhale").join("skills").join("demo");
+        let skill_dir = workspace.join(".nestlone").join("skills").join("demo");
         fs::create_dir_all(&skill_dir).unwrap();
         fs::write(
             skill_dir.join("SKILL.md"),
@@ -915,7 +915,7 @@ mod tests {
         let tmp = TempDir::new().unwrap();
         let _home = IsolatedHome::new(&tmp);
         let mut app = app_in(&tmp);
-        app.skills_dir = tmp.path().join("home").join(".codewhale").join("skills");
+        app.skills_dir = tmp.path().join("home").join(".nestlone").join("skills");
         crate::skills::install_system_skills(&app.skills_dir).unwrap();
 
         let view = SkillsManagerView::new(&app);
@@ -946,7 +946,7 @@ mod tests {
         let tmp = TempDir::new().unwrap();
         let _home = IsolatedHome::new(&tmp);
         let mut app = app_in(&tmp);
-        app.skills_dir = tmp.path().join("home").join(".codewhale").join("skills");
+        app.skills_dir = tmp.path().join("home").join(".nestlone").join("skills");
         crate::skills::install_system_skills(&app.skills_dir).unwrap();
         write_skill_pkg(&app.skills_dir.join("my-workflow"), "my-workflow", "mine");
 
@@ -982,7 +982,7 @@ mod tests {
 
         // Project-owned conflict only — Global import must not prompt replace.
         write_skill_pkg(
-            &workspace.join(".codewhale").join("skills").join("shared"),
+            &workspace.join(".nestlone").join("skills").join("shared"),
             "shared",
             "owned-project",
         );

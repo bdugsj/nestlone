@@ -6,11 +6,11 @@
 //! - `AGENTS.md` - Cross-agent project instructions (canonical, highest priority)
 //! - `.claude/instructions.md` - Claude-style hidden instructions (compat)
 //! - `CLAUDE.md` - Claude-style instructions (compat)
-//! - `.codewhale/instructions.md` - Hidden instructions file (compat)
+//! - `.nestlone/instructions.md` - Hidden instructions file (compat)
 //! - `.deepseek/instructions.md` - Hidden instructions file (legacy)
 //!
 //! Codewhale-specific repo authority/prioritization policy lives separately in
-//! `.codewhale/constitution.json` and is rendered as its own higher-authority
+//! `.nestlone/constitution.json` and is rendered as its own higher-authority
 //! block. The loaded content is injected into the system prompt to give the
 //! agent context about the project's conventions, structure, and requirements.
 
@@ -27,7 +27,7 @@ use thiserror::Error;
 /// `AGENTS.md` is the canonical cross-agent project-instructions file.
 /// `WHALE.md` is no longer an active context surface; when present, Codewhale
 /// reports a migration warning but ignores it. Codewhale-specific repo
-/// authority now lives in `.codewhale/constitution.json`, not a bespoke
+/// authority now lives in `.nestlone/constitution.json`, not a bespoke
 /// markdown file. `CLAUDE.md` and the `*/instructions.md` variants are
 /// read-only compatibility fallbacks; Codewhale never creates or recommends
 /// them.
@@ -35,26 +35,26 @@ const PROJECT_CONTEXT_FILES: &[&str] = &[
     "AGENTS.md",
     ".claude/instructions.md",
     "CLAUDE.md",
-    ".codewhale/instructions.md",
+    ".nestlone/instructions.md",
     ".deepseek/instructions.md",
 ];
 
 /// Rules directories auto-discovered at workspace level, in priority order.
-/// `.codewhale/rules/` is Codewhale-native; `.claude/rules/` is Claude compatibility.
+/// `.nestlone/rules/` is Codewhale-native; `.claude/rules/` is Claude compatibility.
 /// All `.md` files in these directories are loaded as project rules in filename order.
 /// Security model: same trust class as AGENTS.md — workspace-contained content only,
 /// no absolute-path escape. Does not require #417 project-config relaxation.
-const RULES_DIRS: &[&str] = &[".codewhale/rules", ".claude/rules"];
+const RULES_DIRS: &[&str] = &[".nestlone/rules", ".claude/rules"];
 
 /// File name of the deprecated Codewhale-native instructions file.
 const DEPRECATED_WHALE_FILENAME: &str = "WHALE.md";
 
 /// Warning surfaced when an ignored `WHALE.md` is present.
-const WHALE_IGNORED_WARNING: &str = "WHALE.md is ignored; move project instructions to AGENTS.md, or security authority policy to .codewhale/constitution.json.";
+const WHALE_IGNORED_WARNING: &str = "WHALE.md is ignored; move project instructions to AGENTS.md, or security authority policy to .nestlone/constitution.json.";
 
 /// Relative path (within a workspace or one of its parents) to the
 /// Codewhale-specific repo authority/prioritization policy.
-const REPO_CONSTITUTION_RELATIVE_PATH: &[&str] = &[".codewhale", "constitution.json"];
+const REPO_CONSTITUTION_RELATIVE_PATH: &[&str] = &[".nestlone", "constitution.json"];
 
 /// `schema_version` understood by this build of the constitution loader.
 const SUPPORTED_CONSTITUTION_SCHEMA: u32 = 1;
@@ -62,18 +62,18 @@ const SUPPORTED_CONSTITUTION_SCHEMA: u32 = 1;
 /// User-level project instructions loaded as a fallback when the workspace and
 /// its parents do not define project context. Any global AGENTS.md takes
 /// priority over a global instructions.md (#3012). Within each file name,
-/// `.codewhale/` takes priority over vendor-neutral `.agents/`, which takes
+/// `.nestlone/` takes priority over vendor-neutral `.agents/`, which takes
 /// priority over legacy `.deepseek/`. Global `WHALE.md` files are ignored and
 /// reported as migration-only diagnostics.
-const GLOBAL_AGENTS_RELATIVE_PATH: &[&str] = &[".codewhale", "AGENTS.md"];
+const GLOBAL_AGENTS_RELATIVE_PATH: &[&str] = &[".nestlone", "AGENTS.md"];
 const GLOBAL_AGENTS_VENDOR_NEUTRAL_PATH: &[&str] = &[".agents", "AGENTS.md"];
 const GLOBAL_AGENTS_LEGACY_PATH: &[&str] = &[".deepseek", "AGENTS.md"];
-const GLOBAL_WHALE_RELATIVE_PATH: &[&str] = &[".codewhale", "WHALE.md"];
+const GLOBAL_WHALE_RELATIVE_PATH: &[&str] = &[".nestlone", "WHALE.md"];
 const GLOBAL_WHALE_VENDOR_NEUTRAL_PATH: &[&str] = &[".agents", "WHALE.md"];
 const GLOBAL_WHALE_LEGACY_PATH: &[&str] = &[".deepseek", "WHALE.md"];
 /// Global `instructions.md` (#3012): auto-loaded as a fallback context layer,
 /// ranked below AGENTS.md, mirroring the project-level precedence.
-const GLOBAL_INSTRUCTIONS_RELATIVE_PATH: &[&str] = &[".codewhale", "instructions.md"];
+const GLOBAL_INSTRUCTIONS_RELATIVE_PATH: &[&str] = &[".nestlone", "instructions.md"];
 const GLOBAL_INSTRUCTIONS_VENDOR_NEUTRAL_PATH: &[&str] = &[".agents", "instructions.md"];
 const GLOBAL_INSTRUCTIONS_LEGACY_PATH: &[&str] = &[".deepseek", "instructions.md"];
 
@@ -151,7 +151,7 @@ enum ProjectContextError {
 pub struct ProjectContext {
     /// The loaded instructions content
     pub instructions: Option<String>,
-    /// Auto-discovered rules from `.codewhale/rules/` / `.claude/rules/`.
+    /// Auto-discovered rules from `.nestlone/rules/` / `.claude/rules/`.
     /// Kept separate from `instructions` so rules alone don't block
     /// parent-directory AGENTS.md discovery via `has_instructions()`.
     pub rules_block: Option<String>,
@@ -159,7 +159,7 @@ pub struct ProjectContext {
     pub source_path: Option<PathBuf>,
     /// Any warnings during loading
     pub warnings: Vec<String>,
-    /// Rendered `.codewhale/constitution.json` authority block, if present.
+    /// Rendered `.nestlone/constitution.json` authority block, if present.
     /// Codewhale-specific repo authority/prioritization policy — distinct from
     /// the cross-agent prose in `instructions`.
     pub constitution_block: Option<String>,
@@ -194,7 +194,7 @@ impl ProjectContext {
 
     /// Get the instructions as a formatted block for system prompt.
     ///
-    /// The Codewhale repo constitution (`.codewhale/constitution.json`), when
+    /// The Codewhale repo constitution (`.nestlone/constitution.json`), when
     /// present, is emitted first as a higher-authority block, followed by the
     /// cross-agent `<project_instructions>` prose. Either may be absent.
     pub fn as_system_block(&self) -> Option<String> {
@@ -239,7 +239,7 @@ impl ProjectContext {
 }
 
 /// Codewhale-specific repo authority/prioritization policy, loaded from
-/// `.codewhale/constitution.json`. All fields are optional so a minimal file
+/// `.nestlone/constitution.json`. All fields are optional so a minimal file
 /// (or a future schema) still parses; unknown fields are ignored.
 #[derive(Debug, Clone, Default, Deserialize)]
 struct RepoConstitution {
@@ -510,7 +510,7 @@ fn contains_release_version_token(value: &str) -> bool {
         })
 }
 
-/// Discover and render `.codewhale/constitution.json` from `workspace` or, if
+/// Discover and render `.nestlone/constitution.json` from `workspace` or, if
 /// absent, its parent directories up to the git root. Returns the rendered
 /// authority block plus any parse warnings.
 fn load_repo_constitution_block(
@@ -882,7 +882,7 @@ pub fn load_project_context(workspace: &Path) -> ProjectContext {
     ctx.warnings
         .extend(ignored_project_whale_warnings(workspace));
 
-    // Load rules from auto-discovered directories (.codewhale/rules/, .claude/rules/)
+    // Load rules from auto-discovered directories (.nestlone/rules/, .claude/rules/)
     // Each rule file is wrapped in a <project_rule> block and appended after
     // the main instructions content. Security model: same as AGENTS.md —
     // workspace-contained content only, no absolute-path escape.
@@ -1015,7 +1015,7 @@ fn load_project_context_with_parents_and_home(
 
     // Generate a bounded in-memory fallback when no context file exists
     // anywhere. This keeps prompt shape stable without creating project-local
-    // `.codewhale/` files merely because Codewhale was opened in a directory.
+    // `.nestlone/` files merely because Codewhale was opened in a directory.
     if !ctx.has_instructions()
         && let Some(generated) = generate_ephemeral_context(workspace)
     {
@@ -1024,7 +1024,7 @@ fn load_project_context_with_parents_and_home(
     }
 
     // Load the Codewhale-specific repo authority policy
-    // (.codewhale/constitution.json) independently of the prose instructions —
+    // (.nestlone/constitution.json) independently of the prose instructions —
     // it is a distinct, higher-authority artifact and may exist with or without
     // an AGENTS.md. Legacy WHALE.md files are ignored and reported as
     // migration-only diagnostics.
@@ -1217,10 +1217,10 @@ fn load_global_agents_context(workspace: &Path, home_dir: Option<&Path>) -> Opti
     let home = home_dir?;
 
     // Priority order (AGENTS.md preferred; instructions.md next, #3012):
-    // 1. ~/.codewhale/AGENTS.md       (canonical)
+    // 1. ~/.nestlone/AGENTS.md       (canonical)
     // 2. ~/.agents/AGENTS.md          (vendor-neutral fallback)
     // 3. ~/.deepseek/AGENTS.md        (legacy fallback)
-    // 4. ~/.codewhale/instructions.md (canonical)
+    // 4. ~/.nestlone/instructions.md (canonical)
     // 5. ~/.agents/instructions.md    (vendor-neutral fallback)
     // 6. ~/.deepseek/instructions.md  (legacy fallback)
     // Global WHALE.md files are ignored and reported as migration-only
@@ -1261,7 +1261,7 @@ fn generate_ephemeral_context(workspace: &Path) -> Option<String> {
     Some(format!(
         "# Project Context (Auto-generated, ephemeral)\n\n\
          > This context was generated in memory by Codewhale.\n\
-         > No .codewhale/instructions.md file was written.\n\n\
+         > No .nestlone/instructions.md file was written.\n\n\
          {overview}"
     ))
 }
@@ -1533,7 +1533,7 @@ mod tests {
     #[test]
     fn mixed_advisory_and_enforced_invariants_render_and_back_compat_holds() {
         let tmp = tempdir().expect("tempdir");
-        let dir = tmp.path().join(".codewhale");
+        let dir = tmp.path().join(".nestlone");
         fs::create_dir_all(&dir).expect("law dir");
         fs::write(
             dir.join("constitution.json"),
@@ -1569,7 +1569,7 @@ mod tests {
     #[test]
     fn legacy_string_only_invariants_render_unchanged_and_compile_nothing() {
         let tmp = tempdir().expect("tempdir");
-        let dir = tmp.path().join(".codewhale");
+        let dir = tmp.path().join(".nestlone");
         fs::create_dir_all(&dir).expect("law dir");
         fs::write(
             dir.join("constitution.json"),
@@ -1837,9 +1837,9 @@ mod tests {
     fn constitution_json_renders_authority_block() {
         let tmp = tempdir().expect("tempdir");
         fs::create_dir(tmp.path().join(".git")).expect("mkdir .git");
-        fs::create_dir(tmp.path().join(".codewhale")).expect("mkdir .codewhale");
+        fs::create_dir(tmp.path().join(".nestlone")).expect("mkdir .nestlone");
         fs::write(
-            tmp.path().join(".codewhale").join("constitution.json"),
+            tmp.path().join(".nestlone").join("constitution.json"),
             r#"{
                 "schema_version": 1,
                 "authority": ["current user request", "live code and tests", "AGENTS.md"],
@@ -1866,7 +1866,7 @@ mod tests {
         assert!(
             ctx.constitution_source_path
                 .as_ref()
-                .is_some_and(|path| path.ends_with(".codewhale/constitution.json")),
+                .is_some_and(|path| path.ends_with(".nestlone/constitution.json")),
             "constitution source path should be visible: {:?}",
             ctx.constitution_source_path
         );
@@ -1882,9 +1882,9 @@ mod tests {
     fn stale_constitution_branch_policy_warns() {
         let tmp = tempdir().expect("tempdir");
         fs::create_dir(tmp.path().join(".git")).expect("mkdir .git");
-        fs::create_dir(tmp.path().join(".codewhale")).expect("mkdir .codewhale");
+        fs::create_dir(tmp.path().join(".nestlone")).expect("mkdir .nestlone");
         fs::write(
-            tmp.path().join(".codewhale").join("constitution.json"),
+            tmp.path().join(".nestlone").join("constitution.json"),
             r#"{
                 "schema_version": 1,
                 "authority": ["current user request"],
@@ -1911,7 +1911,7 @@ mod tests {
     fn repository_constitution_avoids_hard_coded_release_lane_policy() {
         let repo_constitution = Path::new(env!("CARGO_MANIFEST_DIR"))
             .join("../..")
-            .join(".codewhale")
+            .join(".nestlone")
             .join("constitution.json");
         let raw = fs::read_to_string(&repo_constitution).expect("read repo constitution");
         let constitution: RepoConstitution =
@@ -1928,9 +1928,9 @@ mod tests {
     fn malformed_constitution_warns_without_crashing() {
         let tmp = tempdir().expect("tempdir");
         fs::create_dir(tmp.path().join(".git")).expect("mkdir .git");
-        fs::create_dir(tmp.path().join(".codewhale")).expect("mkdir .codewhale");
+        fs::create_dir(tmp.path().join(".nestlone")).expect("mkdir .nestlone");
         fs::write(
-            tmp.path().join(".codewhale").join("constitution.json"),
+            tmp.path().join(".nestlone").join("constitution.json"),
             "{ not valid json",
         )
         .expect("write bad constitution");
@@ -1953,7 +1953,7 @@ mod tests {
         let workspace = tempdir().expect("workspace tempdir");
         let outside = tempdir().expect("outside tempdir");
         fs::create_dir(workspace.path().join(".git")).expect("mkdir .git");
-        fs::create_dir(workspace.path().join(".codewhale")).expect("mkdir .codewhale");
+        fs::create_dir(workspace.path().join(".nestlone")).expect("mkdir .nestlone");
         let outside_constitution = outside.path().join("constitution.json");
         fs::write(
             &outside_constitution,
@@ -1964,7 +1964,7 @@ mod tests {
             &outside_constitution,
             workspace
                 .path()
-                .join(".codewhale")
+                .join(".nestlone")
                 .join("constitution.json"),
         )
         .expect("symlink constitution");
@@ -2029,10 +2029,10 @@ mod tests {
         fs::write(tmp.path().join("src").join("main.rs"), "fn main() {}").expect("write src");
         fs::write(tmp.path().join(".DS_Store"), "noise").expect("write ds store");
         fs::write(tmp.path().join("paper.pdf"), "not a real pdf").expect("write pdf");
-        fs::create_dir_all(tmp.path().join(".codewhale").join("state")).expect("mkdir state");
+        fs::create_dir_all(tmp.path().join(".nestlone").join("state")).expect("mkdir state");
         fs::write(
             tmp.path()
-                .join(".codewhale")
+                .join(".nestlone")
                 .join("state")
                 .join("subagents.v1.json"),
             "{}",
@@ -2123,15 +2123,15 @@ mod tests {
         );
         assert!(ctx.has_instructions());
 
-        let generated_path = workspace.path().join(".codewhale").join("instructions.md");
+        let generated_path = workspace.path().join(".nestlone").join("instructions.md");
         assert_eq!(ctx.source_path, None);
         assert!(
             !generated_path.exists(),
             "generated project context should stay ephemeral"
         );
         assert!(
-            !workspace.path().join(".codewhale").exists(),
-            "loading context should not create a .codewhale directory"
+            !workspace.path().join(".nestlone").exists(),
+            "loading context should not create a .nestlone directory"
         );
         let generated = ctx.instructions.as_ref().expect("generated instructions");
         assert!(generated.contains("Project Context (Auto-generated, ephemeral)"));
@@ -2191,10 +2191,10 @@ mod tests {
         let workspace = tempdir().expect("workspace tempdir");
         let home = tempdir().expect("home tempdir");
         fs::create_dir(workspace.path().join(".git")).expect("mkdir git");
-        fs::create_dir(workspace.path().join(".codewhale")).expect("mkdir nestlone");
+        fs::create_dir(workspace.path().join(".nestlone")).expect("mkdir nestlone");
         let constitution = workspace
             .path()
-            .join(".codewhale")
+            .join(".nestlone")
             .join("constitution.json");
         fs::write(
             &constitution,
@@ -2240,7 +2240,7 @@ mod tests {
         let first =
             load_project_context_with_parents_cached_and_home(workspace.path(), Some(home.path()));
         assert!(first.has_instructions());
-        let generated_path = workspace.path().join(".codewhale").join("instructions.md");
+        let generated_path = workspace.path().join(".nestlone").join("instructions.md");
         assert!(
             !generated_path.exists(),
             "first load should not write generated instructions"
@@ -2374,8 +2374,8 @@ mod tests {
         let workspace = tempdir().expect("workspace tempdir");
         let home = tempdir().expect("home tempdir");
 
-        let nestlone_dir = home.path().join(".codewhale");
-        fs::create_dir(&nestlone_dir).expect("mkdir .codewhale");
+        let nestlone_dir = home.path().join(".nestlone");
+        fs::create_dir(&nestlone_dir).expect("mkdir .nestlone");
         let nestlone_agents = nestlone_dir.join("AGENTS.md");
         fs::write(&nestlone_agents, "Codewhale-specific instructions")
             .expect("write nestlone agents");
@@ -2405,8 +2405,8 @@ mod tests {
         let workspace = tempdir().expect("workspace tempdir");
         let home = tempdir().expect("home tempdir");
 
-        let nestlone_dir = home.path().join(".codewhale");
-        fs::create_dir(&nestlone_dir).expect("mkdir .codewhale");
+        let nestlone_dir = home.path().join(".nestlone");
+        fs::create_dir(&nestlone_dir).expect("mkdir .nestlone");
         fs::write(nestlone_dir.join("WHALE.md"), "Global WHALE legacy")
             .expect("write nestlone whale");
 
@@ -2442,8 +2442,8 @@ mod tests {
         let workspace = tempdir().expect("workspace tempdir");
         let home = tempdir().expect("home tempdir");
 
-        let nestlone_dir = home.path().join(".codewhale");
-        fs::create_dir(&nestlone_dir).expect("mkdir .codewhale");
+        let nestlone_dir = home.path().join(".nestlone");
+        fs::create_dir(&nestlone_dir).expect("mkdir .nestlone");
         let global_whale = nestlone_dir.join("WHALE.md");
         fs::write(&global_whale, "Global WHALE legacy").expect("write nestlone whale");
 
@@ -2466,13 +2466,13 @@ mod tests {
 
     #[test]
     fn test_global_instructions_md_is_autoloaded_while_whale_is_ignored() {
-        // #3012: a global ~/.codewhale/instructions.md should be auto-loaded as
+        // #3012: a global ~/.nestlone/instructions.md should be auto-loaded as
         // a fallback context layer while legacy WHALE.md remains ignored.
         let workspace = tempdir().expect("workspace tempdir");
         let home = tempdir().expect("home tempdir");
 
-        let nestlone_dir = home.path().join(".codewhale");
-        fs::create_dir(&nestlone_dir).expect("mkdir .codewhale");
+        let nestlone_dir = home.path().join(".nestlone");
+        fs::create_dir(&nestlone_dir).expect("mkdir .nestlone");
         fs::write(nestlone_dir.join("WHALE.md"), "Global WHALE legacy")
             .expect("write nestlone whale");
         let global_instructions = nestlone_dir.join("instructions.md");
@@ -2507,8 +2507,8 @@ mod tests {
         let workspace = tempdir().expect("workspace tempdir");
         let home = tempdir().expect("home tempdir");
 
-        let nestlone_dir = home.path().join(".codewhale");
-        fs::create_dir(&nestlone_dir).expect("mkdir .codewhale");
+        let nestlone_dir = home.path().join(".nestlone");
+        fs::create_dir(&nestlone_dir).expect("mkdir .nestlone");
         let global_agents = nestlone_dir.join("AGENTS.md");
         fs::write(&global_agents, "Global AGENTS canonical").expect("write global agents");
         fs::write(
@@ -2632,7 +2632,7 @@ mod tests {
     #[test]
     fn rules_from_nestlone_dir_are_loaded_as_project_context() {
         let tmp = tempdir().expect("tempdir");
-        let rules_dir = tmp.path().join(".codewhale/rules");
+        let rules_dir = tmp.path().join(".nestlone/rules");
         fs::create_dir_all(&rules_dir).expect("mkdir rules");
         fs::write(
             rules_dir.join("security.md"),
@@ -2656,7 +2656,7 @@ mod tests {
     #[test]
     fn rules_are_loaded_in_filename_order() {
         let tmp = tempdir().expect("tempdir");
-        let rules_dir = tmp.path().join(".codewhale/rules");
+        let rules_dir = tmp.path().join(".nestlone/rules");
         fs::create_dir_all(&rules_dir).expect("mkdir rules");
         fs::write(rules_dir.join("zzz.md"), "last").expect("write");
         fs::write(rules_dir.join("aaa.md"), "first").expect("write");
@@ -2691,7 +2691,7 @@ mod tests {
     #[test]
     fn rules_directory_missing_does_not_crash() {
         let tmp = tempdir().expect("tempdir");
-        // No .codewhale/rules/ or .claude/rules/ directories exist
+        // No .nestlone/rules/ or .claude/rules/ directories exist
         let ctx = load_project_context(tmp.path());
         // Rules block should be None when no rules directories exist
         assert!(
@@ -2704,7 +2704,7 @@ mod tests {
     fn rules_coexist_with_agents_md() {
         let tmp = tempdir().expect("tempdir");
         fs::write(tmp.path().join("AGENTS.md"), "Main project instructions").expect("write");
-        let rules_dir = tmp.path().join(".codewhale/rules");
+        let rules_dir = tmp.path().join(".nestlone/rules");
         fs::create_dir_all(&rules_dir).expect("mkdir rules");
         fs::write(rules_dir.join("extra.md"), "Extra rule").expect("write");
 
@@ -2727,7 +2727,7 @@ mod tests {
     #[test]
     fn non_md_files_in_rules_dir_are_ignored() {
         let tmp = tempdir().expect("tempdir");
-        let rules_dir = tmp.path().join(".codewhale/rules");
+        let rules_dir = tmp.path().join(".nestlone/rules");
         fs::create_dir_all(&rules_dir).expect("mkdir rules");
         fs::write(rules_dir.join("notes.txt"), "should be ignored").expect("write");
         fs::write(rules_dir.join("valid.md"), "loaded").expect("write");
@@ -2745,7 +2745,7 @@ mod tests {
     #[test]
     fn rules_cap_truncates_excess_files() {
         let tmp = tempdir().expect("tempdir");
-        let rules_dir = tmp.path().join(".codewhale/rules");
+        let rules_dir = tmp.path().join(".nestlone/rules");
         fs::create_dir_all(&rules_dir).expect("mkdir rules");
 
         // Create more files than the cap
@@ -2783,7 +2783,7 @@ mod tests {
     fn rules_rejects_symlinked_files() {
         let workspace = tempdir().expect("workspace tempdir");
         let outside = tempdir().expect("outside tempdir");
-        let rules_dir = workspace.path().join(".codewhale/rules");
+        let rules_dir = workspace.path().join(".nestlone/rules");
         fs::create_dir_all(&rules_dir).expect("mkdir rules");
 
         let outside_rule = outside.path().join("outside.md");
@@ -2813,10 +2813,10 @@ mod tests {
         let outside_dir = outside.path().join("real_rules");
         fs::create_dir_all(&outside_dir).expect("mkdir outside dir");
         fs::write(outside_dir.join("secret.md"), "outside content").expect("write outside");
-        fs::create_dir_all(workspace.path().join(".codewhale")).expect("mkdir nestlone");
+        fs::create_dir_all(workspace.path().join(".nestlone")).expect("mkdir nestlone");
 
         // Symlink the directory itself, not individual files
-        std::os::unix::fs::symlink(&outside_dir, workspace.path().join(".codewhale/rules"))
+        std::os::unix::fs::symlink(&outside_dir, workspace.path().join(".nestlone/rules"))
             .expect("symlink rules dir");
 
         let ctx = load_project_context(workspace.path());
@@ -2836,7 +2836,7 @@ mod tests {
     #[test]
     fn rules_from_both_dirs_are_loaded_together() {
         let tmp = tempdir().expect("tempdir");
-        let nestlone_rules = tmp.path().join(".codewhale/rules");
+        let nestlone_rules = tmp.path().join(".nestlone/rules");
         let claude_rules = tmp.path().join(".claude/rules");
         fs::create_dir_all(&nestlone_rules).expect("mkdir nestlone rules");
         fs::create_dir_all(&claude_rules).expect("mkdir claude rules");
@@ -2848,25 +2848,25 @@ mod tests {
 
         assert!(
             rules.contains("nestlone-rule"),
-            ".codewhale/rules/ should be loaded"
+            ".nestlone/rules/ should be loaded"
         );
         assert!(
             rules.contains("claude-rule"),
             ".claude/rules/ should be loaded"
         );
-        // .codewhale/rules/ content should appear before .claude/rules/ (RULES_DIRS order)
+        // .nestlone/rules/ content should appear before .claude/rules/ (RULES_DIRS order)
         let pos_cw = rules.find("nestlone-rule").unwrap();
         let pos_claude = rules.find("claude-rule").unwrap();
         assert!(
             pos_cw < pos_claude,
-            ".codewhale/rules/ should precede .claude/rules/"
+            ".nestlone/rules/ should precede .claude/rules/"
         );
     }
 
     #[test]
     fn rules_block_truncated_at_total_byte_budget() {
         let tmp = tempdir().expect("tempdir");
-        let rules_dir = tmp.path().join(".codewhale/rules");
+        let rules_dir = tmp.path().join(".nestlone/rules");
         fs::create_dir_all(&rules_dir).expect("mkdir rules");
 
         // Create files whose combined content exceeds MAX_RULES_BLOCK_BYTES

@@ -199,8 +199,8 @@ impl SandboxPolicy {
                     .map(|root| {
                         let mut read_only_subpaths = Vec::new();
 
-                        // Protect .codewhale/ and .deepseek/ directories from modification
-                        let nestlone_dir = root.join(".codewhale");
+                        // Protect .nestlone/ and .deepseek/ directories from modification
+                        let nestlone_dir = root.join(".nestlone");
                         if nestlone_dir.is_dir() {
                             read_only_subpaths.push(nestlone_dir);
                         }

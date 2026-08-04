@@ -5265,7 +5265,7 @@ mod tests {
             .lock()
             .unwrap_or_else(|err| err.into_inner());
         let tmp = tempfile::tempdir().expect("tempdir");
-        let spillover_root = tmp.path().join(".codewhale").join("tool_outputs");
+        let spillover_root = tmp.path().join(".nestlone").join("tool_outputs");
         let prior = crate::tools::truncate::set_test_spillover_root(Some(spillover_root.clone()));
         struct Restore(Option<std::path::PathBuf>);
         impl Drop for Restore {
@@ -5338,7 +5338,7 @@ mod tests {
             .unwrap_or_else(|err| err.into_inner());
         let tmp = tempfile::tempdir().expect("tempdir");
         let prior = crate::tools::truncate::set_test_spillover_root(Some(
-            tmp.path().join(".codewhale").join("tool_outputs"),
+            tmp.path().join(".nestlone").join("tool_outputs"),
         ));
         struct Restore(Option<std::path::PathBuf>);
         impl Drop for Restore {

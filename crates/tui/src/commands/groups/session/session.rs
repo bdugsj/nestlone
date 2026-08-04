@@ -14,7 +14,7 @@ use super::CommandResult;
 ///
 /// When an explicit path is given, the session is exported there
 /// (user-visible explicit export).  Without a path, v0.8.44 saves
-/// into the managed session directory (`~/.codewhale/sessions`
+/// into the managed session directory (`~/.nestlone/sessions`
 /// or legacy `~/.deepseek/sessions`) so repo-local `session_*.json`
 /// artifacts are no longer created by default.
 pub fn save(app: &mut App, path: Option<&str>) -> CommandResult {

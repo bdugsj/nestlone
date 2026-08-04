@@ -1555,7 +1555,7 @@ mod tests {
             missing.message
         );
         assert!(
-            !tmpdir.path().join(".codewhale").exists(),
+            !tmpdir.path().join(".nestlone").exists(),
             "read-only copy must not create the workflow journal"
         );
 

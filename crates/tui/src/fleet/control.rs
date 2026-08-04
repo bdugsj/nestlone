@@ -33,7 +33,7 @@ pub const MAX_INSPECTION_ARTIFACT_ROWS: usize = 24;
 /// The durable Fleet ledger for `workspace`, without creating it.
 #[must_use]
 pub fn fleet_ledger_path(workspace: &Path) -> PathBuf {
-    workspace.join(".codewhale").join("fleet.jsonl")
+    workspace.join(".nestlone").join("fleet.jsonl")
 }
 
 /// Read-only availability probe for the Fleet domain.

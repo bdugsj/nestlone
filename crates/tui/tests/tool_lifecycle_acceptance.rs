@@ -570,7 +570,7 @@ fn run_nestlone_exec(
         .env("XDG_CACHE_HOME", home.join(".cache"))
         .env(
             "CODEWHALE_CONFIG_PATH",
-            home.join(".codewhale").join("config.toml"),
+            home.join(".nestlone").join("config.toml"),
         )
         .env(
             "DEEPSEEK_CONFIG_PATH",
@@ -585,7 +585,7 @@ fn run_nestlone_exec(
         .stdout(Stdio::piped())
         .stderr(Stdio::piped());
 
-    std::fs::create_dir_all(home.join(".codewhale")).expect("create nestlone home config dir");
+    std::fs::create_dir_all(home.join(".nestlone")).expect("create nestlone home config dir");
     std::fs::create_dir_all(home.join(".deepseek")).expect("create deepseek home config dir");
 
     run_with_timeout(command, Duration::from_secs(45))

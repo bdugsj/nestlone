@@ -210,7 +210,7 @@ pub fn default_marker_path() -> Option<PathBuf> {
 #[cfg(test)]
 fn marker_path_with_home(home: &Path) -> PathBuf {
     marker_path_with_roots(
-        &home.join(".codewhale"),
+        &home.join(".nestlone"),
         Some(home.join(".deepseek").as_path()),
     )
 }
@@ -551,7 +551,7 @@ mod tests {
     fn fresh_install_marker_path_uses_nestlone_not_legacy() {
         let tmp = tempfile::tempdir().expect("tempdir");
 
-        let expected = tmp.path().join(".codewhale").join(ONBOARDED_MARKER_FILE);
+        let expected = tmp.path().join(".nestlone").join(ONBOARDED_MARKER_FILE);
         assert_eq!(marker_path_with_home(tmp.path()), expected);
 
         let written = mark_onboarded_at_home(tmp.path()).expect("mark onboarded");
@@ -580,7 +580,7 @@ mod tests {
     #[test]
     fn nestlone_marker_wins_over_legacy_marker() {
         let tmp = tempfile::tempdir().expect("tempdir");
-        let primary = tmp.path().join(".codewhale").join(ONBOARDED_MARKER_FILE);
+        let primary = tmp.path().join(".nestlone").join(ONBOARDED_MARKER_FILE);
         let legacy = tmp.path().join(".deepseek").join(ONBOARDED_MARKER_FILE);
         for marker in [&primary, &legacy] {
             std::fs::create_dir_all(marker.parent().expect("marker parent")).expect("mkdir");
@@ -616,7 +616,7 @@ mod tests {
         assert_eq!(default_marker_path().as_deref(), Some(expected.as_path()));
         assert!(ambient_legacy.exists(), "legacy marker remains untouched");
         assert!(
-            !ambient_home.join(".codewhale").exists(),
+            !ambient_home.join(".nestlone").exists(),
             "an explicit state root must not write into the ambient profile"
         );
     }

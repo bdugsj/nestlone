@@ -57,7 +57,7 @@ pub fn default_user_plugins_dir() -> PathBuf {
             );
             std::env::temp_dir()
                 .join(format!(
-                    ".codewhale-home-unavailable-{}",
+                    ".nestlone-home-unavailable-{}",
                     uuid::Uuid::new_v4().simple()
                 ))
                 .join("plugins")
@@ -66,7 +66,7 @@ pub fn default_user_plugins_dir() -> PathBuf {
 
 #[must_use]
 pub fn default_workspace_plugins_dir(workspace: &Path) -> PathBuf {
-    workspace.join(".codewhale").join("plugins")
+    workspace.join(".nestlone").join("plugins")
 }
 
 #[must_use]

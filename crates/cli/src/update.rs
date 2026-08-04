@@ -1353,7 +1353,7 @@ where
         .unwrap_or_else(|| Path::new("."));
 
     let mut tmp = tempfile::Builder::new()
-        .prefix(".codewhale-update-")
+        .prefix(".nestlone-update-")
         .tempfile_in(parent)
         .with_context(|| format!("failed to create temp file in {}", parent.display()))?;
     tmp.write_all(new_bytes)
@@ -1921,7 +1921,7 @@ mod tests {
                     .unwrap()
                     .file_name()
                     .to_string_lossy()
-                    .starts_with(".codewhale-update-")
+                    .starts_with(".nestlone-update-")
             }),
             "failed validation must clean the staged temp file"
         );

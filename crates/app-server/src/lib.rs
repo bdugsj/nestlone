@@ -686,7 +686,7 @@ fn resolve_auth_token(options: &AppServerOptions) -> Result<Option<String>> {
 
     if !has_explicit_token && !options.listen.ip().is_loopback() {
         bail!(
-            "refusing non-loopback app-server bind without explicit auth token; pass --auth-token or set CODEWHALE_APP_SERVER_TOKEN"
+            "refusing non-loopback app-server bind without explicit auth token; pass --auth-token or set NESTLONE_APP_SERVER_TOKEN"
         );
     }
 
@@ -705,7 +705,7 @@ fn app_server_auth_status_lines(has_explicit_token: bool) -> Vec<&'static str> {
     }
     vec![
         "app-server auth: generated bearer token for this process (not printed).",
-        "  Pass --auth-token or set CODEWHALE_APP_SERVER_TOKEN when another client needs to connect.",
+        "  Pass --auth-token or set NESTLONE_APP_SERVER_TOKEN when another client needs to connect.",
     ]
 }
 
@@ -1016,6 +1016,7 @@ impl RuntimeBridge {
             .arg("127.0.0.1")
             .arg("--port")
             .arg(port.to_string())
+            .env("NESTLONE_RUNTIME_TOKEN", auth_token)
             .env("CODEWHALE_RUNTIME_TOKEN", auth_token)
             .env("DEEPSEEK_RUNTIME_TOKEN", auth_token)
             .stdin(Stdio::null())
@@ -3112,8 +3113,13 @@ mod tests {
             .collect();
         assert!(
             envs.iter()
+                .any(|(k, v)| k == "NESTLONE_RUNTIME_TOKEN" && v == token),
+            "token must be carried via NESTLONE_RUNTIME_TOKEN: {envs:?}"
+        );
+        assert!(
+            envs.iter()
                 .any(|(k, v)| k == "CODEWHALE_RUNTIME_TOKEN" && v == token),
-            "token must be carried via CODEWHALE_RUNTIME_TOKEN: {envs:?}"
+            "legacy alias CODEWHALE_RUNTIME_TOKEN must also carry the token: {envs:?}"
         );
         assert!(
             envs.iter()
@@ -3128,7 +3134,7 @@ mod tests {
 
         assert!(!rendered.contains("Authorization: Bearer"));
         assert!(rendered.contains("not printed"));
-        assert!(rendered.contains("CODEWHALE_APP_SERVER_TOKEN"));
+        assert!(rendered.contains("NESTLONE_APP_SERVER_TOKEN"));
     }
 
     #[test]

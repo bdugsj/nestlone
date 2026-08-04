@@ -531,7 +531,7 @@ impl StartupDefaultsWriter {
 ///
 /// Mode and thinking cycling happen inside a great many `App` unit tests that do
 /// not seal `HOME`. Those tests predate this write and must not start rewriting
-/// the developer's real `~/.codewhale/settings.toml`, so under `cfg(test)` the
+/// the developer's real `~/.nestlone/settings.toml`, so under `cfg(test)` the
 /// background write is inert unless the caller is inside a sealed env scope that
 /// opted in with `allow_writes_in_tests`.
 ///
@@ -826,15 +826,15 @@ mod tests {
     #[test]
     fn safe_error_detail_keeps_the_cause_and_drops_the_path() {
         let err = anyhow::anyhow!("Permission denied (os error 13)")
-            .context("Failed to write settings to /Users/real-name/.codewhale/settings.toml");
+            .context("Failed to write settings to /Users/real-name/.nestlone/settings.toml");
         let detail = safe_error_detail(&err);
         assert_eq!(detail, "Permission denied (os error 13)");
         assert!(!detail.contains("real-name"));
-        assert!(!detail.contains(".codewhale"));
+        assert!(!detail.contains(".nestlone"));
 
         // Even when the root cause itself names a path, nothing path-shaped
         // survives.
-        let rooted = anyhow::anyhow!("cannot open /Users/real-name/.codewhale/settings.toml");
+        let rooted = anyhow::anyhow!("cannot open /Users/real-name/.nestlone/settings.toml");
         let scrubbed = safe_error_detail(&rooted);
         assert_eq!(scrubbed, "cannot open <path>");
     }
@@ -885,7 +885,7 @@ mod tests {
         let _home = crate::test_support::EnvVarGuard::set("HOME", tmp.path());
         let _user_profile = crate::test_support::EnvVarGuard::set("USERPROFILE", tmp.path());
         let _nestlone_home =
-            crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", tmp.path().join(".codewhale"));
+            crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", tmp.path().join(".nestlone"));
         let _deepseek_config = crate::test_support::EnvVarGuard::remove("DEEPSEEK_CONFIG_PATH");
         let _nestlone_config = crate::test_support::EnvVarGuard::remove("CODEWHALE_CONFIG_PATH");
         let _writes = allow_writes_in_tests();
@@ -922,7 +922,7 @@ mod tests {
                 .default_mode,
             "operate"
         );
-        assert!(tmp.path().join(".codewhale/settings.toml").exists());
+        assert!(tmp.path().join(".nestlone/settings.toml").exists());
     }
 
     /// Seal `HOME`/`CODEWHALE_HOME` onto `tmp`. Caller must already hold
@@ -932,7 +932,7 @@ mod tests {
         vec![
             EnvVarGuard::set("HOME", tmp),
             EnvVarGuard::set("USERPROFILE", tmp),
-            EnvVarGuard::set("CODEWHALE_HOME", tmp.join(".codewhale")),
+            EnvVarGuard::set("CODEWHALE_HOME", tmp.join(".nestlone")),
             EnvVarGuard::remove("DEEPSEEK_CONFIG_PATH"),
             EnvVarGuard::remove("CODEWHALE_CONFIG_PATH"),
         ]
@@ -987,7 +987,7 @@ mod tests {
             "an unauthorized caller must not enqueue work an authorized drain could inherit"
         );
         assert!(
-            !tmp.path().join(".codewhale/settings.toml").exists(),
+            !tmp.path().join(".nestlone/settings.toml").exists(),
             "an unauthorized caller must not write any settings file"
         );
 
@@ -1075,7 +1075,7 @@ mod tests {
             let writer = StartupDefaultsWriter::default();
             writer.spawn(StartupDefaults::mode(AppMode::Operate));
             assert_eq!(writer.pending_len(), 0);
-            assert!(!tmp.path().join(".codewhale/settings.toml").exists());
+            assert!(!tmp.path().join(".nestlone/settings.toml").exists());
 
             // With its own opt-in it writes into *its* home, keyed to *its*
             // generation.
@@ -1087,7 +1087,7 @@ mod tests {
                 Settings::load_persisted().expect("reload").default_mode,
                 "operate"
             );
-            assert!(tmp.path().join(".codewhale/settings.toml").exists());
+            assert!(tmp.path().join(".nestlone/settings.toml").exists());
         }
     }
 

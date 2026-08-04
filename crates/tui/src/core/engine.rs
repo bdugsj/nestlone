@@ -275,7 +275,7 @@ pub struct EngineConfig {
     pub goal_state: SharedGoalState,
     /// Maximum sub-agent recursion depth (default 3). See
     /// `SubAgentRuntime::max_spawn_depth`. Override via
-    /// `[subagents] max_depth = N` in `~/.codewhale/config.toml`.
+    /// `[subagents] max_depth = N` in `~/.nestlone/config.toml`.
     pub max_spawn_depth: u32,
     /// Optional aggregate token budget for each root sub-agent run.
     /// Descendant agents inherit the root pool unless a child starts a new
@@ -876,7 +876,7 @@ impl Engine {
         Some(format!(
             "The rejected key came from {env_var}; no saved config key is present.\n\
              Run `nestlone auth status` to inspect credential sources, then \
-             `nestlone auth set --provider {provider}` to save a valid key in ~/.codewhale/config.toml, \
+             `nestlone auth set --provider {provider}` to save a valid key in ~/.nestlone/config.toml, \
              or remove the stale export and open a fresh shell.",
             provider = provider.as_str()
         ))
@@ -4017,7 +4017,7 @@ impl Engine {
                     Some(format!(
                         "The engine hit an internal error and stopped this turn: {detail}. \
                          Your session is intact — send your message again to retry. \
-                         A crash report was saved to ~/.codewhale/crashes/."
+                         A crash report was saved to ~/.nestlone/crashes/."
                     )),
                 )
             }
@@ -5028,7 +5028,7 @@ fn default_plugin_tools_dir() -> PathBuf {
     nestlone_config::nestlone_home()
         .unwrap_or_else(|_| {
             crate::config::effective_home_dir()
-                .map_or_else(|| PathBuf::from(".codewhale"), |h| h.join(".codewhale"))
+                .map_or_else(|| PathBuf::from(".nestlone"), |h| h.join(".nestlone"))
         })
         .join("tools")
 }

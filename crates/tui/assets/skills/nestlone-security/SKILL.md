@@ -6,14 +6,14 @@ invocation: model+user
 
 # Nestlone Security Toolkit
 
-Everything runs inside a Kali Linux container. CodeWhale provides the agent
+Everything runs inside a Kali Linux container. Nestlone provides the agent
 runtime + built-in binary analysis tools. Kali provides the pentest toolchain.
 Two MCP servers (vuln + pentest) wrap external APIs and destructive tools
 with safety gates.
 
 ## Environment
 
-- **CodeWhale app-server** — headless runtime at :7878 with embedded Web UI
+- **Nestlone app-server** — headless runtime at :7878 with embedded Web UI
 - **Kali Linux** — nmap, sqlmap, hydra, msf, nikto, john, ffuf, searchsploit + 600 more
 - **MCP: nestlone-vuln** — CVE lookup, dependency scanning, advisory search
 - **MCP: nestlone-pentest** — structured pentest tools with scope enforcement
@@ -59,7 +59,7 @@ in `.nestlone/scope.json`. See Scope Management below.
 
 ### Kali Native Tools (via Bash tool)
 
-These are available directly in $PATH. Use CodeWhale's `Bash` tool to invoke them:
+These are available directly in $PATH. Use Nestlone's `Bash` tool to invoke them:
 
 **Reconnaissance**: `nmap`, `dnsrecon`, `dnsenum`, `enum4linux`, `smbclient`, `whatweb`, `whois`, `dig`
 

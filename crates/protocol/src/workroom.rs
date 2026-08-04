@@ -168,8 +168,13 @@ impl WorkroomLink {
     /// - `nestlone://workroom/wr_<id>`
     /// - `nestlone://workroom/wr_<id>/thread/<thread_id>`
     /// - `nestlone://workroom/wr_<id>/event/<event_id>`
+    ///
+    /// The legacy `codewhale://workroom/...` scheme is still accepted so links
+    /// minted before the rebrand keep resolving.
     pub fn parse(url: &str) -> Option<Self> {
-        let rest = url.strip_prefix("nestlone://workroom/")?;
+        let rest = url
+            .strip_prefix("nestlone://workroom/")
+            .or_else(|| url.strip_prefix("codewhale://workroom/"))?;
         let mut segments = rest.split('/');
         let workroom_id = parse_segment_with_prefix(segments.next()?, "wr_")?;
         let next = segments.next();
@@ -275,6 +280,14 @@ mod tests {
     #[test]
     fn workroom_link_parse_workroom_only() {
         let link = WorkroomLink::parse("nestlone://workroom/wr_abc123def456").unwrap();
+        assert_eq!(link.workroom_id.0, "wr_abc123def456");
+        assert!(link.thread_id.is_none());
+        assert!(link.event_id.is_none());
+    }
+
+    #[test]
+    fn workroom_link_parse_accepts_legacy_codewhale_scheme() {
+        let link = WorkroomLink::parse("codewhale://workroom/wr_abc123def456").unwrap();
         assert_eq!(link.workroom_id.0, "wr_abc123def456");
         assert!(link.thread_id.is_none());
         assert!(link.event_id.is_none());
