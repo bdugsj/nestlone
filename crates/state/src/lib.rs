@@ -1820,7 +1820,7 @@ fn default_state_db_path() -> PathBuf {
 /// inverting the layering).
 fn nestlone_home_override() -> Option<PathBuf> {
     for var in ["NESTLONE_HOME", "CODEWHALE_HOME"] {
-        if let Ok(value) = std::env::var_os(var)
+        if let Some(value) = std::env::var_os(var)
             && !value.is_empty()
         {
             return Some(PathBuf::from(value));
