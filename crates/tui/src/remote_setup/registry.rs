@@ -122,7 +122,7 @@ impl Default for DeployInputs {
             provider_slug: "deepseek".to_string(),
             region: String::new(),
             instance_name: "nestlone-remote".to_string(),
-            image: "ghcr.io/hmbown/nestlone:latest".to_string(),
+            image: "ghcr.io/bdugsj/nestlone:latest".to_string(),
         }
     }
 }

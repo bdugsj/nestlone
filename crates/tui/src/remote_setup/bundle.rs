@@ -86,7 +86,7 @@ impl BundleInputs {
             provider_slug: self.provider.slug.to_string(),
             region: self.cloud.default_region.to_string(),
             instance_name: "nestlone-remote".to_string(),
-            image: "ghcr.io/hmbown/nestlone:latest".to_string(),
+            image: "ghcr.io/bdugsj/nestlone:latest".to_string(),
         }
     }
 }
