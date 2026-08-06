@@ -162,14 +162,14 @@ describe("public surface contracts", () => {
       bin: Record<string, string>;
     };
 
-    expect(matrix.product.name).toBe("Codewhale");
+    expect(matrix.product.name).toBe("Nestlone");
     expect(matrix.product.license).toBe("MIT");
     expect(matrix.product.description).toBe(npmPackage.description);
     // The README intro was simplified; assert the hosted-and-local claim rather
     // than the verbatim product tagline (kept in page-meta.ts / public-surface-facts.json).
     expect(readme).toMatch(/hosted or local/);
     expect(license).toContain("MIT License");
-    expect(matrix.install.recommended).toBe("npm install -g codewhale");
+    expect(matrix.install.recommended).toBe("npm install -g nestlone");
     expect(readme).toContain(matrix.install.recommended);
     expect(Object.keys(npmPackage.bin)).toEqual(matrix.install.binaries);
     expect(matrix.install.channels).toEqual({
@@ -195,9 +195,9 @@ describe("public surface contracts", () => {
     expect(npmReadme).toContain("requires matching Android assets");
     expect(npmArtifacts).toContain("android: {");
     for (const binary of [
-      "codewhale-android-arm64",
-      "codew-android-arm64",
-      "codewhale-tui-android-arm64",
+      "nestlone-android-arm64",
+      "nest-android-arm64",
+      "nestlone-tui-android-arm64",
     ]) {
       expect(npmArtifacts).toContain(binary);
     }
@@ -230,7 +230,7 @@ describe("public surface contracts", () => {
     expect(installPage).toContain(
       "# Install two Cargo packages; together they provide three commands",
     );
-    expect(installPage).toContain("# codewhale + codew");
+    expect(installPage).toContain("# nestlone + nest");
     expect(installPage).toContain("The two Cargo packages install three commands");
     expect(installPage).not.toContain("Install both binaries");
     expect(installDoc).not.toContain("install both binaries from the release tag");
@@ -240,21 +240,21 @@ describe("public surface contracts", () => {
       "linux-arm64",
       "linux-x64",
     ] as const) {
-      expect(SNIPPETS[platform], platform).toContain(`codew-${platform}`);
+      expect(SNIPPETS[platform], platform).toContain(`nest-${platform}`);
       expect(SNIPPETS[platform], platform).toContain(
-        `sudo mv codew-${platform} /usr/local/bin/codew`,
+        `sudo mv nest-${platform} /usr/local/bin/nest`,
       );
     }
     for (const arch of ["x64", "arm64"] as const) {
-      expect(SNIPPETS[`windows-${arch}`], arch).toContain(`codew-windows-${arch}.exe`);
+      expect(SNIPPETS[`windows-${arch}`], arch).toContain(`nest-windows-${arch}.exe`);
       expect(SNIPPETS[`windows-${arch}`], arch).toContain(
-        'Get-FileHash "$dest\\codew.exe"',
+        'Get-FileHash "$dest\\nest.exe"',
       );
     }
   });
 
   it("checks Unix release assets under their manifest filenames before renaming", () => {
-    const scratch = mkdtempSync(join(tmpdir(), "codewhale-install-checksum-"));
+    const scratch = mkdtempSync(join(tmpdir(), "nestlone-install-checksum-"));
     const mockBin = join(scratch, "bin");
     const curlPath = join(mockBin, "curl");
     const checksumPath = join(mockBin, "checksum");
@@ -276,9 +276,9 @@ while [ "$#" -gt 0 ]; do
   shift
 done
 [ -n "$output" ] || output=$(basename "$url")
-if [ "$output" = codewhale-artifacts-sha256.txt ]; then
+if [ "$output" = nestlone-artifacts-sha256.txt ]; then
   for platform in macos-arm64 macos-x64 linux-arm64 linux-x64; do
-    for binary in codewhale codew codewhale-tui; do
+    for binary in nestlone nest nestlone-tui; do
       printf 'fixture-hash  %s-%s\\n' "$binary" "$platform"
     done
   done > "$output"
@@ -334,9 +334,9 @@ done
     const installPage = text("web/app/[locale]/install/page.tsx");
 
     expect(matrix.trust.audit).toContain("best-effort");
-    expect(matrix.trust.audit).toContain("$CODEWHALE_HOME");
+    expect(matrix.trust.audit).toContain("$NESTLONE_HOME");
     expect(installPage).toContain(
-      "const CONFIG_TREE = `$CODEWHALE_HOME/ (default: ~/.codewhale/)",
+      "const CONFIG_TREE = `$NESTLONE_HOME/ (default: ~/.nestlone/)",
     );
     expect(installPage).toContain(
       "best-effort credential / approval / elevation events",
@@ -457,7 +457,7 @@ done
 
     expect(matrix.trust.hostedProviderBoundary).toContain("selected hosted provider");
     expect(matrix.trust.localInference).toContain("loopback local-model route");
-    expect(matrix.trust.telemetry).toContain("no Codewhale product telemetry");
+    expect(matrix.trust.telemetry).toContain("no Nestlone product telemetry");
     expect(faq).toContain("The hosted");
     expect(faq).toContain("provider you select receives the prompt");
     expect(faq).toContain("keep model inference local");
@@ -492,9 +492,9 @@ done
     expect(changelog).toContain("#4674");
     expect(contributors).toContain("github.com/fleitz");
     expect(releaseCredits).toContain('"@fleitz"');
-    expect(footer).toContain('{ label: "MIT license", href: "https://github.com/Hmbown/CodeWhale/blob/main/LICENSE" }');
-    expect(footer).toContain('{ label: "MIT 许可证", href: "https://github.com/Hmbown/CodeWhale/blob/main/LICENSE" }');
-    expect(footer).toContain('href="https://github.com/Hmbown/CodeWhale/releases"');
+    expect(footer).toContain('{ label: "MIT license", href: "https://github.com/bdugsj/nestlone/blob/main/LICENSE" }');
+    expect(footer).toContain('{ label: "MIT 许可证", href: "https://github.com/bdugsj/nestlone/blob/main/LICENSE" }');
+    expect(footer).toContain('href="https://github.com/bdugsj/nestlone/releases"');
     expect(footer).toContain("GITEE_ENABLED &&");
   });
 
@@ -511,8 +511,8 @@ done
     const readme = text("README.md");
     const homepage = text("web/app/[locale]/page.tsx");
     expect(readme).toContain("assets/screenshot.png");
-    expect(homepage).toContain('src="/codewhale-tui.png"');
-    expect(homepage).toContain("Current Codewhale session");
+    expect(homepage).toContain('src="/nestlone-tui.png"');
+    expect(homepage).toContain("Current Nestlone session");
   });
 
   it("keeps reduced motion static without hiding the reasoning trace", () => {

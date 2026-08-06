@@ -42,27 +42,27 @@ export function Footer({ locale = "en" }: { locale?: Locale }) {
 
   const project = isZh
     ? [
-        { label: "GitHub", href: "https://github.com/Hmbown/CodeWhale" },
-        { label: "议题", href: "https://github.com/Hmbown/CodeWhale/issues" },
+        { label: "GitHub", href: "https://github.com/bdugsj/nestlone" },
+        { label: "议题", href: "https://github.com/bdugsj/nestlone/issues" },
         { label: "参与贡献", href: "/zh/contribute" },
-        { label: "MIT 许可证", href: "https://github.com/Hmbown/CodeWhale/blob/main/LICENSE" },
+        { label: "MIT 许可证", href: "https://github.com/bdugsj/nestlone/blob/main/LICENSE" },
       ]
     : locale === "en"
       ? [
-          { label: "GitHub", href: "https://github.com/Hmbown/CodeWhale" },
-          { label: "Issues", href: "https://github.com/Hmbown/CodeWhale/issues" },
+          { label: "GitHub", href: "https://github.com/bdugsj/nestlone" },
+          { label: "Issues", href: "https://github.com/bdugsj/nestlone/issues" },
           { label: "Contribute", href: "/en/contribute" },
-          { label: "MIT license", href: "https://github.com/Hmbown/CodeWhale/blob/main/LICENSE" },
+          { label: "MIT license", href: "https://github.com/bdugsj/nestlone/blob/main/LICENSE" },
         ]
       : [
-          { label: "GitHub", href: "https://github.com/Hmbown/CodeWhale" },
-          { label: chrome.footerIssues, href: "https://github.com/Hmbown/CodeWhale/issues" },
+          { label: "GitHub", href: "https://github.com/bdugsj/nestlone" },
+          { label: chrome.footerIssues, href: "https://github.com/bdugsj/nestlone/issues" },
           { label: chrome.footerContribute, href: `/${locale}/contribute` },
-          { label: chrome.footerLicense, href: "https://github.com/Hmbown/CodeWhale/blob/main/LICENSE" },
+          { label: chrome.footerLicense, href: "https://github.com/bdugsj/nestlone/blob/main/LICENSE" },
         ];
 
   const tagline = isZh
-    ? "Codewhale 开源运行时的文档、源码与社区入口。"
+    ? "Nestlone 开源运行时的文档、源码与社区入口。"
     : chrome.footerTagline;
   const productHeading = isZh ? "产品" : chrome.footerProduct;
   const projectHeading = isZh ? "项目" : chrome.footerProject;
@@ -75,7 +75,7 @@ export function Footer({ locale = "en" }: { locale?: Locale }) {
         <div className="site-footer-brand">
           <Link href={homeHref} className="site-wordmark site-wordmark-footer">
             <Whale size={31} />
-            <span>Codewhale</span>
+            <span>Nestlone</span>
           </Link>
           <p>{tagline}</p>
         </div>
@@ -95,17 +95,17 @@ export function Footer({ locale = "en" }: { locale?: Locale }) {
       <div className="site-footer-meta">
         <p>
           {canonicalSource}
-          <a href="https://github.com/Hmbown/CodeWhale">github.com/Hmbown/CodeWhale</a>
+          <a href="https://github.com/bdugsj/nestlone">github.com/bdugsj/nestlone</a>
           {releases}
-          <a href="https://github.com/Hmbown/CodeWhale/releases">GitHub Releases</a>
+          <a href="https://github.com/bdugsj/nestlone/releases">GitHub Releases</a>
         </p>
         <div>
-          {GITEE_ENABLED && <a href="https://gitee.com/Hmbown/CodeWhale">Gitee</a>}
-          <a href="https://cnb.cool/codewhale.net/codewhale">CNB</a>
-          <a href="https://npmmirror.com/package/codewhale">npmmirror</a>
+          {GITEE_ENABLED && <a href="https://gitee.com/bdugsj/nestlone">Gitee</a>}
+          <a href="https://cnb.cool/nestlone.net/nestlone">CNB</a>
+          <a href="https://npmmirror.com/package/nestlone">npmmirror</a>
           <a href="mailto:hmbown@gmail.com">Security</a>
         </div>
-        <span>© {new Date().getFullYear()} Codewhale</span>
+        <span>© {new Date().getFullYear()} Nestlone</span>
       </div>
     </footer>
   );

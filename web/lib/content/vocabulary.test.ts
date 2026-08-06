@@ -130,18 +130,18 @@ describe("shared getting-started path", () => {
     expect(first.body.en).toMatch(/Model replies need a provider/);
     // The keyless-launch claim is documented behavior, not invented copy.
     const guide = repoText("docs/GUIDE.md");
-    expect(guide).toContain("On first launch, Codewhale starts with a short constitution-first setup path");
+    expect(guide).toContain("On first launch, Nestlone starts with a short constitution-first setup path");
   });
 
   it("uses only documented commands", () => {
     const guide = repoText("docs/GUIDE.md");
     const fleetDoc = repoText("docs/FLEET.md");
     const install = GETTING_STARTED_STEPS.find((s) => s.id === "install")!;
-    expect(install.commands).toContain("npm install -g codewhale");
-    expect(guide).toContain("codewhale doctor");
+    expect(install.commands).toContain("npm install -g nestlone");
+    expect(guide).toContain("nestlone doctor");
     const provider = GETTING_STARTED_STEPS.find((s) => s.id === "connect-provider")!;
-    expect(provider.commands).toContain("codewhale auth set --provider deepseek");
-    expect(guide).toContain("codewhale auth set --provider deepseek");
+    expect(provider.commands).toContain("nestlone auth set --provider deepseek");
+    expect(guide).toContain("nestlone auth set --provider deepseek");
     const fleet = GETTING_STARTED_STEPS.find((s) => s.id === "fleet-workflow")!;
     for (const command of fleet.commands) {
       expect(`${fleetDoc}\n${guide}`, command).toContain(command);

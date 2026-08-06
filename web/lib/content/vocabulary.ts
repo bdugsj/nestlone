@@ -112,8 +112,8 @@ export const PERMISSION_POSTURES: ControlTerm[] = [
     term: "Ask",
     kind: "permission-posture",
     description: {
-      en: "The default: Codewhale asks when an unresolved choice materially changes authority, cost, scope, or outcome.",
-      zh: "默认值：当一个未决选择会实质改变权限、成本、范围或结果时，Codewhale 会询问。",
+      en: "The default: Nestlone asks when an unresolved choice materially changes authority, cost, scope, or outcome.",
+      zh: "默认值：当一个未决选择会实质改变权限、成本、范围或结果时，Nestlone 会询问。",
     },
   },
   {
@@ -151,8 +151,8 @@ export const ROUTE_IDENTITY: { term: string; description: LocalizedText }[] = [
   {
     term: "Model",
     description: {
-      en: "The exact model on that provider. Codewhale treats models as selectable components; no provider or model is privileged over another.",
-      zh: "该提供商上的具体模型。Codewhale 把模型当作可选组件；任何提供商或模型都不享有特权。",
+      en: "The exact model on that provider. Nestlone treats models as selectable components; no provider or model is privileged over another.",
+      zh: "该提供商上的具体模型。Nestlone 把模型当作可选组件；任何提供商或模型都不享有特权。",
     },
   },
   {
@@ -202,7 +202,7 @@ export const MEASUREMENT_PRINCIPLES: LocalizedText[] = [
     zh: "成本、进度、能力和交付状态仅在有来源能够确认时显示。暂不可用的值保持暂不可用，绝不会变成零或成功。",
   },
   {
-    en: "This site publishes no benchmark leaderboard. Any number Codewhale ever publishes must name its exact provider, model, requested and effective reasoning, and measurement harness alongside the result.",
-    zh: "本站不发布基准排行榜。Codewhale 今后发布任何数字时，都必须同时给出确切的提供商、模型、请求与实际思考档位和测量工具链。",
+    en: "This site publishes no benchmark leaderboard. Any number Nestlone ever publishes must name its exact provider, model, requested and effective reasoning, and measurement harness alongside the result.",
+    zh: "本站不发布基准排行榜。Nestlone 今后发布任何数字时，都必须同时给出确切的提供商、模型、请求与实际思考档位和测量工具链。",
   },
 ];

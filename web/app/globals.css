@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ---------- root tokens — Codewhale ocean ---------- */
+/* ---------- root tokens — Nestlone ocean ---------- */
 :root {
   /* RGB channel triples backing the Tailwind surface/ink tokens (see
      tailwind.config.ts). These carry the same light values as the hex vars
@@ -66,8 +66,8 @@ body {
   position: relative;
 }
 
-.codewhale-mark-primary { fill: var(--signal-gold); }
-.codewhale-mark-current { fill: #48d7ff; }
+.nestlone-mark-primary { fill: var(--signal-gold); }
+.nestlone-mark-current { fill: #48d7ff; }
 
 main, header, footer, nav { position: relative; z-index: 1; }
 

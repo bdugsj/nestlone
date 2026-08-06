@@ -5,7 +5,7 @@ export const home: HomeDict = {
   heroTitleA: "Menyelam ke kedalaman",
   heroTitleB: "agar Anda tidak perlu melakukannya.",
   heroIntro:
-    "Codewhale memberikan kemampuan LLM kepada siapa saja untuk membangun sesuatu. Di terminal, Codewhale membaca repositori, mengedit berkas, menjalankan pemeriksaan, dan meninggalkan tanda terima — tanpa menganggap Anda sudah mahir berkode. Berjalan di mesin Anda sendiri.",
+    "Nestlone memberikan kemampuan LLM kepada siapa saja untuk membangun sesuatu. Di terminal, Nestlone membaca repositori, mengedit berkas, menjalankan pemeriksaan, dan meninggalkan tanda terima — tanpa menganggap Anda sudah mahir berkode. Berjalan di mesin Anda sendiri.",
   install: "Instalasi",
   docs: "Dokumentasi",
   copy: "Salin",
@@ -16,13 +16,13 @@ export const home: HomeDict = {
   sourceCandidate: "Kandidat sumber",
   providerRoutes: "{count} rute penyedia",
   screenshotAlt:
-    "Sesi terminal Codewhale v{version} baru menggunakan rute Ollama lokal, tanpa bilah Work kosong",
+    "Sesi terminal Nestlone v{version} baru menggunakan rute Ollama lokal, tanpa bilah Work kosong",
   figcaption: "v{version} {state} · rute Ollama lokal · Plan / Act / Operate",
   publishedRelease: "rilis terpublikasi",
   figcaptionSourceCandidate: "kandidat sumber",
   proofHeading: "Terminal shell bawah air. Netral model. Mengutamakan lokal.",
   proofBody:
-    "Bawa model di-host, gateway, atau lokal yang sudah Anda gunakan. Codewhale berjalan di mesin Anda dan memperlakukan model sebagai komponen yang dapat dipilih—bukan sebagai produk. Mode Plan / Act / Operate dan postur izin yang eksplisit menjaga penyelaman mendalam tetap dalam kendali Anda.",
+    "Bawa model di-host, gateway, atau lokal yang sudah Anda gunakan. Nestlone berjalan di mesin Anda dan memperlakukan model sebagai komponen yang dapat dipilih—bukan sebagai produk. Mode Plan / Act / Operate dan postur izin yang eksplisit menjaga penyelaman mendalam tetap dalam kendali Anda.",
   workflowHeading: "Dari tugas hingga perubahan terverifikasi.",
   workflow: [
     ["Inspeksi", "Baca repositori, instruksinya, dan tugas."],
@@ -42,7 +42,7 @@ export const home: HomeDict = {
   surfacesHeading: "Gunakan runtime di mana pekerjaan dilakukan.",
   surfaces: [
     ["TUI", "Pekerjaan terminal interaktif"],
-    ["codewhale exec", "Skrip dan CI"],
+    ["nestlone exec", "Skrip dan CI"],
     ["Klien Web", "Klien browser berbasis loopback-only"],
     ["Runtime API + MCP", "Integrasi lokal"],
     ["Fleet", "Pekerjaan multi-agent tahan lama"],

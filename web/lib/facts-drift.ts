@@ -19,7 +19,7 @@ import type {
 } from "./facts.generated";
 import { FACTS as BUILD_FACTS } from "./facts.generated";
 
-const RAW_ROOT = "https://raw.githubusercontent.com/Hmbown/CodeWhale";
+const RAW_ROOT = "https://raw.githubusercontent.com/bdugsj/nestlone";
 const KV_KEY = "facts:current";
 const LOG_KEY = "facts:drift-log";
 
@@ -39,7 +39,7 @@ async function fetchText(
   ghToken?: string,
 ): Promise<string | null> {
   const headers: Record<string, string> = {
-    "User-Agent": "codewhale-web-drift",
+    "User-Agent": "nestlone-web-drift",
   };
   if (ghToken) headers["Authorization"] = `Bearer ${ghToken}`;
   try {
@@ -54,13 +54,13 @@ async function fetchText(
 async function fetchSourceMarker(ghToken?: string): Promise<SourceMarker | null> {
   const headers: Record<string, string> = {
     Accept: "application/vnd.github+json",
-    "User-Agent": "codewhale-web-drift",
+    "User-Agent": "nestlone-web-drift",
     "X-GitHub-Api-Version": "2022-11-28",
   };
   if (ghToken) headers.Authorization = `Bearer ${ghToken}`;
   try {
     const response = await fetch(
-      "https://api.github.com/repos/Hmbown/CodeWhale/commits/main",
+      "https://api.github.com/repos/bdugsj/nestlone/commits/main",
       { headers },
     );
     if (!response.ok) return null;
@@ -176,12 +176,12 @@ async function fetchLatestPublishedRelease(
 ): Promise<PublishedReleaseFact | null> {
   const headers: Record<string, string> = {
     Accept: "application/vnd.github+json",
-    "User-Agent": "codewhale-web-drift",
+    "User-Agent": "nestlone-web-drift",
     "X-GitHub-Api-Version": "2022-11-28",
   };
   if (ghToken) headers["Authorization"] = `Bearer ${ghToken}`;
   try {
-    const r = await fetch("https://api.github.com/repos/Hmbown/CodeWhale/releases/latest", { headers });
+    const r = await fetch("https://api.github.com/repos/bdugsj/nestlone/releases/latest", { headers });
     if (!r.ok) return null;
     const j = (await r.json()) as {
       tag_name?: string;

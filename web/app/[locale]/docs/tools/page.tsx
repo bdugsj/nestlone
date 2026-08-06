@@ -7,7 +7,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return buildPageMetadata({
     path: "/docs/tools",
     locale,
-    title: isZh ? "工具 · Codewhale 文档" : "Tools · Codewhale Docs",
+    title: isZh ? "工具 · Nestlone 文档" : "Tools · Nestlone Docs",
     description: isZh
       ? "Bash、File、Git、Run 四个核心 action 工具，以及协调、延迟加载与回放兼容边界。"
       : "Canonical Bash, File, Git, and Run action tools, coordination tools, deferred loading, and replay compatibility.",
@@ -32,7 +32,7 @@ export default async function ToolsPage({ params }: { params: Promise<{ locale: 
             ? "精选工具集——设计思路详见 "
             : "Curated surface — see "}
           <Link
-            href="https://github.com/Hmbown/CodeWhale/blob/main/docs/TOOL_SURFACE.md"
+            href="https://github.com/bdugsj/nestlone/blob/main/docs/TOOL_SURFACE.md"
             className="body-link"
           >
             docs/TOOL_SURFACE.md
@@ -72,8 +72,8 @@ export default async function ToolsPage({ params }: { params: Promise<{ locale: 
             {
               group: "MCP",
               tools: isZh
-                ? "mcp_<server>_<tool>——从 ~/.codewhale/mcp.json 自动注册"
-                : "mcp_<server>_<tool> — auto-registered from ~/.codewhale/mcp.json",
+                ? "mcp_<server>_<tool>——从 ~/.nestlone/mcp.json 自动注册"
+                : "mcp_<server>_<tool> — auto-registered from ~/.nestlone/mcp.json",
             },
           ].map((row) => (
             <div
@@ -101,7 +101,7 @@ export default async function ToolsPage({ params }: { params: Promise<{ locale: 
             : "Legacy single-purpose names remain callable only so saved transcripts and automation can replay. They stay out of the model catalog and tool_search; new work uses the canonical action tools above."}
         </p>
         <Link
-          href="https://github.com/Hmbown/CodeWhale/blob/main/docs/RUNTIME_SIMPLIFICATION_DESIGN.md"
+          href="https://github.com/bdugsj/nestlone/blob/main/docs/RUNTIME_SIMPLIFICATION_DESIGN.md"
           className="inline-block mt-3 font-mono text-xs uppercase tracking-wider text-indigo hover:underline"
         >
           docs/RUNTIME_SIMPLIFICATION_DESIGN.md →

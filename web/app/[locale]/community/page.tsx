@@ -11,10 +11,10 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return buildPageMetadata({
     path: "/community",
     locale,
-    title: isZh ? "社区 · Codewhale" : "Community · Codewhale",
+    title: isZh ? "社区 · Nestlone" : "Community · Nestlone",
     description: isZh
-      ? "了解 Codewhale 的国际开源社区，提交 issue、发送 pull request、改进翻译并查看版本贡献者。"
-      : "Meet Codewhale's international open-source community, file issues, send pull requests, improve translations, and see release contributors.",
+      ? "了解 Nestlone 的国际开源社区，提交 issue、发送 pull request、改进翻译并查看版本贡献者。"
+      : "Meet Nestlone's international open-source community, file issues, send pull requests, improve translations, and see release contributors.",
   });
 }
 
@@ -31,25 +31,25 @@ export default async function CommunityPage({ params }: { params: Promise<{ loca
           title: "报告问题",
           description: "报告 bug、兼容性问题或不清楚的行为，并附上系统信息、复现步骤和可以安全分享的日志。",
           cta: "提交 issue →",
-          href: "https://github.com/Hmbown/CodeWhale/issues/new/choose",
+          href: "https://github.com/bdugsj/nestlone/issues/new/choose",
         },
         {
           title: "改进代码或测试",
           description: "选择一个范围清晰的问题，提交尽可能小的有效补丁，并添加能够证明行为变化的回归测试。",
           cta: "查看开放 issues →",
-          href: "https://github.com/Hmbown/CodeWhale/issues",
+          href: "https://github.com/bdugsj/nestlone/issues",
         },
         {
           title: "改进文档或翻译",
           description: "修正不准确的说明、补充实际示例，或帮助完成新的语言包，让文档在不同地区都自然准确。",
           cta: "查看本地化指南 ↗",
-          href: "https://github.com/Hmbown/CodeWhale/blob/main/docs/LOCALIZATION.md",
+          href: "https://github.com/bdugsj/nestlone/blob/main/docs/LOCALIZATION.md",
         },
         {
           title: "复现并审查现有工作",
           description: "在你的平台和提供商上验证 issue 或 pull request，然后分享你运行的命令、结果和剩余问题。",
           cta: "查看 pull requests →",
-          href: "https://github.com/Hmbown/CodeWhale/pulls",
+          href: "https://github.com/bdugsj/nestlone/pulls",
         },
       ]
     : [
@@ -57,25 +57,25 @@ export default async function CommunityPage({ params }: { params: Promise<{ loca
           title: "Report a problem",
           description: "File a bug, compatibility problem, or unclear behavior with system details, reproduction steps, and any logs you can share safely.",
           cta: "File an issue →",
-          href: "https://github.com/Hmbown/CodeWhale/issues/new/choose",
+          href: "https://github.com/bdugsj/nestlone/issues/new/choose",
         },
         {
           title: "Improve code or tests",
           description: "Choose one well-bounded problem, make the smallest useful patch, and add a regression test that proves the changed behavior.",
           cta: "Browse open issues →",
-          href: "https://github.com/Hmbown/CodeWhale/issues",
+          href: "https://github.com/bdugsj/nestlone/issues",
         },
         {
           title: "Improve documentation or translations",
           description: "Correct inaccurate guidance, add a practical example, or help complete a language pack so the project reads naturally in more regions.",
           cta: "Open the localization guide ↗",
-          href: "https://github.com/Hmbown/CodeWhale/blob/main/docs/LOCALIZATION.md",
+          href: "https://github.com/bdugsj/nestlone/blob/main/docs/LOCALIZATION.md",
         },
         {
           title: "Reproduce and review existing work",
           description: "Verify an issue or pull request with your platform and provider, then share the commands you ran, the result, and any remaining problem.",
           cta: "Browse pull requests →",
-          href: "https://github.com/Hmbown/CodeWhale/pulls",
+          href: "https://github.com/bdugsj/nestlone/pulls",
         },
       ];
 
@@ -97,17 +97,17 @@ export default async function CommunityPage({ params }: { params: Promise<{ loca
         <div className="portal-current" aria-hidden="true" />
         <div className="portal-container community-welcome-inner">
           <div className="eyebrow">{isZh ? "国际开源社区" : "International open-source community"}</div>
-          <h1>{isZh ? "与世界各地的贡献者一起构建 Codewhale。" : "Build Codewhale with contributors around the world."}</h1>
+          <h1>{isZh ? "与世界各地的贡献者一起构建 Nestlone。" : "Build Nestlone with contributors around the world."}</h1>
           <p>
             {isZh
-              ? "Codewhale 的运行时、文档、测试和翻译由不同国家、语言、平台和技术背景的贡献者共同改进。第一次参与不需要从大功能开始；清楚的 bug 报告、准确的文档修正或带测试的小补丁都是重要的项目工作。"
-              : "Codewhale's runtime, documentation, tests, and translations improve through contributors across countries, languages, platforms, and technical backgrounds. A first contribution does not need to be a large feature; a clear bug report, an accurate documentation correction, or a small tested patch is valuable project work."}
+              ? "Nestlone 的运行时、文档、测试和翻译由不同国家、语言、平台和技术背景的贡献者共同改进。第一次参与不需要从大功能开始；清楚的 bug 报告、准确的文档修正或带测试的小补丁都是重要的项目工作。"
+              : "Nestlone's runtime, documentation, tests, and translations improve through contributors across countries, languages, platforms, and technical backgrounds. A first contribution does not need to be a large feature; a clear bug report, an accurate documentation correction, or a small tested patch is valuable project work."}
           </p>
           <div className="portal-actions">
-            <Link href="https://github.com/Hmbown/CodeWhale/issues/new/choose" className="portal-button portal-button-primary">
+            <Link href="https://github.com/bdugsj/nestlone/issues/new/choose" className="portal-button portal-button-primary">
               {isZh ? "提交 issue" : "File an issue"}
             </Link>
-            <Link href="https://github.com/Hmbown/CodeWhale/pulls" className="portal-button portal-button-secondary">
+            <Link href="https://github.com/bdugsj/nestlone/pulls" className="portal-button portal-button-secondary">
               {isZh ? "查看 pull requests" : "Browse pull requests"}
             </Link>
             <Link href={p("/contribute")} className="portal-button portal-button-secondary">
@@ -182,10 +182,10 @@ export default async function CommunityPage({ params }: { params: Promise<{ loca
                 : `This ${sourceIsPublished ? "release" : "candidate"} includes code, tests, reproductions, and verification from the community. When a maintainer needs to adapt a patch before it lands, the original contributor remains credited in the commit, changelog, and contributor record.`}
             </p>
             <div className="community-record-links">
-              <Link href="https://github.com/Hmbown/CodeWhale/blob/main/docs/CONTRIBUTORS.md">
+              <Link href="https://github.com/bdugsj/nestlone/blob/main/docs/CONTRIBUTORS.md">
                 {isZh ? "完整贡献者名单 ↗" : "Full contributor record ↗"}
               </Link>
-              <Link href="https://github.com/Hmbown/CodeWhale/blob/main/CHANGELOG.md">CHANGELOG ↗</Link>
+              <Link href="https://github.com/bdugsj/nestlone/blob/main/CHANGELOG.md">CHANGELOG ↗</Link>
             </div>
           </div>
           <div className="community-credit-groups">

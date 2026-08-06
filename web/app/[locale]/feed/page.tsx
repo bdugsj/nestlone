@@ -14,10 +14,10 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return buildPageMetadata({
     path: "/feed",
     locale,
-    title: isZh ? "动态 · Codewhale" : "Activity · Codewhale",
+    title: isZh ? "动态 · Nestlone" : "Activity · Nestlone",
     description: isZh
-      ? "来自 Hmbown/CodeWhale GitHub 仓库的议题、合并请求和发布的实时动态。"
-      : "Live feed of issues, pull requests, and releases mirrored from the Hmbown/CodeWhale GitHub repo.",
+      ? "来自 bdugsj/nestlone GitHub 仓库的议题、合并请求和发布的实时动态。"
+      : "Live feed of issues, pull requests, and releases mirrored from the bdugsj/nestlone GitHub repo.",
   });
 }
 
@@ -50,7 +50,7 @@ export default async function FeedPage({ params }: { params: Promise<{ locale: s
             </h1>
             <p className="mt-5 max-w-3xl text-ink-soft text-lg leading-[1.9] tracking-wide">
               来自{" "}
-              <Link href="https://github.com/Hmbown/CodeWhale" className="body-link">Hmbown/CodeWhale</Link>
+              <Link href="https://github.com/bdugsj/nestlone" className="body-link">bdugsj/nestlone</Link>
               {" "}的议题与合并请求实时镜像。每十分钟刷新一次。点击任意条目跳转至 GitHub。
             </p>
           </section>
@@ -91,15 +91,15 @@ export default async function FeedPage({ params }: { params: Promise<{ locale: s
 
           <section className="bg-paper-deep hairline-t hairline-b">
             <div className="mx-auto max-w-[1400px] px-6 py-10 grid md:grid-cols-3 gap-6 text-center">
-              <Link href="https://github.com/Hmbown/CodeWhale/issues/new/choose" className="hairline-t hairline-b hairline-l hairline-r bg-paper p-6 hover:bg-indigo hover:text-paper transition-colors">
+              <Link href="https://github.com/bdugsj/nestlone/issues/new/choose" className="hairline-t hairline-b hairline-l hairline-r bg-paper p-6 hover:bg-indigo hover:text-paper transition-colors">
                 <div className="font-display text-xl mb-1">提交议题</div>
                 <div className="font-cjk text-sm text-ink-mute">Open an issue</div>
               </Link>
-              <Link href="https://github.com/Hmbown/CodeWhale/compare" className="hairline-t hairline-b hairline-l hairline-r bg-paper p-6 hover:bg-indigo hover:text-paper transition-colors">
+              <Link href="https://github.com/bdugsj/nestlone/compare" className="hairline-t hairline-b hairline-l hairline-r bg-paper p-6 hover:bg-indigo hover:text-paper transition-colors">
                 <div className="font-display text-xl mb-1">提交合并请求</div>
                 <div className="font-cjk text-sm text-ink-mute">Open a PR</div>
               </Link>
-              <Link href="https://github.com/Hmbown/CodeWhale/discussions/new" className="hairline-t hairline-b hairline-l hairline-r bg-paper p-6 hover:bg-indigo hover:text-paper transition-colors">
+              <Link href="https://github.com/bdugsj/nestlone/discussions/new" className="hairline-t hairline-b hairline-l hairline-r bg-paper p-6 hover:bg-indigo hover:text-paper transition-colors">
                 <div className="font-display text-xl mb-1">发起讨论</div>
                 <div className="font-cjk text-sm text-ink-mute">Start a discussion</div>
               </Link>
@@ -118,7 +118,7 @@ export default async function FeedPage({ params }: { params: Promise<{ locale: s
             </h1>
             <p className="mt-5 max-w-3xl text-ink-soft text-lg leading-relaxed">
               A live mirror of issues and pull requests from{" "}
-              <Link href="https://github.com/Hmbown/CodeWhale" className="body-link">Hmbown/CodeWhale</Link>.
+              <Link href="https://github.com/bdugsj/nestlone" className="body-link">bdugsj/nestlone</Link>.
               Refreshed every ten minutes. Click any item to jump to GitHub.
             </p>
           </section>
@@ -159,15 +159,15 @@ export default async function FeedPage({ params }: { params: Promise<{ locale: s
 
           <section className="bg-paper-deep hairline-t hairline-b">
             <div className="mx-auto max-w-[1400px] px-6 py-10 grid md:grid-cols-3 gap-6 text-center">
-              <Link href="https://github.com/Hmbown/CodeWhale/issues/new/choose" className="hairline-t hairline-b hairline-l hairline-r bg-paper p-6 hover:bg-indigo hover:text-paper transition-colors">
+              <Link href="https://github.com/bdugsj/nestlone/issues/new/choose" className="hairline-t hairline-b hairline-l hairline-r bg-paper p-6 hover:bg-indigo hover:text-paper transition-colors">
                 <div className="font-display text-xl mb-1">Open an issue</div>
                 <div className="font-cjk text-sm text-ink-mute">提交议题</div>
               </Link>
-              <Link href="https://github.com/Hmbown/CodeWhale/compare" className="hairline-t hairline-b hairline-l hairline-r bg-paper p-6 hover:bg-indigo hover:text-paper transition-colors">
+              <Link href="https://github.com/bdugsj/nestlone/compare" className="hairline-t hairline-b hairline-l hairline-r bg-paper p-6 hover:bg-indigo hover:text-paper transition-colors">
                 <div className="font-display text-xl mb-1">Open a PR</div>
                 <div className="font-cjk text-sm text-ink-mute">提交合并</div>
               </Link>
-              <Link href="https://github.com/Hmbown/CodeWhale/discussions/new" className="hairline-t hairline-b hairline-l hairline-r bg-paper p-6 hover:bg-indigo hover:text-paper transition-colors">
+              <Link href="https://github.com/bdugsj/nestlone/discussions/new" className="hairline-t hairline-b hairline-l hairline-r bg-paper p-6 hover:bg-indigo hover:text-paper transition-colors">
                 <div className="font-display text-xl mb-1">Start a discussion</div>
                 <div className="font-cjk text-sm text-ink-mute">发起讨论</div>
               </Link>

@@ -47,9 +47,9 @@ export function Nav({ locale = "en" }: { locale?: Locale }) {
   return (
     <header className="site-nav">
       <div className="site-nav-inner">
-        <Link href={homeHref} className="site-wordmark" aria-label="Codewhale home">
+        <Link href={homeHref} className="site-wordmark" aria-label="Nestlone home">
           <Whale size={31} />
-          <span>Codewhale</span>
+          <span>Nestlone</span>
         </Link>
 
         <NavLinks links={links} isZh={isZh} />
@@ -57,7 +57,7 @@ export function Nav({ locale = "en" }: { locale?: Locale }) {
         <div className="site-nav-actions">
           <ThemeToggle isZh={isZh} />
           <LocaleSwitcher current={locale} />
-          <Link href="https://github.com/Hmbown/CodeWhale" className="site-github-link">
+          <Link href="https://github.com/bdugsj/nestlone" className="site-github-link">
             GitHub
           </Link>
           <MobileMenu

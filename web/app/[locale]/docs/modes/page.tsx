@@ -6,7 +6,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return buildPageMetadata({
     path: "/docs/modes",
     locale,
-    title: isZh ? "模式 · Codewhale 文档" : "Modes · Codewhale Docs",
+    title: isZh ? "模式 · Nestlone 文档" : "Modes · Nestlone Docs",
     description: isZh
       ? "Plan、Act、Operate 三种运行模式与独立的权限姿态。"
       : "Plan, Act, Operate modes and independent permission postures.",
@@ -24,12 +24,12 @@ export default async function ModesPage({ params }: { params: Promise<{ locale: 
         {
           name: "Plan",
           description:
-            "用于只读调查与规划。Codewhale 可以检查工作区，但不能执行 Shell 命令或修改文件。",
+            "用于只读调查与规划。Nestlone 可以检查工作区，但不能执行 Shell 命令或修改文件。",
         },
         {
           name: "Act",
           description:
-            "用于常规交互式编码。Codewhale 可以检查、编辑并使用工具；Shell 是否可用以及何时请求批准，取决于当前配置和权限姿态。",
+            "用于常规交互式编码。Nestlone 可以检查、编辑并使用工具；Shell 是否可用以及何时请求批准，取决于当前配置和权限姿态。",
         },
         {
           name: "Operate",
@@ -41,12 +41,12 @@ export default async function ModesPage({ params }: { params: Promise<{ locale: 
         {
           name: "Plan",
           description:
-            "Read-only investigation and planning. Codewhale can inspect the workspace, but it cannot run shell commands or edit files.",
+            "Read-only investigation and planning. Nestlone can inspect the workspace, but it cannot run shell commands or edit files.",
         },
         {
           name: "Act",
           description:
-            "Normal interactive coding. Codewhale can inspect, edit, and use tools; shell availability and approval prompts follow the active configuration and permission posture.",
+            "Normal interactive coding. Nestlone can inspect, edit, and use tools; shell availability and approval prompts follow the active configuration and permission posture.",
         },
         {
           name: "Operate",
@@ -92,8 +92,8 @@ export default async function ModesPage({ params }: { params: Promise<{ locale: 
         <h2 className="font-display text-3xl mb-1">{isZh ? "模式" : "Modes"}</h2>
         <p className={`${bodyClass} mt-3`}>
           {isZh
-            ? "模式决定 Codewhale 如何组织工作；权限姿态决定它如何处理具有后果的工具调用。两者相互独立。"
-            : "A mode decides how Codewhale handles the work. A permission posture decides how it handles consequential tool calls. They are separate controls."}
+            ? "模式决定 Nestlone 如何组织工作；权限姿态决定它如何处理具有后果的工具调用。两者相互独立。"
+            : "A mode decides how Nestlone handles the work. A permission posture decides how it handles consequential tool calls. They are separate controls."}
         </p>
         <div className="hairline-t mt-6">
           {modes.map((mode) => (

@@ -6,7 +6,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return buildPageMetadata({
     path: "/docs/sandbox",
     locale,
-    title: isZh ? "沙箱与审批 · Codewhale 文档" : "Sandbox & Approval · Codewhale Docs",
+    title: isZh ? "沙箱与审批 · Nestlone 文档" : "Sandbox & Approval · Nestlone Docs",
     description: isZh
       ? "macOS Seatbelt、Linux 可选 bubblewrap、平台缺口和审批策略的真实边界。"
       : "The honest boundary: macOS Seatbelt, opt-in Linux bubblewrap, platform gaps, and approval policy.",
@@ -24,7 +24,7 @@ export default async function SandboxPage({ params }: { params: Promise<{ locale
         {
           name: "macOS · Seatbelt",
           detail:
-            "Codewhale 探测 /usr/bin/sandbox-exec；探测成功且策略要求沙箱时，子命令会被包上运行时生成的 Seatbelt profile：广泛的文件系统读取、按策略限制的写入、仅在策略允许时放行网络。探测失败则如实报告无 OS 沙箱。",
+            "Nestlone 探测 /usr/bin/sandbox-exec；探测成功且策略要求沙箱时，子命令会被包上运行时生成的 Seatbelt profile：广泛的文件系统读取、按策略限制的写入、仅在策略允许时放行网络。探测失败则如实报告无 OS 沙箱。",
         },
         {
           name: "Linux · 可选 bubblewrap",
@@ -34,7 +34,7 @@ export default async function SandboxPage({ params }: { params: Promise<{ locale
         {
           name: "Windows · 无 OS 沙箱",
           detail:
-            "Windows 命令路径目前报告无 OS 沙箱。主机权限和审批策略仍然有效，但它们不是 Codewhale 的 OS 命令沙箱。",
+            "Windows 命令路径目前报告无 OS 沙箱。主机权限和审批策略仍然有效，但它们不是 Nestlone 的 OS 命令沙箱。",
         },
         {
           name: "外部 OpenSandbox 执行",
@@ -46,17 +46,17 @@ export default async function SandboxPage({ params }: { params: Promise<{ locale
         {
           name: "macOS · Seatbelt",
           detail:
-            "Codewhale probes /usr/bin/sandbox-exec; when the probe succeeds and the policy requests a sandbox, the child command is wrapped in a generated Seatbelt profile: broad filesystem reads, policy-limited writes, and network only when the policy enables it. A failed probe is reported honestly as no OS sandbox.",
+            "Nestlone probes /usr/bin/sandbox-exec; when the probe succeeds and the policy requests a sandbox, the child command is wrapped in a generated Seatbelt profile: broad filesystem reads, policy-limited writes, and network only when the policy enables it. A failed probe is reported honestly as no OS sandbox.",
         },
         {
           name: "Linux · opt-in bubblewrap",
           detail:
-            "Linux command sandboxing is opt-in: set prefer_bwrap = true and keep /usr/bin/bwrap executable. The child gets a read-only root view with writable mounts derived from the resolved policy; the network namespace is isolated by default and --share-net is added only when the policy enables network access. Without the opt-in, Codewhale reports none.",
+            "Linux command sandboxing is opt-in: set prefer_bwrap = true and keep /usr/bin/bwrap executable. The child gets a read-only root view with writable mounts derived from the resolved policy; the network namespace is isolated by default and --share-net is added only when the policy enables network access. Without the opt-in, Nestlone reports none.",
         },
         {
           name: "Windows · no OS sandbox",
           detail:
-            "The Windows command path currently reports no OS sandbox. Host permissions and approval policy still apply, but they are not a Codewhale OS command sandbox.",
+            "The Windows command path currently reports no OS sandbox. Host permissions and approval policy still apply, but they are not a Nestlone OS command sandbox.",
         },
         {
           name: "External OpenSandbox execution",
@@ -71,8 +71,8 @@ export default async function SandboxPage({ params }: { params: Promise<{ locale
         <h2 className="font-display text-3xl mb-1">{isZh ? "沙箱与审批" : "Sandbox & Approval"}</h2>
         <p className={`${bodyClass} mt-3`}>
           {isZh
-            ? "Codewhale 可以启动由模型提出的 shell 命令。审批策略、感知工作区的文件工具和操作系统命令包装器是三个独立的控制：一次审批不是沙箱，选择 workspace-write 也不代表当前平台有可用的 OS 包装器。本页只描述已经接入命令执行路径的行为。"
-            : "Codewhale can launch shell commands proposed by a model. Approval policy, workspace-aware tools, and an operating-system command wrapper are separate controls: an approval is not a sandbox, and selecting workspace-write does not prove the current platform has an OS wrapper available. This page describes only behavior wired into the command execution path."}
+            ? "Nestlone 可以启动由模型提出的 shell 命令。审批策略、感知工作区的文件工具和操作系统命令包装器是三个独立的控制：一次审批不是沙箱，选择 workspace-write 也不代表当前平台有可用的 OS 包装器。本页只描述已经接入命令执行路径的行为。"
+            : "Nestlone can launch shell commands proposed by a model. Approval policy, workspace-aware tools, and an operating-system command wrapper are separate controls: an approval is not a sandbox, and selecting workspace-write does not prove the current platform has an OS wrapper available. This page describes only behavior wired into the command execution path."}
         </p>
         <div className="hairline-t mt-6">
           {platforms.map((row) => (
@@ -95,7 +95,7 @@ export default async function SandboxPage({ params }: { params: Promise<{ locale
               <code className="inline">external-sandbox</code>。前两者只在选中且可用的 Seatbelt 或
               bubblewrap 包装器下被强制执行；<code className="inline">danger-full-access</code>{" "}
               有意绕过本地 OS 包装器；<code className="inline">external-sandbox</code>{" "}
-              声明执行已被外部隔离。没有选中包装器时，shell 命令在没有 Codewhale OS 隔离的情况下运行——审批规则和感知工作区的原生文件工具仍是独立的控制。
+              声明执行已被外部隔离。没有选中包装器时，shell 命令在没有 Nestlone OS 隔离的情况下运行——审批规则和感知工作区的原生文件工具仍是独立的控制。
             </>
           ) : (
             <>
@@ -106,7 +106,7 @@ export default async function SandboxPage({ params }: { params: Promise<{ locale
               bubblewrap only when that wrapper is selected and available;{" "}
               <code className="inline">danger-full-access</code> deliberately bypasses the local OS
               wrapper; <code className="inline">external-sandbox</code> declares that execution is already
-              externally isolated. When no wrapper is selected, the shell command runs without Codewhale
+              externally isolated. When no wrapper is selected, the shell command runs without Nestlone
               OS isolation — approval rules and workspace-aware native file tools remain separate controls.
             </>
           )}
@@ -116,7 +116,7 @@ sandbox_mode = "workspace-write"
 prefer_bwrap = true            # Linux opt-in
 
 # Canonical environment overrides
-CODEWHALE_SANDBOX_MODE
+NESTLONE_SANDBOX_MODE
 CODEWHALE_SANDBOX_BACKEND
 CODEWHALE_SANDBOX_URL
 CODEWHALE_SANDBOX_API_KEY`}</pre>
@@ -126,8 +126,8 @@ CODEWHALE_SANDBOX_API_KEY`}</pre>
         <h2 className="font-display text-2xl mb-1">{isZh ? "诊断与限制" : "Diagnostics and limits"}</h2>
         <p className={`${bodyClass} mt-3`}>
           {isZh
-            ? "codewhale setup --status、codewhale doctor、codewhale doctor --json 和 diagnostics 工具会报告应用 bubblewrap 偏好后本地可用的包装器。拒绝归因是保守的：子命令的通用 Permission denied 本身并不能证明是 Codewhale 的沙箱拦截了它，未沙箱化的命令失败永远不会被标记为沙箱拒绝。"
-            : "codewhale setup --status, codewhale doctor, codewhale doctor --json, and the diagnostics tool report the locally available wrapper after applying the resolved bubblewrap preference. Denial attribution is intentionally conservative: a child command's generic Permission denied is not by itself proof that Codewhale's sandbox blocked it, and unsandboxed command failures are never labeled sandbox denials."}
+            ? "nestlone setup --status、nestlone doctor、nestlone doctor --json 和 diagnostics 工具会报告应用 bubblewrap 偏好后本地可用的包装器。拒绝归因是保守的：子命令的通用 Permission denied 本身并不能证明是 Nestlone 的沙箱拦截了它，未沙箱化的命令失败永远不会被标记为沙箱拒绝。"
+            : "nestlone setup --status, nestlone doctor, nestlone doctor --json, and the diagnostics tool report the locally available wrapper after applying the resolved bubblewrap preference. Denial attribution is intentionally conservative: a child command's generic Permission denied is not by itself proof that Nestlone's sandbox blocked it, and unsandboxed command failures are never labeled sandbox denials."}
         </p>
         <p className={`${bodyClass} mt-3`}>
           {isZh

@@ -15,7 +15,7 @@ describe("public website copy contracts", () => {
     expect(layout).toContain("docs-portal-hero");
     expect(layout).toContain("Find the guidance you need.");
     expect(layout).not.toContain("Section 02");
-    expect(layout).not.toContain("How Codewhale works: ego");
+    expect(layout).not.toContain("How Nestlone works: ego");
     expect(layout).not.toContain("<Seal");
     expect(layout.indexOf('<article className="docs-content')).toBeLessThan(
       layout.indexOf("<DocsSidebar"),
@@ -50,7 +50,7 @@ describe("public website copy contracts", () => {
     expect(runtime).toContain("Phase 0 companion for the local runtime");
     expect(runtime).not.toContain("Agent Communication Protocol");
     expect(runtime).not.toContain("IETF-standard");
-    expect(runtime).not.toContain("embeds Codewhale as a side-panel agent");
+    expect(runtime).not.toContain("embeds Nestlone as a side-panel agent");
     expect(runtime).not.toMatch(/\/(?:en|zh)\/docs#(?:runtime-api|acp|mcp)/);
     expect(runtime).toContain("docs/RUNTIME_API.md");
     expect(runtime).toContain("docs/MCP.md");
@@ -97,7 +97,7 @@ describe("public website copy contracts", () => {
     expect(homepage).toContain("Source candidate");
     expect(homepage).toContain("provider routes");
     expect(homepage).not.toContain("releases/tag/v${version}");
-    expect(homepage).not.toMatch(/Codewhale v0\.9\.1|\"v0\.9\.1 \u00b7/);
+    expect(homepage).not.toMatch(/Nestlone v0\.9\.1|\"v0\.9\.1 \u00b7/);
     expect(install).toContain("publishedRelease.tag");
     expect(install).not.toContain('"v0.8.x"');
     expect(install).not.toContain("cnbInstall(facts.version");
@@ -112,7 +112,7 @@ describe("public website copy contracts", () => {
     expect(community).toContain("International open-source community");
     expect(community).toContain("issues/new/choose");
     expect(community).toContain("docs/LOCALIZATION.md");
-    expect(community).toContain("Hmbown/CodeWhale/pulls");
+    expect(community).toContain("bdugsj/nestlone/pulls");
     expect(community).toContain("keeps the weekly archive of repository activity");
     expect(community).not.toContain("latest one sits near the top");
     expect(community).not.toContain("<Ticker");

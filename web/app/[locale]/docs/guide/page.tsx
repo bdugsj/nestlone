@@ -11,7 +11,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return buildPageMetadata({
     path: "/docs/guide",
     locale,
-    title: isZh ? "新手指引 · Codewhale 文档" : "Getting started · Codewhale Docs",
+    title: isZh ? "新手指引 · Nestlone 文档" : "Getting started · Nestlone Docs",
     description: isZh
       ? "从安装到第一个 Fleet Workflow 的完整路径：安装、无需密钥的首次会话、连接提供商、运行 Fleet。"
       : "The full path from install to a first Fleet workflow: install, a first keyless session, provider connection, and Fleet.",

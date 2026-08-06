@@ -23,7 +23,7 @@ export default async function DocsLayout({
         <div className="portal-container docs-portal-hero-inner">
           <div className="portal-mark">
             <Whale size={28} />
-            <span>{isZh ? "Codewhale 文档" : "Codewhale documentation"}</span>
+            <span>{isZh ? "Nestlone 文档" : "Nestlone documentation"}</span>
           </div>
           <h1>{isZh ? "查找准确的使用说明。" : "Find the guidance you need."}</h1>
           <p>
@@ -33,10 +33,10 @@ export default async function DocsLayout({
           </p>
           <div className="portal-actions">
             <Link href={`/${locale}/install`} className="portal-button portal-button-primary">
-              {isZh ? "安装 Codewhale" : "Install Codewhale"}
+              {isZh ? "安装 Nestlone" : "Install Nestlone"}
             </Link>
             <Link
-              href="https://github.com/Hmbown/CodeWhale/tree/main/docs"
+              href="https://github.com/bdugsj/nestlone/tree/main/docs"
               target="_blank"
               rel="noreferrer"
               className="portal-button portal-button-secondary"

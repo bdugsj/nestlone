@@ -6,7 +6,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return buildPageMetadata({
     path: "/docs/work",
     locale,
-    title: isZh ? "工作面板 · Codewhale 文档" : "Work Surface · Codewhale Docs",
+    title: isZh ? "工作面板 · Nestlone 文档" : "Work Surface · Nestlone Docs",
     description: isZh
       ? "唯一的 To-do 执行台账、模型可见的 Work grounding，以及同一份工作状态的延续路径。"
       : "The single canonical To-do ledger, model-facing Work grounding, and how one work state stays continuous.",
@@ -26,8 +26,8 @@ export default async function WorkSurfacePage({ params }: { params: Promise<{ lo
         <h2 className="font-display text-3xl mb-1">{isZh ? "工作面板" : "The Work surface"}</h2>
         <p className={`${bodyClass} mt-3`}>
           {isZh
-            ? "Codewhale 的 TUI 侧栏有一块 Work 区域，显示当前工作的实时状态。它不只是视觉上的待办清单：同一份工作状态同时由模型可见的工具、会话接力（relay）和子 Agent 交接共同维护。Codewhale 只有一个 Work 面板——带计数的 To-do 执行台账。update_plan 是对话式的推理笔记，不是第二个进度面板。"
-            : "The TUI sidebar has a Work area that shows live state for the current job. It is more than a visual to-do list: the same work state is maintained by model-visible tools, session relay, and sub-agent handoff. Codewhale has exactly one Work surface — the counted To-do execution ledger. update_plan is conversational reasoning, not a second progress surface."}
+            ? "Nestlone 的 TUI 侧栏有一块 Work 区域，显示当前工作的实时状态。它不只是视觉上的待办清单：同一份工作状态同时由模型可见的工具、会话接力（relay）和子 Agent 交接共同维护。Nestlone 只有一个 Work 面板——带计数的 To-do 执行台账。update_plan 是对话式的推理笔记，不是第二个进度面板。"
+            : "The TUI sidebar has a Work area that shows live state for the current job. It is more than a visual to-do list: the same work state is maintained by model-visible tools, session relay, and sub-agent handoff. Nestlone has exactly one Work surface — the counted To-do execution ledger. update_plan is conversational reasoning, not a second progress surface."}
         </p>
       </section>
 
@@ -78,8 +78,8 @@ export default async function WorkSurfacePage({ params }: { params: Promise<{ lo
         </h2>
         <p className={`${bodyClass} mt-3`}>
           {isZh
-            ? "同一份工作状态喂给多个出口，而且用的是同一个渲染器：每个父回合循环和子 Agent 步骤请求的尾部会附加一个瞬时的 <codewhale:work_state> 块；分叉（fork_context）的子 Agent 在其前缀的结构化状态块里收到同样的正文；/relay 把同样的正文写进交接指令。三处的 To-do 正文逐字节一致——子 Agent 与下一个线程因此从父级真实的进度位置继续，而不是从转述的摘要开始。侧栏的 To-do 区域则实时渲染同一份状态。"
-            : "The same work state feeds several surfaces through one renderer: a transient <codewhale:work_state> block is appended to each parent turn-loop and sub-agent step request; a forked (fork_context) sub-agent receives the same body inside its structured state block; and /relay writes the same body into the handoff instruction. The To-do body is byte-identical in all three, so a child agent and the next thread continue from the parent's real progress position instead of a paraphrased summary. The sidebar renders that same state live."}
+            ? "同一份工作状态喂给多个出口，而且用的是同一个渲染器：每个父回合循环和子 Agent 步骤请求的尾部会附加一个瞬时的 <nestlone:work_state> 块；分叉（fork_context）的子 Agent 在其前缀的结构化状态块里收到同样的正文；/relay 把同样的正文写进交接指令。三处的 To-do 正文逐字节一致——子 Agent 与下一个线程因此从父级真实的进度位置继续，而不是从转述的摘要开始。侧栏的 To-do 区域则实时渲染同一份状态。"
+            : "The same work state feeds several surfaces through one renderer: a transient <nestlone:work_state> block is appended to each parent turn-loop and sub-agent step request; a forked (fork_context) sub-agent receives the same body inside its structured state block; and /relay writes the same body into the handoff instruction. The To-do body is byte-identical in all three, so a child agent and the next thread continue from the parent's real progress position instead of a paraphrased summary. The sidebar renders that same state live."}
         </p>
       </section>
 
@@ -126,8 +126,8 @@ elapsed: 18m
         </h2>
         <p className={`${bodyClass} mt-3`}>
           {isZh
-            ? "已被实现和测试证实的模型可见路径有五条：work_update 工具本身是模型目录里的活跃工具；每个父回合循环请求尾部的 <codewhale:work_state> 块（#3983）；每个子 Agent 步骤请求尾部的同一个块——渲染自它自己的清单；分叉子 Agent 的结构化状态块（<codewhale:fork_state> 中的 Work 小节，在真正 fork 的那一刻解析）；以及 /relay 输出。侧栏渲染是视觉呈现——它给人看，不注入模型上下文。"
-            : "Five model-facing paths are implemented and covered by tests: the work_update tool itself, which is active in the model catalog; the <codewhale:work_state> block appended to each parent turn-loop request (#3983); the same block on each sub-agent step request, rendered from that agent's own list; the forked sub-agent's structured state block (the Work section inside <codewhale:fork_state>, resolved at the moment of the fork); and /relay output. The sidebar rendering is a visual presentation — it informs the operator and is not injected into model context."}
+            ? "已被实现和测试证实的模型可见路径有五条：work_update 工具本身是模型目录里的活跃工具；每个父回合循环请求尾部的 <nestlone:work_state> 块（#3983）；每个子 Agent 步骤请求尾部的同一个块——渲染自它自己的清单；分叉子 Agent 的结构化状态块（<nestlone:fork_state> 中的 Work 小节，在真正 fork 的那一刻解析）；以及 /relay 输出。侧栏渲染是视觉呈现——它给人看，不注入模型上下文。"
+            : "Five model-facing paths are implemented and covered by tests: the work_update tool itself, which is active in the model catalog; the <nestlone:work_state> block appended to each parent turn-loop request (#3983); the same block on each sub-agent step request, rendered from that agent's own list; the forked sub-agent's structured state block (the Work section inside <nestlone:fork_state>, resolved at the moment of the fork); and /relay output. The sidebar rendering is a visual presentation — it informs the operator and is not injected into model context."}
         </p>
         <p className={`${bodyClass} mt-3`}>
           {isZh

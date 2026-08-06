@@ -44,7 +44,7 @@ export default function OpengraphImage() {
               letterSpacing: 0,
             }}
           >
-            Codewhale
+            Nestlone
           </div>
           <div
             style={{

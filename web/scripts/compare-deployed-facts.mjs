@@ -58,7 +58,7 @@ async function fetchReceipt(url) {
       cache: "no-store",
       headers: {
         Accept: "application/json",
-        "User-Agent": "codewhale-deploy-facts-check",
+        "User-Agent": "nestlone-deploy-facts-check",
       },
     });
     if (!response.ok) {

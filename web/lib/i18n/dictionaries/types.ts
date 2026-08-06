@@ -62,7 +62,7 @@ export interface HomeDict {
   sourceCandidate: string;
   /** "{count} provider routes" */
   providerRoutes: string;
-  /** Screenshot alt: "Fresh Codewhale v{version} terminal session …" */
+  /** Screenshot alt: "Fresh Nestlone v{version} terminal session …" */
   screenshotAlt: string;
   /** "v{version} {state} · local Ollama route · Plan / Act / Operate" */
   figcaption: string;

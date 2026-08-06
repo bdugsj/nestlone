@@ -6,7 +6,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return buildPageMetadata({
     path: "/docs/web",
     locale,
-    title: isZh ? "浏览器客户端 · Codewhale 文档" : "Browser Client · Codewhale Docs",
+    title: isZh ? "浏览器客户端 · Nestlone 文档" : "Browser Client · Nestlone Docs",
     description: isZh
       ? "仅回环的内嵌浏览器客户端：一次性引导、会话 Cookie 与本地信任边界。"
       : "The loopback-only embedded browser client: one-time bootstrap, session cookie, and the local trust boundary.",
@@ -27,21 +27,21 @@ export default async function WebClientPage({ params }: { params: Promise<{ loca
         <p className={`${bodyClass} mt-3`}>
           {isZh ? (
             <>
-              <code className="inline">codewhale web</code> 在 canonical 运行时 API
-              之上打开 Codewhale 内嵌的浏览器客户端。它是一个纯本地界面：服务器始终绑定{" "}
+              <code className="inline">nestlone web</code> 在 canonical 运行时 API
+              之上打开 Nestlone 内嵌的浏览器客户端。它是一个纯本地界面：服务器始终绑定{" "}
               <code className="inline">127.0.0.1</code>，无法改绑到局域网地址，也无法在关闭运行时认证的情况下运行。默认地址是{" "}
               <code className="inline">http://127.0.0.1:7878</code>；端口冲突时用{" "}
-              <code className="inline">codewhale web --port 8788</code>{" "}
+              <code className="inline">nestlone web --port 8788</code>{" "}
               换一个回环端口。Ctrl+C 停止进程，浏览器会话随之结束。
             </>
           ) : (
             <>
-              <code className="inline">codewhale web</code> opens Codewhale's embedded browser client
+              <code className="inline">nestlone web</code> opens Nestlone's embedded browser client
               over the canonical Runtime API. It is a local surface: the server always binds to{" "}
               <code className="inline">127.0.0.1</code>, cannot be rebound to a LAN address, and cannot
               run with Runtime authentication disabled. The default address is{" "}
               <code className="inline">http://127.0.0.1:7878</code>; on a port collision, pick another
-              loopback port with <code className="inline">codewhale web --port 8788</code>. Stop the
+              loopback port with <code className="inline">nestlone web --port 8788</code>. Stop the
               process with Ctrl+C and the browser session ends with it.
             </>
           )}
@@ -67,20 +67,20 @@ export default async function WebClientPage({ params }: { params: Promise<{ loca
         <p className={`${bodyClass} mt-3`}>
           {isZh ? (
             <>
-              <code className="inline">codewhale web</code> 只接受{" "}
+              <code className="inline">nestlone web</code> 只接受{" "}
               <code className="inline">--port</code>——没有 <code className="inline">--host</code>
               ，也没有关闭认证的选项。不要把它当公开网站，也不要通过路由器转发、公开反向代理或隧道暴露它的端口。单独的{" "}
-              <code className="inline">codewhale app-server --mobile</code> 和{" "}
+              <code className="inline">nestlone app-server --mobile</code> 和{" "}
               <code className="inline">--http</code>{" "}
               模式有不同的部署与认证约定，操作它们（尤其是选择非回环绑定）之前请阅读运行时 API 文档。
             </>
           ) : (
             <>
-              <code className="inline">codewhale web</code> accepts only{" "}
+              <code className="inline">nestlone web</code> accepts only{" "}
               <code className="inline">--port</code> — there is no <code className="inline">--host</code>{" "}
               and no insecure-auth option on this command. Do not treat it as a public website or expose
               its port through router forwarding, a public reverse proxy, or a tunnel. The separate{" "}
-              <code className="inline">codewhale app-server --mobile</code> and{" "}
+              <code className="inline">nestlone app-server --mobile</code> and{" "}
               <code className="inline">--http</code> modes carry different deployment and authentication
               contracts; read the Runtime API documentation before operating either one, especially
               before selecting a non-loopback bind.
@@ -93,8 +93,8 @@ export default async function WebClientPage({ params }: { params: Promise<{ loca
         <h2 className="font-display text-2xl mb-1">{isZh ? "常见问题" : "Troubleshooting"}</h2>
         <p className={`${bodyClass} mt-3`}>
           {isZh
-            ? "端口 7878 被占用时用 --port 换一个。浏览器无法打开时命令会报错退出，而不会留下可重用的引导凭证；检查系统默认浏览器设置后重新启动。页面能打开但 provider 不可用时，查 codewhale doctor 和 /provider——web 命令不配置也不迁移 provider 凭据。会话过期后重启 codewhale web 以签发新的进程本地会话；重用旧的引导 URL 本来就会失败。"
-            : "If port 7878 is occupied, pass an unused --port. If the browser cannot be opened, the command exits with an error rather than leaving a reusable bootstrap capability behind; check the OS default-browser setup and start again. If the page loads but a provider is unavailable, inspect codewhale doctor and /provider — the web command does not configure or move provider credentials. If a session expired, restart codewhale web to mint a new process-local session; reusing an old bootstrap URL is expected to fail."}
+            ? "端口 7878 被占用时用 --port 换一个。浏览器无法打开时命令会报错退出，而不会留下可重用的引导凭证；检查系统默认浏览器设置后重新启动。页面能打开但 provider 不可用时，查 nestlone doctor 和 /provider——web 命令不配置也不迁移 provider 凭据。会话过期后重启 nestlone web 以签发新的进程本地会话；重用旧的引导 URL 本来就会失败。"
+            : "If port 7878 is occupied, pass an unused --port. If the browser cannot be opened, the command exits with an error rather than leaving a reusable bootstrap capability behind; check the OS default-browser setup and start again. If the page loads but a provider is unavailable, inspect nestlone doctor and /provider — the web command does not configure or move provider credentials. If a session expired, restart nestlone web to mint a new process-local session; reusing an old bootstrap URL is expected to fail."}
         </p>
       </section>
 

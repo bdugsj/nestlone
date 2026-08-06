@@ -25,7 +25,7 @@ function installGitHubFixture(toolCountSource: string | null): void {
           JSON.stringify({
             tag_name: "v0.9.0",
             published_at: "2026-07-16T20:05:39Z",
-            html_url: "https://github.com/Hmbown/CodeWhale/releases/tag/v0.9.0",
+            html_url: "https://github.com/bdugsj/nestlone/releases/tag/v0.9.0",
           }),
         );
       }

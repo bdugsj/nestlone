@@ -10,10 +10,10 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return buildPageMetadata({
     path: "/models",
     locale,
-    title: isZh ? "模型与提供商 · Codewhale" : "Models & providers · Codewhale",
+    title: isZh ? "模型与提供商 · Nestlone" : "Models & providers · Nestlone",
     description: isZh
-      ? "Codewhale 托管与本地提供商路由的配置方式和完整注册表。"
-      : "Configuration guidance and the full registry for Codewhale's hosted and local provider routes.",
+      ? "Nestlone 托管与本地提供商路由的配置方式和完整注册表。"
+      : "Configuration guidance and the full registry for Nestlone's hosted and local provider routes.",
   });
 }
 
@@ -22,13 +22,13 @@ export default async function ModelsPage({ params }: { params: Promise<{ locale:
   const isZh = locale === "zh";
   const p = (path: string) => (isZh ? `/zh${path}` : `/en${path}`);
   const facts = await getFacts();
-  const providerDocs = "https://github.com/Hmbown/CodeWhale/blob/main/docs/PROVIDERS.md";
+  const providerDocs = "https://github.com/bdugsj/nestlone/blob/main/docs/PROVIDERS.md";
 
   const setupPatterns = isZh
     ? [
         {
           title: "DeepSeek",
-          detail: `新配置默认使用 ${facts.defaultModel ?? "deepseek-v4-pro"}。可以通过 --provider、/provider 或 CODEWHALE_PROVIDER 明确选择其他路由。`,
+          detail: `新配置默认使用 ${facts.defaultModel ?? "deepseek-v4-pro"}。可以通过 --provider、/provider 或 NESTLONE_PROVIDER 明确选择其他路由。`,
           reference: "DEEPSEEK_API_KEY",
         },
         {
@@ -45,7 +45,7 @@ export default async function ModelsPage({ params }: { params: Promise<{ locale:
     : [
         {
           title: "DeepSeek",
-          detail: `New configurations default to ${facts.defaultModel ?? "deepseek-v4-pro"}. Select another route explicitly with --provider, /provider, or CODEWHALE_PROVIDER.`,
+          detail: `New configurations default to ${facts.defaultModel ?? "deepseek-v4-pro"}. Select another route explicitly with --provider, /provider, or NESTLONE_PROVIDER.`,
           reference: "DEEPSEEK_API_KEY",
         },
         {
@@ -69,15 +69,15 @@ export default async function ModelsPage({ params }: { params: Promise<{ locale:
           <h1>{isZh ? "选择模型和提供商。" : "Choose a model and provider."}</h1>
           <p>
             {isZh
-              ? `Codewhale 包含 ${facts.providers.length} 条提供商路由。提供商、模型和端点都是明确的配置；每条路由使用同一个本地运行时、工具和审批边界。托管提供商使用你配置的凭据，本地 vLLM、SGLang 和 Ollama 端点通常不需要密钥。`
-              : `Codewhale includes ${facts.providers.length} provider routes. The provider, model, and endpoint are explicit configuration, and every route uses the same local runtime, tools, and approval boundaries. Hosted providers use credentials you configure; local vLLM, SGLang, and Ollama endpoints usually require no key.`}
+              ? `Nestlone 包含 ${facts.providers.length} 条提供商路由。提供商、模型和端点都是明确的配置；每条路由使用同一个本地运行时、工具和审批边界。托管提供商使用你配置的凭据，本地 vLLM、SGLang 和 Ollama 端点通常不需要密钥。`
+              : `Nestlone includes ${facts.providers.length} provider routes. The provider, model, and endpoint are explicit configuration, and every route uses the same local runtime, tools, and approval boundaries. Hosted providers use credentials you configure; local vLLM, SGLang, and Ollama endpoints usually require no key.`}
           </p>
           <div className="portal-actions">
             <Link href={providerDocs} className="portal-button portal-button-primary">
               {isZh ? "阅读提供商文档" : "Read the provider docs"}
             </Link>
             <Link href={p("/install")} className="portal-button portal-button-secondary">
-              {isZh ? "安装 Codewhale" : "Install Codewhale"}
+              {isZh ? "安装 Nestlone" : "Install Nestlone"}
             </Link>
           </div>
         </div>
@@ -90,8 +90,8 @@ export default async function ModelsPage({ params }: { params: Promise<{ locale:
             <h2>{isZh ? "常用提供商路由" : "Common provider routes"}</h2>
             <p>
               {isZh
-                ? "托管提供商的密钥可以通过 codewhale auth set 保存，也可以使用文档中列出的配置项或环境变量。提供商和模型分别选择；模型名称不会隐式改变提供商。"
-                : "Hosted-provider credentials can be saved with codewhale auth set or supplied through documented configuration and environment variables. Provider and model selection remain separate; a model name never changes the provider implicitly."}
+                ? "托管提供商的密钥可以通过 nestlone auth set 保存，也可以使用文档中列出的配置项或环境变量。提供商和模型分别选择；模型名称不会隐式改变提供商。"
+                : "Hosted-provider credentials can be saved with nestlone auth set or supplied through documented configuration and environment variables. Provider and model selection remain separate; a model name never changes the provider implicitly."}
             </p>
           </div>
           <div className="portal-topic-list">
@@ -133,13 +133,13 @@ export default async function ModelsPage({ params }: { params: Promise<{ locale:
             {isZh ? (
               <>
                 如果需要的提供商尚未列出，请先{" "}
-                <Link href="https://github.com/Hmbown/CodeWhale/issues/new/choose" className="body-link">提交 issue</Link>
+                <Link href="https://github.com/bdugsj/nestlone/issues/new/choose" className="body-link">提交 issue</Link>
                 ，说明端点、认证方式和模型能力；也欢迎发送包含注册表、文档和测试的 pull request。
               </>
             ) : (
               <>
                 If a provider is missing, please{" "}
-                <Link href="https://github.com/Hmbown/CodeWhale/issues/new/choose" className="body-link">file an issue</Link>
+                <Link href="https://github.com/bdugsj/nestlone/issues/new/choose" className="body-link">file an issue</Link>
                 {" "}with its endpoint, authentication method, and model capabilities. Pull requests that update the registry, documentation, and tests are welcome too.
               </>
             )}

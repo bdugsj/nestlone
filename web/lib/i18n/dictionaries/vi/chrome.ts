@@ -7,7 +7,7 @@ export const chrome: ChromeDict = {
   navContribute: "Đóng góp",
   installCta: "Cài đặt →",
   footerTagline:
-    "Tài liệu, mã nguồn và cộng đồng cho runtime Codewhale mã nguồn mở.",
+    "Tài liệu, mã nguồn và cộng đồng cho runtime Nestlone mã nguồn mở.",
   footerProduct: "Sản phẩm",
   footerProject: "Dự án",
   footerDocs: "Tài liệu",

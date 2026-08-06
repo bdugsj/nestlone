@@ -1,28 +1,28 @@
 #!/bin/sh
 set -eu
 
-repo="Hmbown/CodeWhale"
-version="${CODEWHALE_VERSION:-latest}"
-release_base="${CODEWHALE_RELEASE_BASE_URL:-${DEEPSEEK_TUI_RELEASE_BASE_URL:-}}"
+repo="bdugsj/nestlone"
+version="${NESTLONE_VERSION:-${CODEWHALE_VERSION:-${DEEPSEEK_TUI_VERSION:-${DEEPSEEK_VERSION:-latest}}}}"
+release_base="${NESTLONE_RELEASE_BASE_URL:-${CODEWHALE_RELEASE_BASE_URL:-${DEEPSEEK_TUI_RELEASE_BASE_URL:-${DEEPSEEK_RELEASE_BASE_URL:-}}}}"
 
 usage() {
   cat <<'USAGE'
-Codewhale installer for macOS and Linux.
+Nestlone installer for macOS and Linux.
 
 Usage:
   curl -fsSL https://codewhale.net/install.sh | sh
 
 Environment:
-  CODEWHALE_INSTALL_DIR    Install directory. Default: $HOME/.local/bin
-  CODEWHALE_VERSION        Release tag to install, for example v0.9.0. Default: latest
-  CODEWHALE_RELEASE_BASE_URL
-                           Custom release asset base URL ending in /download
-  CODEWHALE_SKIP_GLIBC_CHECK=1
-                           Skip Linux arm64 glibc compatibility preflight
+  NESTLONE_INSTALL_DIR    Install directory. Default: $HOME/.local/bin
+  NESTLONE_VERSION        Release tag to install, for example v0.9.0. Default: latest
+  NESTLONE_RELEASE_BASE_URL
+                          Custom release asset base URL ending in /download
+  NESTLONE_SKIP_GLIBC_CHECK=1
+                          Skip Linux arm64 glibc compatibility preflight
 
 Examples:
-  curl -fsSL https://codewhale.net/install.sh | CODEWHALE_INSTALL_DIR=/usr/local/bin sh
-  curl -fsSL https://codewhale.net/install.sh | CODEWHALE_VERSION=v0.9.0 sh
+  curl -fsSL https://codewhale.net/install.sh | NESTLONE_INSTALL_DIR=/usr/local/bin sh
+  curl -fsSL https://codewhale.net/install.sh | NESTLONE_VERSION=v0.0.2 sh
 USAGE
 }
 
@@ -38,14 +38,14 @@ say() {
 }
 
 fail() {
-  printf 'codewhale install: %s\n' "$*" >&2
+  printf 'nestlone install: %s\n' "$*" >&2
   exit 1
 }
 
-if [ -n "${CODEWHALE_INSTALL_DIR:-}" ]; then
-  install_dir="$CODEWHALE_INSTALL_DIR"
+if [ -n "${NESTLONE_INSTALL_DIR:-${CODEWHALE_INSTALL_DIR:-}}" ]; then
+  install_dir="${NESTLONE_INSTALL_DIR:-${CODEWHALE_INSTALL_DIR:-}}"
 else
-  [ -n "${HOME:-}" ] || fail "HOME is not set; set CODEWHALE_INSTALL_DIR"
+  [ -n "${HOME:-}" ] || fail "HOME is not set; set NESTLONE_INSTALL_DIR"
   install_dir="$HOME/.local/bin"
 fi
 
@@ -139,7 +139,7 @@ check_glibc() {
     *) return ;;
   esac
 
-  [ "${CODEWHALE_SKIP_GLIBC_CHECK:-}" = "1" ] && return
+  [ "${NESTLONE_SKIP_GLIBC_CHECK:-${CODEWHALE_SKIP_GLIBC_CHECK:-}}" = "1" ] && return
   [ "${DEEPSEEK_TUI_SKIP_GLIBC_CHECK:-}" = "1" ] && return
   [ "${DEEPSEEK_SKIP_GLIBC_CHECK:-}" = "1" ] && return
 
@@ -147,12 +147,12 @@ check_glibc() {
   host="$(glibc_version || true)"
   if [ -z "$host" ] || ! version_at_least "$host" "$required"; then
     cat >&2 <<EOF
-codewhale install: prebuilt Codewhale $target assets require glibc $required or newer.
+nestlone install: prebuilt Nestlone $target assets require glibc $required or newer.
 This system reports glibc ${host:-unavailable}.
 
 Linux x64 uses a static musl build. Linux arm64 release assets are GNU libc
 builds from Ubuntu 24.04. Build from source with Cargo or set
-CODEWHALE_SKIP_GLIBC_CHECK=1 to bypass this check at your own risk.
+NESTLONE_SKIP_GLIBC_CHECK=1 to bypass this check at your own risk.
 EOF
     exit 1
   fi
@@ -188,36 +188,36 @@ fi
 
 target="$(detect_platform)"
 check_glibc
-cli_asset="codewhale-$target"
-tui_asset="codewhale-tui-$target"
-manifest_asset="codewhale-artifacts-sha256.txt"
+cli_asset="nestlone-$target"
+tui_asset="nestlone-tui-$target"
+manifest_asset="nestlone-artifacts-sha256.txt"
 
-tmpdir="$(mktemp -d 2>/dev/null || mktemp -d -t codewhale-install)"
+tmpdir="$(mktemp -d 2>/dev/null || mktemp -d -t nestlone-install)"
 trap 'rm -rf "$tmpdir"' EXIT INT TERM
 
-say "Installing Codewhale for $target"
+say "Installing Nestlone for $target"
 say "Release assets: $release_base"
 say "Install dir: $install_dir"
 
 download "$release_base/$manifest_asset" "$tmpdir/$manifest_asset"
-download "$release_base/$cli_asset" "$tmpdir/codewhale"
-download "$release_base/$tui_asset" "$tmpdir/codewhale-tui"
+download "$release_base/$cli_asset" "$tmpdir/nestlone"
+download "$release_base/$tui_asset" "$tmpdir/nestlone-tui"
 
-verify_asset "$cli_asset" "$tmpdir/codewhale" "$tmpdir/$manifest_asset"
-verify_asset "$tui_asset" "$tmpdir/codewhale-tui" "$tmpdir/$manifest_asset"
+verify_asset "$cli_asset" "$tmpdir/nestlone" "$tmpdir/$manifest_asset"
+verify_asset "$tui_asset" "$tmpdir/nestlone-tui" "$tmpdir/$manifest_asset"
 say "Checksums verified"
 
-chmod 755 "$tmpdir/codewhale" "$tmpdir/codewhale-tui"
+chmod 755 "$tmpdir/nestlone" "$tmpdir/nestlone-tui"
 if command -v xattr >/dev/null 2>&1; then
-  xattr -d com.apple.quarantine "$tmpdir/codewhale" "$tmpdir/codewhale-tui" 2>/dev/null || true
+  xattr -d com.apple.quarantine "$tmpdir/nestlone" "$tmpdir/nestlone-tui" 2>/dev/null || true
 fi
 
 sudo_cmd=""
 if [ -d "$install_dir" ]; then
   if [ ! -w "$install_dir" ] ||
-    { [ -e "$install_dir/codewhale" ] && [ ! -w "$install_dir/codewhale" ]; } ||
-    { [ -e "$install_dir/codewhale-tui" ] && [ ! -w "$install_dir/codewhale-tui" ]; } ||
-    { [ -e "$install_dir/codew" ] && [ ! -w "$install_dir/codew" ]; }; then
+    { [ -e "$install_dir/nestlone" ] && [ ! -w "$install_dir/nestlone" ]; } ||
+    { [ -e "$install_dir/nestlone-tui" ] && [ ! -w "$install_dir/nestlone-tui" ]; } ||
+    { [ -e "$install_dir/nest" ] && [ ! -w "$install_dir/nest" ]; }; then
     need_cmd sudo
     sudo_cmd="sudo"
   fi
@@ -229,32 +229,32 @@ else
   fi
 fi
 
-stage_cli="$install_dir/.codewhale.$$"
-stage_tui="$install_dir/.codewhale-tui.$$"
+stage_cli="$install_dir/.nestlone.$$"
+stage_tui="$install_dir/.nestlone-tui.$$"
 trap 'rm -rf "$tmpdir"; rm -f "$stage_cli" "$stage_tui" 2>/dev/null || true' EXIT INT TERM
 
-$sudo_cmd cp "$tmpdir/codewhale" "$stage_cli"
-$sudo_cmd cp "$tmpdir/codewhale-tui" "$stage_tui"
+$sudo_cmd cp "$tmpdir/nestlone" "$stage_cli"
+$sudo_cmd cp "$tmpdir/nestlone-tui" "$stage_tui"
 $sudo_cmd chmod 755 "$stage_cli" "$stage_tui"
-$sudo_cmd mv "$stage_cli" "$install_dir/codewhale"
-$sudo_cmd mv "$stage_tui" "$install_dir/codewhale-tui"
+$sudo_cmd mv "$stage_cli" "$install_dir/nestlone"
+$sudo_cmd mv "$stage_tui" "$install_dir/nestlone-tui"
 
-$sudo_cmd rm -f "$install_dir/codew"
-if ! $sudo_cmd ln -s codewhale "$install_dir/codew"; then
-  say "Installed binaries, but could not create $install_dir/codew alias"
+$sudo_cmd rm -f "$install_dir/nest"
+if ! $sudo_cmd ln -s nestlone "$install_dir/nest"; then
+  say "Installed binaries, but could not create $install_dir/nest alias"
 fi
 
 say "Installed:"
-"$install_dir/codewhale" --version || true
-"$install_dir/codewhale-tui" --version || true
+"$install_dir/nestlone" --version || true
+"$install_dir/nestlone-tui" --version || true
 
 case ":$PATH:" in
   *":$install_dir:"*) ;;
   *)
     say ""
-    say "Add $install_dir to PATH to run codewhale from any terminal."
+    say "Add $install_dir to PATH to run nestlone from any terminal."
     ;;
 esac
 
 say ""
-say "Run: codewhale"
+say "Run: nestlone"

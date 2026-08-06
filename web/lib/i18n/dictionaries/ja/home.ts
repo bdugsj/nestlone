@@ -5,7 +5,7 @@ export const home: HomeDict = {
   heroTitleA: "深海へ潜り、",
   heroTitleB: "あなたは潜らなくていい。",
   heroIntro:
-    "Codewhale は、LLM のレバレッジを普通の人々に届けます。ターミナルでリポジトリを読み、ファイルを編集し、チェックを実行し、レシートを残します — コードを話せることを前提にしません。あなたのマシンで動きます。",
+    "Nestlone は、LLM のレバレッジを普通の人々に届けます。ターミナルでリポジトリを読み、ファイルを編集し、チェックを実行し、レシートを残します — コードを話せることを前提にしません。あなたのマシンで動きます。",
   install: "インストール",
   docs: "ドキュメント",
   copy: "コピー",
@@ -16,13 +16,13 @@ export const home: HomeDict = {
   sourceCandidate: "ソース候補版",
   providerRoutes: "{count} 件のプロバイダールート",
   screenshotAlt:
-    "ローカル Ollama ルートを使う新しい Codewhale v{version} ターミナルセッション。空の Work バーなし",
+    "ローカル Ollama ルートを使う新しい Nestlone v{version} ターミナルセッション。空の Work バーなし",
   figcaption: "v{version} {state} · ローカル Ollama ルート · Plan / Act / Operate",
   publishedRelease: "公開リリース",
   figcaptionSourceCandidate: "ソース候補",
   proofHeading: "水中のターミナルシェル。モデル中立。ローカルファースト。",
   proofBody:
-    "すでに使っているホスト型、ゲートウェイ、ローカルのモデルをそのまま使えます。Codewhale はあなたのマシンで動作し、モデルを製品ではなく選択可能なコンポーネントとして扱います。Plan / Act / Operate と明示的な権限ポスチャで、深い潜水もコントロールできます。",
+    "すでに使っているホスト型、ゲートウェイ、ローカルのモデルをそのまま使えます。Nestlone はあなたのマシンで動作し、モデルを製品ではなく選択可能なコンポーネントとして扱います。Plan / Act / Operate と明示的な権限ポスチャで、深い潜水もコントロールできます。",
   workflowHeading: "タスクから検証済みの変更へ。",
   workflow: [
     ["検査", "リポジトリ、その指示、タスクを読みます。"],
@@ -42,7 +42,7 @@ export const home: HomeDict = {
   surfacesHeading: "作業が起きる場所でランタイムを使う。",
   surfaces: [
     ["TUI", "対話型ターミナル作業"],
-    ["codewhale exec", "スクリプトと CI"],
+    ["nestlone exec", "スクリプトと CI"],
     ["Web クライアント", "ループバック専用ブラウザクライアント"],
     ["Runtime API + MCP", "ローカル統合"],
     ["Fleet", "永続的なマルチエージェント作業"],

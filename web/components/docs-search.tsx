@@ -225,7 +225,7 @@ export function DocsSearch({ locale }: { locale: string }) {
               : "Try a different keyword, or browse the full docs on GitHub."}
           </p>
           <Link
-            href="https://github.com/Hmbown/CodeWhale/tree/main/docs"
+            href="https://github.com/bdugsj/nestlone/tree/main/docs"
             target="_blank"
             className="portal-button portal-button-secondary"
           >

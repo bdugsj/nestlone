@@ -5,7 +5,7 @@ export const home: HomeDict = {
   heroTitleA: "Mergulhe nas profundezas",
   heroTitleB: "para que você não precise.",
   heroIntro:
-    "O Codewhale dá às pessoas comuns a alavancagem dos LLMs para construir coisas. No seu terminal, ele lê o repositório, edita arquivos, executa verificações e deixa um recibo — sem assumir que você já fala a língua do código. Roda na sua máquina.",
+    "O Nestlone dá às pessoas comuns a alavancagem dos LLMs para construir coisas. No seu terminal, ele lê o repositório, edita arquivos, executa verificações e deixa um recibo — sem assumir que você já fala a língua do código. Roda na sua máquina.",
   install: "Instalar",
   docs: "Documentação",
   copy: "Copiar",
@@ -16,13 +16,13 @@ export const home: HomeDict = {
   sourceCandidate: "Candidato da fonte",
   providerRoutes: "{count} rotas de provedores",
   screenshotAlt:
-    "Nova sessão de terminal do Codewhale v{version} usando uma rota Ollama local, sem barra Work vazia",
+    "Nova sessão de terminal do Nestlone v{version} usando uma rota Ollama local, sem barra Work vazia",
   figcaption: "v{version} {state} · rota Ollama local · Plan / Act / Operate",
   publishedRelease: "lançamento publicado",
   figcaptionSourceCandidate: "candidato da fonte",
   proofHeading: "Um terminal subaquático. Neutro a modelos. Local primeiro.",
   proofBody:
-    "Traga o modelo hospedado, de gateway ou local que você já usa. O Codewhale roda na sua máquina e trata o modelo como um componente selecionável — não o produto. Plan / Act / Operate e posturas de permissão explícitas mantêm o mergulho profundo sob seu controle.",
+    "Traga o modelo hospedado, de gateway ou local que você já usa. O Nestlone roda na sua máquina e trata o modelo como um componente selecionável — não o produto. Plan / Act / Operate e posturas de permissão explícitas mantêm o mergulho profundo sob seu controle.",
   workflowHeading: "Da tarefa à mudança verificada.",
   workflow: [
     ["Inspecionar", "Lê o repositório, suas instruções e a tarefa."],
@@ -42,7 +42,7 @@ export const home: HomeDict = {
   surfacesHeading: "Use o runtime onde o trabalho acontece.",
   surfaces: [
     ["TUI", "Trabalho interativo no terminal"],
-    ["codewhale exec", "Scripts e CI"],
+    ["nestlone exec", "Scripts e CI"],
     ["Cliente web", "Cliente de navegador apenas loopback"],
     ["Runtime API + MCP", "Integrações locais"],
     ["Fleet", "Trabalho multiagente duradouro"],

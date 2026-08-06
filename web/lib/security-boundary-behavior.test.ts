@@ -138,7 +138,7 @@ describe("public security boundaries", () => {
         title: "Unchanged issue",
         body: "same body",
         updated_at: "2020-01-01T00:00:00.000Z",
-        html_url: "https://github.com/Hmbown/CodeWhale/issues/42",
+        html_url: "https://github.com/bdugsj/nestlone/issues/42",
         labels: [],
       }]);
     });
@@ -161,7 +161,7 @@ describe("public security boundaries", () => {
         title: "Unchanged PR",
         body: "same body",
         updated_at: "2020-01-01T00:00:00.000Z",
-        html_url: "https://github.com/Hmbown/CodeWhale/pull/84",
+        html_url: "https://github.com/bdugsj/nestlone/pull/84",
         changed_files: 3,
         additions: 10,
         deletions: 2,

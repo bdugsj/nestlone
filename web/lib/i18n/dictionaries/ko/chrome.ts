@@ -6,7 +6,7 @@ export const chrome: ChromeDict = {
   navCommunity: "커뮤니티",
   navContribute: "기여",
   installCta: "설치 →",
-  footerTagline: "오픈 소스 Codewhale 런타임의 문서, 소스, 커뮤니티.",
+  footerTagline: "오픈 소스 Nestlone 런타임의 문서, 소스, 커뮤니티.",
   footerProduct: "제품",
   footerProject: "프로젝트",
   footerDocs: "문서",

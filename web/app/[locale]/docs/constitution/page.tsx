@@ -7,7 +7,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return buildPageMetadata({
     path: "/docs/constitution",
     locale,
-    title: isZh ? "宪法与 /constitution · Codewhale 文档" : "Constitution and /constitution · Codewhale Docs",
+    title: isZh ? "宪法与 /constitution · Nestlone 文档" : "Constitution and /constitution · Nestlone Docs",
     description: isZh
       ? "用户全局宪法、仓库本地法、项目说明和运行时边界。"
       : "User-global constitution, repo-local law, project instructions, and runtime boundaries.",
@@ -29,21 +29,21 @@ export default async function ConstitutionPage({ params }: { params: Promise<{ l
         </h2>
         {isZh ? (
           <p className="text-ink-soft mt-3 leading-[1.9] tracking-wide">
-            Codewhale 先给 Agent 一个可追责的地址，再给上下文冲突一套法律。
+            Nestlone 先给 Agent 一个可追责的地址，再给上下文冲突一套法律。
             <code className="inline">/constitution</code> 是管理个人常驻宪法的主入口：
-            它把结构化的用户全局设置保存在 <code className="inline">$CODEWHALE_HOME/constitution.json</code>，
+            它把结构化的用户全局设置保存在 <code className="inline">$NESTLONE_HOME/constitution.json</code>，
             再渲染成模型可读的 prose block。仓库仍可通过{" "}
-            <code className="inline">.codewhale/constitution.json</code> 增加本地 law；runtime
+            <code className="inline">.nestlone/constitution.json</code> 增加本地 law；runtime
             policy 独立负责模式、审批、沙箱、成本和工具边界。
           </p>
         ) : (
           <p className="text-ink-soft mt-3 leading-relaxed">
-            Codewhale gives the agent an accountable address, then a legal system for
+            Nestlone gives the agent an accountable address, then a legal system for
             context conflicts. <code className="inline">/constitution</code> is the
             primary personal constitution surface: guided setup stores structured
-            user-global data in <code className="inline">$CODEWHALE_HOME/constitution.json</code>
+            user-global data in <code className="inline">$NESTLONE_HOME/constitution.json</code>
             and renders it as model-facing prose. Repos can still add local law via{" "}
-            <code className="inline">.codewhale/constitution.json</code>; runtime policy
+            <code className="inline">.nestlone/constitution.json</code>; runtime policy
             separately encodes modes, approval, sandbox, cost, and tool boundaries.
           </p>
         )}
@@ -58,8 +58,8 @@ export default async function ConstitutionPage({ params }: { params: Promise<{ l
             {
               name: "Repo-local",
               cn: "仓库本地",
-              en: ".codewhale/constitution.json is optional project policy for protected invariants, branch rules, verification, and escalation.",
-              zh: ".codewhale/constitution.json 是可选项目 law，用于不变量、分支规则、验证和升级条件。",
+              en: ".nestlone/constitution.json is optional project policy for protected invariants, branch rules, verification, and escalation.",
+              zh: ".nestlone/constitution.json 是可选项目 law，用于不变量、分支规则、验证和升级条件。",
             },
             {
               name: "Runtime",
@@ -83,7 +83,7 @@ export default async function ConstitutionPage({ params }: { params: Promise<{ l
             ? "普通项目说明仍放在 AGENTS.md；记忆和交接低于宪法与项目说明；完整 base prompt Markdown 覆盖只是专家逃生口，不是普通设置路径。详见 "
             : "Standard project instructions still live in AGENTS.md; memory and handoffs rank below constitutions and project instructions; the full base-prompt Markdown override is an expert escape hatch, not the normal setup path. See "}
           <Link
-            href="https://github.com/Hmbown/CodeWhale/blob/main/docs/CONFIGURATION.md#constitution-project-instructions-and-repo-authority"
+            href="https://github.com/bdugsj/nestlone/blob/main/docs/CONFIGURATION.md#constitution-project-instructions-and-repo-authority"
             className="body-link"
           >
             {isZh ? "configuration docs" : "configuration docs"}

@@ -1,6 +1,6 @@
-# codewhale-web
+# nestlone-web
 
-Documentation and community site for [Codewhale](https://github.com/Hmbown/CodeWhale) — lives at **codewhale.net**.
+Documentation and community site for [Nestlone](https://github.com/bdugsj/nestlone) — lives at **codewhale.net**.
 
 Next.js 15 (App Router) + Tailwind, deployed to Cloudflare Workers via [`@opennextjs/cloudflare`](https://opennext.js.org/cloudflare). Curated "Today's Dispatch" content is regenerated every 6 hours by a Cloudflare Cron Trigger that calls `deepseek-v4-flash` to summarise recent repo activity, and stored in Workers KV.
 
@@ -19,7 +19,7 @@ Env (mirrors `.env.example`):
 | --------------------------- | ---------------------------------------------------------------- | -------------------- |
 | `DEEPSEEK_API_KEY`          | DeepSeek platform key (`sk-...`)                                 | only for the `/api/cron` tasks (summarization + community agent) |
 | `GITHUB_TOKEN`              | Fine-grained PAT, public-repo read scope                         | optional (raises rate limit 60 → 5000 req/h) |
-| `GITHUB_REPO`               | Defaults to `Hmbown/CodeWhale`                                   | optional             |
+| `GITHUB_REPO`               | Defaults to `bdugsj/nestlone`                                   | optional             |
 | `CRON_SECRET`               | Shared secret for manual `/api/cron` invocation                  | optional (Cloudflare cron triggers don't need it) |
 | `DEEPSEEK_MODEL`            | Defaults to `deepseek-v4-flash`                                  | optional             |
 | `DEEPSEEK_BASE_URL`         | Defaults to `https://api.deepseek.com`                           | optional             |
@@ -39,7 +39,7 @@ record the exact 40-character `origin/main` SHA and trigger that ref:
 ```bash
 git fetch origin main
 git rev-parse origin/main
-gh workflow run web.yml --repo Hmbown/CodeWhale --ref main
+gh workflow run web.yml --repo bdugsj/nestlone --ref main
 ```
 
 The manual job records the pre-deploy source drift, builds the OpenNext bundle,
@@ -73,7 +73,7 @@ You already own `codewhale.net` on Cloudflare and have a Workers Paid plan. The 
    npm run deploy                           # builds with OpenNext + uploads
    ```
 
-3. **Point the domain:** in the Cloudflare dashboard, add a Worker route for `codewhale.net/*` → the deployed Worker, named `codewhale-web` (see `wrangler.jsonc`).
+3. **Point the domain:** in the Cloudflare dashboard, add a Worker route for `codewhale.net/*` → the deployed Worker, named `nestlone-web` (see `wrangler.jsonc`).
 
 The first cron run happens within 6 hours; you can also kick it manually:
 
@@ -117,7 +117,7 @@ web/
 ├── components/
 │   ├── nav.tsx                 sticky header w/ date strip + CJK accents
 │   ├── footer.tsx              dense 5-column footer
-│   ├── whale.tsx               shared Codewhale mark
+│   ├── whale.tsx               shared Nestlone mark
 │   ├── ticker.tsx              animated live activity strip
 │   ├── stat-grid.tsx           tabular repo stats row
 │   ├── feed-card.tsx           one issue/PR card

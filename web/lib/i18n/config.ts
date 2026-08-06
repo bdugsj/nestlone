@@ -151,7 +151,7 @@ export function isPartialLocale(x: string): boolean {
   return partialLocales.includes(x);
 }
 
-/** Set to "1" once the Gitee mirror at gitee.com/Hmbown/... exists. */
+/** Set to "1" once the Gitee mirror at gitee.com/bdugsj/nestlone... exists. */
 export const GITEE_ENABLED = process.env.NEXT_PUBLIC_GITEE_ENABLED === "1";
 
 export function isValidLocale(x: string): x is Locale {

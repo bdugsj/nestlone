@@ -142,7 +142,7 @@ describe("navigation parity and accessibility", () => {
     expect(footer).toContain('href: "/zh/docs/guide"');
     expect(footer).toContain('href: "/en/faq"');
     expect(footer).toContain(
-      '{ label: "MIT license", href: "https://github.com/Hmbown/CodeWhale/blob/main/LICENSE" }',
+      '{ label: "MIT license", href: "https://github.com/bdugsj/nestlone/blob/main/LICENSE" }',
     );
   });
 });
@@ -163,7 +163,7 @@ describe("homepage integration", () => {
     // gate's required surface (the full contract lives in public-copy.test.ts).
     expect(homepage).toContain("facts.latestPublishedRelease");
     expect(homepage).toContain("Source candidate");
-    expect(homepage).toContain('src="/codewhale-tui.png"');
+    expect(homepage).toContain('src="/nestlone-tui.png"');
     for (const label of ["Plan", "Act", "Operate", "Ask", "Auto-Review", "Full Access"]) {
       expect(homepage).toContain(label);
     }

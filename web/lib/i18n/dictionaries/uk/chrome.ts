@@ -7,7 +7,7 @@ export const chrome: ChromeDict = {
   navContribute: "Участь",
   installCta: "Встановлення →",
   footerTagline:
-    "Документація, вихідний код і спільнота відкритого рантайму Codewhale.",
+    "Документація, вихідний код і спільнота відкритого рантайму Nestlone.",
   footerProduct: "Продукт",
   footerProject: "Проєкт",
   footerDocs: "Документація",

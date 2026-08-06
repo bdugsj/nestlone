@@ -6,7 +6,7 @@ import { Whale } from "@/components/whale";
 import { getFacts } from "@/lib/facts";
 import { fill, getHome } from "@/lib/i18n/dictionaries";
 
-const REPO = "https://github.com/Hmbown/CodeWhale";
+const REPO = "https://github.com/bdugsj/nestlone";
 
 // Revalidate against source-proven runtime facts without giving up static edge
 // caching. `getFacts()` rejects legacy or older KV snapshots.
@@ -37,8 +37,8 @@ const SURFACES = [
     zh: ["TUI", "交互式终端工作"],
   },
   {
-    en: ["codewhale exec", "Scripts and CI"],
-    zh: ["codewhale exec", "脚本与 CI"],
+    en: ["nestlone exec", "Scripts and CI"],
+    zh: ["nestlone exec", "脚本与 CI"],
   },
   {
     en: ["Web client", "Loopback-only browser client"],
@@ -75,7 +75,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           <div className="product-hero-copy">
             <div className="product-hero-brandline">
               <Whale size={34} />
-              <span>Codewhale</span>
+              <span>Nestlone</span>
               <em>{facts.license ?? "MIT"}</em>
             </div>
             <p className="product-kicker">
@@ -104,10 +104,10 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             </h1>
             <p>
               {isZh
-                ? "Codewhale 把大模型的杠杆交给普通人：在你的终端里读取仓库、修改文件、运行检查、留下收据。不必已经是程序员，也能把东西做出来——运行在你自己的机器上。"
+                ? "Nestlone 把大模型的杠杆交给普通人：在你的终端里读取仓库、修改文件、运行检查、留下收据。不必已经是程序员，也能把东西做出来——运行在你自己的机器上。"
                 : foreign
                   ? d.heroIntro
-                  : "Codewhale gives ordinary people the leverage of LLMs to build things. In your terminal it reads the repo, edits files, runs checks, and leaves a receipt — without assuming you already speak code. It runs on your machine."}
+                  : "Nestlone gives ordinary people the leverage of LLMs to build things. In your terminal it reads the repo, edits files, runs checks, and leaves a receipt — without assuming you already speak code. It runs on your machine."}
             </p>
             <div className="product-actions">
               <Link href={`/${locale}/install`} className="product-button product-button-primary">
@@ -122,7 +122,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             </div>
             <div className="product-install">
               <InstallCodeBlock
-                cmd="npm install -g codewhale"
+                cmd="npm install -g nestlone"
                 copyLabel={isZh ? "复制" : foreign ? d.copy : "Copy"}
                 copiedLabel={isZh ? "已复制 ✓" : foreign ? d.copied : "Copied ✓"}
               />
@@ -164,16 +164,16 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             <div className="product-shot-toolbar">
               <span>
                 <Whale size={20} />
-                Codewhale TUI
+                Nestlone TUI
               </span>
               <span>{isZh ? "当前会话" : "Current session"}</span>
             </div>
             <Image
-              src="/codewhale-tui.png"
+              src="/nestlone-tui.png"
               alt={
                 isZh
-                  ? "Codewhale 当前终端会话，显示 Operate 模式、鲸鱼、输入区和状态栏"
-                  : "Current Codewhale terminal session showing Operate mode, the whale, composer, and footer"
+                  ? "Nestlone 当前终端会话，显示 Operate 模式、鲸鱼、输入区和状态栏"
+                  : "Current Nestlone terminal session showing Operate mode, the whale, composer, and footer"
               }
               width={1562}
               height={1256}
@@ -182,8 +182,8 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             />
             <figcaption>
               {isZh
-                ? "当前 Codewhale 会话 · Operate 模式 · Ask 权限姿态"
-                : "Current Codewhale session · Operate mode · Ask permission posture"}
+                ? "当前 Nestlone 会话 · Operate 模式 · Ask 权限姿态"
+                : "Current Nestlone session · Operate mode · Ask permission posture"}
             </figcaption>
           </figure>
         </div>
@@ -202,10 +202,10 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           </h2>
           <p>
             {isZh
-              ? "连接你已有的托管、网关或本地模型。Codewhale 在你的机器上运行；模型是可选择的组件，不是产品本身。Plan / Act / Operate 与明确的审批边界，让深潜也保持可控。"
+              ? "连接你已有的托管、网关或本地模型。Nestlone 在你的机器上运行；模型是可选择的组件，不是产品本身。Plan / Act / Operate 与明确的审批边界，让深潜也保持可控。"
               : foreign
                 ? d.proofBody
-                : "Bring the hosted, gateway, or local model you already use. Codewhale runs on your machine and treats the model as a selectable component—not the product. Plan / Act / Operate and explicit permission postures keep the deep dive under your control."}
+                : "Bring the hosted, gateway, or local model you already use. Nestlone runs on your machine and treats the model as a selectable component—not the product. Plan / Act / Operate and explicit permission postures keep the deep dive under your control."}
           </p>
         </div>
       </section>
@@ -232,7 +232,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             })}
           </ol>
           <div className="product-receipt" aria-label={isZh ? "工作流程示例" : foreign ? d.receiptAria : "Example work receipt"}>
-            <span>$ codewhale exec &quot;fix the failing test&quot;</span>
+            <span>$ nestlone exec &quot;fix the failing test&quot;</span>
             <span>inspect&nbsp;&nbsp; repository and instructions</span>
             <span>act&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; edit through the selected permission posture</span>
             <span>verify&nbsp;&nbsp;&nbsp; cargo test --locked</span>
@@ -244,7 +244,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       <section className="product-start">
         <div className="product-container">
           <h2>
-            {isZh ? "第一次使用？四步走完。" : "New to Codewhale? Four steps end to end."}
+            {isZh ? "第一次使用？四步走完。" : "New to Nestlone? Four steps end to end."}
           </h2>
           <p className="product-start-lede">
             {isZh
@@ -289,7 +289,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             </h2>
             <p>
               {isZh
-                ? "显式选择模型、工作模式与权限姿态。Codewhale 不会把未知成本显示成零，也不会把预览功能说成已发布产品。"
+                ? "显式选择模型、工作模式与权限姿态。Nestlone 不会把未知成本显示成零，也不会把预览功能说成已发布产品。"
                 : foreign
                   ? d.boundariesBody
                   : "Choose the model, working mode, and permission posture explicitly. Unknown cost stays unknown, and preview surfaces stay labeled as such."}
@@ -353,7 +353,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           <h2>{isZh ? "从一条命令开始。" : foreign ? d.installBandHeading : "Start with one command."}</h2>
           <div>
             <InstallCodeBlock
-              cmd="npm install -g codewhale"
+              cmd="npm install -g nestlone"
               copyLabel={isZh ? "复制" : foreign ? d.copy : "Copy"}
               copiedLabel={isZh ? "已复制 ✓" : foreign ? d.copied : "Copied ✓"}
             />
@@ -377,7 +377,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             <h2>{isZh ? "公开构建" : foreign ? d.communityHeading : "Built in public"}</h2>
             <p>
               {isZh
-                ? "Codewhale 采用 MIT 许可证，由来自不同时区、语言和技术背景的贡献者共同塑造。"
+                ? "Nestlone 采用 MIT 许可证，由来自不同时区、语言和技术背景的贡献者共同塑造。"
                 : foreign
                   ? d.communityBody
                   : "MIT-licensed and shaped by contributors across runtimes, providers, platforms, documentation, and tests."}

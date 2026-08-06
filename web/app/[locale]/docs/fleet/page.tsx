@@ -7,7 +7,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return buildPageMetadata({
     path: "/docs/fleet",
     locale,
-    title: isZh ? "Fleet 与 Workflow · Codewhale 文档" : "Fleet & Workflow · Codewhale Docs",
+    title: isZh ? "Fleet 与 Workflow · Nestlone 文档" : "Fleet & Workflow · Nestlone Docs",
     description: isZh
       ? "持久多 worker 运行的本地控制平面，以及可选的 Workflow 编排层。"
       : "The local-first control plane for durable multi-worker runs, plus the optional Workflow orchestration overlay.",
@@ -31,8 +31,8 @@ export default async function FleetPage({ params }: { params: Promise<{ locale: 
         <h2 className="font-display text-3xl mb-1">{isZh ? "Fleet 与 Workflow" : "Fleet & Workflow"}</h2>
         <p className={`${bodyClass} mt-3`}>
           {isZh
-            ? "Fleet 是面向持久多 worker 运行的本地优先控制平面。它不是独立的执行引擎：一个 Fleet worker 就是一次由 Fleet 启动并持久跟踪的 codewhale exec 无头运行。当工作需要重试、睡眠/重启后存活、远程执行、收据或可审计的台账时，使用 Fleet 而不是短寿命的 agent 扇出。"
-            : "Fleet is the local-first control plane for durable multi-worker runs. It is not a separate execution engine: a fleet worker is a headless codewhale exec run that the fleet launches and tracks durably. Reach for Fleet instead of short-lived agent fan-out whenever the work needs retry, sleep/restart survival, remote execution, receipts, or a ledgered audit trail."}
+            ? "Fleet 是面向持久多 worker 运行的本地优先控制平面。它不是独立的执行引擎：一个 Fleet worker 就是一次由 Fleet 启动并持久跟踪的 nestlone exec 无头运行。当工作需要重试、睡眠/重启后存活、远程执行、收据或可审计的台账时，使用 Fleet 而不是短寿命的 agent 扇出。"
+            : "Fleet is the local-first control plane for durable multi-worker runs. It is not a separate execution engine: a fleet worker is a headless nestlone exec run that the fleet launches and tracks durably. Reach for Fleet instead of short-lived agent fan-out whenever the work needs retry, sleep/restart survival, remote execution, receipts, or a ledgered audit trail."}
         </p>
         <div className="hairline-t mt-6">
           {vocabulary.map((row) => (
@@ -48,30 +48,30 @@ export default async function FleetPage({ params }: { params: Promise<{ locale: 
         <h2 className="font-display text-2xl mb-1">{isZh ? "运行一次 Fleet" : "Run a fleet"}</h2>
         <p className={`${bodyClass} mt-3`}>
           {isZh
-            ? "Fleet 状态存放在工作区的 .codewhale/fleet.jsonl 台账中，worker 日志在 .codewhale/fleet/ 下。codewhale fleet resume <run-id> 是重启恢复命令：它重放台账、调和停止心跳的在途租约，且幂等——在管理进程退出、笔记本睡眠或运行时重启后都可以安全运行。"
-            : "Fleet state lives in the workspace's .codewhale/fleet.jsonl ledger, with worker logs under .codewhale/fleet/. codewhale fleet resume <run-id> is the restart-recovery verb: it replays the ledger, reconciles in-flight leases whose workers stopped heartbeating, and is idempotent — safe after a manager exit, laptop sleep, or runtime restart."}
+            ? "Fleet 状态存放在工作区的 .nestlone/fleet.jsonl 台账中，worker 日志在 .nestlone/fleet/ 下。nestlone fleet resume <run-id> 是重启恢复命令：它重放台账、调和停止心跳的在途租约，且幂等——在管理进程退出、笔记本睡眠或运行时重启后都可以安全运行。"
+            : "Fleet state lives in the workspace's .nestlone/fleet.jsonl ledger, with worker logs under .nestlone/fleet/. nestlone fleet resume <run-id> is the restart-recovery verb: it replays the ledger, reconciles in-flight leases whose workers stopped heartbeating, and is idempotent — safe after a manager exit, laptop sleep, or runtime restart."}
         </p>
-        <pre className="code-block mt-4">{`codewhale fleet init
-codewhale fleet run tasks.json --max-workers 4
-codewhale fleet status
-codewhale fleet inspect <worker-id>
-codewhale fleet logs <worker-id>
-codewhale fleet interrupt <worker-id>
-codewhale fleet resume <run-id>
-codewhale fleet stop --all`}</pre>
+        <pre className="code-block mt-4">{`nestlone fleet init
+nestlone fleet run tasks.json --max-workers 4
+nestlone fleet status
+nestlone fleet inspect <worker-id>
+nestlone fleet logs <worker-id>
+nestlone fleet interrupt <worker-id>
+nestlone fleet resume <run-id>
+nestlone fleet stop --all`}</pre>
         <p className={`${bodyClass} mt-3`}>
           {isZh ? (
             <>
               注意两个同名状态面：TUI 里的 <code className="inline">/fleet status</code>（或{" "}
               <code className="inline">/subagents</code>）只显示当前交互会话的子 Agent；shell 里的{" "}
-              <code className="inline">codewhale fleet status</code> 才读取持久 Fleet 台账。
+              <code className="inline">nestlone fleet status</code> 才读取持久 Fleet 台账。
             </>
           ) : (
             <>
               Two similarly named status surfaces exist: in the TUI,{" "}
               <code className="inline">/fleet status</code> (or <code className="inline">/subagents</code>)
               shows the sub-agents attached to the current interactive session; in a shell,{" "}
-              <code className="inline">codewhale fleet status</code> reads the durable Fleet ledger.
+              <code className="inline">nestlone fleet status</code> reads the durable Fleet ledger.
             </>
           )}
         </p>
@@ -81,8 +81,8 @@ codewhale fleet stop --all`}</pre>
         <h2 className="font-display text-2xl mb-1">{isZh ? "角色与 /fleet setup" : "Roles and /fleet setup"}</h2>
         <p className={`${bodyClass} mt-3`}>
           {isZh
-            ? "/fleet setup 打开一个渐进式向导，编写可复用的 agent 团队档案：一次只做一个选择——角色，然后是模型（可继承，或任何已配置提供商的具体模型），再是思考档位（inherit、off、low、medium、high、max 或 auto）——最后在审查页确认完整姿态（路由、思考、权限、工具、范围与审查策略）。档案可以写在项目级（.codewhale/agents/<role>.toml，随仓库走）或个人级（$CODEWHALE_HOME/agents/<role>.toml，本机所有仓库可用）；同名项目档案优先。档案的存储范围不会扩大运行操作的权限。"
-            : "/fleet setup opens a progressive wizard for authoring a reusable agent-team profile: one focused choice at a time — a role, then a model (inherit, or a concrete model from any configured provider), then a thinking tier (inherit, off, low, medium, high, max, or auto) — and a review of the full posture (route, thinking, permissions, tools, scope, and review policy) before anything is saved. Profiles live in project scope (.codewhale/agents/<role>.toml, travels with the repo) or personal scope ($CODEWHALE_HOME/agents/<role>.toml, available in every repo on the machine); a same-id project profile wins. Profile storage scope never widens the authority of a running operation."}
+            ? "/fleet setup 打开一个渐进式向导，编写可复用的 agent 团队档案：一次只做一个选择——角色，然后是模型（可继承，或任何已配置提供商的具体模型），再是思考档位（inherit、off、low、medium、high、max 或 auto）——最后在审查页确认完整姿态（路由、思考、权限、工具、范围与审查策略）。档案可以写在项目级（.nestlone/agents/<role>.toml，随仓库走）或个人级（$NESTLONE_HOME/agents/<role>.toml，本机所有仓库可用）；同名项目档案优先。档案的存储范围不会扩大运行操作的权限。"
+            : "/fleet setup opens a progressive wizard for authoring a reusable agent-team profile: one focused choice at a time — a role, then a model (inherit, or a concrete model from any configured provider), then a thinking tier (inherit, off, low, medium, high, max, or auto) — and a review of the full posture (route, thinking, permissions, tools, scope, and review policy) before anything is saved. Profiles live in project scope (.nestlone/agents/<role>.toml, travels with the repo) or personal scope ($NESTLONE_HOME/agents/<role>.toml, available in every repo on the machine); a same-id project profile wins. Profile storage scope never widens the authority of a running operation."}
         </p>
       </section>
 
@@ -90,8 +90,8 @@ codewhale fleet stop --all`}</pre>
         <h2 className="font-display text-2xl mb-1">{isZh ? "Workflow 编排" : "Workflow orchestration"}</h2>
         <p className={`${bodyClass} mt-3`}>
           {isZh
-            ? "普通多 Agent 工作不需要 Workflow：在 Operate 里直接发消息，需要并行、隔离或长时间工作时让 Codewhale 优先委派后台 worker 即可。只有当工作需要有序阶段、门禁、共享预算、回放或确定性汇总时才用 Workflow。Workflow 脚本是纯协调者：没有自己的文件系统和 shell，真正的工作由它启动的子 Agent 完成。脚本以编译专用的声明式 JS 子集编写，降低到类型化的 WorkflowSpec 后由 Rust 校验与执行；import、fetch、process、eval、async/await 等会产生副作用的写法会被编译器拒绝。"
-            : "Ordinary multi-agent work does not need Workflow: send normal messages in Operate and let Codewhale prefer background workers when parallelism, isolation, or duration makes delegation useful. Use Workflow when ordered phases, gates, shared budgets, replay, or deterministic fan-in matter. A Workflow script is a coordinator only: it has no filesystem or shell of its own; real work happens in the sub-agents it launches. Scripts are written in a declarative compile-only JS subset that lowers to a typed WorkflowSpec validated and executed by Rust; effectful constructs such as import, fetch, process, eval, and async/await are rejected by the compiler."}
+            ? "普通多 Agent 工作不需要 Workflow：在 Operate 里直接发消息，需要并行、隔离或长时间工作时让 Nestlone 优先委派后台 worker 即可。只有当工作需要有序阶段、门禁、共享预算、回放或确定性汇总时才用 Workflow。Workflow 脚本是纯协调者：没有自己的文件系统和 shell，真正的工作由它启动的子 Agent 完成。脚本以编译专用的声明式 JS 子集编写，降低到类型化的 WorkflowSpec 后由 Rust 校验与执行；import、fetch、process、eval、async/await 等会产生副作用的写法会被编译器拒绝。"
+            : "Ordinary multi-agent work does not need Workflow: send normal messages in Operate and let Nestlone prefer background workers when parallelism, isolation, or duration makes delegation useful. Use Workflow when ordered phases, gates, shared budgets, replay, or deterministic fan-in matter. A Workflow script is a coordinator only: it has no filesystem or shell of its own; real work happens in the sub-agents it launches. Scripts are written in a declarative compile-only JS subset that lowers to a typed WorkflowSpec validated and executed by Rust; effectful constructs such as import, fetch, process, eval, and async/await are rejected by the compiler."}
         </p>
         <p className={`${bodyClass} mt-3`}>
           {isZh

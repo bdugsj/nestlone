@@ -5,7 +5,7 @@ export const home: HomeDict = {
   heroTitleA: "Dive into the deep",
   heroTitleB: "so you don't have to.",
   heroIntro:
-    "Codewhale gives ordinary people the leverage of LLMs to build things. In your terminal it reads the repo, edits files, runs checks, and leaves a receipt — without assuming you already speak code. It runs on your machine.",
+    "Nestlone gives ordinary people the leverage of LLMs to build things. In your terminal it reads the repo, edits files, runs checks, and leaves a receipt — without assuming you already speak code. It runs on your machine.",
   install: "Install",
   docs: "Docs",
   copy: "Copy",
@@ -16,13 +16,13 @@ export const home: HomeDict = {
   sourceCandidate: "Source candidate",
   providerRoutes: "{count} provider routes",
   screenshotAlt:
-    "Fresh Codewhale v{version} terminal session using a local Ollama route, with no empty Work bar",
+    "Fresh Nestlone v{version} terminal session using a local Ollama route, with no empty Work bar",
   figcaption: "v{version} {state} · local Ollama route · Plan / Act / Operate",
   publishedRelease: "published release",
   figcaptionSourceCandidate: "source candidate",
   proofHeading: "An underwater terminal shell. Model-neutral. Local-first.",
   proofBody:
-    "Bring the hosted, gateway, or local model you already use. Codewhale runs on your machine and treats the model as a selectable component—not the product. Plan / Act / Operate and explicit permission postures keep the deep dive under your control.",
+    "Bring the hosted, gateway, or local model you already use. Nestlone runs on your machine and treats the model as a selectable component—not the product. Plan / Act / Operate and explicit permission postures keep the deep dive under your control.",
   workflowHeading: "From task to verified change.",
   workflow: [
     ["Inspect", "Read the repository, its instructions, and the task."],
@@ -42,7 +42,7 @@ export const home: HomeDict = {
   surfacesHeading: "Use the runtime where the work happens.",
   surfaces: [
     ["TUI", "Interactive terminal work"],
-    ["codewhale exec", "Scripts and CI"],
+    ["nestlone exec", "Scripts and CI"],
     ["Web client", "Loopback-only browser client"],
     ["Runtime API + MCP", "Local integrations"],
     ["Fleet", "Durable multi-agent work"],

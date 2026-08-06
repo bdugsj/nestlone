@@ -15,15 +15,15 @@ function expectedLanguages(path: string): Record<string, string> {
 
 describe("page metadata", () => {
   it.each([
-    ["en", "/faq", "FAQ · Codewhale", "en_US"],
-    ["zh", "/faq", "常见问题 · Codewhale", "zh_CN"],
-    ["en", "/feed", "Activity · Codewhale", "en_US"],
-    ["zh", "/feed", "动态 · Codewhale", "zh_CN"],
-    ["en", "/roadmap", "Roadmap · Codewhale", "en_US"],
-    ["zh", "/roadmap", "路线图 · Codewhale", "zh_CN"],
-    ["ru", "/faq", "FAQ · Codewhale", "ru_RU"],
-    ["uk", "/faq", "FAQ · Codewhale", "uk_UA"],
-    ["pt-BR", "/install", "Install · Codewhale", "pt_BR"],
+    ["en", "/faq", "FAQ · Nestlone", "en_US"],
+    ["zh", "/faq", "常见问题 · Nestlone", "zh_CN"],
+    ["en", "/feed", "Activity · Nestlone", "en_US"],
+    ["zh", "/feed", "动态 · Nestlone", "zh_CN"],
+    ["en", "/roadmap", "Roadmap · Nestlone", "en_US"],
+    ["zh", "/roadmap", "路线图 · Nestlone", "zh_CN"],
+    ["ru", "/faq", "FAQ · Nestlone", "ru_RU"],
+    ["uk", "/faq", "FAQ · Nestlone", "uk_UA"],
+    ["pt-BR", "/install", "Install · Nestlone", "pt_BR"],
   ])("builds canonical, hreflang, Open Graph, and Twitter fields for %s%s", (locale, path, title, ogLocale) => {
     const description = `${locale} metadata contract`;
     const metadata = buildPageMetadata({ path, locale, title, description });
@@ -61,7 +61,7 @@ describe("page metadata", () => {
     const metadata = buildPageMetadata({
       path: "/docs",
       locale: "ja",
-      title: "Docs · Codewhale",
+      title: "Docs · Nestlone",
       description: "hreflang coverage",
     });
     const languages = metadata.alternates?.languages as Record<string, string>;

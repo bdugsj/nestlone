@@ -5,7 +5,7 @@ export const home: HomeDict = {
   heroTitleA: "Lặn xuống biển sâu,",
   heroTitleB: "để bạn khỏi phải lặn.",
   heroIntro:
-    "Codewhale trao cho người bình thường đòn bẩy của LLM để kiến tạo. Trong terminal của bạn, nó đọc kho mã, sửa tệp, chạy kiểm tra và để lại biên lai — mà không mặc định bạn đã biết nói ngôn ngữ code. Chạy trên máy của bạn.",
+    "Nestlone trao cho người bình thường đòn bẩy của LLM để kiến tạo. Trong terminal của bạn, nó đọc kho mã, sửa tệp, chạy kiểm tra và để lại biên lai — mà không mặc định bạn đã biết nói ngôn ngữ code. Chạy trên máy của bạn.",
   install: "Cài đặt",
   docs: "Tài liệu",
   copy: "Sao chép",
@@ -16,13 +16,13 @@ export const home: HomeDict = {
   sourceCandidate: "Ứng viên từ mã nguồn",
   providerRoutes: "{count} tuyến provider",
   screenshotAlt:
-    "Phiên terminal Codewhale v{version} mới dùng tuyến Ollama cục bộ, không có thanh Work trống",
+    "Phiên terminal Nestlone v{version} mới dùng tuyến Ollama cục bộ, không có thanh Work trống",
   figcaption: "v{version} {state} · tuyến Ollama cục bộ · Plan / Act / Operate",
   publishedRelease: "bản phát hành chính thức",
   figcaptionSourceCandidate: "ứng viên mã nguồn",
   proofHeading: "Một lớp vỏ terminal dưới nước. Trung lập về mô hình. Ưu tiên cục bộ.",
   proofBody:
-    "Mang theo mô hình hosted, gateway hoặc cục bộ mà bạn đang dùng. Codewhale chạy trên máy của bạn và xem mô hình là một thành phần tùy chọn — không phải sản phẩm. Plan / Act / Operate cùng các tư thế quyền rõ ràng giữ cho cuộc lặn sâu luôn trong tầm kiểm soát.",
+    "Mang theo mô hình hosted, gateway hoặc cục bộ mà bạn đang dùng. Nestlone chạy trên máy của bạn và xem mô hình là một thành phần tùy chọn — không phải sản phẩm. Plan / Act / Operate cùng các tư thế quyền rõ ràng giữ cho cuộc lặn sâu luôn trong tầm kiểm soát.",
   workflowHeading: "Từ tác vụ đến thay đổi đã kiểm chứng.",
   workflow: [
     ["Kiểm tra", "Đọc kho mã, hướng dẫn và tác vụ."],
@@ -42,7 +42,7 @@ export const home: HomeDict = {
   surfacesHeading: "Dùng runtime ngay nơi công việc diễn ra.",
   surfaces: [
     ["TUI", "Làm việc terminal tương tác"],
-    ["codewhale exec", "Script và CI"],
+    ["nestlone exec", "Script và CI"],
     ["Ứng dụng web", "Trình duyệt chỉ dùng loopback"],
     ["Runtime API + MCP", "Tích hợp cục bộ"],
     ["Fleet", "Công việc đa tác tử bền vững"],

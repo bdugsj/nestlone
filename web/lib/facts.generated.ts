@@ -27,7 +27,7 @@ export interface RepoFacts {
 }
 
 export const FACTS: RepoFacts = {
-  "generatedAt": "2026-08-04T04:46:38.817Z",
+  "generatedAt": "2026-08-06T05:10:45.871Z",
   "sourceRevision": null,
   "sourceCommittedAt": null,
   "version": "0.0.2",
@@ -240,11 +240,11 @@ export const FACTS: RepoFacts = {
   "defaultModel": "deepseek-v4-pro",
   "nodeEngines": ">=18",
   "toolCount": 76,
-  "license": null,
+  "license": "MIT",
   "latestPublishedRelease": {
-    "tag": "v0.9.1",
-    "version": "0.9.1",
-    "publishedAt": "2026-07-24T21:46:31Z",
-    "url": "https://github.com/Hmbown/CodeWhale/releases/tag/v0.9.1"
+    "tag": "v0.0.2",
+    "version": "0.0.2",
+    "publishedAt": "2026-08-02T11:31:07Z",
+    "url": "https://github.com/bdugsj/nestlone/releases/tag/v0.0.2"
   }
 };

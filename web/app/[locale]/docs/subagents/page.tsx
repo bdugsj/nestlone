@@ -6,7 +6,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return buildPageMetadata({
     path: "/docs/subagents",
     locale,
-    title: isZh ? "子 Agent · Codewhale 文档" : "Sub-Agents · Codewhale Docs",
+    title: isZh ? "子 Agent · Nestlone 文档" : "Sub-Agents · Nestlone Docs",
     description: isZh
       ? "agent 工具、Fleet 角色、上下文分叉、worktree 隔离和并发上限。"
       : "The agent tool, Fleet roles, context forking, worktree isolation, and concurrency caps.",
@@ -94,10 +94,10 @@ export default async function SubagentsPage({ params }: { params: Promise<{ loca
         <p className={`${bodyClass} mt-3`}>
           {isZh ? (
             <>
-              并行编辑通道用 <code className="inline">worktree: true</code> 启动：Codewhale
+              并行编辑通道用 <code className="inline">worktree: true</code> 启动：Nestlone
               为子 Agent 创建新的 git worktree 和分支（默认{" "}
               <code className="inline">codex/agent-&lt;name&gt;-&lt;id&gt;</code>，检出在父仓库旁的{" "}
-              <code className="inline">.codewhale-worktrees/</code> 下），父检出保持干净。隔离不等于写权限：只带
+              <code className="inline">.worktrees/</code> 下），父检出保持干净。隔离不等于写权限：只带
               prompt 的 worker 从只读开始；要写代码的子 Agent 还需声明{" "}
               <code className="inline">write_authority</code> 和至少一个规范化的{" "}
               <code className="inline">write_roots</code>、<code className="inline">exact_files</code>{" "}
@@ -106,10 +106,10 @@ export default async function SubagentsPage({ params }: { params: Promise<{ loca
             </>
           ) : (
             <>
-              Launch parallel edit lanes with <code className="inline">worktree: true</code>: Codewhale
+              Launch parallel edit lanes with <code className="inline">worktree: true</code>: Nestlone
               creates a fresh git worktree and branch for the child (default{" "}
               <code className="inline">codex/agent-&lt;name&gt;-&lt;id&gt;</code>, checked out beside the
-              parent repo under <code className="inline">.codewhale-worktrees/</code>) so the parent
+              parent repo under <code className="inline">.worktrees/</code>) so the parent
               checkout stays clean. Isolation is not write authority: a prompt-only worker starts
               read-only, and a writer also declares{" "}
               <code className="inline">write_authority</code> plus at least one normalized{" "}

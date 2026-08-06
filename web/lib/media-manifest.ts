@@ -92,8 +92,8 @@ export const MEDIA_ASSETS: MediaAsset[] = [
   {
     id: "first-fleet-session",
     title: {
-      en: "A real Codewhale session, end to end",
-      zh: "一次真实的 Codewhale 端到端会话",
+      en: "A real Nestlone session, end to end",
+      zh: "一次真实的 Nestlone 端到端会话",
     },
     description: {
       en: "Will be recorded from the v0.9.2 release candidate during dogfood: install, first offline session, provider connection, and one Fleet workflow on a sealed local route. Until that recording exists, no footage is shown here — the manifest and budgets above are the contract it must satisfy.",

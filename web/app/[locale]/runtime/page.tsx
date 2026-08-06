@@ -1,7 +1,7 @@
 import { Seal } from "@/components/seal";
 import { buildPageMetadata } from "@/lib/page-meta";
 
-const REPO_BLOB_BASE = "https://github.com/Hmbown/CodeWhale/blob/main";
+const REPO_BLOB_BASE = "https://github.com/bdugsj/nestlone/blob/main";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
@@ -9,10 +9,10 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return buildPageMetadata({
     path: "/runtime",
     locale,
-    title: isZh ? "Runtime & 集成 · Codewhale" : "Runtime & Integrations · Codewhale",
+    title: isZh ? "Runtime & 集成 · Nestlone" : "Runtime & Integrations · Nestlone",
     description: isZh
-      ? "Codewhale 的本地 Runtime API、HTTP/SSE、ACP stdio 适配器、MCP 服务器、VS Code 配套扩展与消息桥接。"
-      : "Codewhale's local Runtime API, HTTP/SSE, baseline ACP stdio adapter, MCP servers, Phase 0 VS Code companion, and messaging bridges.",
+      ? "Nestlone 的本地 Runtime API、HTTP/SSE、ACP stdio 适配器、MCP 服务器、VS Code 配套扩展与消息桥接。"
+      : "Nestlone's local Runtime API, HTTP/SSE, baseline ACP stdio adapter, MCP servers, Phase 0 VS Code companion, and messaging bridges.",
   });
 }
 
@@ -38,33 +38,33 @@ const INTEGRATIONS: Integration[] = [
   },
   {
     name: "MCP (Model Context Protocol)",
-    desc: "Connect Codewhale to external tools and services through configured MCP servers over stdio or HTTP/SSE, or expose Codewhale's own tools to another MCP client.",
-    descZh: "通过已配置的 MCP 服务器（stdio 或 HTTP/SSE）将 Codewhale 连接到外部工具和服务，或把 Codewhale 自身工具暴露给其他 MCP 客户端。",
+    desc: "Connect Nestlone to external tools and services through configured MCP servers over stdio or HTTP/SSE, or expose Nestlone's own tools to another MCP client.",
+    descZh: "通过已配置的 MCP 服务器（stdio 或 HTTP/SSE）将 Nestlone 连接到外部工具和服务，或把 Nestlone 自身工具暴露给其他 MCP 客户端。",
     href: `${REPO_BLOB_BASE}/docs/MCP.md`,
   },
   {
     name: "VS Code Extension",
-    desc: "Phase 0 companion for the local runtime. It can open Codewhale in a terminal, start and check the Runtime API, and show read-only thread summaries and restore points. It does not yet provide full chat, inline edits, or editor actions.",
-    descZh: "本地 Runtime 的 Phase 0 配套扩展。它可以在终端中打开 Codewhale、启动并检查 Runtime API，以及显示只读线程摘要和还原点；目前尚不提供完整聊天、内联编辑或编辑器操作。",
-    href: "https://github.com/Hmbown/CodeWhale/tree/main/extensions/vscode",
+    desc: "Phase 0 companion for the local runtime. It can open Nestlone in a terminal, start and check the Runtime API, and show read-only thread summaries and restore points. It does not yet provide full chat, inline edits, or editor actions.",
+    descZh: "本地 Runtime 的 Phase 0 配套扩展。它可以在终端中打开 Nestlone、启动并检查 Runtime API，以及显示只读线程摘要和还原点；目前尚不提供完整聊天、内联编辑或编辑器操作。",
+    href: "https://github.com/bdugsj/nestlone/tree/main/extensions/vscode",
   },
   {
     name: "Telegram Bridge",
-    desc: "First-party Telegram bot bridge. Start a headless Codewhale session, then chat with it from any Telegram client — approvals, tool results, and completions surface inline.",
-    descZh: "官方 Telegram 机器人桥接。启动无头 Codewhale 会话，在任何 Telegram 客户端中与之对话——审批、工具结果和完成状态内联展示。",
-    href: "https://github.com/Hmbown/CodeWhale/tree/main/integrations/telegram-bridge",
+    desc: "First-party Telegram bot bridge. Start a headless Nestlone session, then chat with it from any Telegram client — approvals, tool results, and completions surface inline.",
+    descZh: "官方 Telegram 机器人桥接。启动无头 Nestlone 会话，在任何 Telegram 客户端中与之对话——审批、工具结果和完成状态内联展示。",
+    href: "https://github.com/bdugsj/nestlone/tree/main/integrations/telegram-bridge",
   },
   {
     name: "Feishu / Lark Bridge",
     desc: "First-party Feishu / Lark bot bridge. Chat-native agent loop inside your Feishu workspace with approval cards, session linking, and audit trail.",
     descZh: "官方飞书 / Lark 机器人桥接。在飞书工作区内实现聊天原生 Agent 循环，支持审批卡片、会话关联和审计日志。",
-    href: "https://github.com/Hmbown/CodeWhale/tree/main/integrations/feishu-bridge",
+    href: "https://github.com/bdugsj/nestlone/tree/main/integrations/feishu-bridge",
   },
   {
     name: "Weixin Bridge (实验性)",
     desc: "Experimental Weixin / WeChat bridge. Receive agent completions and approvals inside WeChat; early-stage and not recommended for production deployments.",
     descZh: "实验性微信桥接。在微信中接收 Agent 完成通知和审批；早期阶段，不建议用于生产环境。",
-    href: "https://github.com/Hmbown/CodeWhale/tree/main/integrations/weixin-bridge",
+    href: "https://github.com/bdugsj/nestlone/tree/main/integrations/weixin-bridge",
   },
 ];
 
@@ -90,8 +90,8 @@ export default async function RuntimePage({ params }: { params: Promise<{ locale
 
         <p className="max-w-2xl text-ink-soft leading-relaxed">
           {isZh
-            ? "Codewhale 不仅是一个终端 Agent——它还是一个可通过多种协议和集成方式嵌入到你现有工作流中的本地控制平面。"
-            : "Codewhale is more than a terminal agent — it is a local control plane you can embed into your existing workflow through multiple protocols and integrations."}
+            ? "Nestlone 不仅是一个终端 Agent——它还是一个可通过多种协议和集成方式嵌入到你现有工作流中的本地控制平面。"
+            : "Nestlone is more than a terminal agent — it is a local control plane you can embed into your existing workflow through multiple protocols and integrations."}
         </p>
       </section>
 
@@ -106,16 +106,16 @@ export default async function RuntimePage({ params }: { params: Promise<{ locale
             <strong className="text-ink">{isZh ? "本地优先" : "Local-first"}</strong>
             <p className="mt-1">
               {isZh
-                ? "Runtime API 默认仅监听 127.0.0.1。本地运行时不需要 Codewhale 账户或托管中继。"
-                : "The Runtime API binds 127.0.0.1 by default. The local runtime does not require a Codewhale account or hosted relay."}
+                ? "Runtime API 默认仅监听 127.0.0.1。本地运行时不需要 Nestlone 账户或托管中继。"
+                : "The Runtime API binds 127.0.0.1 by default. The local runtime does not require a Nestlone account or hosted relay."}
             </p>
           </div>
           <div>
             <strong className="text-ink">{isZh ? "认证必需" : "Auth required"}</strong>
             <p className="mt-1">
               {isZh
-                ? "所有 Runtime API 路由（/v1/*）需要 Bearer Token。配置 CODEWHALE_RUNTIME_TOKEN 环境变量或 config.toml 中的 auth_token。"
-                : "All Runtime API routes (/v1/*) require a Bearer token. Set CODEWHALE_RUNTIME_TOKEN env var or auth_token in config.toml."}
+                ? "所有 Runtime API 路由（/v1/*）需要 Bearer Token。配置 NESTLONE_RUNTIME_TOKEN 环境变量或 config.toml 中的 auth_token。"
+                : "All Runtime API routes (/v1/*) require a Bearer token. Set NESTLONE_RUNTIME_TOKEN env var or auth_token in config.toml."}
             </p>
           </div>
           <div>

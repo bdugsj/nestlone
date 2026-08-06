@@ -6,7 +6,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return buildPageMetadata({
     path: "/docs/hooks",
     locale,
-    title: isZh ? "钩子 · Codewhale 文档" : "Hooks · Codewhale Docs",
+    title: isZh ? "钩子 · Nestlone 文档" : "Hooks · Nestlone Docs",
     description: isZh
       ? "已发布的生命周期钩子：可变 message_submit、tool_call_before 决策、turn_end 与子 Agent 观察事件。"
       : "The shipped lifecycle hooks: mutable message_submit, tool_call_before decisions, turn_end, and sub-agent observer events.",
@@ -71,8 +71,8 @@ export default async function HooksPage({ params }: { params: Promise<{ locale: 
         <h2 className="font-display text-3xl mb-1">{isZh ? "钩子" : "Hooks"}</h2>
         <p className={`${bodyClass} mt-3`}>
           {isZh
-            ? "钩子让你把自己的命令挂进 Codewhale 的生命周期：在消息提交前注入上下文、在工具调用前执行策略、在回合结束或子 Agent 启停时做审计。本页描述当前已发布的行为；docs/rfcs/1364-hooks-lifecycle.md 是这组能力的设计 RFC，完整配置 schema 见 docs/CONFIGURATION.md。"
-            : "Hooks attach your own commands to Codewhale's lifecycle: inject context before a message is submitted, enforce policy before a tool call, and audit turns or sub-agent activity. This page describes what currently ships; docs/rfcs/1364-hooks-lifecycle.md is the design RFC for this surface, and docs/CONFIGURATION.md carries the full configuration schema."}
+            ? "钩子让你把自己的命令挂进 Nestlone 的生命周期：在消息提交前注入上下文、在工具调用前执行策略、在回合结束或子 Agent 启停时做审计。本页描述当前已发布的行为；docs/rfcs/1364-hooks-lifecycle.md 是这组能力的设计 RFC，完整配置 schema 见 docs/CONFIGURATION.md。"
+            : "Hooks attach your own commands to Nestlone's lifecycle: inject context before a message is submitted, enforce policy before a tool call, and audit turns or sub-agent activity. This page describes what currently ships; docs/rfcs/1364-hooks-lifecycle.md is the design RFC for this surface, and docs/CONFIGURATION.md carries the full configuration schema."}
         </p>
         <p className={`${bodyClass} mt-3`}>
           {isZh ? (
@@ -104,8 +104,8 @@ export default async function HooksPage({ params }: { params: Promise<{ locale: 
         <h2 className="font-display text-2xl mb-1">{isZh ? "项目级钩子" : "Project-local hooks"}</h2>
         <p className={`${bodyClass} mt-3`}>
           {isZh
-            ? "仓库可以在 <workspace>/.codewhale/hooks.toml 中携带策略。因为项目钩子是可执行的 shell 配置，Codewhale 只有在工作区通过信任提示或用户配置中的 trust_level = \"trusted\" 被信任后才加载它们——会话内的 /trust on 和旧版 .deepseek/trusted 标记都不会单独启用项目钩子。受信任后，项目钩子追加在 config.toml 的全局钩子之后运行，因此对 updatedInput 而言最后生效。格式错误但已受信任的项目文件会记警告并回退到只用全局钩子。"
-            : "Repositories can ship policy in <workspace>/.codewhale/hooks.toml. Because project hooks are executable shell configuration, Codewhale loads them only after the workspace is trusted through the trust prompt or a trust_level = \"trusted\" entry in user-owned config — session /trust on and legacy .deepseek/trusted markers do not enable project hooks by themselves. Once trusted, project hooks are appended after the global hooks from config.toml, so they run last and win updatedInput ties. A malformed trusted project file logs a warning and startup falls back to global hooks only."}
+            ? "仓库可以在 <workspace>/.nestlone/hooks.toml 中携带策略。因为项目钩子是可执行的 shell 配置，Nestlone 只有在工作区通过信任提示或用户配置中的 trust_level = \"trusted\" 被信任后才加载它们——会话内的 /trust on 和旧版 .deepseek/trusted 标记都不会单独启用项目钩子。受信任后，项目钩子追加在 config.toml 的全局钩子之后运行，因此对 updatedInput 而言最后生效。格式错误但已受信任的项目文件会记警告并回退到只用全局钩子。"
+            : "Repositories can ship policy in <workspace>/.nestlone/hooks.toml. Because project hooks are executable shell configuration, Nestlone loads them only after the workspace is trusted through the trust prompt or a trust_level = \"trusted\" entry in user-owned config — session /trust on and legacy .deepseek/trusted markers do not enable project hooks by themselves. Once trusted, project hooks are appended after the global hooks from config.toml, so they run last and win updatedInput ties. A malformed trusted project file logs a warning and startup falls back to global hooks only."}
         </p>
       </section>
 
