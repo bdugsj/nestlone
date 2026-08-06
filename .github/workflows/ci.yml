@@ -1,0 +1,69 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  rust-gates:
+    name: Rust workspace gates
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: Install deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pkg-config libssl-dev libdbus-1-dev
+
+      - name: Version state checks
+        run: |
+          ./scripts/release/check-versions.sh
+          ./scripts/release/check-ohos-deps.sh
+
+      - name: Format
+        run: cargo fmt --all -- --check
+
+      - name: Check
+        run: cargo check --workspace --all-targets --locked
+
+      - name: Clippy
+        run: cargo clippy --workspace --all-targets --all-features --locked -- -D warnings
+
+      - name: Test
+        run: cargo test --workspace --all-features --locked
+
+      - name: Parity tests
+        run: |
+          cargo test -p nestlone-protocol --test parity_protocol --locked
+          cargo test -p nestlone-state --test parity_state --locked
+
+  feishu-bridge:
+    name: Feishu bridge tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: integrations/feishu-bridge
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check
+        run: npm run check
+
+      - name: Test
+        run: npm test

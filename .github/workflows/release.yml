@@ -12,14 +12,31 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - target: x86_64-unknown-linux-gnu
+          - target: x86_64-unknown-linux-musl
             os: ubuntu-latest
             release_os: linux
             release_arch: x64
+            ext: ''
           - target: aarch64-unknown-linux-gnu
             os: ubuntu-24.04-arm
             release_os: linux
             release_arch: arm64
+            ext: ''
+          - target: x86_64-apple-darwin
+            os: macos-13
+            release_os: macos
+            release_arch: x64
+            ext: ''
+          - target: aarch64-apple-darwin
+            os: macos-14
+            release_os: macos
+            release_arch: arm64
+            ext: ''
+          - target: x86_64-pc-windows-msvc
+            os: windows-latest
+            release_os: windows
+            release_arch: x64
+            ext: .exe
 
     steps:
       - uses: actions/checkout@v5
@@ -29,31 +46,39 @@ jobs:
         with:
           targets: ${{ matrix.target }}
 
-      - name: Install deps
+      - name: Install Linux deps
+        if: startsWith(matrix.release_os, 'linux') && matrix.target != 'x86_64-unknown-linux-musl'
         run: |
           sudo apt-get update
           sudo apt-get install -y pkg-config libssl-dev libdbus-1-dev
+
+      - name: Install musl toolchain
+        if: matrix.target == 'x86_64-unknown-linux-musl'
+        run: sudo apt-get install -y musl-tools
 
       - name: Build
         run: cargo build --release -p nestlone-cli -p nestlone-tui --target ${{ matrix.target }}
 
       - name: Package
+        shell: bash
         run: |
           set -euo pipefail
+          ext="${{ matrix.ext }}"
           os_arch="${{ matrix.release_os }}-${{ matrix.release_arch }}"
+          bin_dir="target/${{ matrix.target }}/release"
           # Tarball keeps plain binary names for install.sh.
           mkdir -p dist
-          cp target/${{ matrix.target }}/release/nestlone dist/
-          cp target/${{ matrix.target }}/release/nest dist/
-          cp target/${{ matrix.target }}/release/nestlone-tui dist/
+          cp "${bin_dir}/nestlone${ext}" dist/nestlone${ext}
+          cp "${bin_dir}/nest${ext}" dist/nest${ext}
+          cp "${bin_dir}/nestlone-tui${ext}" dist/nestlone-tui${ext}
           cp install.sh dist/ 2>/dev/null || true
           tar -czf "nestlone-${os_arch}.tar.gz" -C dist .
 
           # Standalone self-update assets use {prefix}-{os}-{arch} naming.
-          cp target/${{ matrix.target }}/release/nestlone "nestlone-${os_arch}"
-          cp target/${{ matrix.target }}/release/nest "nest-${os_arch}"
-          cp target/${{ matrix.target }}/release/nestlone-tui "nestlone-tui-${os_arch}"
-          sha256sum "nestlone-${os_arch}" "nestlone-tui-${os_arch}" "nest-${os_arch}" \
+          cp "${bin_dir}/nestlone${ext}" "nestlone-${os_arch}${ext}"
+          cp "${bin_dir}/nest${ext}" "nest-${os_arch}${ext}"
+          cp "${bin_dir}/nestlone-tui${ext}" "nestlone-tui-${os_arch}${ext}"
+          sha256sum "nestlone-${os_arch}${ext}" "nestlone-tui-${os_arch}${ext}" "nest-${os_arch}${ext}" \
             > "nestlone-artifacts-sha256-${{ matrix.target }}.txt"
 
       - name: Upload artifact
@@ -62,9 +87,9 @@ jobs:
           name: nestlone-${{ matrix.target }}
           path: |
             nestlone-${{ matrix.release_os }}-${{ matrix.release_arch }}.tar.gz
-            nestlone-${{ matrix.release_os }}-${{ matrix.release_arch }}
-            nest-${{ matrix.release_os }}-${{ matrix.release_arch }}
-            nestlone-tui-${{ matrix.release_os }}-${{ matrix.release_arch }}
+            nestlone-${{ matrix.release_os }}-${{ matrix.release_arch }}${{ matrix.ext }}
+            nest-${{ matrix.release_os }}-${{ matrix.release_arch }}${{ matrix.ext }}
+            nestlone-tui-${{ matrix.release_os }}-${{ matrix.release_arch }}${{ matrix.ext }}
             nestlone-artifacts-sha256-${{ matrix.target }}.txt
 
   release:
@@ -93,5 +118,14 @@ jobs:
             nestlone-linux-arm64
             nest-linux-arm64
             nestlone-tui-linux-arm64
+            nestlone-macos-x64
+            nest-macos-x64
+            nestlone-tui-macos-x64
+            nestlone-macos-arm64
+            nest-macos-arm64
+            nestlone-tui-macos-arm64
+            nestlone-windows-x64.exe
+            nest-windows-x64.exe
+            nestlone-tui-windows-x64.exe
             nestlone-artifacts-sha256.txt
           generate_release_notes: true
