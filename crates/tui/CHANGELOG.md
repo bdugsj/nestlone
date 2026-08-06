@@ -7,6 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.2] - 2026-08-02
+
+First Nestlone release. The project was forked from CodeWhale and rebranded
+end to end; release engineering moved fully to GitHub Actions.
+
+### Changed
+
+- **Crate packages, binaries, and aliases carry the Nestlone name.** All
+  `codewhale-*` workspace crates became `nestlone-*`; the CLI dispatcher
+  `codewhale` became `nestlone`, the TUI `nestlone` became `nestlone-tui`,
+  and the `codew` alias became `nest`.
+- **User data moves to `~/.nestlone`.** The previous `~/.codewhale` directory
+  is not migrated; profiles start fresh.
+- **Environment variables use the `NESTLONE_*` prefix.** `CODEWHALE_*` and
+  `DEEPSEEK_*` names are still read as legacy fallbacks for compatibility.
+- **Release assets and self-update use `nestlone-{os}-{arch}` names.**
+  `install.sh`, the npm wrapper, and `nestlone update` resolve the current
+  release from `bdugsj/nestlone`.
+- **The web AI path calls the DeepSeek API directly**, removing the Cloudflare
+  AI gateway indirection from `wrangler.jsonc`.
+- **CI moved fully to GitHub Actions.** A compile gate runs on every push and
+  PR (fmt, check, clippy, workspace tests, parity, version checks); release
+  builds now cover Linux (static musl x64 + GNU arm64), macOS (x64/arm64),
+  and Windows (x64); the Tencent CNB pipeline was removed.
+- **Remote-setup default image points at `ghcr.io/bdugsj/nestlone`.**
+
+### Fixed
+
+- **State crate home-override parsing** broke after the data-directory rename
+  and is restored.
+
 ## [0.9.2] - 2026-07-29
 
 This is the Codewhale v0.9.2 source candidate. It is not a published release
@@ -2952,64 +2983,6 @@ folds in several community contributions.
   (#3020).
 
 
-## [0.8.57] - 2026-06-10
-
-### Added
-
-- **Turns now survive system sleep.** When the host suspends mid-stream, the
-  connection used to die on wake with `Stream read error: error decoding
-  response body` and the turn was lost (#2990). The engine now stamps stream
-  progress with both monotonic and wall-clock time; a large divergence on a
-  stream error identifies a sleep/wake cycle, and the request is silently
-  re-issued (up to the existing 3-retry budget) instead of failing the turn.
-- **One-command release prep.** `./scripts/release/prepare-release.sh X.Y.Z`
-  bumps the workspace version, every internal crate dependency pin, the npm
-  wrapper, and the README install-tag examples, refreshes `Cargo.lock`,
-  regenerates the embedded TUI changelog slice and web facts, and runs
-  `check-versions.sh` — the v0.8.56 release needed nine follow-up commits for
-  exactly these sync points.
-- `.github/CODEOWNERS` and `.github/dependabot.yml` (weekly cargo +
-  github-actions updates, monthly npm for `web/`).
-
-### Changed
-
-- **The changelog went on a diet.** Root `CHANGELOG.md` now carries recent
-  releases (v0.8.40+); older entries moved to `docs/CHANGELOG_ARCHIVE.md`.
-  `crates/tui/CHANGELOG.md` — embedded into every binary for `/change` — is a
-  generated 15-release slice (`scripts/sync-changelog.sh`), no longer a
-  357 KB manual byte-for-byte copy (~300 KB smaller binaries).
-- GitHub Release bodies are generated from the tagged version's changelog
-  section (`scripts/release/generate-release-body.sh`) instead of a
-  hardcoded workflow blob with a hand-pasted contributor list.
-- `check-versions.sh` now also gates `web/lib/facts.generated.ts` and the
-  README install-tag examples; the CNB mirror pipeline validates the pushed
-  tag against `Cargo.toml` before generating release notes.
-- Docs reorganized: internal design notes moved under `docs/rfcs/`; stale
-  internal docs (old audits, handoffs, region-specific VM notes) removed.
-- Agent-facing polish: the system prompt environment block reports
-  `codewhale_version` (was `deepseek_version`), the legacy
-  `.deepseek/instructions.md` path is no longer advertised in the prompt
-  (still honored for back-compat), and oversized instruction files are
-  truncated with an explicit `[…truncated: N bytes omitted]` marker instead
-  of a bare ellipsis.
-
-### Fixed
-
-- **Docker images build again.** The release `docker` job failed for v0.8.56
-  because the Dockerfile still copied the pre-rebrand `deepseek` /
-  `deepseek-tui` binaries; they are now symlinks to the codewhale binaries
-  inside the image, so legacy container entrypoints keep working.
-- `.devcontainer/devcontainer.json` used the pre-rebrand container name,
-  mount path, and `deepseek` remote user.
-- Stale `--bin deepseek` examples, `DeepSeek-TUI` strings in `/change`
-  output, and pre-rebrand doc comments.
-
-### Removed
-
-- Unused dependencies: `tracing-appender` and `zeroize` (TUI crate),
-  `rustls` (release crate); the orphaned `vendor/schemaui-0.12.0` lockfile
-  leftover and a machine-specific one-off `scripts/verify_task.sh`.
-
 ---
 
-Older releases: [CHANGELOG.md](https://github.com/Hmbown/CodeWhale/blob/main/CHANGELOG.md) and [docs/CHANGELOG_ARCHIVE.md](https://github.com/Hmbown/CodeWhale/blob/main/docs/CHANGELOG_ARCHIVE.md).
+Older releases: [CHANGELOG.md](https://github.com/bdugsj/nestlone/blob/main/CHANGELOG.md) and [docs/CHANGELOG_ARCHIVE.md](https://github.com/bdugsj/nestlone/blob/main/docs/CHANGELOG_ARCHIVE.md).

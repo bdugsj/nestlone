@@ -7,6 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.2] - 2026-08-02
+
+First Nestlone release. The project was forked from CodeWhale and rebranded
+end to end; release engineering moved fully to GitHub Actions.
+
+### Changed
+
+- **Crate packages, binaries, and aliases carry the Nestlone name.** All
+  `codewhale-*` workspace crates became `nestlone-*`; the CLI dispatcher
+  `codewhale` became `nestlone`, the TUI `nestlone` became `nestlone-tui`,
+  and the `codew` alias became `nest`.
+- **User data moves to `~/.nestlone`.** The previous `~/.codewhale` directory
+  is not migrated; profiles start fresh.
+- **Environment variables use the `NESTLONE_*` prefix.** `CODEWHALE_*` and
+  `DEEPSEEK_*` names are still read as legacy fallbacks for compatibility.
+- **Release assets and self-update use `nestlone-{os}-{arch}` names.**
+  `install.sh`, the npm wrapper, and `nestlone update` resolve the current
+  release from `bdugsj/nestlone`.
+- **The web AI path calls the DeepSeek API directly**, removing the Cloudflare
+  AI gateway indirection from `wrangler.jsonc`.
+- **CI moved fully to GitHub Actions.** A compile gate runs on every push and
+  PR (fmt, check, clippy, workspace tests, parity, version checks); release
+  builds now cover Linux (static musl x64 + GNU arm64), macOS (x64/arm64),
+  and Windows (x64); the Tencent CNB pipeline was removed.
+- **Remote-setup default image points at `ghcr.io/bdugsj/nestlone`.**
+
+### Fixed
+
+- **State crate home-override parsing** broke after the data-directory rename
+  and is restored.
+
 ## [0.9.2] - 2026-07-29
 
 This is the Codewhale v0.9.2 source candidate. It is not a published release
@@ -4578,7 +4609,8 @@ overflow report and `/theme` picker edge-wrapping patch in #1814.
 
 Older releases (v0.8.39 and earlier) are archived in [docs/CHANGELOG_ARCHIVE.md](docs/CHANGELOG_ARCHIVE.md).
 
-[Unreleased]: https://github.com/Hmbown/CodeWhale/compare/v0.9.1...HEAD
+[Unreleased]: https://github.com/bdugsj/nestlone/compare/v0.0.2...HEAD
+[0.0.2]: https://github.com/bdugsj/nestlone/compare/v0.0.1...v0.0.2
 [0.9.2]: https://github.com/Hmbown/CodeWhale/compare/v0.9.1...v0.9.2
 [0.9.1]: https://github.com/Hmbown/CodeWhale/compare/v0.9.0...v0.9.1
 [0.8.68]: https://github.com/Hmbown/CodeWhale/compare/v0.8.67...v0.8.68
