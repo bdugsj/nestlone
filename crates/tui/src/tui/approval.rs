@@ -33,9 +33,9 @@ use crate::tools::apply_patch::{NormalizedApplyPatchInput, normalize_apply_patch
 use crate::tools::canonical_action::canonical_action_alias;
 use crate::tui::views::{ModalKind, ModalView, ViewAction, ViewEvent};
 use crate::tui::widgets::{ApprovalWidget, ElevationWidget, Renderable};
+use crossterm::event::{KeyCode, KeyEvent, MouseButton, MouseEvent, MouseEventKind};
 use nestlone_config::ToolAskRule;
 use nestlone_execpolicy::PermissionAction;
-use crossterm::event::{KeyCode, KeyEvent, MouseButton, MouseEvent, MouseEventKind};
 use ratatui::layout::Rect;
 use serde_json::Value;
 use std::borrow::Cow;
@@ -478,8 +478,7 @@ fn build_persistent_allow_rules(
     }
 
     let workspace = workspace.to_string_lossy();
-    let Some(workspace) = nestlone_execpolicy::normalize_workspace_scope(workspace.as_ref())
-    else {
+    let Some(workspace) = nestlone_execpolicy::normalize_workspace_scope(workspace.as_ref()) else {
         return Vec::new();
     };
 

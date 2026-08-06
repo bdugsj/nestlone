@@ -57,14 +57,12 @@ const CONTRIBUTOR_ONBOARDING_BODY: &str =
     include_str!("../../assets/skills/contributor-onboarding/SKILL.md");
 
 // ── security ───────────────────────────────────────────────────────────
-const NESTLONE_SECURITY_BODY: &str =
-    include_str!("../../assets/skills/nestlone-security/SKILL.md");
+const NESTLONE_SECURITY_BODY: &str = include_str!("../../assets/skills/nestlone-security/SKILL.md");
 
 // ── security personas ──────────────────────────────────────────────────
 const RED_TEAM_BODY: &str = include_str!("../../assets/skills/red-team/SKILL.md");
 const BLUE_TEAM_BODY: &str = include_str!("../../assets/skills/blue-team/SKILL.md");
-const MALWARE_ANALYST_BODY: &str =
-    include_str!("../../assets/skills/malware-analyst/SKILL.md");
+const MALWARE_ANALYST_BODY: &str = include_str!("../../assets/skills/malware-analyst/SKILL.md");
 
 // Optional integration (not auto-installed for every user): Feishu body kept for
 // digest/migration helpers only.

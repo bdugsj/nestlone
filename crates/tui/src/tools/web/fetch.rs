@@ -19,8 +19,7 @@ pub(crate) const HARD_MAX_TIMEOUT: Duration = Duration::from_secs(60);
 pub(crate) const DEFAULT_MAX_BYTES: usize = 1_000_000;
 pub(crate) const HARD_MAX_BYTES: usize = 10 * 1024 * 1024;
 const MAX_REDIRECTS: usize = 5;
-const USER_AGENT: &str =
-    "Mozilla/5.0 (compatible; nestlone/0.9.1; )";
+const USER_AGENT: &str = "Mozilla/5.0 (compatible; nestlone/0.9.1; )";
 
 #[derive(Debug, Clone)]
 pub(crate) struct FetchOptions {

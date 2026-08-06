@@ -3070,12 +3070,7 @@ fn test_child_max_spawn_depth_profile_hint_only_narrows() {
     // Explicit request alone keeps its existing widen-up-to-ceiling semantics.
     assert_eq!(child_max_spawn_depth_for_spawn(2, 0, Some(3), None), 3);
     assert_eq!(
-        child_max_spawn_depth_for_spawn(
-            2,
-            0,
-            Some(nestlone_config::MAX_SPAWN_DEPTH_CEILING),
-            None
-        ),
+        child_max_spawn_depth_for_spawn(2, 0, Some(nestlone_config::MAX_SPAWN_DEPTH_CEILING), None),
         nestlone_config::MAX_SPAWN_DEPTH_CEILING
     );
     // Neither request nor hint: inherit unchanged.

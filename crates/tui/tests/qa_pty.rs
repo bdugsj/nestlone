@@ -752,11 +752,7 @@ model = "k3"
     ] {
         setup_state.set_step(
             step,
-            nestlone_config::StepEntry::new(
-                nestlone_config::StepStatus::Verified,
-                true,
-                "0.8.67",
-            ),
+            nestlone_config::StepEntry::new(nestlone_config::StepStatus::Verified, true, "0.8.67"),
         );
     }
     setup_state.set_step(

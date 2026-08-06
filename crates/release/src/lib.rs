@@ -10,12 +10,10 @@ use serde::Deserialize;
 pub const CHECKSUM_MANIFEST_ASSET: &str = "nestlone-artifacts-sha256.txt";
 
 /// GitHub API URL for the single latest stable release.
-pub const LATEST_RELEASE_URL: &str =
-    "https://api.github.com/repos/bdugsj/nestlone/releases/latest";
+pub const LATEST_RELEASE_URL: &str = "https://api.github.com/repos/bdugsj/nestlone/releases/latest";
 
 /// GitHub API URL listing recent releases (up to 100), used to find beta tags.
-pub const RELEASES_URL: &str =
-    "https://api.github.com/repos/bdugsj/nestlone/releases?per_page=100";
+pub const RELEASES_URL: &str = "https://api.github.com/repos/bdugsj/nestlone/releases?per_page=100";
 
 /// Base URL of the Nestlone repository on the CNB mirror platform.
 pub const CNB_REPO_URL: &str = "https://cnb.cool/bdugsj/nestlone";

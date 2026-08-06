@@ -56,16 +56,16 @@ use std::sync::OnceLock;
 
 use anyhow::{Context, Result, bail};
 pub use auth_source::{AuthSourceKind, ProviderAuthSourceToml};
-pub use nestlone_execpolicy::ToolAskRule;
-use nestlone_execpolicy::{ExecPolicyEngine, PermissionAction, Ruleset};
-use nestlone_secrets::SecretSource;
-pub use nestlone_secrets::Secrets;
 pub use external_credentials::{
     EXTERNAL_CREDENTIAL_CONSENT_VERSION, EXTERNAL_CREDENTIAL_READ_ONLY_SEMANTICS,
     ExternalCredentialAccess, ExternalCredentialConsentStatus, ExternalCredentialConsentToml,
     ExternalCredentialReadGrant, ExternalCredentialSource, external_credential_consent_status,
     quote_os_path, resolve_external_credential_path,
 };
+pub use nestlone_execpolicy::ToolAskRule;
+use nestlone_execpolicy::{ExecPolicyEngine, PermissionAction, Ruleset};
+use nestlone_secrets::SecretSource;
+pub use nestlone_secrets::Secrets;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest as _, Sha256};
 
@@ -4703,7 +4703,11 @@ pub fn resolve_config_path(explicit: Option<PathBuf>) -> Result<PathBuf> {
     if let Some(path) = explicit {
         return normalize_config_file_path(path);
     }
-    for var in ["NESTLONE_CONFIG_PATH", "CODEWHALE_CONFIG_PATH", "DEEPSEEK_CONFIG_PATH"] {
+    for var in [
+        "NESTLONE_CONFIG_PATH",
+        "CODEWHALE_CONFIG_PATH",
+        "DEEPSEEK_CONFIG_PATH",
+    ] {
         if let Ok(path) = std::env::var(var) {
             if let Some(path) = config_path_from_env_value(&path)? {
                 return Ok(path);

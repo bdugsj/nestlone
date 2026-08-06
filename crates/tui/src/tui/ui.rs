@@ -11650,10 +11650,9 @@ fn launch_worktree_spec(
 
 async fn provision_launch_worktree(workspace: PathBuf, requested: String) -> Result<PathBuf> {
     let spec = launch_worktree_spec(&workspace, &requested)?;
-    let provisioned =
-        tokio::task::spawn_blocking(move || nestlone_lane::provision_worktree(&spec))
-            .await
-            .context("new worktree task failed")??;
+    let provisioned = tokio::task::spawn_blocking(move || nestlone_lane::provision_worktree(&spec))
+        .await
+        .context("new worktree task failed")??;
     Ok(provisioned.path)
 }
 
@@ -18142,10 +18141,9 @@ async fn version_hint_from_release_mirror_env(current: &str) -> Option<UpdateNot
     if !release_mirror_env_configured() {
         return None;
     }
-    let tag =
-        nestlone_release::latest_release_tag_async(nestlone_release::ReleaseChannel::Stable)
-            .await
-            .ok()?;
+    let tag = nestlone_release::latest_release_tag_async(nestlone_release::ReleaseChannel::Stable)
+        .await
+        .ok()?;
     version_hint_from_latest_tag(&tag, current)
 }
 
@@ -18159,8 +18157,8 @@ async fn version_hint_from_configured_update_uri(
     update_uri: &str,
     current: &str,
 ) -> Result<Option<UpdateNotice>> {
-    let body = nestlone_release::fetch_release_json_async(update_uri, "configured latest release")
-        .await?;
+    let body =
+        nestlone_release::fetch_release_json_async(update_uri, "configured latest release").await?;
     let json: serde_json::Value = serde_json::from_str(&body).with_context(|| {
         format!("failed to parse release JSON from configured URI {update_uri}")
     })?;

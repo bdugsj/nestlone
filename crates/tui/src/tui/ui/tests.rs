@@ -1080,10 +1080,7 @@ impl Drop for SettingsHomeGuard {
             "DEEPSEEK_CONFIG_PATH",
             self.previous_deepseek_config_path.take(),
         );
-        restore(
-            "CODEWHALE_PROVIDER",
-            self.previous_nestlone_provider.take(),
-        );
+        restore("CODEWHALE_PROVIDER", self.previous_nestlone_provider.take());
         restore("DEEPSEEK_PROVIDER", self.previous_deepseek_provider.take());
         restore("XDG_CONFIG_HOME", self.previous_xdg_config_home.take());
         restore("APPDATA", self.previous_appdata.take());
@@ -15531,10 +15528,7 @@ async fn reselecting_live_model_and_thinking_persists_startup_defaults() {
         ..Default::default()
     };
     assert!(
-        nestlone_config::SetupState::load()
-            .ok()
-            .flatten()
-            .is_none(),
+        nestlone_config::SetupState::load().ok().flatten().is_none(),
         "the test home must start with no recorded setup progress"
     );
 
@@ -19486,10 +19480,8 @@ mod work_sidebar_projection_tests {
         // Verify that killing a shell job via ShellManager removes it from
         // the list of running jobs, so the task panel refresh picks up the
         // correct state.
-        let temp_dir = std::env::temp_dir().join(format!(
-            "nestlone-test-shell-cancel-{}",
-            std::process::id()
-        ));
+        let temp_dir =
+            std::env::temp_dir().join(format!("nestlone-test-shell-cancel-{}", std::process::id()));
         let _ = std::fs::create_dir_all(&temp_dir);
         let mut manager = crate::tools::shell::ShellManager::new(temp_dir.clone());
 

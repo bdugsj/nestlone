@@ -111,7 +111,13 @@ fn render_hex_dump(data: &[u8], base_offset: usize) -> String {
             .join(" ");
         let ascii_part: String = chunk
             .iter()
-            .map(|&b| if b.is_ascii_graphic() || b == b' ' { b as char } else { '.' })
+            .map(|&b| {
+                if b.is_ascii_graphic() || b == b' ' {
+                    b as char
+                } else {
+                    '.'
+                }
+            })
             .collect();
         lines.push(format!("{addr:08x}  {hex_part:<48}  {ascii_part}"));
     }
@@ -412,9 +418,8 @@ impl ToolSpec for TeaDecryptTool {
         let key_hex = required_str(&input, "key_hex")?;
         let data_hex = required_str(&input, "data_hex")?;
 
-        let key = hex::decode(key_hex).map_err(|e| {
-            ToolError::invalid_input(format!("Invalid key hex: {e}"))
-        })?;
+        let key = hex::decode(key_hex)
+            .map_err(|e| ToolError::invalid_input(format!("Invalid key hex: {e}")))?;
         if key.len() != 16 {
             return Err(ToolError::invalid_input(format!(
                 "Key must be 16 bytes, got {} bytes",
@@ -422,9 +427,8 @@ impl ToolSpec for TeaDecryptTool {
             )));
         }
 
-        let mut data = hex::decode(data_hex).map_err(|e| {
-            ToolError::invalid_input(format!("Invalid data hex: {e}"))
-        })?;
+        let mut data = hex::decode(data_hex)
+            .map_err(|e| ToolError::invalid_input(format!("Invalid data hex: {e}")))?;
 
         // Pad to 8-byte boundary
         let pad = (8 - data.len() % 8) % 8;
@@ -443,10 +447,14 @@ impl ToolSpec for TeaDecryptTool {
             let mut sum = TEA_DELTA.wrapping_mul(32);
             for _ in 0..32 {
                 v1 = v1.wrapping_sub(
-                    ((v0 << 4).wrapping_add(k[2])) ^ (v0.wrapping_add(sum)) ^ ((v0 >> 5).wrapping_add(k[3]))
+                    ((v0 << 4).wrapping_add(k[2]))
+                        ^ (v0.wrapping_add(sum))
+                        ^ ((v0 >> 5).wrapping_add(k[3])),
                 );
                 v0 = v0.wrapping_sub(
-                    ((v1 << 4).wrapping_add(k[0])) ^ (v1.wrapping_add(sum)) ^ ((v1 >> 5).wrapping_add(k[1]))
+                    ((v1 << 4).wrapping_add(k[0]))
+                        ^ (v1.wrapping_add(sum))
+                        ^ ((v1 >> 5).wrapping_add(k[1])),
                 );
                 sum = sum.wrapping_sub(TEA_DELTA);
             }
@@ -489,7 +497,10 @@ mod tests {
         fs::write(tmp.path().join("test.bin"), &[0u8; 100]).expect("write");
 
         let result = HexDumpTool
-            .execute(json!({"path": "test.bin", "offset": 80, "length": 16}), &ctx)
+            .execute(
+                json!({"path": "test.bin", "offset": 80, "length": 16}),
+                &ctx,
+            )
             .await
             .expect("execute");
         assert!(result.success);

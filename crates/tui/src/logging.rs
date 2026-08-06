@@ -89,9 +89,7 @@ mod tests {
     fn log_value_parser_accepts_common_rust_log_directives() {
         assert!(log_value_enables_verbose("debug"));
         assert!(log_value_enables_verbose("nestlone_cli=debug"));
-        assert!(log_value_enables_verbose(
-            "warn,nestlone_tui::client=trace"
-        ));
+        assert!(log_value_enables_verbose("warn,nestlone_tui::client=trace"));
         assert!(!log_value_enables_verbose("warn"));
         assert!(!log_value_enables_verbose("nestlone_tui=off"));
     }

@@ -2795,10 +2795,7 @@ fn save_key_falls_back_to_config_when_isolated_file_store_is_unwritable() -> Res
     let nestlone_home = temp_root.path().join("nestlone-home");
     let config_path = nestlone_home.join("config.toml");
     fs::create_dir_all(nestlone_home.join("secrets"))?;
-    fs::write(
-        nestlone_home.join("secrets/secrets.json"),
-        "not valid json",
-    )?;
+    fs::write(nestlone_home.join("secrets/secrets.json"), "not valid json")?;
     #[cfg(unix)]
     fs::set_permissions(
         nestlone_home.join("secrets/secrets.json"),

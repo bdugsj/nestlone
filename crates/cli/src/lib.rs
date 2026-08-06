@@ -3921,7 +3921,11 @@ fn web_serve_passthrough(args: &WebArgs) -> Vec<String> {
 }
 
 fn app_server_token_from_env() -> Option<String> {
-    for var in ["NESTLONE_APP_SERVER_TOKEN", "CODEWHALE_APP_SERVER_TOKEN", "DEEPSEEK_APP_SERVER_TOKEN"] {
+    for var in [
+        "NESTLONE_APP_SERVER_TOKEN",
+        "CODEWHALE_APP_SERVER_TOKEN",
+        "DEEPSEEK_APP_SERVER_TOKEN",
+    ] {
         if let Ok(value) = std::env::var(var) {
             return Some(value);
         }
@@ -8649,12 +8653,14 @@ model = "qwen-2.5-7b"
         std::fs::write(&dispatcher, b"").unwrap();
 
         // Only the pre-rename sibling exists — no `nestlone-tui`.
-        let target =
-            dispatcher.with_file_name(format!("nestlone{}", std::env::consts::EXE_SUFFIX));
+        let target = dispatcher.with_file_name(format!("nestlone{}", std::env::consts::EXE_SUFFIX));
         std::fs::write(&target, b"").unwrap();
 
         let found = sibling_tui_candidate(&dispatcher).expect("must locate sibling");
-        assert_eq!(found, target, "legacy `nestlone` sibling resolves as fallback");
+        assert_eq!(
+            found, target,
+            "legacy `nestlone` sibling resolves as fallback"
+        );
     }
 
     /// A dispatcher named `nestlone` must never resolve to itself as the
@@ -8689,7 +8695,10 @@ model = "qwen-2.5-7b"
         std::fs::write(&target, b"").unwrap();
 
         let found = sibling_tui_candidate(&dispatcher).expect("must locate sibling");
-        assert_eq!(found, target, "legacy `codewhale-tui` sibling resolves as fallback");
+        assert_eq!(
+            found, target,
+            "legacy `codewhale-tui` sibling resolves as fallback"
+        );
     }
 
     #[test]

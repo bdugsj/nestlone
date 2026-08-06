@@ -3587,10 +3587,8 @@ heartbeat_timeout_secs = 1
 
     #[test]
     fn config_command_audit_lists_editability_and_current_values() {
-        let temp_root = env::temp_dir().join(format!(
-            "nestlone-config-audit-test-{}",
-            std::process::id()
-        ));
+        let temp_root =
+            env::temp_dir().join(format!("nestlone-config-audit-test-{}", std::process::id()));
         fs::create_dir_all(&temp_root).unwrap();
         // Hermetic: the audit reads Settings::load(); without this guard the
         // developer's real saved permission_posture leaks in and the

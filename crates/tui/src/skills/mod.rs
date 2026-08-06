@@ -777,9 +777,9 @@ fn skills_directories_with_home_and_mode(
     roots::skills_directories_with_home_and_mode(workspace, home_dir, mode)
 }
 
-pub(crate) use roots::nestlone_workspace_skills_dir;
 #[cfg(test)]
 pub(crate) use roots::existing_skill_dirs;
+pub(crate) use roots::nestlone_workspace_skills_dir;
 
 /// Walk every candidate skills directory for a workspace and merge
 /// the discovered skills into a single registry. Name conflicts are

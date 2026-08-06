@@ -104,9 +104,7 @@ impl FeedbackKind {
     fn issue_url_base(self) -> &'static str {
         match self {
             Self::Bug => "/issues/new?template=bug_report.md",
-            Self::Feature => {
-                "/issues/new?template=feature_request.md"
-            }
+            Self::Feature => "/issues/new?template=feature_request.md",
             Self::Security => SECURITY_POLICY_URL,
         }
     }
@@ -268,14 +266,8 @@ mod tests {
         let bug = FeedbackKind::Bug.issue_url();
         let feature = FeedbackKind::Feature.issue_url();
 
-        assert_eq!(
-            bug,
-            "/issues/new?template=bug_report.md"
-        );
-        assert_eq!(
-            feature,
-            "/issues/new?template=feature_request.md"
-        );
+        assert_eq!(bug, "/issues/new?template=bug_report.md");
+        assert_eq!(feature, "/issues/new?template=feature_request.md");
     }
 
     #[test]

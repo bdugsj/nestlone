@@ -1950,20 +1950,14 @@ mod tests {
 
         // Dispatcher binary should use nestlone prefix
         assert_eq!(binary_prefix_for_exe(Path::new("nestlone")), "nestlone");
-        assert_eq!(
-            binary_prefix_for_exe(Path::new("nestlone.exe")),
-            "nestlone"
-        );
+        assert_eq!(binary_prefix_for_exe(Path::new("nestlone.exe")), "nestlone");
         assert_eq!(
             binary_prefix_for_exe(Path::new("/usr/local/bin/nestlone")),
             "nestlone"
         );
 
         // Fallback for unknown names
-        assert_eq!(
-            binary_prefix_for_exe(Path::new("other-binary")),
-            "nestlone"
-        );
+        assert_eq!(binary_prefix_for_exe(Path::new("other-binary")), "nestlone");
 
         // Legacy names still map to the canonical update asset prefixes.
         assert_eq!(
@@ -2088,12 +2082,7 @@ mod tests {
                 "aarch64",
                 "nestlone-tui-macos-arm64",
             ),
-            (
-                "nestlone-tui",
-                "linux",
-                "x86_64",
-                "nestlone-tui-linux-x64",
-            ),
+            ("nestlone-tui", "linux", "x86_64", "nestlone-tui-linux-x64"),
         ];
 
         for (exe, os, arch, expected) in cases {
@@ -2374,11 +2363,8 @@ E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855  *nestlone-wind
     #[test]
     fn mocked_release_selects_tui_asset_when_tui_binary_invokes_update() {
         let release = mocked_release();
-        let stem = release_asset_stem_for(
-            Path::new("/usr/local/bin/nestlone-tui"),
-            "macos",
-            "aarch64",
-        );
+        let stem =
+            release_asset_stem_for(Path::new("/usr/local/bin/nestlone-tui"), "macos", "aarch64");
         let asset = select_platform_asset(&release, &stem).expect("TUI platform asset");
         assert_eq!(asset.name, "nestlone-tui-macos-arm64");
 
@@ -2487,8 +2473,8 @@ E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855  *nestlone-wind
 
     #[test]
     fn github_release_url_parser_extracts_tag() {
-        let url = reqwest::Url::parse("https://github.com/bdugsj/nestlone/releases/tag/v0.8.61")
-            .unwrap();
+        let url =
+            reqwest::Url::parse("https://github.com/bdugsj/nestlone/releases/tag/v0.8.61").unwrap();
 
         assert_eq!(
             release_tag_from_github_release_url(&url).as_deref(),

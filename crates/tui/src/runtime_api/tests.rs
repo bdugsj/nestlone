@@ -6062,8 +6062,7 @@ async fn reload_config_reads_from_config_path_and_updates_in_memory_state() -> R
     // If Fix #2 is reverted (reload uses Config::load(None, None) instead of
     // state.config_path), the reload will read an empty/default config and
     // the persisted value will NOT appear in GET /v1/config → test fails.
-    let root =
-        std::env::temp_dir().join(format!("nestlone-config-reload-path-{}", Uuid::new_v4()));
+    let root = std::env::temp_dir().join(format!("nestlone-config-reload-path-{}", Uuid::new_v4()));
     fs::create_dir_all(&root)?;
     let config_file = root.join("custom-config.toml");
     fs::write(&config_file, "# initial\n")?;
@@ -6376,10 +6375,8 @@ async fn switch_provider_with_deepseek_and_explicit_model_updates_default_text_m
     // endpoint must persist `default_text_model` (the DeepSeek-specific
     // root key) in addition to the provider change, mirroring
     // `switch_provider` in ui.rs which pins `default_model` for DeepSeek.
-    let root = std::env::temp_dir().join(format!(
-        "nestlone-switch-deepseek-model-{}",
-        Uuid::new_v4()
-    ));
+    let root =
+        std::env::temp_dir().join(format!("nestlone-switch-deepseek-model-{}", Uuid::new_v4()));
     fs::create_dir_all(&root)?;
     let config_file = root.join("custom-config.toml");
     fs::write(
@@ -6437,8 +6434,7 @@ async fn switch_provider_empty_model_string_treated_as_no_override() -> Result<(
     // An empty string model (`{ "model": "" }`) must be treated the same
     // as no model at all — the endpoint should NOT persist a model key,
     // matching the TUI's behavior where a blank model arg is ignored.
-    let root =
-        std::env::temp_dir().join(format!("nestlone-switch-empty-model-{}", Uuid::new_v4()));
+    let root = std::env::temp_dir().join(format!("nestlone-switch-empty-model-{}", Uuid::new_v4()));
     fs::create_dir_all(&root)?;
     let config_file = root.join("custom-config.toml");
     fs::write(
@@ -6598,10 +6594,8 @@ model = "GLM-5.2"
 
 #[tokio::test]
 async fn reload_config_preserves_profile_selected_named_custom_route() -> Result<()> {
-    let root = std::env::temp_dir().join(format!(
-        "nestlone-config-reload-profile-{}",
-        Uuid::new_v4()
-    ));
+    let root =
+        std::env::temp_dir().join(format!("nestlone-config-reload-profile-{}", Uuid::new_v4()));
     fs::create_dir_all(&root)?;
     let config_file = root.join("custom-config.toml");
     fs::write(
@@ -6657,8 +6651,7 @@ async fn reload_config_refreshes_mcp_config_path() -> Result<()> {
     // this test would fail because the old field wouldn't update. Since we
     // removed the stale field and read directly from config, this test also
     // validates that architectural decision.
-    let root =
-        std::env::temp_dir().join(format!("nestlone-config-mcp-refresh-{}", Uuid::new_v4()));
+    let root = std::env::temp_dir().join(format!("nestlone-config-mcp-refresh-{}", Uuid::new_v4()));
     fs::create_dir_all(&root)?;
     let config_file = root.join("custom-config.toml");
     fs::write(&config_file, "# initial\n")?;
@@ -6909,10 +6902,8 @@ async fn reload_config_with_malformed_file_returns_error() -> Result<()> {
 
 #[tokio::test]
 async fn set_config_model_follows_persisted_provider_before_reload() -> Result<()> {
-    let root = std::env::temp_dir().join(format!(
-        "nestlone-config-provider-model-{}",
-        Uuid::new_v4()
-    ));
+    let root =
+        std::env::temp_dir().join(format!("nestlone-config-provider-model-{}", Uuid::new_v4()));
     fs::create_dir_all(&root)?;
     let config_file = root.join("custom-config.toml");
     fs::write(

@@ -6306,9 +6306,10 @@ fn root_deepseek_model_is_foreign_to_direct_provider(provider: ApiProvider, mode
 mod home;
 mod paths;
 use paths::{
-    canonicalize_or_keep, nestlone_home_dir, default_config_path, default_managed_config_path,
+    canonicalize_or_keep, default_config_path, default_managed_config_path,
     default_mcp_config_path, default_memory_path, default_notes_path, default_requirements_path,
-    default_skills_dir, env_config_path, expand_pathbuf, home_config_path, workspace_config_key,
+    default_skills_dir, env_config_path, expand_pathbuf, home_config_path, nestlone_home_dir,
+    workspace_config_key,
 };
 pub(crate) use paths::{effective_home_dir, expand_path};
 
@@ -6558,10 +6559,7 @@ fn provider_env_base_url_override(provider: ApiProvider) -> Option<String> {
 /// Resolve an env var, preferring the `CODEWHALE_*` form over the
 /// legacy `DEEPSEEK_*` form. Empty values are ignored so a blank shell export
 /// does not erase configured provider settings.
-fn nestlone_env_var(
-    nestlone_name: &str,
-    legacy_name: &str,
-) -> Result<String, std::env::VarError> {
+fn nestlone_env_var(nestlone_name: &str, legacy_name: &str) -> Result<String, std::env::VarError> {
     let read = || {
         std::env::var(nestlone_name)
             .ok()
@@ -8622,9 +8620,7 @@ fn merge_skills_config(
             max_install_size_bytes: override_cfg
                 .max_install_size_bytes
                 .or(base.max_install_size_bytes),
-            scan_nestlone_only: override_cfg
-                .scan_nestlone_only
-                .or(base.scan_nestlone_only),
+            scan_nestlone_only: override_cfg.scan_nestlone_only.or(base.scan_nestlone_only),
         }),
     }
 }

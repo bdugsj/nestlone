@@ -94,7 +94,11 @@ pub(crate) fn env_config_path() -> Option<PathBuf> {
 }
 
 fn env_config_path_unlocked() -> Option<PathBuf> {
-    for var in ["NESTLONE_CONFIG_PATH", "CODEWHALE_CONFIG_PATH", "DEEPSEEK_CONFIG_PATH"] {
+    for var in [
+        "NESTLONE_CONFIG_PATH",
+        "CODEWHALE_CONFIG_PATH",
+        "DEEPSEEK_CONFIG_PATH",
+    ] {
         if let Ok(path) = std::env::var(var) {
             let trimmed = path.trim();
             if !trimmed.is_empty() {

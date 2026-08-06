@@ -1962,10 +1962,7 @@ mod tests {
         .expect("write outside constitution");
         std::os::unix::fs::symlink(
             &outside_constitution,
-            workspace
-                .path()
-                .join(".nestlone")
-                .join("constitution.json"),
+            workspace.path().join(".nestlone").join("constitution.json"),
         )
         .expect("symlink constitution");
 
@@ -2192,10 +2189,7 @@ mod tests {
         let home = tempdir().expect("home tempdir");
         fs::create_dir(workspace.path().join(".git")).expect("mkdir git");
         fs::create_dir(workspace.path().join(".nestlone")).expect("mkdir nestlone");
-        let constitution = workspace
-            .path()
-            .join(".nestlone")
-            .join("constitution.json");
+        let constitution = workspace.path().join(".nestlone").join("constitution.json");
         fs::write(
             &constitution,
             r#"{"schema_version":1,"authority":["alpha authority"]}"#,

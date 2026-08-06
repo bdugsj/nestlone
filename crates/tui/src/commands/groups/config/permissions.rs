@@ -279,9 +279,7 @@ workspace = {other:?}
         let message = result.message.expect("list message");
 
         assert!(!result.is_error);
-        assert!(message.contains(&nestlone_config::quote_os_path(
-            &displayed_permissions_path
-        )));
+        assert!(message.contains(&nestlone_config::quote_os_path(&displayed_permissions_path)));
         assert!(message.contains("#1 | allow | exec_shell"));
         assert!(message.contains("exact command `cargo test`"));
         assert!(message.contains("active in this workspace"));
@@ -321,9 +319,10 @@ workspace = {other:?}
         let malformed_message = malformed.message.expect("malformed message");
         assert!(malformed.is_error);
         assert!(malformed_message.contains("Permission rule operation failed"));
-        assert!(malformed_message.contains(&nestlone_config::quote_os_path(
-            &displayed_permissions_path
-        )));
+        assert!(
+            malformed_message
+                .contains(&nestlone_config::quote_os_path(&displayed_permissions_path))
+        );
         assert!(malformed_message.contains("file contents were omitted"));
         assert!(!malformed_message.contains("do-not-echo-this"));
     }

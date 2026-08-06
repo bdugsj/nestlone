@@ -442,8 +442,7 @@ impl SetupRuntimeFacts {
         );
         let nestlone_home = setup_nestlone_home_dir();
         let persistence = SetupPersistenceFacts::from_app_config(app, config, &nestlone_home);
-        let tools_mcp =
-            tools_mcp::SetupToolsMcpFacts::from_app_config(app, config, &nestlone_home);
+        let tools_mcp = tools_mcp::SetupToolsMcpFacts::from_app_config(app, config, &nestlone_home);
         let tools_mcp_servers_result = tools_mcp.servers_result;
         let tools_mcp_skills_result = tools_mcp.skills_result;
         let tools_mcp_tools_result = tools_mcp.tools_result;
@@ -6756,10 +6755,7 @@ mod tests {
         assert!(title.contains("Draft for Ratification"));
         assert!(content.contains("shown unchanged"), "{content}");
         assert!(content.contains("press K to keep it"), "{content}");
-        assert!(
-            content.contains("<nestlone_user_constitution"),
-            "{content}"
-        );
+        assert!(content.contains("<nestlone_user_constitution"), "{content}");
 
         // Second K completes the checkpoint without touching the file.
         let action = view.handle_key(key(KeyCode::Char('k')));
