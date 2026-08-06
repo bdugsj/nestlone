@@ -1461,6 +1461,7 @@ mod tests {
         requested_reasoning: Option<String>,
     }
 
+    #[allow(clippy::too_many_arguments)]
     async fn assert_preview_matches_first_wire_body(
         engine: &mut Engine,
         server: &wiremock::MockServer,

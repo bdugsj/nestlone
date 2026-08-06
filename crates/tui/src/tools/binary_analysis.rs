@@ -200,18 +200,18 @@ fn extract_printable_strings(data: &[u8], min_len: usize) -> Vec<String> {
         if byte.is_ascii_graphic() || byte == b' ' {
             current.push(byte);
         } else {
-            if current.len() >= min_len {
-                if let Ok(s) = String::from_utf8(current.clone()) {
-                    strings.push(s);
-                }
+            if current.len() >= min_len
+                && let Ok(s) = String::from_utf8(current.clone())
+            {
+                strings.push(s);
             }
             current.clear();
         }
     }
-    if current.len() >= min_len {
-        if let Ok(s) = String::from_utf8(current) {
-            strings.push(s);
-        }
+    if current.len() >= min_len
+        && let Ok(s) = String::from_utf8(current)
+    {
+        strings.push(s);
     }
     strings
 }
@@ -494,7 +494,7 @@ mod tests {
     async fn hex_dump_offset() {
         let tmp = tempdir().expect("tempdir");
         let ctx = ToolContext::new(tmp.path());
-        fs::write(tmp.path().join("test.bin"), &[0u8; 100]).expect("write");
+        fs::write(tmp.path().join("test.bin"), [0u8; 100]).expect("write");
 
         let result = HexDumpTool
             .execute(

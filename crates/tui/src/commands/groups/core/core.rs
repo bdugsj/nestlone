@@ -455,26 +455,10 @@ fn expand_workspace_path(path: &str) -> Result<PathBuf, String> {
     Ok(PathBuf::from(path))
 }
 
-fn public_site_locale_segment(locale: Locale) -> &'static str {
-    match locale {
-        Locale::ZhHans | Locale::ZhHant => "zh",
-        Locale::Ja => "ja",
-        Locale::Vi => "vi",
-        Locale::Ko => "ko",
-        Locale::Es419 => "es",
-        Locale::PtBr => "pt-BR",
-        Locale::Ru => "ru",
-        Locale::Uk => "uk",
-        // Not shipped on the website yet — English pages are the fallback.
-        Locale::En | Locale::Ca | Locale::De | Locale::Fr | Locale::Id | Locale::Hi => "en",
-    }
-}
-
 /// Show Codewhale documentation, community, managed-app, and provider links.
 pub fn nestlone_links(app: &mut App) -> CommandResult {
     let locale = app.ui_locale;
     let active_provider = app.api_provider.as_str();
-    let site_locale = public_site_locale_segment(locale);
     let mut message = format!(
         "{}\n─────────────────────────────\n",
         tr(locale, MessageId::LinksProjectTitle)
