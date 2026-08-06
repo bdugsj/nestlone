@@ -1543,7 +1543,7 @@ mod tests {
 
         let header = header_text(&app, 40);
 
-        assert!(header.starts_with("cw"), "brand missing: {header:?}");
+        assert!(header.starts_with("ns"), "brand missing: {header:?}");
         assert!(
             header.to_ascii_lowercase().contains("operate"),
             "mode missing: {header:?}"
@@ -1651,7 +1651,7 @@ mod tests {
             !header.contains('🐳') && !header.contains('🐋'),
             "whale emoji must stay out of the header: {header:?}"
         );
-        assert!(header.contains("cw"), "cw mark missing: {header:?}");
+        assert!(header.contains("ns"), "ns mark missing: {header:?}");
     }
 
     #[test]

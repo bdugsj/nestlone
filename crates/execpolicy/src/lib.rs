@@ -2414,7 +2414,7 @@ mod tests {
     #[test]
     fn workspace_scope_normalizes_windows_separators_and_case() {
         let rule =
-            ToolAskRule::exec_shell("cargo test").into_exact_workspace_allow(r"C:\Repo\CodeWhale");
+            ToolAskRule::exec_shell("cargo test").into_exact_workspace_allow(r"C:\Repo\Nestlone");
         let engine = engine_with_ask_rule(rule);
         let decision = engine
             .check(ExecPolicyContext {
@@ -2429,7 +2429,7 @@ mod tests {
 
         assert_eq!(decision.matched_action, Some(PermissionAction::Allow));
         assert_eq!(
-            normalize_workspace_scope(r"C:\Repo\CodeWhale"),
+            normalize_workspace_scope(r"C:\Repo\Nestlone"),
             Some("c:/repo/nestlone".to_string())
         );
         assert_eq!(normalize_workspace_scope("relative/repo"), None);

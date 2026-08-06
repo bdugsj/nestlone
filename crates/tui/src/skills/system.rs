@@ -583,7 +583,7 @@ mod tests {
             .find(|skill| skill.name == "contributor-onboarding")
             .expect("contributor-onboarding must be bundled");
         assert_eq!(skill.introduced_in, 8);
-        assert_eq!(BUNDLED_SKILL_VERSION, "8");
+        assert_eq!(BUNDLED_SKILL_VERSION, "10");
 
         let body = skill.body;
         assert!(body.contains("invocation: explicit-only"));

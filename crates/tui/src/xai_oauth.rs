@@ -673,7 +673,7 @@ pub fn missing_auth_message() -> String {
     format!(
         "xAI OAuth credentials not found.\n\
          Options:\n\
-         1. Run `nestlone auth xai-device` for Codewhale-owned OAuth storage\n\
+         1. Run `nestlone auth xai-device` for Nestlone-owned OAuth storage\n\
          2. To read an existing Grok CLI login without changing it, run \
          `nestlone auth external-consent --provider xai --mode read-only --path {}`\n\
          3. Or use API-key auth: export XAI_API_KEY=... / \
@@ -2022,7 +2022,7 @@ consent_version = 1
         let msg = missing_auth_message();
         assert!(msg.contains("xAI OAuth credentials not found"), "{msg}");
         assert!(msg.contains("external-consent"), "{msg}");
-        assert!(msg.contains("Codewhale-owned OAuth storage"), "{msg}");
+        assert!(msg.contains("Nestlone-owned OAuth storage"), "{msg}");
         assert!(msg.contains("XAI_API_KEY"), "{msg}");
     }
 

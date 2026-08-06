@@ -496,7 +496,7 @@ pub fn build_document(app: &App, config: &Config) -> Result<ConfigUiDocument> {
 
 pub fn build_schema() -> Value {
     let mut schema = serde_json::to_value(schema_for!(ConfigUiDocument)).expect("config ui schema");
-    schema["title"] = Value::String("Codewhale Config".to_string());
+    schema["title"] = Value::String("Nestlone Config".to_string());
     schema["description"] = Value::String(
         "Tune live runtime choices and durable TUI defaults. Provider switching stays in /provider."
             .to_string(),
@@ -513,7 +513,7 @@ pub fn run_tui_editor(app: &App, config: &Config) -> Result<ConfigUiDocument> {
     let document = build_document(app, config)?;
     let value = SchemaUI::new(serde_json::to_value(document.clone())?)
         .with_schema(build_schema())
-        .with_title("Codewhale Config")
+        .with_title("Nestlone Config")
         .with_description("Review the live route, then save the settings you want to keep.")
         .run(FrontendOptions::Tui(
             UiOptions::default()
@@ -531,7 +531,7 @@ pub async fn start_web_editor(app: &App, config: &Config) -> Result<WebConfigSes
     let initial = serde_json::to_value(build_document(app, config)?)?;
     let session = WebSessionBuilder::new(build_schema())
         .with_initial_data(initial)
-        .with_title("Codewhale Config")
+        .with_title("Nestlone Config")
         .with_description(
             "Save updates this browser draft. Exit returns the reviewed changes to the TUI.",
         )
@@ -1752,7 +1752,7 @@ background_color = "#1A1B26"
     #[test]
     fn schema_contains_typed_enums() {
         let schema = build_schema();
-        assert_eq!(schema["title"], serde_json::json!("Codewhale Config"));
+        assert_eq!(schema["title"], serde_json::json!("Nestlone Config"));
         assert!(
             schema["description"]
                 .as_str()

@@ -2457,7 +2457,7 @@ impl ProviderPickerView {
         let display = if codex_oauth {
             "(run codex login; then explicitly grant read-only access)".to_string()
         } else if xai_oauth {
-            "(browser/device-code sign-in; tokens use Codewhale-owned storage)".to_string()
+            "(browser/device-code sign-in; tokens use Nestlone-owned storage)".to_string()
         } else if masked.is_empty() && saved_credential {
             "Saved credential configured".to_string()
         } else if masked.is_empty() {
@@ -6284,7 +6284,7 @@ mod tests {
         let rendered = render_text(&picker, 96, 20);
         assert!(rendered.contains("OAuth login"));
         assert!(rendered.contains("device login"));
-        assert!(rendered.contains("Codewhale-owned storage"));
+        assert!(rendered.contains("Nestlone-owned storage"));
         assert!(!rendered.contains("(paste key here)"));
 
         assert!(picker.handle_paste("xai-token"));

@@ -543,7 +543,7 @@ mod tests {
 
         assert_eq!(
             footer,
-            "Press 1/Y to trust and continue, 3/U to continue without trusting, 2/N/Esc to quit Codewhale"
+            "Press 1/Y to trust and continue, 3/U to continue without trusting, 2/N/Esc to quit Nestlone"
         );
     }
 

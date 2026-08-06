@@ -143,7 +143,7 @@ mod tests {
             .collect::<Vec<_>>()
             .join("\n");
 
-        assert!(body.contains("How Codewhale works"));
+        assert!(body.contains("How Nestlone works"));
         assert!(body.contains("Plan"));
         assert!(body.contains("Act"));
         assert!(body.contains("Operate"));

@@ -3402,11 +3402,11 @@ mod tests {
         }
 
         let setup_intro = tr(Locale::ZhHans, MessageId::SetupStepConstitutionWhy);
-        assert!(setup_intro.contains("Codewhale"));
+        assert!(setup_intro.contains("Nestlone"));
         assert!(setup_intro.contains("宪章"));
         assert!(!setup_intro.contains("代码"));
         let welcome = tr(Locale::ZhHans, MessageId::OnboardWelcomeLead);
-        assert!(welcome.contains("Codewhale"));
+        assert!(welcome.contains("Nestlone"));
         assert!(!welcome.contains("代码"));
         assert!(tr(Locale::ZhHans, MessageId::OnboardTipsLine2).contains("/constitution"));
         assert!(

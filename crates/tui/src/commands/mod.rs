@@ -1355,9 +1355,9 @@ mod tests {
         for cmd in ["/links", "/dashboard", "/api", "/lianjie"] {
             let result = execute(cmd, &mut app);
             let msg = result.message.expect("links commands should return text");
-            assert!(msg.contains("https://nestlone.net/en/docs"));
-            assert!(msg.contains("https://nestlone.net/en/community"));
-            assert!(msg.contains("https://github.com/Hmbown/CodeWhale"));
+            assert!(msg.contains("https://nestlone.local/docs"));
+            assert!(msg.contains("https://nestlone.local/docs"));
+            assert!(msg.contains("GitHub: (see project docs)"));
             assert!(msg.contains("https://app.codewhale.net"));
             assert!(msg.contains("separate sign-in"));
             assert!(msg.contains("not connected to the current local session"));

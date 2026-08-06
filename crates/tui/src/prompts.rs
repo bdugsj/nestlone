@@ -1141,7 +1141,7 @@ fn render_core_tool_group(group: &[&str], core_tools: &[&str]) -> Option<String>
 const AUTHORITY_RECAP: &str = "\
 ## Authority Recap
 
-Codewhale's constitution governs your behavior. Ground truth underlies the
+Nestlone's constitution governs your behavior. Ground truth underlies the
 whole list: the user may override a fact, but no one may invent one. When
 guidance conflicts, consult ### Whose word wins — that is the only place
 precedence is stated.";
@@ -1755,10 +1755,10 @@ mod tests {
         let composer: Box<StaticPromptComposer> = Box::new(|ctx| {
             assert_eq!(ctx.model_id, "deepseek-v4-pro");
             assert_eq!(ctx.personality, Personality::Calm);
-            // The 0.9.0 core is model-agnostic ("You are Codewhale") and
+            // The 0.9.0 core is model-agnostic ("You are Nestlone") and
             // folds tone in — no per-model id line, no separate personality
             // section in default_layers.
-            assert!(ctx.default_layers.contains("You are Codewhale"));
+            assert!(ctx.default_layers.contains("You are Nestlone"));
             assert!(
                 ctx.default_layers
                     .contains("Take the work seriously. Don't take")
@@ -1818,8 +1818,8 @@ start it",
     #[test]
     fn base_prompt_carries_constitutional_core() {
         for phrase in [
-            "## Codewhale",
-            "You are Codewhale",
+            "## Nestlone",
+            "You are Nestlone",
             "The A is already yours",
             "Let the work speak",
             "### Ground truth",
@@ -1948,7 +1948,7 @@ start it",
     fn compose_prompt_for_v4_model_stays_model_fact_free() {
         let prompt =
             compose_prompt_with_approval_model_and_shell(Personality::Calm, "deepseek-v4-pro");
-        assert!(prompt.contains("You are Codewhale"));
+        assert!(prompt.contains("You are Nestlone"));
         assert!(!prompt.contains("Your V4 Characteristics"));
         assert!(!prompt.contains("one-million-token context window"));
         assert_no_unresolved_model_placeholders(&prompt);
@@ -1958,7 +1958,7 @@ start it",
     fn compose_prompt_for_kimi_stays_model_fact_free() {
         let prompt =
             compose_prompt_with_approval_model_and_shell(Personality::Calm, "moonshotai/kimi-k2.6");
-        assert!(prompt.contains("You are Codewhale"));
+        assert!(prompt.contains("You are Nestlone"));
         assert!(!prompt.contains("Your V4 Characteristics"));
         assert!(!prompt.contains("one-million"));
         assert!(!prompt.contains("$0.14"));
@@ -1970,7 +1970,7 @@ start it",
     #[test]
     fn compose_prompt_for_openai_api_gpt_55_stays_model_fact_free() {
         let prompt = compose_prompt_with_approval_model_and_shell(Personality::Calm, "gpt-5.5");
-        assert!(prompt.contains("You are Codewhale"));
+        assert!(prompt.contains("You are Nestlone"));
         assert!(!prompt.contains("Your V4 Characteristics"));
         assert!(!prompt.contains("1050000-token context window"));
         assert!(!prompt.contains("Models may emit *thinking tokens*"));
@@ -1982,7 +1982,7 @@ start it",
     fn compose_prompt_for_unknown_model_stays_model_fact_free() {
         let prompt =
             compose_prompt_with_approval_model_and_shell(Personality::Calm, "llama3.3:70b");
-        assert!(prompt.contains("You are Codewhale"));
+        assert!(prompt.contains("You are Nestlone"));
         assert!(!prompt.contains("Your V4 Characteristics"));
         assert!(!prompt.contains("one-million"));
         assert!(!prompt.contains("$0.14"));
@@ -2015,7 +2015,7 @@ start it",
         let kimi =
             compose_prompt_with_approval_model_and_shell(Personality::Calm, "moonshotai/kimi-k2.6");
         assert!(
-            flash.contains("You are Codewhale"),
+            flash.contains("You are Nestlone"),
             "0.9.0 preamble must open with the model-agnostic Codewhale stance"
         );
         assert!(
@@ -2057,7 +2057,7 @@ start it",
         // system prompt, scoped under each mode sub-heading.
         assert!(!prompt.contains("## Core Tool Taxonomy"));
         assert!(!prompt.contains("## Toolbox"));
-        assert!(prompt.contains("You are Codewhale"));
+        assert!(prompt.contains("You are Nestlone"));
     }
 
     #[test]
@@ -2112,7 +2112,7 @@ start it",
             "full system prompt must contain the authority recap"
         );
         assert!(
-            text.contains("Codewhale's constitution governs your behavior"),
+            text.contains("Nestlone's constitution governs your behavior"),
             "authority recap must reference the Constitution"
         );
         assert!(
@@ -2202,7 +2202,7 @@ start it",
             "Preamble should carry tone guidance (take the work, not yourself, seriously)"
         );
         // Verify the preamble still carries the Codewhale identity.
-        assert!(prompt.contains("You are Codewhale"));
+        assert!(prompt.contains("You are Nestlone"));
         assert!(prompt.contains("Let the work speak"));
     }
 
@@ -2320,7 +2320,7 @@ start it",
             ),
         );
         let preamble_marker = "## 语言要求";
-        let base_marker = "You are Codewhale";
+        let base_marker = "You are Nestlone";
         let preamble_pos = text
             .find(preamble_marker)
             .expect("zh-Hans preamble should be present");
@@ -3059,7 +3059,7 @@ start it",
     fn compose_prompt_includes_all_layers() {
         let prompt = compose_prompt(Personality::Calm);
         // Base layer — balanced Constitution; procedural recipes stay out.
-        assert!(prompt.contains("## Codewhale"));
+        assert!(prompt.contains("## Nestlone"));
         assert!(prompt.contains("### Whose word wins"));
         assert!(!prompt.contains("## STATUTES (Tier 2)"));
         assert!(!prompt.contains("## EVIDENCE (Tier 6)"));
@@ -3076,10 +3076,10 @@ start it",
     #[test]
     fn constitution_md_carries_required_structure() {
         let md = BASE_PROMPT;
-        assert!(md.contains("## Codewhale"), "missing title");
+        assert!(md.contains("## Nestlone"), "missing title");
         let mut cursor = 0usize;
         for needle in [
-            "## Codewhale",
+            "## Nestlone",
             "### Ground truth",
             "### Verify before you claim",
             "### Do what's asked",
@@ -3152,7 +3152,7 @@ start it",
     #[test]
     fn compose_prompt_deterministic_order() {
         let prompt = compose_prompt(Personality::Calm);
-        let base_pos = prompt.find("## Codewhale").unwrap();
+        let base_pos = prompt.find("## Nestlone").unwrap();
         let article_pos = prompt.find("### Ground truth").unwrap();
 
         assert!(base_pos < article_pos);
@@ -3168,7 +3168,7 @@ start it",
         assert!(!prompt.contains("Mode: Plan"));
         assert!(!prompt.contains("Approval Policy:"));
         // Base prompt carries the 0.9.0 compact Constitution.
-        assert!(prompt.contains("You are Codewhale"));
+        assert!(prompt.contains("You are Nestlone"));
         assert!(prompt.contains("Take the work seriously. Don't take"));
     }
 
@@ -3226,7 +3226,7 @@ start it",
                 "{name} mode prompt should remain compact, got {estimated_tokens} estimated tokens"
             );
             for forbidden in [
-                "## Codewhale",
+                "## Nestlone",
                 "## STATUTES (Tier 2)",
                 "## REGULATIONS (Tier 3)",
                 "## EVIDENCE (Tier 6)",
@@ -3276,7 +3276,7 @@ start it",
         assert!(!prompt.contains("Mode: Agent"));
         assert!(!prompt.contains("Approval Policy:"));
         // The compact Constitutional preamble is still present.
-        assert!(prompt.contains("You are Codewhale"));
+        assert!(prompt.contains("You are Nestlone"));
     }
 
     #[test]
@@ -3291,7 +3291,7 @@ start it",
             "personality enum is a no-op — both produce identical output"
         );
         assert!(calm.contains("Take the work seriously. Don't take"));
-        assert!(calm.contains("You are Codewhale"));
+        assert!(calm.contains("You are Nestlone"));
     }
 
     #[test]
@@ -3466,7 +3466,7 @@ start it",
                 },
             ));
 
-        assert!(prompt.contains("## Codewhale"));
+        assert!(prompt.contains("## Nestlone"));
         assert!(prompt.contains("## Language"));
         assert!(prompt.contains("## Output Formatting"));
         assert!(prompt.contains("Use the `lang` field only when"));

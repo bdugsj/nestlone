@@ -455,7 +455,7 @@ fn expand_workspace_path(path: &str) -> Result<PathBuf, String> {
     Ok(PathBuf::from(path))
 }
 
-/// Show Codewhale documentation, community, managed-app, and provider links.
+/// Show Nestlone documentation, community, managed-app, and provider links.
 pub fn nestlone_links(app: &mut App) -> CommandResult {
     let locale = app.ui_locale;
     let active_provider = app.api_provider.as_str();
@@ -466,12 +466,12 @@ pub fn nestlone_links(app: &mut App) -> CommandResult {
 
     let _ = writeln!(
         message,
-        "{} `https://nestlone.local/docs",
+        "{} `https://nestlone.local/docs`",
         tr(locale, MessageId::LinksDocumentation)
     );
     let _ = writeln!(
         message,
-        "{} `https://nestlone.local/docs",
+        "{} `https://nestlone.local/docs`",
         tr(locale, MessageId::LinksCommunity)
     );
     let _ = writeln!(
@@ -826,7 +826,7 @@ mod tests {
         let result = help(&mut app, Some("links"));
         let msg = result.message.expect("help topic should return message");
         assert!(msg.contains("links"));
-        assert!(msg.contains("Show Codewhale, community, and provider links"));
+        assert!(msg.contains("Show Nestlone, community, and provider links"));
         assert!(msg.contains("Usage: /links"));
         assert!(msg.contains("Aliases: dashboard, api"));
     }
@@ -1498,10 +1498,10 @@ mod tests {
         let result = nestlone_links(&mut app);
         assert!(result.message.is_some());
         let msg = result.message.unwrap();
-        assert!(msg.contains("Codewhale & community"));
+        assert!(msg.contains("Nestlone & community"));
         assert!(msg.contains("https://nestlone.local/docs"));
         assert!(msg.contains("https://nestlone.local/docs"));
-        assert!(msg.contains("https://github.com/Hmbown/CodeWhale"));
+        assert!(msg.contains("GitHub: (see project docs)"));
         assert!(msg.contains("https://app.codewhale.net"));
         assert!(msg.contains("separate sign-in"));
         assert!(msg.contains("not connected to the current local session"));
@@ -1590,8 +1590,8 @@ mod tests {
         let result = home_dashboard(&mut app);
         assert!(result.message.is_some());
         let msg = result.message.unwrap();
-        assert!(msg.contains("Codewhale"));
-        assert!(!msg.contains("nestlone Home Dashboard"));
+        assert!(msg.contains("Nestlone"));
+        assert!(!msg.contains("Home Dashboard"));
         assert!(msg.contains("Model:"));
         assert!(msg.contains("Mode:"));
         assert!(msg.contains("Workspace:"));
@@ -1640,7 +1640,7 @@ mod tests {
         let msg = result
             .message
             .expect("home dashboard should return message");
-        assert!(msg.contains("/links      - Codewhale, community & provider links"));
+        assert!(msg.contains("/links      - Nestlone, community & provider links"));
         assert!(msg.contains("/config      - Inspect and change settings"));
         assert!(
             !msg.lines()
@@ -1659,7 +1659,7 @@ mod tests {
             .message
             .expect("home dashboard should return message");
         assert!(
-            msg.contains("Codewhale"),
+            msg.contains("Nestlone"),
             "missing canonical product title:\n{msg}"
         );
         assert!(msg.contains("模型"), "missing zh-Hans model label:\n{msg}");

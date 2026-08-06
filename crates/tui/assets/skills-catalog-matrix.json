@@ -1,6 +1,6 @@
 {
   "_doc": [
-    "Provider-free expectation matrix for the bundled Codewhale starter pack (#4698).",
+    "Provider-free expectation matrix for the bundled Nestlone starter pack (#4698).",
     "This file is an authored contract, not a generated snapshot: the catalog matrix",
     "tests assert a bijection between these entries and BUNDLED_SKILLS, so adding,",
     "removing, or re-flagging a shipped skill fails until this file is updated too.",
@@ -15,7 +15,7 @@
     "in_model_catalogue": "true when the skill renders as an ambient catalogue line",
     "shadowed_aliases": "aliases that collide with another canonical bundled name; the canonical skill wins resolution"
   },
-  "generation": "8",
+  "generation": "10",
   "skills": [
     {
       "name": "skill-creator",
@@ -297,6 +297,38 @@
       "invocation": "explicit-only",
       "aliases": [],
       "in_model_catalogue": false,
+      "shadowed_aliases": []
+    },
+    {
+      "name": "nestlone-security",
+      "tier": "core",
+      "invocation": "model+user",
+      "aliases": [],
+      "in_model_catalogue": true,
+      "shadowed_aliases": []
+    },
+    {
+      "name": "red-team",
+      "tier": "core",
+      "invocation": "model+user",
+      "aliases": [],
+      "in_model_catalogue": true,
+      "shadowed_aliases": []
+    },
+    {
+      "name": "blue-team",
+      "tier": "core",
+      "invocation": "model+user",
+      "aliases": [],
+      "in_model_catalogue": true,
+      "shadowed_aliases": []
+    },
+    {
+      "name": "malware-analyst",
+      "tier": "core",
+      "invocation": "model+user",
+      "aliases": [],
+      "in_model_catalogue": true,
       "shadowed_aliases": []
     }
   ]

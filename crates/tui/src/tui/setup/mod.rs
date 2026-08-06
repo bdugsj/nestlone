@@ -6530,7 +6530,7 @@ mod tests {
         assert!(
             SetupConstitutionFileState::PathError
                 .label(ConstitutionChoice::Unset, Locale::ZhHans)
-                .contains("CODEWHALE_HOME")
+                .contains("NESTLONE_HOME")
         );
     }
 

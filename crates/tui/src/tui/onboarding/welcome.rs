@@ -156,7 +156,7 @@ mod tests {
 
         let body = body(&app);
 
-        assert!(body.contains("Codewhale 会与你协作完成工作"));
+        assert!(body.contains("Nestlone 会与你协作完成工作"));
         assert!(!body.contains("代码在这里有两层含义"));
         assert!(body.contains("接下来：选择语言 -> 选择外观 -> 了解模式与权限 -> 设置提示。"));
         assert!(!body.contains("Press Enter"));

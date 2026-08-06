@@ -18,7 +18,7 @@ use tempfile::TempDir;
 fn doctor_text_leaves_a_sealed_home_untouched() {
     let output = run_sealed_diagnostic(["doctor"]);
     let stdout = String::from_utf8_lossy(&output.stdout);
-    assert!(stdout.contains("nestlone Doctor"), "stdout:\n{stdout}");
+    assert!(stdout.contains("Nestlone Doctor"), "stdout:\n{stdout}");
 }
 
 #[test]
@@ -196,7 +196,7 @@ fn doctor_context_json_leaves_a_sealed_home_untouched() {
 fn setup_status_leaves_a_sealed_home_untouched() {
     let output = run_sealed_diagnostic(["setup", "--status"]);
     let stdout = String::from_utf8_lossy(&output.stdout);
-    assert!(stdout.contains("Codewhale Status"), "stdout:\n{stdout}");
+    assert!(stdout.contains("Nestlone Status"), "stdout:\n{stdout}");
 }
 
 #[test]

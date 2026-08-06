@@ -6317,7 +6317,7 @@ mod tests {
         let context = "nestlone · /tmp/nestlone-test-workspace · no git · mcp 0";
         let context_x = ((100usize - UnicodeWidthStr::width(context)) / 2) as u16;
         let context_cell = (0..area.height)
-            .find_map(|y| (buf[(context_x, y)].symbol() == "c").then_some((context_x, y)))
+            .find_map(|y| (buf[(context_x, y)].symbol() == "n").then_some((context_x, y)))
             .expect("context line");
         assert_eq!(
             buf[context_cell].bg,

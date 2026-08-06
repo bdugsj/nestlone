@@ -114,6 +114,6 @@ mod tests {
         assert!(body.contains("3/U"));
         assert!(body.contains("continue without trusting"));
         assert!(body.contains("2/N/Esc"));
-        assert!(body.contains("quit Codewhale"));
+        assert!(body.contains("quit Nestlone"));
     }
 }

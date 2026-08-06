@@ -853,7 +853,7 @@ mod tests {
             "session-1".to_string(),
             "deepseek-v4-pro".to_string(),
             PathBuf::from("."),
-            Some(SystemPrompt::Text("You are CodeWhale.".to_string())),
+            Some(SystemPrompt::Text("You are Nestlone.".to_string())),
             vec![
                 Message {
                     role: "user".to_string(),
@@ -1077,7 +1077,7 @@ mod tests {
             open_json["preview_500"]
                 .as_str()
                 .unwrap()
-                .contains("CodeWhale")
+                .contains("Nestlone")
         );
 
         RlmTool::alias("rlm_close", "close", None)
