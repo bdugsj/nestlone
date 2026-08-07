@@ -1,6 +1,6 @@
 //! End-to-end TUI scenarios driven through a real pseudo-terminal.
 //!
-//! Each scenario boots `deepseek-tui` in a sealed workspace + sealed `$HOME`,
+//! Each scenario boots `nestlone-tui` in a sealed workspace + sealed `$HOME`,
 //! sends scripted input through the PTY, and asserts on the parsed terminal
 //! frame and on the workspace filesystem. See `support/qa_harness/README.md`
 //! for design + how-to.
@@ -3320,10 +3320,10 @@ where
             let full_width_rules = (0..rows)
                 .filter(|&row| horizontal_rule_fills(frame, row, cols))
                 .count();
-            // Brand-aware header: `cw 🐳` (emoji chip) or legacy `cw  ` spacing.
+            // Brand-aware header: `ns 🐳` (emoji chip) or legacy `ns  ` spacing.
             let header = frame.row(0);
             let brand_header =
-                header.contains("cw  ") || header.contains("cw 🐳") || header.starts_with("cw ");
+                header.contains("ns  ") || header.contains("ns 🐳") || header.starts_with("ns ");
             frame.rows() == rows
                 && frame.cols() == cols
                 && brand_header
