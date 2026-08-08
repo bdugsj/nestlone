@@ -1,7 +1,7 @@
 # Recursive self-improvement prompt
 
-CodeWhale works across supported coding-model routes. One practical way to
-help is to let CodeWhale inspect itself and return a small, reviewable
+Nestlone works across supported coding-model routes. One practical way to
+help is to let Nestlone inspect itself and return a small, reviewable
 improvement.
 
 This is the "100-to-1 model": one clear prompt, many bounded agent runs, one
@@ -11,17 +11,17 @@ rewrite the project. It is a contribution shape.
 > [!Tip]
 > The **100-to-1 model** is a nod to Ralph Bown's 1948 public demonstration of
 > the transistor. The device itself was tiny; the large model made the structure
-> easy to inspect. CodeWhale uses the metaphor in the same practical sense: the
+> easy to inspect. Nestlone uses the metaphor in the same practical sense: the
 > agent may do a lot of cached, tool-using, sub-agent work, but the contribution
 > should arrive as one visible artifact a maintainer can review.
 >
 > **100:1 模型**致敬 Ralph Bown 在 1948 年对晶体管的公开演示。晶体管本身很小，
-> 大比例模型让结构更容易被观察和理解。CodeWhale 借用这个比喻：智能体可以进行大量
+> 大比例模型让结构更容易被观察和理解。Nestlone 借用这个比喻：智能体可以进行大量
 > 带缓存、带工具、带子智能体的工作，但最终交付应当是一个维护者可以审查的清晰产物。
 >
 > **100:1 モデル**は、1948年にラルフ・ボーンが行ったトランジスタの公開デモへの
 > オマージュです。実物は小さく、大きな模型は構造を観察しやすくするためのものでした。
-> CodeWhale はこの比喩を実務的に使います。エージェントはキャッシュ、ツール、サブ
+> Nestlone はこの比喩を実務的に使います。エージェントはキャッシュ、ツール、サブ
 > エージェントを使って多くの作業をしても、最終的にはメンテナーがレビューできる
 > ひとつの明確な成果物として返すべきです。
 
@@ -39,12 +39,12 @@ rewrite the project. It is a contribution shape.
 
 ## English
 
-Paste this into CodeWhale from the repository root:
+Paste this into Nestlone from the repository root:
 
 ```text
-You are running inside CodeWhale. Use the model route selected for this run.
+You are running inside Nestlone. Use the model route selected for this run.
 
-Your task is to improve CodeWhale itself by finding exactly one small,
+Your task is to improve Nestlone itself by finding exactly one small,
 reviewable place where the harness, docs, tests, or contributor workflow causes
 friction.
 
@@ -78,12 +78,12 @@ Output:
 
 ## 简体中文
 
-从仓库根目录把这段粘贴到 CodeWhale：
+从仓库根目录把这段粘贴到 Nestlone：
 
 ```text
-你正在 CodeWhale 中运行。请使用本次运行所选的模型路由。
+你正在 Nestlone 中运行。请使用本次运行所选的模型路由。
 
-你的任务是改进 CodeWhale 本身：只找一个很小、可审查的点，看看这个
+你的任务是改进 Nestlone 本身：只找一个很小、可审查的点，看看这个
 智能体框架、文档、测试或贡献流程哪里让人不顺手，然后产出一个维护者
 可以快速审查的补丁。
 
@@ -114,12 +114,12 @@ Output:
 
 ## 日本語
 
-リポジトリのルートで、このプロンプトを CodeWhale に貼り付けます。
+リポジトリのルートで、このプロンプトを Nestlone に貼り付けます。
 
 ```text
-あなたは CodeWhale の中で動いています。この実行で選択されたモデルルートを使ってください。
+あなたは Nestlone の中で動いています。この実行で選択されたモデルルートを使ってください。
 
-目的は CodeWhale 自体を改善することです。ただし、対象はひとつだけに
+目的は Nestlone 自体を改善することです。ただし、対象はひとつだけに
 絞ります。ハーネス、ドキュメント、テスト、またはコントリビューター
 体験の中から、小さくレビューしやすい摩擦点を見つけてください。
 

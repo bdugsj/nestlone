@@ -1,4 +1,4 @@
-# Codewhale Runtime Simplification Design
+# Nestlone Runtime Simplification Design
 
 ## Goal
 
@@ -82,7 +82,7 @@ synthetic always-active catalog entry.
 - Behavior-preserving: targeted unit tests for `File`, `Git`, `Run`, and `Web`
   dispatch against legacy inputs.
 - Regression: `cargo fmt`, `cargo clippy --workspace --all-targets --locked`,
-  `cargo test -p codewhale-tui --bin codewhale-tui --locked`, and
+  `cargo test -p nestlone-tui --bin nestlone-tui --locked`, and
   `cargo test --workspace`.
 
 ### v0.9.1 receipt

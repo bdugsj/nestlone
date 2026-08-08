@@ -1,6 +1,6 @@
 # MCP (External Tool Servers)
 
-codewhale can load additional tools via MCP (Model Context Protocol). MCP servers can be local stdio processes that the TUI starts, or remote URL-based servers that speak Streamable HTTP with legacy SSE fallback.
+nestlone can load additional tools via MCP (Model Context Protocol). MCP servers can be local stdio processes that the TUI starts, or remote URL-based servers that speak Streamable HTTP with legacy SSE fallback.
 
 Browsing note:
 - `Web` is the canonical, deferred built-in browsing tool; it provides
@@ -9,9 +9,9 @@ Browsing note:
   aliases. New prompts and integrations should use `Web`.
 
 Server mode note:
-- `codewhale-tui serve --mcp` runs the MCP stdio server.
-- `codewhale-tui serve --http` runs the runtime HTTP/SSE API (separate mode).
-- The `codewhale` dispatcher exposes `codewhale mcp-server` as an equivalent stdio
+- `nestlone-tui serve --mcp` runs the MCP stdio server.
+- `nestlone-tui serve --http` runs the runtime HTTP/SSE API (separate mode).
+- The `nestlone` dispatcher exposes `nestlone mcp-server` as an equivalent stdio
   entrypoint used by the split CLI.
 
 ## Setup wizard vs manual MCP setup (#3407)
@@ -23,8 +23,8 @@ step. That step is discovery/readiness only:
 | --- | --- |
 | Show configured servers as `healthy` / `needs_config` / `off` | Start or connect MCP servers |
 | Report config path presence (global + project) | Write or edit `mcp.json` contents |
-| Safe static health probe (missing command/url, broken absolute path, missing bearer env) | `codewhale mcp validate`, live connect, OAuth login |
-| Point at safe on-ramps (`/mcp`, `codewhale mcp init`, `codewhale doctor`) | Install community skills, trust skills, enable plugins |
+| Safe static health probe (missing command/url, broken absolute path, missing bearer env) | `nestlone mcp validate`, live connect, OAuth login |
+| Point at safe on-ramps (`/mcp`, `nestlone mcp init`, `nestlone doctor`) | Install community skills, trust skills, enable plugins |
 | Share Hotbar source counts from the same skill/MCP adapters (#3399) | Bind Hotbar slots (Hotbar step / `H`) |
 | Record optional/`needs_action` setup_state without blocking first-run | Anything that spawns processes or installs packages |
 
@@ -34,7 +34,7 @@ yet, that’s fine.” Failing or incomplete configured servers surface as
 Enumeration never executes MCP/plugin commands beyond the static probe.
 Summaries redact commands, args, env, headers, and tokens.
 
-`codewhale doctor` reports MCP/skills/tools/plugins health with the same
+`nestlone doctor` reports MCP/skills/tools/plugins health with the same
 optional-surface intent (paths, counts, static checks) so wizard and doctor
 stay consistent.
 
@@ -71,25 +71,25 @@ cancellation. MCP subscriptions are not exposed through plugin bundles. See
 Create a starter MCP config at your resolved MCP path:
 
 ```bash
-codewhale-tui mcp init
+nestlone-tui mcp init
 ```
 
-`codewhale-tui setup --mcp` performs the same MCP bootstrap alongside skills setup.
+`nestlone-tui setup --mcp` performs the same MCP bootstrap alongside skills setup.
 
 Common management commands:
 
 ```bash
-codewhale-tui mcp list
-codewhale-tui mcp tools [server]
-codewhale-tui mcp add <name> --command "<cmd>" --arg "<arg>"
-codewhale-tui mcp add <name> --url "http://localhost:3000/mcp"
-codewhale-tui mcp add <name> --url "https://example.com/mcp" --bearer-token-env-var MCP_TOKEN
-codewhale-tui mcp login <name>
-codewhale-tui mcp logout <name>
-codewhale-tui mcp enable <name>
-codewhale-tui mcp disable <name>
-codewhale-tui mcp remove <name>
-codewhale-tui mcp validate
+nestlone-tui mcp list
+nestlone-tui mcp tools [server]
+nestlone-tui mcp add <name> --command "<cmd>" --arg "<arg>"
+nestlone-tui mcp add <name> --url "http://localhost:3000/mcp"
+nestlone-tui mcp add <name> --url "https://example.com/mcp" --bearer-token-env-var MCP_TOKEN
+nestlone-tui mcp login <name>
+nestlone-tui mcp logout <name>
+nestlone-tui mcp enable <name>
+nestlone-tui mcp disable <name>
+nestlone-tui mcp remove <name>
+nestlone-tui mcp validate
 ```
 
 ## In-TUI Manager
@@ -146,19 +146,19 @@ For bearer-token auth, prefer env-backed config:
 For generic remote MCP OAuth, add the URL server and run login:
 
 ```bash
-codewhale-tui mcp add remote --url "https://example.com/mcp"
-codewhale-tui mcp login remote
+nestlone-tui mcp add remote --url "https://example.com/mcp"
+nestlone-tui mcp login remote
 ```
 
-Codewhale discovers the server OAuth metadata, opens the authorization URL in
+Nestlone discovers the server OAuth metadata, opens the authorization URL in
 your browser, listens on a local callback, exchanges the code, and stores the
-token response through the Codewhale secrets backend. Stored OAuth tokens are
+token response through the Nestlone secrets backend. Stored OAuth tokens are
 looked up by server name plus URL and refreshed when possible before requests.
 During login, the CLI prints the authorization URL and a waiting status while
 the local callback listener is active. If a URL-based server returns 401 or
-Unauthorized during connect/discovery, `codewhale mcp connect <name>` reports
+Unauthorized during connect/discovery, `nestlone mcp connect <name>` reports
 that OAuth authentication is required and points to
-`codewhale mcp login <name>`. Resource helper listings also surface an
+`nestlone mcp login <name>`. Resource helper listings also surface an
 `authentication_required` entry for auth-shaped failures instead of silently
 looking empty.
 
@@ -192,20 +192,20 @@ These callback fields are ignored from project-scope config overlays.
 ## Hugging Face MCP
 
 Hugging Face provides a hosted MCP server for Hub resources, documentation,
-datasets, Spaces, and community tools. Codewhale does not call Hugging Face's
+datasets, Spaces, and community tools. Nestlone does not call Hugging Face's
 Hub HTTP APIs from `/hf`; it only helps you inspect and set up the MCP config
 that the regular MCP manager will load.
 
 The recommended setup path is Hugging Face's settings-generated configuration:
 
 1. Visit <https://huggingface.co/settings/mcp> while signed in.
-2. Choose the MCP client closest to your Codewhale config shape and copy the
+2. Choose the MCP client closest to your Nestlone config shape and copy the
    generated server snippet.
 3. Paste the Hugging Face server entry into your resolved MCP config file.
-4. Restart Codewhale, or run `/mcp reload` for the manager snapshot and restart
+4. Restart Nestlone, or run `/mcp reload` for the manager snapshot and restart
    if the model-visible tool pool still needs to rebuild.
 
-Codewhale reads both `servers` and `mcpServers`, so settings-generated snippets
+Nestlone reads both `servers` and `mcpServers`, so settings-generated snippets
 can be adapted without changing the rest of the MCP file. A placeholder-only
 shape looks like this:
 
@@ -243,14 +243,14 @@ Official docs: <https://huggingface.co/docs/hub/hf-mcp-server>
 
 Default path:
 
-- `~/.codewhale/mcp.json` (`~/.deepseek/mcp.json` is still read when the Codewhale file is absent)
+- `~/.nestlone/mcp.json` (`~/.deepseek/mcp.json` is still read when the Nestlone file is absent)
 
 Overrides:
 
 - Config: `mcp_config_path = "/path/to/mcp.json"`
 - Env: `DEEPSEEK_MCP_CONFIG=/path/to/mcp.json`
 
-`codewhale-tui mcp init` (and `codewhale-tui setup --mcp`) writes to this resolved path.
+`nestlone-tui mcp init` (and `nestlone-tui setup --mcp`) writes to this resolved path.
 
 The interactive `/config` editor also exposes `mcp_config_path`. Changing it in
 the TUI updates the path used by `/mcp`, and requires a restart before the
@@ -308,25 +308,25 @@ You can register your local DeepSeek binary as an MCP server so other DeepSeek s
 ### Quick Setup
 
 ```bash
-codewhale-tui mcp add-self
+nestlone-tui mcp add-self
 ```
 
-This resolves the current binary path, generates a config entry that runs `codewhale-tui serve --mcp`, and writes it to your MCP config file. The default server name is `codewhale`.
+This resolves the current binary path, generates a config entry that runs `nestlone-tui serve --mcp`, and writes it to your MCP config file. The default server name is `nestlone`.
 
 Options:
 
-- `--name <NAME>` — custom server name (default: `codewhale`)
+- `--name <NAME>` — custom server name (default: `nestlone`)
 - `--workspace <PATH>` — workspace directory for the server
 
 ### Manual Config
 
-Equivalent manual entry in `~/.codewhale/mcp.json`:
+Equivalent manual entry in `~/.nestlone/mcp.json`:
 
 ```json
 {
   "servers": {
-    "codewhale": {
-      "command": "/path/to/codewhale",
+    "nestlone": {
+      "command": "/path/to/nestlone",
       "args": ["serve", "--mcp"],
       "env": {}
     }
@@ -334,9 +334,9 @@ Equivalent manual entry in `~/.codewhale/mcp.json`:
 }
 ```
 
-The `codewhale-tui` binary supports `serve --mcp` directly. The `codewhale`
-dispatcher offers the equivalent `codewhale mcp-server` stdio entrypoint. Use
-whichever is on your `PATH` (run `which codewhale` or `which codewhale-tui` to
+The `nestlone-tui` binary supports `serve --mcp` directly. The `nestlone`
+dispatcher offers the equivalent `nestlone mcp-server` stdio entrypoint. Use
+whichever is on your `PATH` (run `which nestlone` or `which nestlone-tui` to
 find the full path). The `mcp add-self` command automatically resolves the
 correct binary.
 
@@ -350,17 +350,17 @@ correct binary.
 
 Tools from a self-hosted DeepSeek server follow the standard naming convention:
 
-- `mcp_deepseek_<tool>` (if the server is named `codewhale`)
+- `mcp_deepseek_<tool>` (if the server is named `nestlone`)
 
 For example, the `shell` tool becomes `mcp_deepseek_shell`.
 
 ### MCP Server vs HTTP/SSE API vs ACP
 
-| | `codewhale-tui serve --mcp` | `codewhale-tui serve --http` | `codewhale-tui serve --acp` |
+| | `nestlone-tui serve --mcp` | `nestlone-tui serve --http` | `nestlone-tui serve --acp` |
 |---|---|---|---|
 | **Protocol** | MCP stdio | HTTP/SSE JSON-RPC | ACP stdio |
 | **Use case** | Tool server for MCP clients | Runtime API for apps | Editor agent for Zed/custom ACP clients |
-| **Config** | `~/.codewhale/mcp.json` entry | Direct URL connection | Editor `agent_servers` custom command |
+| **Config** | `~/.nestlone/mcp.json` entry | Direct URL connection | Editor `agent_servers` custom command |
 | **Lifecycle** | Spawned per client session | Long-running daemon | Spawned per editor agent session |
 
 Use `mcp add-self` when you want DeepSeek tools available to other MCP clients.
@@ -372,8 +372,8 @@ Use `serve --acp` when an editor wants to talk to DeepSeek as an ACP agent.
 After adding, test the connection:
 
 ```bash
-codewhale-tui mcp validate
-codewhale-tui mcp tools codewhale
+nestlone-tui mcp validate
+nestlone-tui mcp tools nestlone
 ```
 
 ## Server Fields
@@ -411,7 +411,7 @@ Avoid committing literal `Authorization` headers. Prefer `env_headers`,
 
 ## Troubleshooting
 
-- Run `codewhale-tui doctor` to confirm the MCP config path it resolved and whether it exists.
+- Run `nestlone-tui doctor` to confirm the MCP config path it resolved and whether it exists.
 - In the TUI, run `/mcp validate` to refresh the visible server/tool snapshot.
-- If the MCP config is missing, run `codewhale-tui mcp init --force` to regenerate it.
+- If the MCP config is missing, run `nestlone-tui mcp init --force` to regenerate it.
 - If tools don’t appear, verify the server command works from your shell and that the server supports MCP `tools/list`.

@@ -59,10 +59,10 @@ StreamFn (shared decode loop) is still deferred.
 
 ## Reserved vocabulary: "Operation" (not shipped, not a rename)
 
-**Workflow keeps its name.** `/workflow`, `codewhale workflow`, the `workflow`
+**Workflow keeps its name.** `/workflow`, `nestlone workflow`, the `workflow`
 tool, the `[workflow]` config table, `*.workflow.js` sources, and the public
 vocabulary below are unchanged in v0.9.2, and no `/operation` or
-`codewhale operation` alias ships.
+`nestlone operation` alias ships.
 
 The public vocabulary stays:
 

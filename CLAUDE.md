@@ -29,10 +29,10 @@ version, because it governs almost every judgment call you will make here:
 - Treat community PRs and issues as maintainer evidence. Inspect code, tests,
   linked issues, comments, and CI before merging, harvesting, closing, or
   deferring work.
-- CodeWhale started as a DeepSeek-only harness; it's now about building the
-  greatest possible coding harness with the help of an open-source community.
-  Keep CodeWhale branding and every model/provider first-class — none
-  privileged — and preserve legacy migration care.
+- Nestlone is a fork of CodeWhale, which started as a DeepSeek-only harness;
+  it's now about building the greatest possible coding harness with the help of
+  an open-source community. Keep Nestlone branding and every model/provider
+  first-class — none privileged — and preserve legacy migration care.
 - Preserve contributor credit for harvested work with authorship,
   `Co-authored-by`, `Harvested from PR #N by @handle`, and changelog/release
   notes where applicable. Keep `Co-authored-by` trailers to human contributors,
@@ -71,7 +71,7 @@ merge is an excavation, stop and apply "Intent is the artifact" instead.
   branch before editing.
 - Read the workspace version from `Cargo.toml`; it advances per release lane.
 - Base release triage on the current GitHub release milestone named in the active
-  handoff (`gh issue list --repo Hmbown/CodeWhale --milestone "<current>" --state open`)
+  handoff (`gh issue list --repo bdugsj/nestlone --milestone "<current>" --state open`)
   unless Hunter gives a newer branch/milestone.
 - Work the queue in this order: release blockers, recently approved PRs, clean
   PRs with small scope, blocked PRs with obvious fixes, dirty PRs that can be

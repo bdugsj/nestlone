@@ -82,7 +82,7 @@ The same toggles are reachable from the command palette:
 * `/settings set calm_mode on`
 * `/settings set status_indicator off`
 
-Settings written this way persist to `~/.codewhale/settings.toml` on new
+Settings written this way persist to `~/.nestlone/settings.toml` on new
 installs, with legacy `~/.deepseek/settings.toml` and platform config-dir
 settings kept as compatibility fallbacks.
 The `NO_ANIMATIONS` env var still wins at startup if it's set, so

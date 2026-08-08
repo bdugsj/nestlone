@@ -1,6 +1,6 @@
-# Berkontribusi pada Codewhale
+# Berkontribusi pada Nestlone
 
-Terima kasih atas minat Anda untuk berkontribusi pada Codewhale! Dokumen ini memberikan panduan dan instruksi untuk berkontribusi.
+Terima kasih atas minat Anda untuk berkontribusi pada Nestlone! Dokumen ini memberikan panduan dan instruksi untuk berkontribusi.
 
 ---
 
@@ -16,8 +16,8 @@ Terima kasih atas minat Anda untuk berkontribusi pada Codewhale! Dokumen ini mem
 
 1. Fork dan klon repositori:
    ```bash
-   git clone https://github.com/USERNAME_ANDA/CodeWhale.git
-   cd CodeWhale
+   git clone https://github.com/USERNAME_ANDA/Nestlone.git
+   cd Nestlone
    ```
 
 2. Kompilasi proyek:
@@ -32,7 +32,7 @@ Terima kasih atas minat Anda untuk berkontribusi pada Codewhale! Dokumen ini mem
 
 4. Jalankan dalam mode pengembangan:
    ```bash
-   cargo run --bin codewhale
+   cargo run --bin nestlone
    ```
 
 ---

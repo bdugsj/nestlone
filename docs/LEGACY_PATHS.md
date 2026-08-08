@@ -1,9 +1,12 @@
 # Legacy `.deepseek/` compatibility paths — audit & migration status (#3068)
 
-Codewhale was renamed from DeepSeek-TUI. To avoid breaking existing installs, the runtime reads
-state from the new `~/.codewhale/` location but **falls back** to the legacy `~/.deepseek/` location,
-and always **writes** to `~/.codewhale/`. This doc audits each legacy reference and records a
-keep / deprecate / remove decision so the migration is auditable.
+The Nestlone runtime (fork of Codewhale, which was itself renamed from
+DeepSeek-TUI) reads state from the canonical `~/.nestlone/` location but
+**falls back** to the legacy `~/.deepseek/` location, and always **writes** to
+`~/.nestlone/`. The intermediate Codewhale-era `~/.codewhale/` directory is not
+migrated; Nestlone profiles start fresh in `~/.nestlone/`. This doc audits each
+legacy reference and records a keep / deprecate / remove decision so the
+migration is auditable.
 
 ## The canonical resolver (use this for new code)
 
@@ -11,21 +14,25 @@ State-dir resolution is consolidated in `crates/config/src/lib.rs`:
 
 | Symbol | Line | Purpose |
 |---|---|---|
-| `CODEWHALE_APP_DIR = ".codewhale"` | 3428 | canonical app dir |
-| `LEGACY_APP_DIR = ".deepseek"` | 3431 | legacy app dir (fallback only) |
-| `codewhale_home()` | 3437 | `~/.codewhale` |
-| `legacy_deepseek_home()` | 3451 | `~/.deepseek` (legacy) |
-| `resolve_state_dir(subdir)` | 3469 | **read** path: `~/.codewhale/<subdir>`, falling back to `~/.deepseek/<subdir>` when only the legacy dir exists |
-| `ensure_state_dir(subdir)` | 3484 | **write** path: always creates under `~/.codewhale/<subdir>` |
+| `NESTLONE_APP_DIR = ".nestlone"` | 4396 | canonical app dir |
+| `LEGACY_APP_DIR = ".deepseek"` | 4399 | legacy app dir (fallback only) |
+| `nestlone_home()` | 4406 | `~/.nestlone` |
+| `legacy_deepseek_home()` | 4437 | `~/.deepseek` (legacy) |
+| `resolve_state_dir(subdir)` | 4487 | **read** path: `~/.nestlone/<subdir>`, falling back to `~/.deepseek/<subdir>` when only the legacy dir exists |
+| `ensure_state_dir(subdir)` | 4511 | **write** path: always creates under `~/.nestlone/<subdir>` |
 
-Migration contract: read-with-fallback, write-to-new. This preserves the v0.8.44 migration for
-users who still have `~/.deepseek/` while steering all new writes to `~/.codewhale/`.
+Migration contract: read-with-fallback, write-to-new, migrate-on-first-write.
+`ensure_state_dir` relocates a legacy `~/.deepseek/<subdir>` into
+`~/.nestlone/<subdir>` on first write and removes the legacy copy (#3240);
+`resolve_state_dir` keeps reading the legacy location while the primary does
+not exist. This preserves the v0.8.44 migration for users who still have
+`~/.deepseek/` while steering all new writes to `~/.nestlone/`.
 
 ## Per-path decisions
 
 **Decision for all legacy references below: keep-as-fallback.** Removing the `.deepseek` fallback
 would strand users who upgraded in place and never re-ran onboarding. Revisit only after a release
-that actively migrates `~/.deepseek/` → `~/.codewhale/` on first run and a deprecation window.
+that actively migrates `~/.deepseek/` → `~/.nestlone/` on first run and a deprecation window.
 
 | Reference | Routed through `resolve_state_dir`? | Decision |
 |---|---|---|
@@ -42,7 +49,7 @@ that actively migrates `~/.deepseek/` → `~/.codewhale/` on first run and a dep
 ## Follow-up (separate, non-doc change — out of scope for #3068)
 
 The optional consolidation the issue mentions — routing the hardcoded sites above through
-`resolve_state_dir`/`ensure_state_dir` instead of joining `.deepseek`/`.codewhale` by hand — is a
+`resolve_state_dir`/`ensure_state_dir` instead of joining `.deepseek`/`.nestlone` by hand — is a
 small refactor that should land as its own PR with tests asserting read-fallback + write-to-new for
 each migrated site. It is intentionally kept out of this audit so the documentation can land safely
 on its own.

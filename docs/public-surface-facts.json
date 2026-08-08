@@ -11,7 +11,7 @@
       "Lane": "one running Workflow instance",
       "Runtime": "where and how a Lane executes"
     },
-    "sources": ["Cargo.toml", "LICENSE", "README.md", "npm/codewhale/package.json", "docs/FLEET.md"]
+    "sources": ["Cargo.toml", "LICENSE", "README.md", "npm/nestlone/package.json", "docs/FLEET.md"]
   },
   "sourceCandidate": {
     "version": "0.0.2",
@@ -50,7 +50,7 @@
       "requiresMatchingPublishedAssets": true,
       "sourceBuild": true
     },
-    "sources": ["README.md", "npm/codewhale/package.json", "npm/codewhale/README.md", "npm/codewhale/scripts/artifacts.js", "docs/INSTALL.md", "docs/CNB_MIRROR.md"]
+    "sources": ["README.md", "npm/nestlone/package.json", "npm/nestlone/README.md", "npm/nestlone/scripts/artifacts.js", "docs/INSTALL.md", "docs/CNB_MIRROR.md"]
   },
   "control": {
     "modes": ["Plan", "Act", "Operate"],

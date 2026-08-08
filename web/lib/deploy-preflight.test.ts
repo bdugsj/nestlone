@@ -1,11 +1,14 @@
 import { spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
-const script = new URL("../scripts/check-cloudflare-deploy-env.mjs", import.meta.url);
+const script = fileURLToPath(
+  new URL("../scripts/check-cloudflare-deploy-env.mjs", import.meta.url),
+);
 
 function run(overrides: Record<string, string>, args: string[] = []) {
-  return spawnSync(process.execPath, [script.pathname, ...args], {
+  return spawnSync(process.execPath, [script, ...args], {
     encoding: "utf8",
     env: {
       ...process.env,

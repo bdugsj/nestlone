@@ -1,12 +1,12 @@
 # Integrasi MCP (Server Alat Eksternal)
 
-Codewhale dapat memuat alat tambahan melalui **MCP (Model Context Protocol)**. Server MCP dapat berupa proses stdio lokal yang dijalankan oleh TUI, atau server jarak jauh berbasis URL yang menggunakan Streamable HTTP dengan fallback SSE.
+Nestlone dapat memuat alat tambahan melalui **MCP (Model Context Protocol)**. Server MCP dapat berupa proses stdio lokal yang dijalankan oleh TUI, atau server jarak jauh berbasis URL yang menggunakan Streamable HTTP dengan fallback SSE.
 
 ---
 
 ## Konfigurasi Server MCP
 
-Konfigurasi server MCP disimpan di dalam `mcp.json` (baik di `$CODEWHALE_HOME/mcp.json` untuk global atau `.codewhale/mcp.json` untuk proyek).
+Konfigurasi server MCP disimpan di dalam `mcp.json` (baik di `$CODEWHALE_HOME/mcp.json` untuk global atau `.nestlone/mcp.json` untuk proyek).
 
 Contoh konfigurasi `mcp.json`:
 
@@ -30,5 +30,5 @@ Contoh konfigurasi `mcp.json`:
 ## Perintah CLI & TUI untuk MCP
 
 - `/mcp` — Kelola server dan alat MCP dari dalam TUI.
-- `codewhale mcp init` — Inisialisasi templat konfigurasi `mcp.json`.
-- `codewhale doctor` — Periksa kesehatan dan kesiapan server MCP yang terkonfigurasi.
+- `nestlone mcp init` — Inisialisasi templat konfigurasi `mcp.json`.
+- `nestlone doctor` — Periksa kesehatan dan kesiapan server MCP yang terkonfigurasi.

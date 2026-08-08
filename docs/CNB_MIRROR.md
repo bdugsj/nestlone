@@ -1,6 +1,6 @@
 # CNB Cool mirror
 
-`cnb.cool/codewhale.net/codewhale` is a one-way mirror of this
+`cnb.cool/codewhale.net/nestlone` is a one-way mirror of this
 GitHub repository for users on networks where GitHub is slow or blocked
 (primarily mainland China). The mirror receives every push to `main`, every
 `fix/*`, `rebrand/*`, and `work/v*` branch used for first-party release work,
@@ -13,7 +13,7 @@ originate at `github.com/Hmbown/CodeWhale`. The CNB mirror is a read-only
 replica maintained by the `Sync to CNB` workflow — it exists solely to serve
 users behind GFW-blocked or slow GitHub connections.
 
-Every CNB release includes `codewhale-artifacts-sha256.txt` — a SHA256 manifest
+Every CNB release includes `nestlone-artifacts-sha256.txt` — a SHA256 manifest
 of the CNB-built Linux x64 binaries, generated from the same source commit that
 is tagged on GitHub. (CNB builds from source, so these checksums cover the
 CNB-built artifacts, not GitHub's release assets.) Verify a downloaded binary
@@ -21,7 +21,7 @@ against it:
 
 ```bash
 # Verify a downloaded CNB binary against the CNB manifest
-sha256sum -c codewhale-artifacts-sha256.txt --ignore-missing
+sha256sum -c nestlone-artifacts-sha256.txt --ignore-missing
 ```
 
 ## How it works
@@ -56,10 +56,10 @@ mirror carry them to CNB.
 When CNB receives a `v*` tag, the root `.cnb.yml` tag pipeline builds Linux x64
 release assets from source and publishes a CNB release with:
 
-- `codewhale-linux-x64`
+- `nestlone-linux-x64`
 - `codew-linux-x64`
-- `codewhale-tui-linux-x64`
-- `codewhale-artifacts-sha256.txt`
+- `nestlone-tui-linux-x64`
+- `nestlone-artifacts-sha256.txt`
 
 This gives users who can reach CNB but not GitHub a CNB-native release path.
 GitHub remains the canonical macOS/Windows release matrix; the CNB tag pipeline
@@ -75,7 +75,7 @@ Linux Rust gates run on Tencent-hosted runners instead of GitHub Actions:
 - `cargo check --workspace --all-targets --locked`
 - `cargo clippy --workspace --all-targets --all-features --locked -- -D warnings`
 - `cargo test --workspace --all-features --locked`
-- `cargo build --release --locked -p codewhale-cli -p codewhale-tui`
+- `cargo build --release --locked -p nestlone-cli -p nestlone-tui`
 - `node scripts/release/npm-wrapper-smoke.js`
 
 Release branches matching `work/v*` also run
@@ -89,12 +89,12 @@ should have both the new commit on `main` and the new tag:
 
 ```bash
 # Quick check: does the new tag exist on CNB?
-git ls-remote https://cnb.cool/codewhale.net/codewhale.git \
+git ls-remote https://cnb.cool/codewhale.net/nestlone.git \
     refs/tags/vX.Y.Z
 
 # Quick check: is CNB's main at the same commit as origin/main?
 gh_main=$(git ls-remote https://github.com/Hmbown/CodeWhale.git refs/heads/main | awk '{print $1}')
-cnb_main=$(git ls-remote https://cnb.cool/codewhale.net/codewhale.git refs/heads/main | awk '{print $1}')
+cnb_main=$(git ls-remote https://cnb.cool/codewhale.net/nestlone.git refs/heads/main | awk '{print $1}')
 test "$gh_main" = "$cnb_main" && echo "in sync" || echo "DIVERGED: gh=$gh_main cnb=$cnb_main"
 ```
 
@@ -149,7 +149,7 @@ expired:
    ```
 4. Confirm the run succeeds via `gh run list --workflow=sync-cnb.yml`.
 
-## Binary release assets and `codewhale update`
+## Binary release assets and `nestlone update`
 
 CNB now builds Linux x64 assets for `v*` tags from the source-controlled
 `.cnb.yml` pipeline. GitHub remains the canonical macOS/Windows release matrix. Users
@@ -157,8 +157,8 @@ behind GitHub-blocking networks should use one of these paths:
 
 - **`cargo install`** from the CNB mirror:
   ```bash
-  cargo install --git https://cnb.cool/codewhale.net/codewhale --tag vX.Y.Z codewhale-cli
-  cargo install --git https://cnb.cool/codewhale.net/codewhale --tag vX.Y.Z codewhale-tui
+  cargo install --git https://cnb.cool/codewhale.net/nestlone --tag vX.Y.Z nestlone-cli
+  cargo install --git https://cnb.cool/codewhale.net/nestlone --tag vX.Y.Z nestlone-tui
   ```
   (Both binaries are required — the dispatcher and the TUI ship
   separately; see `AGENTS.md` for the two-binary install rationale.)
@@ -167,8 +167,8 @@ behind GitHub-blocking networks should use one of these paths:
   [INSTALL.md](INSTALL.md#4-install-via-cargo-any-tier-1-rust-target).
 
 - **CNB release assets** for Linux x64, when the matching CNB tag pipeline has
-  completed successfully. Download `codewhale-linux-x64`, `codew-linux-x64`,
-  `codewhale-tui-linux-x64`, and `codewhale-artifacts-sha256.txt` from the CNB
+  completed successfully. Download `nestlone-linux-x64`, `codew-linux-x64`,
+  `nestlone-tui-linux-x64`, and `nestlone-artifacts-sha256.txt` from the CNB
   release for `vX.Y.Z`, then verify the binaries against the manifest. The npm
   wrapper can select this source with `CODEWHALE_USE_CNB_MIRROR=1` on Linux x64
   and OpenHarmony x64 only; other platforms must use GitHub or a complete
@@ -176,11 +176,11 @@ behind GitHub-blocking networks should use one of these paths:
 
 - **`DEEPSEEK_TUI_RELEASE_BASE_URL`** environment variable, if a
   CDN mirror of release assets exists. The npm
-  wrapper installer and `codewhale update` read this variable to redirect
-  binary downloads. For `codewhale update`, also set
+  wrapper installer and `nestlone update` read this variable to redirect
+  binary downloads. For `nestlone update`, also set
   `DEEPSEEK_TUI_VERSION=X.Y.Z` so the updater can label the mirrored
   release without contacting GitHub. The directory pointed to must contain
-  `codewhale-artifacts-sha256.txt` and the platform binaries; format matches
+  `nestlone-artifacts-sha256.txt` and the platform binaries; format matches
   a GitHub Release asset directory.
 
 ## Clone from CNB
@@ -188,7 +188,7 @@ behind GitHub-blocking networks should use one of these paths:
 For a stable install, clone `main` or a release tag from:
 
 ```bash
-https://cnb.cool/codewhale.net/codewhale.git
+https://cnb.cool/codewhale.net/nestlone.git
 ```
 
 The mirror receives `main`, release tags, and matched release branches. GitHub

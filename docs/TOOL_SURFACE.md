@@ -77,7 +77,7 @@ state never becomes model-facing Work grounding.
 That distinction is enforced at the request boundary (#3983): the current To-do
 snapshot is rendered by one bounded renderer
 (`crates/tui/src/work_grounding.rs`) and appended to each parent turn-loop and
-sub-agent step request as a transient `<codewhale:work_state>` block. Forked
+sub-agent step request as a transient `<nestlone:work_state>` block. Forked
 sub-agents and `/relay` handoffs embed the byte-identical body. An empty To-do
 emits no block at all.
 
@@ -95,7 +95,7 @@ the active or deferred catalog only when their implementation and host
 dependencies are available.
 
 MCP tools are dynamic. Successfully connected servers register names such as
-`mcp_<server>_<tool>` from `~/.codewhale/mcp.json`; a failed or disabled server
+`mcp_<server>_<tool>` from `~/.nestlone/mcp.json`; a failed or disabled server
 must not be presented as an available model tool.
 
 ## Inspect the model-client request tool payload
@@ -263,9 +263,9 @@ catalog and alias visibility at the exact candidate SHA:
 
 ```bash
 python3 scripts/measure-runtime-contract.py
-cargo test -p codewhale-tui --bin codewhale-tui --locked canonical_runtime_tools_hide_legacy_aliases
-cargo test -p codewhale-tui --bin codewhale-tui --locked shell_alias_tools_hidden_from_model_catalog
-cargo test -p codewhale-tui --bin codewhale-tui --locked runtime_task_families_expose_canonical_tools_with_hidden_aliases
+cargo test -p nestlone-tui --bin nestlone-tui --locked canonical_runtime_tools_hide_legacy_aliases
+cargo test -p nestlone-tui --bin nestlone-tui --locked shell_alias_tools_hidden_from_model_catalog
+cargo test -p nestlone-tui --bin nestlone-tui --locked runtime_task_families_expose_canonical_tools_with_hidden_aliases
 ```
 
 The provider-free full-policy receipt enables built-in memory and must report the

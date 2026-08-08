@@ -1,4 +1,4 @@
-# The CodeWhale Agent Runtime — one durable substrate, familiar launchers
+# The Nestlone Agent Runtime — one durable substrate, familiar launchers
 
 This document explains how sub-agents, the headless `exec` path, and Agent Fleet
 relate. It exists because these had drifted into *two* parallel "worker"
@@ -25,11 +25,11 @@ runtime, or a different way to *observe* it.
             launches │              │              │ launches
                      │              │              │
         ┌────────────┴───┐  ┌───────┴────────┐  ┌──┴───────────────────┐
-        │   TUI turn     │  │ `codewhale     │  │   Agent Fleet         │
+        │   TUI turn     │  │ `nestlone     │  │   Agent Fleet         │
         │  (interactive, │  │   exec`        │  │  (durable: ledger,    │
         │   in-process)  │  │  (headless CLI,│  │   scheduler, SSH,     │
         │                │  │   anyone/any-  │  │   alerts) — launches   │
-        │                │  │   time)        │  │   `codewhale exec`     │
+        │                │  │   time)        │  │   `nestlone exec`     │
         └────────────────┘  └────────────────┘  │   per worker          │
                                                  └───────────────────────┘
 ```
@@ -38,12 +38,12 @@ runtime, or a different way to *observe* it.
   (`explore`, `review`, `implementer`, `verifier`, ...). It should be backed by
   the same worker run lifecycle as fleet. `agent` is the model-facing launcher,
   not a second runtime.
-- **`codewhale exec`** is the headless front door: usable by anyone at any time
+- **`nestlone exec`** is the headless front door: usable by anyone at any time
   (CI, scripts, another agent), full tools, emits a `stream-json` event stream,
   and can spawn sub-agents. It is *the* runtime with a CLI on it.
-- A **fleet worker** *is* a `codewhale exec` run that the fleet launches and
+- A **fleet worker** *is* a `nestlone exec` run that the fleet launches and
   tracks durably — locally as a subprocess, or remotely as
-  `ssh host … codewhale exec …`. The fleet does not re-implement execution; it
+  `ssh host … nestlone exec …`. The fleet does not re-implement execution; it
   adds **orchestration** (durable ledger, scheduling/leasing/retry, host
   transport, alert escalation) *over* the one runtime.
 
@@ -55,7 +55,7 @@ for a nested worker.
 
 If a detached `agent` child can fail on a one-off provider timeout with no
 retry while an equivalent fleet worker would retry and preserve ledger evidence,
-then the cutover is incomplete. Treat that as a CodeWhale runtime gap, not as
+then the cutover is incomplete. Treat that as a Nestlone runtime gap, not as
 normal "sub-agent behavior".
 
 The compatibility `agent` runtime now retries transient provider header,
@@ -100,7 +100,7 @@ spawn sub-agents.
 
 When the work also needs to be **durable** (survive the TUI closing, a laptop
 sleeping) or **remote** (SSH), the fleet runs the worker out-of-process as
-`codewhale exec`. The heavy construction then lives in another process entirely,
+`nestlone exec`. The heavy construction then lives in another process entirely,
 so the orchestrator stays smooth regardless of fanout, and the run survives
 restarts — the day-scale autonomy goal of #3154.
 
@@ -109,7 +109,7 @@ restarts — the day-scale autonomy goal of #3154.
 A worker runs at `spawn_depth = 0` and may spawn children while
 `spawn_depth + 1 ≤ max_spawn_depth`, so a budget of `N` affords `N` nested
 delegation levels. Sub-agents and fleet workers share **one** axis, sourced from
-`codewhale_config`:
+`nestlone_config`:
 
 - `DEFAULT_SPAWN_DEPTH = 3` — the default budget for both standalone sub-agents
   and fleet workers (so they cannot drift into "two moving targets");
@@ -122,7 +122,7 @@ delegation. The default affords at least three nested levels.
 ## Event vocabulary
 
 The fleet ledger persists the worker's own event stream rather than a separate,
-simulated taxonomy. `codewhale exec --output-format stream-json` emits
+simulated taxonomy. `nestlone exec --output-format stream-json` emits
 `{"type": "content" | "tool_use" | "tool_result" | "workflow_event" |
 "metadata" | "done" | "error"}` lines, which map onto the fleet ledger's
 `FleetWorkerEventPayload` (`RunningTool`, `WorkflowEvent`, `Running`,
@@ -133,15 +133,15 @@ terminal `done` or `error`. One vocabulary, two surfaces.
 
 ## Convergence with Claude Code (#2972)
 
-CodeWhale should converge with Claude Code on **shape**, not on branding:
+Nestlone should converge with Claude Code on **shape**, not on branding:
 
 - **Adopt**: a headless runtime with a real CLI/SDK front door; sub-agents as
   isolated runs that return summaries (not transcripts); a compact, event-driven
   fanout projection; capability/role tool profiles; the skills ecosystem
   (#2743); structured run receipts.
-- **Keep distinct**: CodeWhale branding and first-class DeepSeek/GLM/MiniMax/
+- **Keep distinct**: Nestlone branding and first-class DeepSeek/GLM/MiniMax/
   multi-provider support; the local-first **Agent Fleet** (durable, SSH-capable
-  orchestration) as CodeWhale's own layer above the shared runtime; Workflow as
+  orchestration) as Nestlone's own layer above the shared runtime; Workflow as
   the orchestration overlay.
 - **Do not** fork execution semantics per surface. The TUI, `agent`,
   `exec`, the Runtime API, and the fleet must all drive the *same* runtime and
@@ -162,7 +162,7 @@ remaining work belongs to later releases:
 
 1. **Rebrand completion** — the only hard-dated obligations: remove the
    `deepseek`/`deepseek-tui` binary shims and shim release assets; finish the
-   Homebrew `codewhale` formula rollout (`docs/REBRAND.md`).
+   Homebrew `nestlone` formula rollout (`docs/REBRAND.md`).
 2. **Operate as a value stream** — a control-board surface over the underwater
    shell (WIP, queue age, bottleneck); model-visible Work state (#3983); phase
    ledger (#4039); Workrooms Phase 2 (#3209/#3210) as the inbox substrate;
@@ -186,11 +186,11 @@ probing (needs a product decision).
 ## Public launch contract for an external harness (#4641)
 
 An external evaluation harness (for example a future Verifiers v1 built-in
-harness) embeds CodeWhale by launching the public `codewhale exec` front door
-against an interception endpoint it owns. CodeWhale owns only its **launch
+harness) embeds Nestlone by launching the public `nestlone exec` front door
+against an interception endpoint it owns. Nestlone owns only its **launch
 contract**; the harness owns interception, traces, model-call timing, token
 accounting, retries, rollout limits, and runtime orchestration. Do not add a
-harness runtime, trace parser, or receipt schema to CodeWhale.
+harness runtime, trace parser, or receipt schema to Nestlone.
 
 A reproducible headless launch uses only existing generic surfaces:
 
@@ -226,8 +226,8 @@ the `stream-json` stream, or any generated file.
 The exact argument order is:
 
 ```sh
-codewhale \
-  --config .vf-codewhale/config.toml \
+nestlone \
+  --config .vf-nestlone/config.toml \
   --workspace . \
   --no-project-config \
   --skip-onboarding \
@@ -247,16 +247,16 @@ is the provider-free acceptance lock for this contract.
 
 ### Future upstream checklist (out of scope here — do not run)
 
-Actually adding CodeWhale as a built-in harness lives in the external Verifiers
-repository, **after** a public, immutable CodeWhale `v0.9.1` GitHub Release and
+Actually adding Nestlone as a built-in harness lives in the external Verifiers
+repository, **after** a public, immutable Nestlone `v0.9.1` GitHub Release and
 checksum manifest exist. That upstream change is expected to be limited to a new
-`verifiers/v1/harnesses/codewhale/` package plus its test-matrix and docs
-registration, with `CodewhaleHarnessConfig` pinning `0.9.1`, `setup()`
+`verifiers/v1/harnesses/nestlone/` package plus its test-matrix and docs
+registration, with `NestloneHarnessConfig` pinning `0.9.1`, `setup()`
 downloading and verifying the released archive, and `launch()` writing the
 temporary route/MCP files above and calling `runtime.run_program(...)`.
 
 Holdouts, explicitly **not** performed by this contract work: tagging,
-publishing, or creating a CodeWhale release; opening or submitting the upstream
+publishing, or creating a Nestlone release; opening or submitting the upstream
 Verifiers PR; running its credentialed E2E matrix; or claiming
 runtime/architecture support before the exact released archive has run in that
 upstream runtime.

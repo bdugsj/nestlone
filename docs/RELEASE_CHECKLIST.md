@@ -16,8 +16,8 @@ generic checklist does not enumerate.
 - [ ] The live milestone and PR queue no longer contain work intended for this
       version:
       ```
-      gh issue list --repo Hmbown/CodeWhale --milestone "vX.Y.Z" --state open
-      gh pr list --repo Hmbown/CodeWhale --state open --limit 100
+      gh issue list --repo bdugsj/nestlone --milestone "vX.Y.Z" --state open
+      gh pr list --repo bdugsj/nestlone --state open --limit 100
       ```
 - [ ] Any remaining same-theme work is explicitly retargeted to a later
       version or called out as a known issue. Do not bump/tag while still
@@ -26,7 +26,7 @@ generic checklist does not enumerate.
       maintainer has deliberately chosen to publish exactly that older SHA:
       ```
       git ls-remote origin refs/heads/main refs/tags/vX.Y.Z
-      gh release view vX.Y.Z --repo Hmbown/CodeWhale
+      gh release view vX.Y.Z --repo bdugsj/nestlone
       ./scripts/release/check-published.sh X.Y.Z
       ```
 - [ ] If `vX.Y.Z` exists with no GitHub Release/packages and `main` has moved
@@ -62,7 +62,7 @@ generic checklist does not enumerate.
 
 - [ ] Run `./scripts/release/prepare-release.sh X.Y.Z` — it bumps the
       workspace version, every per-crate dependency pin,
-      `npm/codewhale/package.json` (`version` + `codewhaleBinaryVersion`),
+      `npm/nestlone/package.json` (`version` + `nestloneBinaryVersion`),
       the README install-tag examples, refreshes `Cargo.lock`, regenerates
       `crates/tui/CHANGELOG.md` and `web/lib/facts.generated.ts`, and ends
       by running the version and OHOS gates. Write the CHANGELOG entry
@@ -95,7 +95,7 @@ Run, in order, from the repo root:
 
 ## 4. npm wrapper smoke
 
-- [ ] `cargo build --release --locked -p codewhale-cli -p codewhale-tui`
+- [ ] `cargo build --release --locked -p nestlone-cli -p nestlone-tui`
 - [ ] `node scripts/release/npm-wrapper-smoke.js`
       (Set `DEEPSEEK_TUI_KEEP_SMOKE_DIR=1` if you need to inspect the temp
       install afterwards.)
@@ -172,7 +172,7 @@ release anxiety: contributors cannot tell whether their work merged.
       ```
       Both runs must resolve to that SHA. The candidate must report all seven
       targets and the complete 34-file asset inventory, including Android
-      arm64, Windows arm64, `codew`, the NSIS installer, archives, and checksum
+      arm64, Windows arm64, `nest`, the NSIS installer, archives, and checksum
       manifests. These are Actions artifacts only and are not a release.
 - [ ] PR has been reviewed.
 
@@ -199,21 +199,21 @@ release anxiety: contributors cannot tell whether their work merged.
 - [ ] The live GitHub Release body has its own `## Contributors` or
       `## Credits` section; do not rely on "see CHANGELOG" alone. Verify with:
       ```
-      gh release view vX.Y.Z --repo Hmbown/CodeWhale --json body \
+      gh release view vX.Y.Z --repo bdugsj/nestlone --json body \
         --jq '.body | test("## (Contributors|Credits)")'
       ```
-- [ ] `npm view codewhale@X.Y.Z version codewhaleBinaryVersion --json`
+- [ ] `npm view nestlone@X.Y.Z version nestloneBinaryVersion --json`
       reports the new version on the npm registry.
 - [ ] `npm view deepseek-tui deprecated` is non-empty. The legacy npm package
       is deprecated and must not receive an `X.Y.Z` publish.
 - [ ] Distribution channels are canonical-first: the website install page
-      (codewhale.net/install) shows Codewhale-native commands first (`npm install -g
-      codewhale`, `curl .../install.sh | sh`); Homebrew is labeled as legacy
-      compatibility; the shell installer uses codewhale-native names as documented
+      (codewhale.net/install) shows Nestlone-native commands first (`npm install -g
+      nestlone`, `curl .../install.sh | sh`); Homebrew is labeled as legacy
+      compatibility; the shell installer uses nestlone-native names as documented
       in `docs/REBRAND.md#homebrew`.
 - [ ] `crates.io` has the new version (or the `publish-crates.sh` job has
       pushed it).
-- [ ] `ghcr.io/hmbown/codewhale:vX.Y.Z` and `:latest` are updated.
+- [ ] `ghcr.io/hmbown/nestlone:vX.Y.Z` and `:latest` are updated.
 - [ ] The final registry verification passes:
       ```
       ./scripts/release/check-published.sh X.Y.Z

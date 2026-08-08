@@ -2,7 +2,7 @@
 
 Agent Fleet is the local-first control plane for durable multi-worker runs. It
 is **not** a separate execution engine: a fleet worker is a headless
-`codewhale exec` run that the fleet launches and tracks durably. See
+`nestlone exec` run that the fleet launches and tracks durably. See
 [AGENT_RUNTIME.md](AGENT_RUNTIME.md) for how sub-agents, `exec`, and the fleet
 converge on one durable runtime. In product language, a user may still "open a
 sub-agent"; in architecture language, durable nested work should be a
@@ -16,33 +16,33 @@ For a guided start-to-monitor walkthrough that combines Fleet task specs with
 Workflow authoring, see [Fleet + Workflow Tutorial](FLEET_WORKFLOW_TUTORIAL.md).
 
 ```sh
-codewhale fleet init
-codewhale fleet run tasks.json --max-workers 4
-codewhale fleet status
-codewhale fleet inspect <worker-id>
-codewhale fleet logs <worker-id>
-codewhale fleet artifacts <worker-id>
-codewhale fleet interrupt <worker-id>
-codewhale fleet restart <worker-id>
-codewhale fleet resume <run-id>
-codewhale fleet stop --all
+nestlone fleet init
+nestlone fleet run tasks.json --max-workers 4
+nestlone fleet status
+nestlone fleet inspect <worker-id>
+nestlone fleet logs <worker-id>
+nestlone fleet artifacts <worker-id>
+nestlone fleet interrupt <worker-id>
+nestlone fleet restart <worker-id>
+nestlone fleet resume <run-id>
+nestlone fleet stop --all
 ```
 
-`codewhale fleet resume <run-id>` is the restart-recovery verb: it replays the
+`nestlone fleet resume <run-id>` is the restart-recovery verb: it replays the
 ledger, reconciles any in-flight lease whose worker stopped heartbeating
 (retrying within the task's budget, else failing and escalating per the alert
 policy), and prints the post-resume status. It launches no new work and is
 idempotent, so it is safe to run after a manager exit, laptop sleep, or runtime
 restart.
 
-Fleet state is stored under the workspace in `.codewhale/fleet.jsonl`. Worker
-logs and adapter logs are stored under `.codewhale/fleet/` and
-`.codewhale/fleet-host/`.
+Fleet state is stored under the workspace in `.nestlone/fleet.jsonl`. Worker
+logs and adapter logs are stored under `.nestlone/fleet/` and
+`.nestlone/fleet-host/`.
 
 ### Interactive and persistent status
 
-`/fleet status` and `codewhale fleet status` are the **same** command on two
-surfaces. Both read the durable `.codewhale/fleet.jsonl` ledger for the
+`/fleet status` and `nestlone fleet status` are the **same** command on two
+surfaces. Both read the durable `.nestlone/fleet.jsonl` ledger for the
 workspace, through one shared control-plane contract, and both report the same
 verb id (`fleet.status`), read-vs-write authority, persistence scope, and
 receipt. When the workspace has no ledger they say so with a typed reason
@@ -54,9 +54,9 @@ have their own name:
 
 - `/fleet workers` (or `/subagents`, or `n`) shows sub-agents attached to the
   current TUI session. It does not read the persistent ledger.
-- `/fleet list|status|interrupt|resume` and `codewhale fleet
+- `/fleet list|status|interrupt|resume` and `nestlone fleet
   list|status|interrupt|resume` act on the durable ledger.
-- `codewhale fleet restart <worker-id>` is CLI-only: it re-leases the task and
+- `nestlone fleet restart <worker-id>` is CLI-only: it re-leases the task and
   then drives the manager loop to completion. `/fleet restart` does not
   silently do a smaller thing — it reports `surface_not_supported` and names
   the CLI command.
@@ -75,7 +75,7 @@ authoring a reusable agent-team profile. Bare `/fleet` and the
 `roster`/`roles`/`profiles`/`party` aliases open the roster (the saved profiles).
 `/fleet workers` opens the current-session worker view; `/subagents` is a
 compatibility shortcut for that view. For durable run history, use
-`/fleet status` or the shell command `codewhale fleet status` described above —
+`/fleet status` or the shell command `nestlone fleet status` described above —
 they are the same command.
 
 The wizard is progressive: you make one focused choice at a time — a **role**,
@@ -86,7 +86,7 @@ provider*, not only the one the parent session is currently using), then a
 scope, and review policy) before doing anything. On Review, press **`s`** to
 choose where the profile lives:
 
-- **Project** (default) writes `.codewhale/agents/<role>.toml` and can travel
+- **Project** (default) writes `.nestlone/agents/<role>.toml` and can travel
   with this repository.
 - **Personal** writes `$CODEWHALE_HOME/agents/<role>.toml` and is available in
   every repository on this machine. A project profile with the same id still
@@ -94,7 +94,7 @@ choose where the profile lives:
 
 Profile scope controls where a role definition is reusable; it does not widen
 the authority of a running operation. To coordinate several nearby
-repositories, start Codewhale from their shared parent directory so that parent
+repositories, start Nestlone from their shared parent directory so that parent
 is the workspace. Explicit trusted external paths or Full Access can still
 change what tools may reach; workers inherit the active trust and permission
 posture, never the profile's storage scope.
@@ -215,7 +215,7 @@ rejected. A manually selected worker reasoning tier makes no Router call. Route
 and reasoning receipts name the worker model and, when used, the Router's exact
 provider/model so the operator can see which model did which job. If the same
 bare Router or Fleet name exists in both roots, qualify it as
-`workspace/<name>` or `codewhale_home/<name>` instead of relying on shadowing.
+`workspace/<name>` or `nestlone_home/<name>` instead of relying on shadowing.
 
 Each member's `permissions` preset is a **ceiling**, never a grant: it is
 intersected with the live session posture, so a `read_write` member inside a
@@ -266,7 +266,7 @@ Fleet rather than silently ignored.
 
 Reasoning receipts record the requested tier *and* the tier the provider was
 actually asked for. Those differ whenever a route cannot express the requested
-one — CodeWhale's route normalizer sends `high` for a requested `low` on most
+one — Nestlone's route normalizer sends `high` for a requested `low` on most
 routes, and Z.AI's GLM routes express only thinking on/off — so the receipt
 reports the real request rather than the label that was selected. The value a
 call actually carries is spelled by that route's own normalizer, not by the tier
@@ -318,7 +318,7 @@ saved route pins or inheritance, tool posture, launch concurrency, and the ledge
 Workflow owns only the orchestration plan: branch, sequence, loop, expand,
 review, and reduce decisions. The workflow script must not get direct shell,
 filesystem, network, provider-secret, cancellation, or TUI authority; workers
-perform real work as `codewhale exec` processes.
+perform real work as `nestlone exec` processes.
 
 Default Workflow-to-Fleet validation is intentionally bounded:
 
@@ -344,7 +344,7 @@ next recursive ring rather than trying to show the whole tree at once.
 
 ## Task Spec
 
-`codewhale fleet run` accepts JSON or TOML. A minimal JSON spec:
+`nestlone fleet run` accepts JSON or TOML. A minimal JSON spec:
 
 ```json
 {
@@ -360,7 +360,7 @@ next recursive ring rather than trying to show the whole tree at once.
 }
 ```
 
-Workers are optional. If omitted, Codewhale creates local worker slots up to
+Workers are optional. If omitted, Nestlone creates local worker slots up to
 `--max-workers`.
 
 Task specs are typed in Rust and keep verification data separate from worker
@@ -372,10 +372,10 @@ transcripts. A task can declare:
 - `input_files`, extra `context`, `budget`, `timeout_seconds`, and `retry_policy`
 - `expected_artifacts`, `scorer`, `tags`, and free-form `metadata`
 
-Workers write bounded artifact files under `.codewhale/fleet/` and ledger only
+Workers write bounded artifact files under `.nestlone/fleet/` and ledger only
 the artifact refs: kind, path, checksum, MIME type, and size. Receipts record
 `pass`, `fail`, `partial`, `skip`, or `timeout`; failed receipts may also mark
-the source as `transport`, `task`, or `verifier`. `codewhale fleet status`
+the source as `transport`, `task`, or `verifier`. `nestlone fleet status`
 surfaces those failure-source counts separately.
 
 Deterministic built-in scorers are `exit_code`, `file_exists`, `regex_match`,
@@ -420,7 +420,7 @@ override any field in the task spec:
   "input_files": ["crates/**/*.rs"],
   "budget": { "max_tokens": 32000 },
   "expected_artifacts": ["log", "report"],
-  "scorer": { "kind": "regex_match", "path": ".codewhale/fleet/report.md", "pattern": "finding|all clear" }
+  "scorer": { "kind": "regex_match", "path": ".nestlone/fleet/report.md", "pattern": "finding|all clear" }
 }
 ```
 
@@ -500,7 +500,7 @@ Example alert config shape:
     "ops-slack": {
       "kind": "slack",
       "webhook_env": "CODEWHALE_FLEET_SLACK_WEBHOOK",
-      "channel": "#codewhale-fleet"
+      "channel": "#nestlone-fleet"
     },
     "pager": {
       "kind": "pager_duty",
@@ -514,7 +514,7 @@ Example alert config shape:
 Use dry-run to inspect a redacted adapter payload without sending:
 
 ```sh
-codewhale fleet alert-dry-run \
+nestlone fleet alert-dry-run \
   --event stale \
   --run-id fleet-demo \
   --worker-id fleet-demo-local-1 \
@@ -524,13 +524,13 @@ codewhale fleet alert-dry-run \
 ```
 
 The payload includes the run id, worker id, task id, status, short reason, and
-safe inspection commands such as `codewhale fleet status` and
-`codewhale fleet inspect <worker-id>`. Endpoints, webhook secrets, and
+safe inspection commands such as `nestlone fleet status` and
+`nestlone fleet inspect <worker-id>`. Endpoints, webhook secrets, and
 PagerDuty routing keys are shown as `<redacted:env:...>`.
 
 ## Status Surfaces
 
-`codewhale fleet status` shows compact counts for queued, running, completed,
+`nestlone fleet status` shows compact counts for queued, running, completed,
 partial, failed, restarted, escalated, cancelled, stale, and verifier/transport
 failure sources. `inspect` shows the worker state plus the current task
 objective, role, host, heartbeat, latest event, artifact refs, latest error, and
@@ -556,9 +556,9 @@ decisions in the fleet ledger.
 ## Manager-Agent Runbook
 
 Manager agents should treat Fleet operations as typed, ledgered control-plane
-work. Start with `codewhale fleet status`, then inspect one run or worker with
-`codewhale fleet inspect <worker-id>`, `logs`, and `artifacts`. Use direct
-reads of `.codewhale/fleet.jsonl`, host logs, or remote files only when the
+work. Start with `nestlone fleet status`, then inspect one run or worker with
+`nestlone fleet inspect <worker-id>`, `logs`, and `artifacts`. Use direct
+reads of `.nestlone/fleet.jsonl`, host logs, or remote files only when the
 typed CLI/API surface cannot provide the required evidence.
 
 Classify the worker before taking action:
@@ -578,10 +578,10 @@ Choose one typed action:
 
 - Restart a worker only when the failure is transient, retry budget remains,
   the task is idempotent or retry-safe, and no permission or secret boundary is
-  involved: `codewhale fleet restart <worker-id>`.
+  involved: `nestlone fleet restart <worker-id>`.
 - Interrupt or stop only when the current task is unsafe to continue or the
-  operator explicitly asks for cancellation: `codewhale fleet interrupt
-  <worker-id>` or `codewhale fleet stop --all`.
+  operator explicitly asks for cancellation: `nestlone fleet interrupt
+  <worker-id>` or `nestlone fleet stop --all`.
 - Do not restart pure task failures by default; preserve artifacts and hand the
   receipt to the task owner unless the task spec says retrying can produce new
   evidence.
@@ -594,13 +594,13 @@ Choose one typed action:
 Safe Slack or PagerDuty draft:
 
 ```text
-Codewhale fleet needs attention
+Nestlone fleet needs attention
 Run: <run-id>
 Worker: <worker-id>
 Task: <task-id or unknown>
 Classification: <transient failure | task failure | verifier failure | needs-human>
 Reason: <one sentence, no secrets>
-Latest typed evidence: codewhale fleet inspect <worker-id>; codewhale fleet artifacts <worker-id>
+Latest typed evidence: nestlone fleet inspect <worker-id>; nestlone fleet artifacts <worker-id>
 Safe log excerpt: <3 lines max or "see artifact <ref>">
 Requested decision: <restart approval | verifier review | task owner review | permission decision>
 ```
@@ -637,12 +637,12 @@ Example SSH worker spec:
   "host": {
     "kind": "ssh",
     "host": "builder.example.com",
-    "user": "codewhale",
+    "user": "nestlone",
     "port": 22,
-    "identity": "~/.ssh/codewhale_fleet",
-    "working_directory": "/srv/codewhale/work",
+    "identity": "~/.ssh/nestlone_fleet",
+    "working_directory": "/srv/nestlone/work",
     "env_allowlist": ["CODEWHALE_PROFILE"],
-    "codewhale_binary": "/usr/local/bin/codewhale"
+    "nestlone_binary": "/usr/local/bin/nestlone"
   },
   "capabilities": ["local", "linux", "tests"],
   "max_concurrent_tasks": 1
@@ -652,10 +652,10 @@ Example SSH worker spec:
 Defaults are intentionally conservative:
 
 - no hosted control plane or cloud provisioning is enabled;
-- SSH requires an explicit host, working directory, and Codewhale binary path;
+- SSH requires an explicit host, working directory, and Nestlone binary path;
 - secret-like environment names such as `TOKEN`, `SECRET`, `PASSWORD`,
   `API_KEY`, and `PRIVATE_KEY` are rejected from adapter allowlists;
-- secrets should remain in Codewhale config providers or remote host config,
+- secrets should remain in Nestlone config providers or remote host config,
   not in task instructions, argv, or fleet logs.
 
 ## Security and Trust Boundaries
@@ -668,7 +668,7 @@ writes) and how it must prove its identity before being granted those privileges
 
 | Level | Access | Requires |
 |-------|--------|----------|
-| `sandbox` | No network, no secrets, writes only to `.codewhale/fleet/` | Nothing — default for new workers |
+| `sandbox` | No network, no secrets, writes only to `.nestlone/fleet/` | Nothing — default for new workers |
 | `local` | Workspace reads, gated writes, configured secrets | Local process (same uid) |
 | `remote-verified` | Network access, bounded capability grants, configured secrets | SSH host-key verification or equivalent attestation |
 | `operator` | Full access to all secrets, unrestricted writes, any action | Operator-owned machine |
@@ -720,7 +720,7 @@ optional source hint that tells the fleet manager where to resolve the value:
 Supported sources:
 - `"env"` — resolve from a process environment variable
 - `"keyring"` — resolve from the OS keyring (macOS Keychain, Windows Credential Manager, Linux Secret Service)
-- `"file"` — resolve from `~/.codewhale/secrets/`
+- `"file"` — resolve from `~/.nestlone/secrets/`
 - absent — try all sources in default order (store first, then env)
 
 Secret refs are redacted in logs and ledger entries: `<secret:env.GH_TOKEN>`.
@@ -747,14 +747,14 @@ SSH workers should always set `host_key_fingerprint` in production:
   "host": {
     "kind": "ssh",
     "host": "builder.example.com",
-    "user": "codewhale",
+    "user": "nestlone",
     "port": 22,
-    "identity": "~/.ssh/codewhale_fleet",
+    "identity": "~/.ssh/nestlone_fleet",
     "host_key_fingerprint": "SHA256:aLGqZo1M6c...",
     "known_hosts": "~/.ssh/known_hosts",
-    "working_directory": "/srv/codewhale/work",
+    "working_directory": "/srv/nestlone/work",
     "env_allowlist": ["CODEWHALE_PROFILE"],
-    "codewhale_binary": "/usr/local/bin/codewhale"
+    "nestlone_binary": "/usr/local/bin/nestlone"
   },
   "capabilities": ["local", "linux", "tests"],
   "max_concurrent_tasks": 1

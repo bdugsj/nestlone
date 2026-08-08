@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Workrooms are CodeWhale's chat-native abstraction for durable, addressable
+Workrooms are Nestlone's chat-native abstraction for durable, addressable
 threads of agent work. They sit between the Runtime API's transient thread
 model and the user-facing surfaces (TUI, mobile, chat bridges).
 
@@ -60,10 +60,10 @@ rendering, and model-visible link resolution are planned follow-ups.
 
 ## State store
 
-Persisted workroom state should live alongside existing CodeWhale state:
+Persisted workroom state should live alongside existing Nestlone state:
 
 ```
-~/.codewhale/
+~/.nestlone/
 ├── workrooms/
 │   ├── wr_abc123.json     # Workroom metadata + event log
 │   └── wr_def456.json
@@ -81,10 +81,10 @@ a list of `WorkroomThread` descriptors, and a bounded set of recent
 
 | Crate | Responsibility |
 |---|---|
-| `codewhale-protocol` | Types: `Workroom`, `WorkroomId`, `WorkroomThread`, `WorkroomEvent`, `WorkroomLink`, `ExternalThreadRef`, `AgentAttribution` |
-| `codewhale-app-server` | Future endpoints: `GET /workrooms`, `GET /workroom/:id/threads`, `GET /workroom/resolve` |
-| `codewhale-tui` | Future model-facing link resolution and optional sidebar inbox |
-| `codewhale-state` | Future: persistent workroom store (Phase 2) |
+| `nestlone-protocol` | Types: `Workroom`, `WorkroomId`, `WorkroomThread`, `WorkroomEvent`, `WorkroomLink`, `ExternalThreadRef`, `AgentAttribution` |
+| `nestlone-app-server` | Future endpoints: `GET /workrooms`, `GET /workroom/:id/threads`, `GET /workroom/resolve` |
+| `nestlone-tui` | Future model-facing link resolution and optional sidebar inbox |
+| `nestlone-state` | Future: persistent workroom store (Phase 2) |
 
 ## Phase status
 

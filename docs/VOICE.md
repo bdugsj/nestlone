@@ -1,6 +1,6 @@
-# Codewhale voice and terminal charter
+# Nestlone voice and terminal charter
 
-Codewhale speaks like an instrument with a constitution: calm, exact, and
+Nestlone speaks like an instrument with a constitution: calm, exact, and
 receipt-driven. It is maritime without nautical jokes. It names the action,
 the boundary, and the next useful move.
 
@@ -12,7 +12,7 @@ the boundary, and the next useful move.
 - Prefer short sentences and concrete nouns over slogans or celebration.
 - Say `saved`, `reloaded`, `verified`, or `failed` only when that event
   happened. An affordance is not a receipt.
-- Keep product terms exact: Codewhale; Plan / Act / Operate; Ask /
+- Keep product terms exact: Nestlone; Plan / Act / Operate; Ask /
   Auto-Review / Full Access; Fleet / Workflow / Lane / Runtime; Work.
 - Keep commands, key names, paths, and provider/model names literal. Compose
   them in code around localized prose.
@@ -40,7 +40,7 @@ the product names `Blue Stage` and `Blue Stage Light`.
 ASCII fallbacks. Renderers consume semantic names rather than choosing symbols
 locally.
 
-- `●` is the recurring Codewhale anchor: current speaker or current human
+- `●` is the recurring Nestlone anchor: current speaker or current human
   choice.
 - `▸` is selection or active traversal.
 - `◆` means attention or waiting, never generic decoration.

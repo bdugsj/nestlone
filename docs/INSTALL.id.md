@@ -1,4 +1,4 @@
-# Menginstal Codewhale
+# Menginstal Nestlone
 
 Halaman ini mencakup setiap jalur instalasi yang didukung dan penanganan masalah umum saat instalasi gagal, termasuk **Linux ARM64** dan platform lainnya.
 
@@ -14,23 +14,23 @@ Pada macOS dan Linux, installer situs web adalah jalur instalasi dan pembaruan t
 curl -fsSL https://codewhale.net/install.sh | sh
 ```
 
-Skrip ini akan mengunduh biner rilis `codewhale`, `codew`, dan `codewhale-tui` yang cocok, memverifikasinya terhadap `codewhale-artifacts-sha256.txt`, menginstal ke `~/.local/bin` secara bawaan, serta menyediakan perintah `codew`.
+Skrip ini akan mengunduh biner rilis `nestlone`, `nest`, dan `nestlone-tui` yang cocok, memverifikasinya terhadap `nestlone-artifacts-sha256.txt`, menginstal ke `~/.local/bin` secara bawaan, serta menyediakan perintah `nest`.
 
 ---
 
 ## 2. Platform yang Didukung
 
-Rilis resmi Codewhale menyediakan biner pra-kemas untuk kombinasi platform dan arsitektur berikut:
+Rilis resmi Nestlone menyediakan biner pra-kemas untuk kombinasi platform dan arsitektur berikut:
 
 | Platform     | Arsitektur | `npm install` | `cargo install` | Aset Rilis GitHub                                     |
 | ------------ | ------------ | :---------: | :-------------: | ----------------------------------------------------- |
-| Linux        | x64 (x86_64) |     ✅      |       ✅        | `codewhale-linux-x64`, `codew-linux-x64`, `codewhale-tui-linux-x64`        |
-| Linux        | arm64        |     ✅      |       ✅        | `codewhale-linux-arm64`, `codew-linux-arm64`, `codewhale-tui-linux-arm64`    |
-| Android / Termux | arm64 (aarch64) | ⚠️ Pratinjau | ⚠️ Pratinjau | Arsip pratinjau `codewhale-android-arm64.tar.gz` |
-| macOS        | x64          |     ✅      |       ✅        | `codewhale-macos-x64`, `codew-macos-x64`, `codewhale-tui-macos-x64`        |
-| macOS        | arm64 (M-series) | ✅      |       ✅        | `codewhale-macos-arm64`, `codew-macos-arm64`, `codewhale-tui-macos-arm64`    |
-| Windows      | x64          |     ✅      |       ✅        | `codewhale-windows-x64.exe`, `codew-windows-x64.exe`, `codewhale-tui-windows-x64.exe` |
-| Windows      | arm64        |     ✅      |       ✅        | `codewhale-windows-arm64.exe`, `codew-windows-arm64.exe`, `codewhale-tui-windows-arm64.exe` |
+| Linux        | x64 (x86_64) |     ✅      |       ✅        | `nestlone-linux-x64`, `nest-linux-x64`, `nestlone-tui-linux-x64`        |
+| Linux        | arm64        |     ✅      |       ✅        | `nestlone-linux-arm64`, `nest-linux-arm64`, `nestlone-tui-linux-arm64`    |
+| Android / Termux | arm64 (aarch64) | ⚠️ Pratinjau | ⚠️ Pratinjau | Arsip pratinjau `nestlone-android-arm64.tar.gz` |
+| macOS        | x64          |     ✅      |       ✅        | `nestlone-macos-x64`, `nest-macos-x64`, `nestlone-tui-macos-x64`        |
+| macOS        | arm64 (M-series) | ✅      |       ✅        | `nestlone-macos-arm64`, `nest-macos-arm64`, `nestlone-tui-macos-arm64`    |
+| Windows      | x64          |     ✅      |       ✅        | `nestlone-windows-x64.exe`, `nest-windows-x64.exe`, `nestlone-tui-windows-x64.exe` |
+| Windows      | arm64        |     ✅      |       ✅        | `nestlone-windows-arm64.exe`, `nest-windows-arm64.exe`, `nestlone-tui-windows-arm64.exe` |
 
 ---
 
@@ -39,7 +39,7 @@ Rilis resmi Codewhale menyediakan biner pra-kemas untuk kombinasi platform dan a
 npm adalah pengelola paket yang paling umum digunakan:
 
 ```bash
-npm install -g codewhale
+npm install -g nestlone
 ```
 
 Bagi pengguna Linux/macOS, pastikan direktori biner global npm berada di dalam `$PATH` Anda.
@@ -51,8 +51,8 @@ Bagi pengguna Linux/macOS, pastikan direktori biner global npm berada di dalam `
 Jika Anda ingin mengompilasi biner langsung dari sumber kode menggunakan Rust:
 
 ```bash
-cargo install codewhale-cli --locked
-cargo install codewhale-tui --locked
+cargo install nestlone-cli --locked
+cargo install nestlone-tui --locked
 ```
 
 Persyaratan sistem:
@@ -71,8 +71,8 @@ Termux berjalan di atas Bionic libc Android dan menggunakan `$PREFIX` sebagai aw
    ```
 2. Jalankan instalasi via Cargo:
    ```bash
-   cargo install codewhale-cli --locked
-   cargo install codewhale-tui --locked
+   cargo install nestlone-cli --locked
+   cargo install nestlone-tui --locked
    ```
 
 ---
@@ -80,5 +80,5 @@ Termux berjalan di atas Bionic libc Android dan menggunakan `$PREFIX` sebagai aw
 ## 6. Migrasi dari `deepseek-tui`
 
 Jika Anda sebelumnya menggunakan `deepseek-tui`, seluruh sesi dan berkas konfigurasi Anda dapat ditransisikan dengan mudah:
-- Jalur konfigurasi otomatis dimigrasikan dari `~/.config/deepseek-tui` ke `~/.config/codewhale`.
+- Jalur konfigurasi otomatis dimigrasikan dari `~/.config/deepseek-tui` ke `~/.config/nestlone`.
 - Detail selengkapnya tersedia di [docs/REBRAND.md](REBRAND.md).

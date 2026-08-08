@@ -242,7 +242,7 @@ export async function deriveFactsFromRemote(ghToken?: string): Promise<RepoFacts
     fetchText("crates/tui/src/config.rs", source.revision, ghToken),
     fetchText("crates/tui/src/config/models.rs", source.revision, ghToken),
     fetchText("crates/tui/src/sandbox/mod.rs", source.revision, ghToken),
-    fetchText("npm/codewhale/package.json", source.revision, ghToken),
+    fetchText("npm/nestlone/package.json", source.revision, ghToken),
     fetchText("LICENSE", source.revision, ghToken),
     fetchText("web/lib/facts.generated.ts", source.revision, ghToken),
     fetchLatestPublishedRelease(ghToken),

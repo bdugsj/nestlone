@@ -1,6 +1,6 @@
 # Matriks Lokalisasi (Localization Matrix)
 
-Dokumen pelacakan kanonik untuk setiap bahasa yang didukung, sedang dibangun, direncanakan, atau ditunda oleh Codewhale.
+Dokumen pelacakan kanonik untuk setiap bahasa yang didukung, sedang dibangun, direncanakan, atau ditunda oleh Nestlone.
 
 > **Catatan Cakupan (diperbarui 2026-07-29):** Matriks ini mencakup tiga permukaan utama — paket bahasa TUI (`crates/tui/locales/`), README terjemahan (root repositori), dan situs web (`web/`). Ketiganya rilis pada ritme yang berbeda, sehingga suatu bahasa bisa berstatus **shipped** di satu permukaan dan **planned** di permukaan lain.
 
@@ -63,7 +63,7 @@ Paket TUI di bawah `crates/tui/locales/` adalah permukaan terjemahan terbesar di
 1. **Paket TUI**:
    - Buat berkas `crates/tui/locales/<tag>.json` berisi seluruh kunci di `en.json`.
    - Tambahkan varian `Locale` pada `crates/tui/src/localization.rs` dan daftarkan di `config_ui.rs`.
-   - Jalankan `python3 scripts/check-tui-locale-parity.py` dan `cargo test -p codewhale-tui localization`.
+   - Jalankan `python3 scripts/check-tui-locale-parity.py` dan `cargo test -p nestlone-tui localization`.
 
 2. **README**:
    - Terjemahkan `README.md` menjadi `README.<tag>.md`.

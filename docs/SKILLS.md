@@ -1,7 +1,7 @@
 # Skills Manager
 
-Skills are reusable `SKILL.md` instruction packs. Codewhale discovers them from
-several roots, but **only CodeWhale-owned directories are writable**. The unified
+Skills are reusable `SKILL.md` instruction packs. Nestlone discovers them from
+several roots, but **only Nestlone-owned directories are writable**. The unified
 `/skills` manager is the interactive surface for audit and mutation; slash
 aliases share the same write path.
 
@@ -23,12 +23,12 @@ shadowing stay visible.
 
 ## Ownership and roots
 
-**Writable (CodeWhale-owned)**
+**Writable (Nestlone-owned)**
 
 | Scope | Path |
 | --- | --- |
-| Project | `<workspace>/.codewhale/skills/` |
-| Global | `~/.codewhale/skills/` |
+| Project | `<workspace>/.nestlone/skills/` |
+| Global | `~/.nestlone/skills/` |
 
 **Read-only compatible** (discover / import source only — never mutated in place)
 
@@ -41,7 +41,7 @@ and similar harness layouts.
 - `.codex/skills` appears in **compatible** audit scans so operators can see it.
   It does **not** join the runtime discovery set.
 
-Configured `skills_dir` that is not one of the owned CodeWhale roots stays
+Configured `skills_dir` that is not one of the owned Nestlone roots stays
 read-only. Discovery and the manager can list it; mutations still target owned
 project/global roots only.
 
@@ -64,7 +64,7 @@ Notes:
 
 - There is **no** `/skills audit` subcommand. Use the manager (and `c` to toggle
   compatible roots) or `/skills inspect` for discovery details.
-- Bare `/skill install <spec>` (no scope flag) installs into the CodeWhale
+- Bare `/skill install <spec>` (no scope flag) installs into the Nestlone
   **global** owned root.
 - If the same name exists in both project and global owned roots, update /
   uninstall / trust require `--project` or `--global`.
@@ -94,7 +94,7 @@ the inventory.
 
 ## Bundled catalog tiers
 
-Codewhale presents its shipped skills in two compact tiers so agentic workflows
+Nestlone presents its shipped skills in two compact tiers so agentic workflows
 are not buried under document and integration helpers:
 
 - **Core agentic** — planning, implementation, debugging, review, verification,
@@ -102,7 +102,7 @@ are not buried under document and integration helpers:
 - **Format & tooling** — document formats, data visualization, frontend and web
   testing, and skill/plugin/MCP authoring helpers.
 
-Workspace, user, and compatible-harness skills stay labeled **custom**; Codewhale
+Workspace, user, and compatible-harness skills stay labeled **custom**; Nestlone
 does not guess their intent from their name. The shipped pack also does not
 advertise capabilities the runtime lacks. In particular, image understanding
 is available, but an image-generation skill is not bundled until a real
@@ -134,16 +134,16 @@ inspectable.
 
 The v0.9.2 parity audit in [#4698](https://github.com/Hmbown/CodeWhale/issues/4698)
 compared the five `xai-grok-memory` / `xai-grok-shell` reference skills with
-the actual Codewhale bundle. This is a decision matrix, not a request to copy
+the actual Nestlone bundle. This is a decision matrix, not a request to copy
 reference text or advertise unsupported tools:
 
-| Reference skill | Codewhale decision | Runtime grounding |
+| Reference skill | Nestlone decision | Runtime grounding |
 | --- | --- | --- |
 | `check-work` | Canonical alias/compatibility mapping to `verify` | `verify` is the shipped evidence-collection workflow. |
 | `code-review` | Canonical alias/compatibility mapping to `review` | `review` is the shipped read-only correctness workflow. |
 | `create-skill` | Canonical alias/compatibility mapping to `skill-creator` | `skill-creator` is the shipped authoring workflow. |
 | `help` | Bounded `invocation: explicit-only` router, not an ambient manual | Routes to `/help`, `/skills`, `/config`, `doctor`, and the installed `docs/` tree; it embeds no manual text. |
-| `imagine` | Intentionally out of scope | Codewhale has no image-generation/edit tool, so the starter pack must not advertise one. |
+| `imagine` | Intentionally out of scope | Nestlone has no image-generation/edit tool, so the starter pack must not advertise one. |
 
 Notes on the two non-alias decisions:
 
@@ -288,13 +288,13 @@ does not run readiness probes and does not block mutations on readiness.
 
 ```toml
 # Optional override for discovery preference (not automatically a write target
-# unless it is the CodeWhale project/global owned path).
+# unless it is the Nestlone project/global owned path).
 skills_dir = "/path/to/skills"
 
 [skills]
 # When true, runtime discovery skips cross-tool roots (.claude, .agents, …).
-# Owned CodeWhale roots and an explicit skills_dir override still apply.
-scan_codewhale_only = false
+# Owned Nestlone roots and an explicit skills_dir override still apply.
+scan_nestlone_only = false
 
 # Optional registry / install size overrides used by --remote, sync, and install.
 # registry_url = "https://…"
@@ -307,7 +307,7 @@ See [CONFIGURATION.md](CONFIGURATION.md) for the full config surface.
 
 1. Prefer `/skills` for day-to-day management; keep `--remote` / `sync` explicit.
 2. Never hand-edit `.claude` / `.agents` / `.cursor` trees to “install” for
-   Codewhale — import into `.codewhale/skills` instead.
+   Nestlone — import into `.nestlone/skills` instead.
 3. Treat `.trusted` as advisory documentation of review, not a security boundary.
 4. After registry updates that change content, re-trust if you still want the
    advisory marker.

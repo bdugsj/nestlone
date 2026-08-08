@@ -1,4 +1,4 @@
-# Test-Time Compute (TTC) in CodeWhale — design
+# Test-Time Compute (TTC) in Nestlone — design
 
 Status: **approved direction** (maintainer greenlit). Synthesized from three independent reviews — the verify-tool implementation contributor, GLM 5.2, and an internal analysis — which all converged. This doc is the spec; implementation is deferred beyond v0.9.0 and is split so nothing here blocks the current release.
 
@@ -54,10 +54,10 @@ The bug in `auto_reasoning.rs` was never "Low is wrong" — it's that **Low is a
 
 **Do not change the default floor from Low** — sub-agent traffic is majority search/lookup, and raising the floor silently raises cost on every existing fleet. Non-surprising > clever. This composes with #4137 (profile carries the tier alongside provider/model) rather than competing with it.
 
-## Anti-patterns (what would read as bolted-on *in CodeWhale specifically*)
+## Anti-patterns (what would read as bolted-on *in Nestlone specifically*)
 
 1. A **second critic implementation** — if `verify`/`review`/#3982/#4013 each roll their own prompt+call+parse, four paths diverge on the first bug. The single `CriticEngine` is the whole game.
-2. A **non-tool control plane for reasoning escalation** — CodeWhale's model contract is tool-shaped; a side-channel breaks symmetry and bleeds into every provider adapter. The `verify` call *is* the escalation (Max internally). One vocabulary.
+2. A **non-tool control plane for reasoning escalation** — Nestlone's model contract is tool-shaped; a side-channel breaks symmetry and bleeds into every provider adapter. The `verify` call *is* the escalation (Max internally). One vocabulary.
 3. **Recursion policy in Constitution prose** — enforce it in the registry builder; the depth guard is secondary.
 4. **Cost accounting leaking into `MessageRequest`** — budget belongs in the engine + a session `TtcBudget`. Don't make every tool cost-aware.
 5. **`auto_reasoning.rs` becoming TTC-aware** — Auto resolves *effort per turn*; the model decides verify. Keep them separate or you get non-determinism the user can't reason about.

@@ -30,7 +30,7 @@ Sources for the external PR author:
 
 ## Local ACP Readiness Audit
 
-CodeWhale already exposes ACP through `codewhale serve --acp`.
+Nestlone already exposes ACP through `nestlone serve --acp`.
 
 Implemented locally:
 
@@ -39,8 +39,8 @@ Implemented locally:
 - `crates/tui/src/acp_server.rs` implements JSON-RPC 2.0 over newline-delimited
   stdio.
 - `initialize` advertises:
-  - `agentInfo.name = "codewhale"`
-  - `agentInfo.title = "codewhale"`
+  - `agentInfo.name = "nestlone"`
+  - `agentInfo.title = "nestlone"`
   - `agentInfo.version = env!("CARGO_PKG_VERSION")`
   - `promptCapabilities.embeddedContext = true`
   - `loadSession = false`
@@ -49,7 +49,7 @@ Implemented locally:
   - `authMethods` with terminal auth: `auth set --provider <provider>`
 - `session/new` creates an in-memory session with a cwd.
 - `session/prompt` accepts string prompts plus text/resource/resource_link
-  blocks and routes through the configured CodeWhale client.
+  blocks and routes through the configured Nestlone client.
 - `session/prompt` **streams**: each provider text delta is emitted as a
   `session/update` agent_message_chunk as it arrives, then the prompt returns
   `stopReason: "end_turn"` (instead of buffering the whole turn and sending one
@@ -74,7 +74,7 @@ Known limitations to state clearly:
   `agentclientprotocol/registry#411` was opened.
 
 The submitted registry PR uses the `npx` distribution because
-`codewhale@0.8.65` is already published and the npm wrapper handles platform
+`nestlone@0.8.65` is already published and the npm wrapper handles platform
 selection, checksums, mirrors, and glibc preflight.
 
 ## External Registry Files
@@ -82,35 +82,35 @@ selection, checksums, mirrors, and glibc preflight.
 Create this directory in `agentclientprotocol/registry`:
 
 ```text
-codewhale/
+nestlone/
   agent.json
   icon.svg
 ```
 
 Use a concrete published version. Do not use `@latest`.
 
-### `codewhale/agent.json`
+### `nestlone/agent.json`
 
 ```json
 {
-  "id": "codewhale",
-  "name": "CodeWhale",
+  "id": "nestlone",
+  "name": "Nestlone",
   "version": "0.8.65",
   "description": "Provider-agnostic terminal coding agent with first-class DeepSeek support.",
-  "repository": "https://github.com/Hmbown/CodeWhale",
-  "website": "https://github.com/Hmbown/CodeWhale/blob/main/docs/RUNTIME_API.md#acp-stdio-adapter-codewhale-serve---acp",
+  "repository": "https://github.com/bdugsj/nestlone",
+  "website": "https://github.com/bdugsj/nestlone/blob/main/docs/RUNTIME_API.md#acp-stdio-adapter-nestlone-serve---acp",
   "authors": ["Hunter Bown"],
   "license": "MIT",
   "distribution": {
     "npx": {
-      "package": "codewhale@0.8.65",
+      "package": "nestlone@0.8.65",
       "args": ["serve", "--acp"]
     }
   }
 }
 ```
 
-### `codewhale/icon.svg`
+### `nestlone/icon.svg`
 
 ```svg
 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -124,20 +124,20 @@ Use a concrete published version. Do not use `@latest`.
 Title:
 
 ```text
-Add CodeWhale ACP agent
+Add Nestlone ACP agent
 ```
 
 Body:
 
 ```text
-Adds CodeWhale to the ACP registry.
+Adds Nestlone to the ACP registry.
 
-CodeWhale is a provider-agnostic terminal coding agent with first-class
+Nestlone is a provider-agnostic terminal coding agent with first-class
 DeepSeek support. The submitted distribution uses the published npm package and
-runs `codewhale serve --acp`.
+runs `nestlone serve --acp`.
 
 Local readiness checked in Hmbown/CodeWhale:
-- ACP stdio adapter exists at `codewhale serve --acp`.
+- ACP stdio adapter exists at `nestlone serve --acp`.
 - `initialize` returns terminal auth via `auth set --provider <provider>`.
 - `session/new`, `session/prompt`, and `session/cancel` are implemented.
 - `session/prompt` streams provider text deltas as `session/update` chunks.
@@ -149,11 +149,11 @@ Version: 0.8.65
 
 ## Pre-Submission Checklist
 
-- Confirm `codewhale@0.8.65` is published to npm: done on 2026-06-27.
+- Confirm `nestlone@0.8.65` is published to npm: done on 2026-06-27.
 - Run the upstream registry validator: done on 2026-06-27 with
-  `python3 .github/workflows/verify_agents.py --auth-check --agent codewhale --verbose`;
-  result was `Auth OK: codewhale-terminal-auth(terminal)`.
-- Verify `npx -y codewhale@0.8.65 serve --acp` returns `authMethods` from
+  `python3 .github/workflows/verify_agents.py --auth-check --agent nestlone --verbose`;
+  result was `Auth OK: nestlone-terminal-auth(terminal)`.
+- Verify `npx -y nestlone@0.8.65 serve --acp` returns `authMethods` from
   `initialize`: done on 2026-06-27.
 - Keep the external PR body explicit that ACP support is baseline and does not
   imply the full TUI/runtime API is available inside ACP: done in

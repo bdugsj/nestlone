@@ -1,26 +1,26 @@
 # Local browser client
 
-`codewhale web` opens Codewhale's embedded browser client over the canonical
+`nestlone web` opens Nestlone's embedded browser client over the canonical
 Runtime API. It is a local surface: the server always binds to
 `127.0.0.1`, cannot be rebound to a LAN address, and cannot run with Runtime
 authentication disabled.
 
 ## Start it
 
-From the workspace Codewhale should operate in, run:
+From the workspace Nestlone should operate in, run:
 
 ```bash
-codewhale web
+nestlone web
 ```
 
 The default address is `http://127.0.0.1:7878`. To avoid a local port
 collision, choose another loopback port:
 
 ```bash
-codewhale web --port 8788
+nestlone web --port 8788
 ```
 
-Codewhale starts the Runtime API, serves the dependency-free client embedded
+Nestlone starts the Runtime API, serves the dependency-free client embedded
 in the installed binary, and asks the operating system to open the launch URL
 in the default browser. Stop the process with `Ctrl+C`; the browser session
 ends with it.
@@ -57,11 +57,11 @@ API behavior.
 
 ## Local means local
 
-`codewhale web` accepts only `--port`; there is no `--host` or insecure-auth
+`nestlone web` accepts only `--port`; there is no `--host` or insecure-auth
 option on this command. Do not treat it as a public website or expose its port
 directly through router forwarding, a public reverse proxy, or a tunnel.
 
-The separate `codewhale app-server --mobile` and `--http` modes have different
+The separate `nestlone app-server --mobile` and `--http` modes have different
 deployment and authentication contracts. Read [RUNTIME_API.md](RUNTIME_API.md)
 before operating either one, especially before selecting a non-loopback bind.
 
@@ -70,11 +70,11 @@ before operating either one, especially before selecting a non-loopback bind.
 - If port `7878` is occupied, pass an unused `--port` value.
 - If the browser cannot be opened, the command exits with an error rather than
   printing or leaving a reusable bootstrap capability behind. Check the
-  operating system's default-browser setup, then start `codewhale web` again.
-- If the page loads but a provider is unavailable, inspect `codewhale doctor`
+  operating system's default-browser setup, then start `nestlone web` again.
+- If the page loads but a provider is unavailable, inspect `nestlone doctor`
   and `/provider`; the web command does not configure or move provider
   credentials.
-- If a session expired, stop and restart `codewhale web` to mint a new
+- If a session expired, stop and restart `nestlone web` to mint a new
   process-local session. Reusing an old bootstrap URL is expected to fail.
 
 For integration endpoints, headers, events, and the complete web-session

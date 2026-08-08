@@ -36,7 +36,7 @@ Treat these as investigation starting points, not proven failure classes:
    `CODEWHALE_HOME`, and `*_API_KEY` values are not forwarded. Only variables
    listed explicitly on the `env` line survive.
 2. Only `CODEWHALE_HOME` points at the task-specific throwaway directory, so
-   Codewhale config, sessions, and the bundled skill install land in scratch
+   Nestlone config, sessions, and the bundled skill install land in scratch
    state. `HOME` is intentionally left unset; the smoke run never repurposes it.
 3. You name the credential variable yourself (`CW_SMOKE_CRED_VAR`). Nothing is
    guessed from the provider.
@@ -54,12 +54,12 @@ niceties and both exist on macOS and mainstream Linux.
 ```sh
 CW_SMOKE_CODEWHALE_HOME="$(mktemp -d)" || exit 1
 mkdir -p "$CW_SMOKE_CODEWHALE_HOME/tmp"
-echo "scratch Codewhale state: $CW_SMOKE_CODEWHALE_HOME"
+echo "scratch Nestlone state: $CW_SMOKE_CODEWHALE_HOME"
 ```
 
 ## Step 2 — name the credential variable
 
-`CW_SMOKE_CRED_VAR` must be the variable name the provider expects. Codewhale
+`CW_SMOKE_CRED_VAR` must be the variable name the provider expects. Nestlone
 reads `MOONSHOT_API_KEY` (or `KIMI_API_KEY`) for the Moonshot/Kimi route and
 `DEEPSEEK_API_KEY` for the DeepSeek route.
 
@@ -115,7 +115,7 @@ env -i \
 
     export "$CW_SMOKE_CRED_VAR=$CW_SMOKE_CRED"
     unset CW_SMOKE_CRED
-    exec codewhale-tui exec \
+    exec nestlone-tui exec \
       --provider "$1" --model "$2" --reasoning-effort "$3" --json "$4"
   ' sh "$CW_SMOKE_PROVIDER" "$CW_SMOKE_MODEL" "$CW_SMOKE_EFFORT" "$CW_SMOKE_PROMPT"
 ```
@@ -144,7 +144,7 @@ tool-catalog and reasoning receipts, use the streaming form (still inside the
 same `env -i` wrapper, substituting the `exec` line):
 
 ```sh
-    exec codewhale-tui exec --auto --max-turns 3 \
+    exec nestlone-tui exec --auto --max-turns 3 \
       --output-format stream-json \
       --provider "$1" --model "$2" --reasoning-effort "$3" "$4"
 ```

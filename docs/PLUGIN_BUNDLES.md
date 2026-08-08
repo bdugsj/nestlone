@@ -1,16 +1,16 @@
 # Plugin bundles
 
-Codewhale v0.9.1 supports a deliberately small plugin-bundle boundary. A
+Nestlone v0.9.1 supports a deliberately small plugin-bundle boundary. A
 bundle may contribute declarative Skills and MCP server configuration through
-Codewhale's existing engines. Discovery alone never executes, enables, trusts,
+Nestlone's existing engines. Discovery alone never executes, enables, trusts,
 downloads, updates, or installs anything.
 
 ## Discovery and precedence
 
-Codewhale scans only its own roots:
+Nestlone scans only its own roots:
 
-- User: `~/.codewhale/plugins/<name>/plugin.toml`
-- Workspace: `<workspace>/.codewhale/plugins/<name>/plugin.toml`
+- User: `~/.nestlone/plugins/<name>/plugin.toml`
+- Workspace: `<workspace>/.nestlone/plugins/<name>/plugin.toml`
 
 No built-in bundle ships in v0.9.1. The internal precedence order is built-in,
 user, then workspace; the first bundle with a given name wins. This prevents a
@@ -78,7 +78,7 @@ explicit proxy support.
 
 Local stdio environment entries must use exact `${SOURCE_ENV}` references.
 The review shows destination and source names, but never reads or prints their
-values. Plugin children inherit only Codewhale's base secret-scrubbed child
+values. Plugin children inherit only Nestlone's base secret-scrubbed child
 environment plus those reviewed mappings; credential-capable proxy variables
 and the broader compatibility environment used by user-authored MCP
 configuration are not inherited ambiently. Absolute arguments and parent
@@ -141,7 +141,7 @@ hashes, and inactive declarations. It also prints an exact confirmation:
 
 Run that exact command only after reviewing the bundle. The confirmation token
 uses both complete SHA-256 receipts rather than display prefixes. Trust first
-copies the complete reviewed tree into a Codewhale-owned, content-addressed
+copies the complete reviewed tree into a Nestlone-owned, content-addressed
 runtime snapshot and records the matching receipt; it does not activate
 anything.
 Then run `/plugin enable example` again. Trust and enablement are separate:
@@ -160,14 +160,14 @@ plugin stdio child, and denies persisted queued Skills carrying the older
 authority receipt.
 
 The review distinguishes remote MCP endpoints from local stdio MCP servers.
-A local stdio server is a child process running with the Codewhale user's host
+A local stdio server is a child process running with the Nestlone user's host
 filesystem and network authority; plugin trust is not an OS sandbox. The
 review therefore shows the command, argument count, working directory,
 environment-variable names, and this host-authority warning without printing
 environment or header values. MCP tool approval still applies after the
 server starts.
 
-Trust receipts live in `~/.codewhale/plugins/state.json`. Atomic owner-only
+Trust receipts live in `~/.nestlone/plugins/state.json`. Atomic owner-only
 writes record the full content hash, capability hash, reviewed capability
 inventory, generation, and review time, with the latest 32 reviews retained as
 a bounded audit trail. Malformed or unsupported state is not overwritten: all

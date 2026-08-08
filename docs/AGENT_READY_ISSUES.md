@@ -1,6 +1,6 @@
 # Agent-Ready Issues
 
-CodeWhale's tracker is worked by humans and by autonomous agents. An issue is
+Nestlone's tracker is worked by humans and by autonomous agents. An issue is
 **agent-ready** when a fresh agent — with a clone of `main`, shell/read/write
 tools, and *no other context* — can execute it end-to-end and prove the result.
 This document defines that standard for new issues, for triage reworks of
@@ -42,7 +42,7 @@ Behavior-level `- [ ]` checkboxes. Every item must be testable.
 
 ## Verification
 Exact commands, e.g.
-`cargo test -p codewhale-tui --bin codewhale-tui --locked <filter>`.
+`cargo test -p nestlone-tui --bin nestlone-tui --locked <filter>`.
 
 ## Out of scope
 What this issue deliberately does not change.
@@ -64,7 +64,7 @@ is not agent-ready.
   `(anchor not found — needs discovery)` rather than a guess. A wrong anchor
   costs an executing agent more than a missing one.
 - Verification commands use real workspace package names
-  (`codewhale-tui`, `codewhale-config`, `codewhale-protocol`, …) — confirm in
+  (`nestlone-tui`, `nestlone-config`, `nestlone-protocol`, …) — confirm in
   the crate's `Cargo.toml`, not from memory.
 
 ## Reworking existing issues
@@ -93,7 +93,7 @@ is not agent-ready.
 - Reporters writing in Chinese (or another language) get the key points and
   asks translated at the end of the English reply.
 - `needs-info` issues get exactly one crisp ask (typically
-  `codewhale --version`, `codewhale doctor --json`, OS + terminal, minimal
+  `nestlone --version`, `nestlone doctor --json`, OS + terminal, minimal
   repro), plus a pointer that the stale policy in
   [ISSUE_TRIAGE.md](./ISSUE_TRIAGE.md) applies once a maintainer labels the
   issue `needs-info`.

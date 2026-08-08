@@ -20,8 +20,8 @@ currently pass the documented pre-push gate** (`cargo clippy --all-targets
 TUI-DOG-012/013. This is the one must-fix.
 
 Build state observed:
-- `cargo check -p codewhale-tui --bins --tests` → **passes** (warnings only).
-- `cargo clippy -p codewhale-tui --all-targets --locked -- -D warnings` →
+- `cargo check -p nestlone-tui --bins --tests` → **passes** (warnings only).
+- `cargo clippy -p nestlone-tui --all-targets --locked -- -D warnings` →
   **FAILS**: 37 errors (bin) / 22 errors (bin test).
 
 ---
@@ -31,7 +31,7 @@ Build state observed:
 ### P0.1 Clippy `-D warnings` gate is red (blocks install + TUI-DOG-012/013)
 
 `crates/tui/AGENTS.md` names `cargo clippy --workspace --all-targets --locked
--- -D warnings` as a required gate. The branch fails it. codewhale-tui is a
+-- -D warnings` as a required gate. The branch fails it. nestlone-tui is a
 **binary** crate, so `pub` items with no in-crate consumer trip `dead_code`, and
 `-D warnings` promotes every warning to an error. The authors anticipated this
 for imports (`#[allow(unused_imports)]` is sprinkled on the re-exports) but
@@ -266,9 +266,9 @@ whole is not yet gate-clean. Specifically framework-ahead-of-consumer:
 
 ## Suggested pre-install checklist
 
-1. `cargo clippy -p codewhale-tui --all-targets --locked -- -D warnings` → green
+1. `cargo clippy -p nestlone-tui --all-targets --locked -- -D warnings` → green
    (fix P0.1).
-2. `cargo test -p codewhale-tui --bins --locked` and the locale parity tests
+2. `cargo test -p nestlone-tui --bins --locked` and the locale parity tests
    (`shipped_complete_packs_have_raw_key_parity_with_english`,
    `message_id_list_english_pack_stay_in_exact_sync`).
 3. Decide P1.1 (enforce or re-word deliberate-spawn authority) and P1.2 (thread

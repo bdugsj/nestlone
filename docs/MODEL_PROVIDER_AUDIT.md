@@ -1,7 +1,7 @@
 # Model & Provider Metadata Audit
 
 Audit date: **2026-07-12** · Repo state: `main` @ `3e97b278e` (v0.8.68 lane)
-Scope: every provider and model CodeWhale knows about, their characteristics
+Scope: every provider and model Nestlone knows about, their characteristics
 (context window, max output, reasoning, tools, modalities, pricing, aliases),
 where each fact lives in code, how the metadata layers interact, and every
 discrepancy found against the live Models.dev catalog. Intended as the working
@@ -12,7 +12,7 @@ reference for a future metadata-consolidation pass.
 ## 1. Executive summary
 
 1. **The "gpt-5.6-luna 272K" display is correct by design, not a data bug.**
-   On the ChatGPT/Codex OAuth route, CodeWhale shows the context window that
+   On the ChatGPT/Codex OAuth route, Nestlone shows the context window that
    OpenAI's account-scoped `/models` endpoint advertises (persisted by the
    Codex CLI at `~/.codex/models_cache.json`). That cache on this machine
    (fetched 2026-07-13) advertises `context_window: 272000` for **all**
@@ -51,7 +51,7 @@ lowest → highest, confirmed from `crates/config/src/catalog.rs:9-18`,
 (4) static code tables      crates/tui/src/models.rs    ← fallback inside context_window_for_model()
 (3) bundled Models.dev seed crates/config/assets/models_dev.bundled.json  ("NOT a competing source of truth", #4188)
     + bundled TUI catalog   crates/tui/assets/model_catalog.bundled.json  (31 entries)
-(2) live Models.dev catalog https://models.dev/catalog.json  → ~/.codewhale/catalog/models-dev-catalog.json (24 h TTL)
+(2) live Models.dev catalog https://models.dev/catalog.json  → ~/.nestlone/catalog/models-dev-catalog.json (24 h TTL)
 (1) user / custom overrides (pinned models, custom endpoints, explicit facts)
 (0) SPECIAL: ChatGPT/Codex OAuth roster  ~/.codex/models_cache.json — bypasses the catalog entirely
     for ApiProvider::OpenaiCodex (provider_lake.rs:131-133, route_runtime.rs:33-51)
@@ -138,7 +138,7 @@ OAuth routes (token precedence: route OAuth → CLI key → provider/root config
 
 ## 4. First-class model metadata (the curated set)
 
-Merged view of the four fact sources for the models CodeWhale makes explicit
+Merged view of the four fact sources for the models Nestlone makes explicit
 promises about. Columns: **Ctx** = context window (tokens), **Out** = max
 output, **R** = emits reasoning, pricing = USD per 1M tokens as
 **cache-hit / input / output** from `pricing.rs` (catalog rows have no
@@ -284,7 +284,7 @@ modalities and (for some rows) USD pricing on top of §4 facts. Highlights:
 - **Where it comes from:** `~/.codex/models_cache.json` — the ChatGPT/Codex
   OAuth `/models` roster persisted by the Codex CLI. On this machine every
   gpt-5.x OAuth entry advertises `context_window: 272000`.
-- **Why CodeWhale shows it:** for `ApiProvider::OpenaiCodex` the picker and
+- **Why Nestlone shows it:** for `ApiProvider::OpenaiCodex` the picker and
   runtime use the OAuth-advertised window **exclusively** — never the API
   route's 1,050,000 — because the OAuth offering genuinely has the smaller
   window and different (subscription) billing. Precedence code:
@@ -305,7 +305,7 @@ Confidence key: **vendor** = the live row is the vendor's own provider entry
 (strong signal); **aggregator** = row from a reseller (Vercel/OpenRouter etc.,
 weaker — verify against the vendor's docs before changing anything).
 
-| # | Model | CodeWhale says | Live catalog says | Source | Assessment |
+| # | Model | Nestlone says | Live catalog says | Source | Assessment |
 |---|---|---|---|---|---|
 | D-1 | `trinity-mini` | ctx 128,000 / out 64,000 (bundled) | 131,072 / 131,072 | aggregator | verify vs Arcee docs |
 | D-2 | `trinity-large-thinking` | out 262,144 (= full ctx — suspicious) | ctx 262,100 / out 80,000 | aggregator | out=ctx is a common data-entry smell; verify |
@@ -489,7 +489,7 @@ Auto fast route.
 | Pricing (USD + DeepSeek CNY, time-aware rows) | `crates/tui/src/pricing.rs:112-303` |
 | Bundled TUI catalog (31 entries, modalities) | `crates/tui/assets/model_catalog.bundled.json` |
 | Bundled Models.dev seed (14 providers / 42 offerings) | `crates/config/assets/models_dev.bundled.json` |
-| Live Models.dev cache (disk) | `~/.codewhale/catalog/models-dev-catalog.json` |
+| Live Models.dev cache (disk) | `~/.nestlone/catalog/models-dev-catalog.json` |
 | Codex OAuth roster (disk, read-only) | `~/.codex/models_cache.json` |
 | Provider descriptors (33) | `crates/config/src/provider.rs` |
 | Provider base-URL/model constants | `crates/config/src/provider_defaults.rs` |

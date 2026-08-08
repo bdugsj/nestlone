@@ -1,6 +1,6 @@
-# Contributing to codewhale
+# Contributing to nestlone
 
-Thank you for your interest in contributing to codewhale! This document provides guidelines and instructions for contributing.
+Thank you for your interest in contributing to nestlone! This document provides guidelines and instructions for contributing.
 
 ## Getting Started
 
@@ -14,8 +14,8 @@ Thank you for your interest in contributing to codewhale! This document provides
 
 1. Fork and clone the repository:
    ```bash
-   git clone https://github.com/YOUR_USERNAME/CodeWhale.git
-   cd CodeWhale
+   git clone https://github.com/YOUR_USERNAME/Nestlone.git
+   cd Nestlone
    ```
 
 2. Build the project:
@@ -30,7 +30,7 @@ Thank you for your interest in contributing to codewhale! This document provides
 
 4. Run with development settings:
    ```bash
-   cargo run --bin codewhale
+   cargo run --bin nestlone
    ```
 
 ## Development Workflow
@@ -88,14 +88,14 @@ Some suites are slow, platform-bound, or intentionally excluded from the
 default run; treat them as documented isolation cases rather than
 failures of the normal gate:
 
-- **PTY snapshots** (`cargo test -p codewhale-tui --test qa_pty
+- **PTY snapshots** (`cargo test -p nestlone-tui --test qa_pty
   --locked`) are Unix-only and internally serialized. One recovery-boot
   case is `#[ignore]`d for a documented input-starvation issue. When a
   PTY case fails, rerun that exact case in isolation and diagnose the
   rendered frame before calling it a flake; `run_verifiers_background_*`
   is the one known full-suite-parallelism flake that passes in
   isolation.
-- **Release runtime QA** (`cargo test -p codewhale-tui --test
+- **Release runtime QA** (`cargo test -p nestlone-tui --test
   release_runtime_qa --locked`) includes an `#[ignore]`d 32-worker storm
   benchmark that is only run explicitly for evidence gathering.
 - **OCR** (`image_ocr`) uses the macOS Vision framework or a locally
@@ -282,7 +282,7 @@ What this means for you:
 
 ## Contribution Gate
 
-Codewhale uses a maintainer-managed contribution gate for the community front
+Nestlone uses a maintainer-managed contribution gate for the community front
 door. Maintainers and collaborators bypass this gate automatically. The gate
 workflows default to dry-run / comment-only mode so maintainers can observe the
 signal before changing contributor flow.
@@ -293,7 +293,7 @@ keeping good-faith contributors seen, credited, and able to keep helping.
 
 Issues are never auto-closed by the contribution gate. Unapproved external
 issues receive a short welcome note that asks for reproduction details and then
-remain open for maintainer triage. Codewhale depends on real edge cases from
+remain open for maintainer triage. Nestlone depends on real edge cases from
 real users, so issue intake should stay warm and open.
 
 Pull requests are different because they can touch code, CI, release plumbing,
@@ -326,7 +326,7 @@ reopened, ask the contributor to resubmit after the allowlist PR is merged.
 
 ## Agent-Assisted Improvements
 
-Codewhale is allowed to help improve Codewhale, but the contribution still has
+Nestlone is allowed to help improve Nestlone, but the contribution still has
 to be shaped for human review. The recommended workflow is the
 [recursive self-improvement prompt](docs/RECURSIVE_SELF_IMPROVEMENT.md): run it
 from a fresh fork or branch, let the agent find exactly one small friction point,
@@ -347,14 +347,14 @@ branding, or global prompts without prior maintainer sign-off.
 
 ## Project Structure
 
-codewhale is a Cargo workspace. The live runtime and the majority of TUI,
+nestlone is a Cargo workspace. The live runtime and the majority of TUI,
 engine, and tool code currently live in `crates/tui/src/`. Smaller workspace
 crates provide shared abstractions that are being extracted incrementally.
 
 ```
 crates/
-├── tui/           codewhale-tui binary (interactive TUI + runtime API)
-├── cli/           codewhale binary (dispatcher facade)
+├── tui/           nestlone-tui binary (interactive TUI + runtime API)
+├── cli/           nestlone binary (dispatcher facade)
 ├── app-server/    HTTP/SSE + JSON-RPC transport
 ├── core/          Agent loop / session / turn management
 ├── protocol/      Request/response framing
@@ -432,7 +432,7 @@ Issue reports should include:
 
 - Operating system and version
 - Rust version (`rustc --version`)
-- codewhale version (`codewhale --version`)
+- nestlone version (`nestlone --version`)
 - Steps to reproduce the issue
 - Expected vs actual behavior
 - Relevant error messages or logs
@@ -451,7 +451,7 @@ code of conduct.
 
 ## License
 
-By contributing to codewhale, you agree that your contributions will be licensed under the MIT License.
+By contributing to nestlone, you agree that your contributions will be licensed under the MIT License.
 
 ## Questions?
 

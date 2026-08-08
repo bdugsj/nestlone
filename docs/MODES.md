@@ -1,6 +1,6 @@
 # Modes and Permission Postures
 
-codewhale has three related concepts:
+nestlone has three related concepts:
 
 - **TUI mode**: what kind of visible interaction you're in (Plan/Act/Operate).
 - **Permission posture**: how aggressively the UI asks before executing tools.
@@ -108,7 +108,7 @@ thread resume semantics.
 Choosing a mode interactively also sets the mode a fresh session starts in.
 Tab/Shift+Tab cycling, the `Alt+A` / `Alt+P` / `Alt+Y` shortcuts, the hotbar's
 Plan/Act/Operate actions, and `/mode` all write `default_mode` to
-`~/.codewhale/settings.toml`, so switching to Operate survives a restart. The
+`~/.nestlone/settings.toml`, so switching to Operate survives a restart. The
 write happens off the event loop; if it fails, the TUI says so in a warning
 toast rather than reverting silently on the next launch.
 
@@ -125,7 +125,7 @@ alias, never a startup mode.
 
 Re-selecting the mode you are already in is not a no-op. After a restored
 session the live mode and `default_mode` routinely disagree, so choosing the
-live mode again is how you make it durable; Codewhale confirms with a
+live mode again is how you make it durable; Nestlone confirms with a
 "saved as startup default" receipt rather than reporting "already in that mode".
 
 While a turn is running, every change to the live route is refused — mode,
@@ -135,8 +135,8 @@ now includes the slash surfaces (`/mode`, `/model`, `/set <key> <value>`,
 Esc to interrupt first. The restart-only `default_mode` key is exempt, because
 it does not touch the running turn.
 
-Codewhale writes `settings.toml` under a lock that spans processes, and replaces
-the file atomically, so a second Codewhale instance on the same home directory
+Nestlone writes `settings.toml` under a lock that spans processes, and replaces
+the file atomically, so a second Nestlone instance on the same home directory
 cannot lose your selection or read a half-written file. At exit, queued writes
 are flushed before the terminal is restored; anything that failed is printed on
 the way out instead of disappearing with the alternate screen.
@@ -167,7 +167,7 @@ missing user decision. Cycle it with `Shift+Tab`, or edit it at runtime:
 
 Legacy note: `/set approval_mode ...` was retired in favor of `/config`.
 
-- `suggest` (**Ask**, default): tool approvals may interrupt, and Codewhale asks
+- `suggest` (**Ask**, default): tool approvals may interrupt, and Nestlone asks
   when an unresolved user choice materially changes authority, cost, scope, or
   outcome.
 - `auto` (**Auto-Review**): the fully autonomous posture. It never opens a user
@@ -217,14 +217,14 @@ See `MCP.md`.
 
 ## Related CLI Flags
 
-Run `codewhale --help` for the canonical list. Common flags:
+Run `nestlone --help` for the canonical list. Common flags:
 
 - `-p, --prompt <TEXT>`: one-shot prompt mode (prints and exits)
-- `codewhale exec --auto --output-format stream-json <PROMPT>`: run the tool-backed non-interactive agent and emit one JSON object per line for harnesses and backend wrappers
-- `codewhale exec --resume <ID|PREFIX> <PROMPT>` / `--session-id <ID|PREFIX>`: continue a saved session non-interactively
-- `codewhale exec --continue <PROMPT>`: continue the most recent saved session for this workspace non-interactively
-- `codewhale fork <ID|PREFIX>` / `codewhale fork --last`: copy a saved session into a new sibling session; forked sessions retain additive parent-session metadata and show that lineage in session listings
-- `--model <MODEL>`: when using the `codewhale` facade, forward a DeepSeek model override to the TUI
+- `nestlone exec --auto --output-format stream-json <PROMPT>`: run the tool-backed non-interactive agent and emit one JSON object per line for harnesses and backend wrappers
+- `nestlone exec --resume <ID|PREFIX> <PROMPT>` / `--session-id <ID|PREFIX>`: continue a saved session non-interactively
+- `nestlone exec --continue <PROMPT>`: continue the most recent saved session for this workspace non-interactively
+- `nestlone fork <ID|PREFIX>` / `nestlone fork --last`: copy a saved session into a new sibling session; forked sessions retain additive parent-session metadata and show that lineage in session listings
+- `--model <MODEL>`: when using the `nestlone` facade, forward a DeepSeek model override to the TUI
 - `--workspace <DIR>`: workspace root for file tools
 - `-r, --resume <ID|PREFIX|latest>`: resume a saved session
 - `-c, --continue`: resume the most recent session in this workspace
@@ -238,7 +238,7 @@ Run `codewhale --help` for the canonical list. Common flags:
 
 DeepSeek-TUI has three related but intentionally separate recovery paths:
 
-- `codewhale fork <ID>` creates a new saved session from an existing saved
+- `nestlone fork <ID>` creates a new saved session from an existing saved
   conversation and records the source session id. This is the safe way to
   explore a different answer path without overwriting the original session.
 - Esc-Esc backtrack rewinds the live transcript to a previous user prompt and

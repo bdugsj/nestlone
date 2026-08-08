@@ -2,7 +2,7 @@
 
 ## Scope
 
-This document covers the security boundaries of CodeWhale Workrooms — the
+This document covers the security boundaries of Nestlone Workrooms — the
 durable, addressable containers for threaded agent conversations described
 in [RFC 3209](rfcs/3209-workrooms.md).
 
@@ -18,7 +18,7 @@ model-visible link resolution remain follow-up work.
 ## Principles
 
 1. **Local-first.** Future persisted workroom state should live under the
-   CodeWhale home directory, protected by user-only filesystem permissions.
+   Nestlone home directory, protected by user-only filesystem permissions.
    No cloud sync, no telemetry, no third-party hosting.
 
 2. **No secrets in links.** `codewhale://workroom/wr_...` URLs contain only

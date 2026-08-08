@@ -1,18 +1,18 @@
 # Runtime API & Integration Contract
 
-`codewhale app-server` is the canonical local runtime API and control plane.
+`nestlone app-server` is the canonical local runtime API and control plane.
 Local SDKs, mobile/remote-control clients, and editor integrations talk to it
 instead of screen-scraping terminal output. It serves the full HTTP/SSE runtime
 API (`/v1/*`), a JSON-RPC control transport over stdio, and the phone-friendly
-mobile page. `codewhale doctor --json` provides machine-readable health, and
-`codewhale serve --acp` speaks the Agent Client Protocol over stdio for editors
+mobile page. `nestlone doctor --json` provides machine-readable health, and
+`nestlone serve --acp` speaks the Agent Client Protocol over stdio for editors
 such as Zed.
 
-`codewhale serve --http` / `serve --mobile` remain as **compatibility aliases**
-for `codewhale app-server --http` / `--mobile`; both launch the identical
+`nestlone serve --http` / `serve --mobile` remain as **compatibility aliases**
+for `nestlone app-server --http` / `--mobile`; both launch the identical
 server. New integrations should target `app-server`.
 
-`codewhale exec` is the separate one-shot headless worker path (stream-json,
+`nestlone exec` is the separate one-shot headless worker path (stream-json,
 fleet worker subprocess, CI primitive). It is not part of this API, but it
 shares the same runtime, provider/model resolution, permission profiles, and
 event vocabulary.
@@ -25,14 +25,14 @@ applications (and other local supervisors) that embed the DeepSeek engine.
 ```
 local supervisor / SDK / automation harness
         │
-        ├─ codewhale app-server --http     → HTTP/SSE runtime API (/v1/*)        [canonical]
-        ├─ codewhale app-server --mobile   → runtime API + mobile control page
-        ├─ codewhale app-server --stdio    → JSON-RPC control transport over stdio
-        ├─ codewhale doctor --json         → machine-readable health & capability
-        ├─ codewhale serve --acp           → ACP stdio agent for editors such as Zed
-        ├─ codewhale serve --mcp           → MCP stdio server
-        ├─ codewhale serve --http/--mobile → legacy aliases for `app-server --http/--mobile`
-        └─ codewhale exec [args]           → one-shot headless worker (stream-json)
+        ├─ nestlone app-server --http     → HTTP/SSE runtime API (/v1/*)        [canonical]
+        ├─ nestlone app-server --mobile   → runtime API + mobile control page
+        ├─ nestlone app-server --stdio    → JSON-RPC control transport over stdio
+        ├─ nestlone doctor --json         → machine-readable health & capability
+        ├─ nestlone serve --acp           → ACP stdio agent for editors such as Zed
+        ├─ nestlone serve --mcp           → MCP stdio server
+        ├─ nestlone serve --http/--mobile → legacy aliases for `app-server --http/--mobile`
+        └─ nestlone exec [args]           → one-shot headless worker (stream-json)
 ```
 
 The engine runs as a local-only process. All APIs bind to `localhost` by
@@ -46,12 +46,12 @@ CLI/API surfaces are not implemented yet.
 
 | Entry | Transport | Use |
 |---|---|---|
-| `codewhale web [--port 7878]` | HTTP/SSE on `127.0.0.1:7878` + embedded client | First-class loopback-only browser client; opens the default browser |
-| `codewhale app-server --http` | HTTP/SSE on `127.0.0.1:7878` | Full `/v1/*` runtime API (canonical) |
-| `codewhale app-server --mobile` | HTTP/SSE on `0.0.0.0:7878` + `/mobile` | Runtime API + phone control page |
-| `codewhale app-server --stdio` | JSON-RPC 2.0 over stdio | Local SDK / control probe (no listener) |
-| `codewhale app-server` | HTTP on `127.0.0.1:8787` | Legacy in-process app-server (`/healthz`, `/thread`, `/app`, `/prompt`, `/tool`, `/jobs`) |
-| `codewhale serve --http` / `--mobile` | same server as `app-server --http`/`--mobile` | Compatibility aliases |
+| `nestlone web [--port 7878]` | HTTP/SSE on `127.0.0.1:7878` + embedded client | First-class loopback-only browser client; opens the default browser |
+| `nestlone app-server --http` | HTTP/SSE on `127.0.0.1:7878` | Full `/v1/*` runtime API (canonical) |
+| `nestlone app-server --mobile` | HTTP/SSE on `0.0.0.0:7878` + `/mobile` | Runtime API + phone control page |
+| `nestlone app-server --stdio` | JSON-RPC 2.0 over stdio | Local SDK / control probe (no listener) |
+| `nestlone app-server` | HTTP on `127.0.0.1:8787` | Legacy in-process app-server (`/healthz`, `/thread`, `/app`, `/prompt`, `/tool`, `/jobs`) |
+| `nestlone serve --http` / `--mobile` | same server as `app-server --http`/`--mobile` | Compatibility aliases |
 
 `app-server --http` and `--mobile` launch the same mature runtime API server
 historically reached through `serve --http` — no routes or behavior changed, so
@@ -59,7 +59,7 @@ every endpoint documented below is identical across both entrypoints. The
 runtime API token is read from `--auth-token`, then `CODEWHALE_RUNTIME_TOKEN`,
 then `DEEPSEEK_RUNTIME_TOKEN`; use `--insecure-no-auth` only with a loopback
 bind. The `serve` compatibility aliases keep their `--insecure` flag.
-The legacy in-process `codewhale app-server` also requires an explicit
+The legacy in-process `nestlone app-server` also requires an explicit
 `--auth-token` or `CODEWHALE_APP_SERVER_TOKEN` before binding a non-loopback
 host; its generated one-time `cwapp_*` token is loopback-only.
 
@@ -71,7 +71,7 @@ printf '%s\n' \
   '{"jsonrpc":"2.0","id":1,"method":"healthz"}' \
   '{"jsonrpc":"2.0","id":2,"method":"capabilities"}' \
   '{"jsonrpc":"2.0","id":3,"method":"shutdown"}' \
-  | codewhale app-server --stdio
+  | nestlone app-server --stdio
 ```
 
 `capabilities` returns the advertised method families (`thread/*`, `app/*`,
@@ -120,7 +120,7 @@ this; the table maps each integration need to where a local client reads it.
 | Token usage | `TurnRecord.usage`; aggregate via `GET /v1/usage` | available |
 | Single-read run receipt (route + usage + cost) | `GET /v1/threads/{id}/turns/{turn_id}/receipt` | proposed ([RECEIPTS.md](RECEIPTS.md)) |
 
-For one-shot/headless automation, prefer `codewhale exec` with explicit
+For one-shot/headless automation, prefer `nestlone exec` with explicit
 `--provider <id> --model <id>` so a failure identifies the exact provider/model
 pair. Use `app-server` when a local integration needs to start, resume, steer,
 or interrupt turns, list models/capabilities, follow the event stream, or read
@@ -138,7 +138,7 @@ scripts/release/app-server-smoke.sh --matrix --real # + exec a cheap sentinel pe
 ```
 
 The stdio probe runs against a throwaway config, so it never reads real keys.
-The matrix discovers configured providers from `codewhale auth list`, skips
+The matrix discovers configured providers from `nestlone auth list`, skips
 unconfigured providers, and maps a provider to a cheap sentinel model only when
 it has a built-in cheap default. That built-in set is deliberately conservative
 (currently `deepseek`, `zai`, `moonshot`, and `openai`); every other provider —
@@ -147,12 +147,12 @@ unmapped on purpose and must be given a model per run via `SMOKE_MODEL_<SLUG>`
 rather than a guessed default (#3205). Any configured-but-unmapped provider
 fails loudly in `--real` mode. `auth list` reports presence flags only and exec
 output is passed through a redactor, so secrets are never printed. The parser is
-covered by `scripts/release/app-server-smoke.test.sh` against a fake `codewhale`
+covered by `scripts/release/app-server-smoke.test.sh` against a fake `nestlone`
 binary.
 
-## ACP stdio adapter: `codewhale serve --acp`
+## ACP stdio adapter: `nestlone serve --acp`
 
-`codewhale serve --acp` speaks JSON-RPC 2.0 over newline-delimited stdio for
+`nestlone serve --acp` speaks JSON-RPC 2.0 over newline-delimited stdio for
 ACP-compatible editor clients. The initial adapter implements the ACP baseline:
 
 - `initialize`
@@ -166,16 +166,16 @@ followed by a `session/prompt` response with `stopReason: "end_turn"`.
 
 The adapter is intentionally conservative: it does not yet expose shell tools,
 file-write tools, checkpoint replay, or session loading through ACP. Use
-`codewhale serve --http` for the full local runtime API and `codewhale serve --mcp`
+`nestlone serve --http` for the full local runtime API and `nestlone serve --mcp`
 when another client needs DeepSeek's tools as MCP tools.
 
-## Capability endpoint: `codewhale doctor --json`
+## Capability endpoint: `nestlone doctor --json`
 
 Returns a JSON object describing the current installation's readiness state.
 Suitable for health-check polling from a macOS workbench.
 
 ```bash
-codewhale doctor --json
+nestlone doctor --json
 ```
 
 ### Response schema (key fields)
@@ -186,7 +186,7 @@ codewhale doctor --json
 | `config_path` | string | Resolved config file path |
 | `config_present` | bool | Whether the config file exists |
 | `workspace` | string | Default workspace directory |
-| `legacy_state.primary_root` | string | Primary Codewhale state root inspected for known state paths |
+| `legacy_state.primary_root` | string | Primary Nestlone state root inspected for known state paths |
 | `legacy_state.legacy_root` | string | Legacy `.deepseek` state root inspected for known state paths |
 | `legacy_state.needs_attention` | bool | Whether known `~/.deepseek` state paths need review or the read-only session recovery diagnostic found missing destination filenames / could not complete |
 | `legacy_state.legacy_only_count` | number | Count of known state paths present only under the legacy root |
@@ -199,7 +199,7 @@ codewhale doctor --json
 | `legacy_state.session_recovery.recoverable_files` | array | Bounded sample of up to 100 missing destination filenames with source and destination paths; no chat payloads |
 | `legacy_state.session_recovery.recoverable_file_count` | number | Total missing destination filename count, including entries beyond the bounded sample |
 | `legacy_state.session_recovery.recoverable_files_truncated` | bool | Whether more than 100 recoverable filenames were found |
-| `legacy_state.session_recovery.recovery_command` | string or null | `codewhale sessions` when additive automatic recovery is available; null for isolated, complete, empty, or failed scans |
+| `legacy_state.session_recovery.recovery_command` | string or null | `nestlone sessions` when additive automatic recovery is available; null for isolated, complete, empty, or failed scans |
 | `api_key.source` | string | `env`, `config`, or `missing` |
 | `base_url` | string | API base URL |
 | `default_text_model` | string | Default model |
@@ -212,7 +212,7 @@ codewhale doctor --json
 | `mcp.live_health_checked` | bool | Always false for doctor JSON |
 | `mcp.servers` | array | Per-server configuration result plus separate `checks` for command availability, process reachability, protocol initialization, and backend/tool health; live stages are `not_checked` |
 | `skills.selected` | string | Resolved skills directory |
-| `skills.global.path` / `.present` / `.count` | — | Codewhale global skills dir (`~/.codewhale/skills`, with legacy `~/.deepseek/skills` support) |
+| `skills.global.path` / `.present` / `.count` | — | Nestlone global skills dir (`~/.nestlone/skills`, with legacy `~/.deepseek/skills` support) |
 | `skills.agents.path` / `.present` / `.count` | — | Workspace `.agents/skills/` dir |
 | `skills.agents_global.path` / `.present` / `.count` | — | agentskills.io global skills dir (`~/.agents/skills`) |
 | `skills.local.path` / `.present` / `.count` | — | `skills/` dir |
@@ -230,9 +230,9 @@ codewhale doctor --json
 ```json
 {
   "version": "0.8.9",
-  "config_path": "/Users/you/.codewhale/config.toml",
+  "config_path": "/Users/you/.nestlone/config.toml",
   "config_present": true,
-  "workspace": "/Users/you/projects/codewhale-tui",
+  "workspace": "/Users/you/projects/nestlone-tui",
   "api_key": {
     "source": "env"
   },
@@ -240,11 +240,11 @@ codewhale doctor --json
   "default_text_model": "deepseek-v4-pro",
   "memory": {
     "enabled": false,
-    "path": "/Users/you/.codewhale/memory.md",
+    "path": "/Users/you/.nestlone/memory.md",
     "file_present": true
   },
   "mcp": {
-    "config_path": "/Users/you/.codewhale/mcp.json",
+    "config_path": "/Users/you/.nestlone/mcp.json",
     "present": true,
     "servers": [
       {"name": "filesystem", "enabled": true, "status": "ok", "detail": "ready"}
@@ -257,17 +257,17 @@ codewhale doctor --json
 }
 ```
 
-## HTTP/SSE runtime API: `codewhale app-server --http`
+## HTTP/SSE runtime API: `nestlone app-server --http`
 
 ```bash
-codewhale app-server --http [--host 127.0.0.1] [--port 7878] [--workers 2] [--auth-token TOKEN] [--insecure-no-auth]
-codewhale app-server --mobile [--host 0.0.0.0] [--port 7878] [--auth-token TOKEN]
-codewhale app-server --mobile --host 127.0.0.1 [--port 7878] [--insecure-no-auth]
-codewhale web [--port 7878]
+nestlone app-server --http [--host 127.0.0.1] [--port 7878] [--workers 2] [--auth-token TOKEN] [--insecure-no-auth]
+nestlone app-server --mobile [--host 0.0.0.0] [--port 7878] [--auth-token TOKEN]
+nestlone app-server --mobile --host 127.0.0.1 [--port 7878] [--insecure-no-auth]
+nestlone web [--port 7878]
 
 # Compatibility aliases — identical server, serve flag names:
-codewhale serve --http   [...] [--insecure]
-codewhale serve --mobile [...] [--insecure]
+nestlone serve --http   [...] [--insecure]
+nestlone serve --mobile [...] [--insecure]
 ```
 
 Defaults: host `127.0.0.1`, port `7878`, 2 workers (clamped 1–8).
@@ -275,11 +275,11 @@ Defaults: host `127.0.0.1`, port `7878`, 2 workers (clamped 1–8).
 The server binds to `localhost` by default. Configuration is via CLI flags —
 there is no `[app_server]` config section.
 
-`/v1/*` routes require a bearer token unless `codewhale app-server` is started
+`/v1/*` routes require a bearer token unless `nestlone app-server` is started
 with `--insecure-no-auth` on a loopback bind such as `127.0.0.1`. Do not combine
 no-auth mode with the `--mobile` default host `0.0.0.0`; use a token for LAN
 mobile access, or add `--host 127.0.0.1` for local-only no-auth testing. The
-`codewhale serve` compatibility aliases use `--insecure` for the same loopback
+`nestlone serve` compatibility aliases use `--insecure` for the same loopback
 escape hatch.
 Pass `--auth-token TOKEN` or set `CODEWHALE_RUNTIME_TOKEN=TOKEN` before starting
 the server; `DEEPSEEK_RUNTIME_TOKEN` remains a compatibility alias. If neither
@@ -290,20 +290,20 @@ authentication. `/mobile` returns 404 when mobile mode is disabled and serves
 the unchanged static shell when it is enabled.
 
 Authenticated clients can provide the token as `Authorization: Bearer TOKEN`,
-`X-Codewhale-Runtime-Token: TOKEN`, the legacy
-`X-DeepSeek-Runtime-Token: TOKEN`, or the `codewhale_runtime_token` cookie.
+`X-Nestlone-Runtime-Token: TOKEN`, the legacy
+`X-DeepSeek-Runtime-Token: TOKEN`, or the `nestlone_runtime_token` cookie.
 Query-string authentication is not supported.
 
 ### Local browser client
 
-`codewhale web` starts the canonical Runtime API on `127.0.0.1`, serves
+`nestlone web` starts the canonical Runtime API on `127.0.0.1`, serves
 dependency-free assets embedded in the binary, and opens the default browser.
 It cannot bind to a non-loopback host and cannot run with Runtime auth disabled.
 
 The browser-launch URL contains a random, short-lived, one-time bootstrap
 capability, never the Runtime token. A loopback request exchanges that
 capability for a
-`codewhale_web_session=…; HttpOnly; SameSite=Strict; Path=/` cookie backed by a
+`nestlone_web_session=…; HttpOnly; SameSite=Strict; Path=/` cookie backed by a
 single process-local server session that expires 12 hours after the server
 process starts, consumes the capability immediately, and redirects to `/`.
 Reused, expired, malformed, or
@@ -342,7 +342,7 @@ absent until the Runtime publishes explicit contracts for them.
 
 ### Mobile control page
 
-`codewhale serve --mobile` starts the same HTTP/SSE runtime API and serves a
+`nestlone serve --mobile` starts the same HTTP/SSE runtime API and serves a
 phone-friendly control page at `/mobile`. When the bind host is left at the
 default, mobile mode binds to `0.0.0.0`, prints a warning, and prints local/LAN
 URLs. Pass `--host 127.0.0.1` to keep the mobile page loopback-only. The static
@@ -404,11 +404,11 @@ never chosen by `--continue` or by auto-resume. The route is the same writer
 the TUI picker (`e`) and `/sessions archive <id>` use — there is no second
 archive notion.
 
-While a session is open in an interactive Codewhale process, that process holds
+While a session is open in an interactive Nestlone process, that process holds
 the authoritative copy in memory and rewrites the whole document on its next
 autosave. `PATCH` therefore fails closed on it with `409 Conflict` rather than
 writing something that would be silently reverted. Change it in the terminal
-instead. A standalone `codewhale web` holds nothing open and is never blocked.
+instead. A standalone `nestlone web` holds nothing open and is never blocked.
 
 `GET /v1/sessions/{id}?peek=true` returns a bounded, redacted, read-only view
 instead of the transcript: at most 12 entries of at most 400 characters each
@@ -443,7 +443,7 @@ workspace metadata:
   "branch": "feature/runtime-api",
   "head": "abc1234",
   "dirty": false,
-  "workspace": "/Users/you/projects/codewhale",
+  "workspace": "/Users/you/projects/nestlone",
   "archived": false,
   "updated_at": "2026-06-06T05:43:00Z",
   "latest_turn_id": "turn_...",
@@ -598,7 +598,7 @@ specified and tested.
 
 Skill activation toggles are persisted under a cross-process transaction lock.
 Each mutation reloads and merges the latest exact-name state before an atomic
-write, and `GET /v1/skills` refreshes that shared state so another Codewhale
+write, and `GET /v1/skills` refreshes that shared state so another Nestlone
 process's successful toggle is visible without restarting the Runtime API.
 
 **Usage** (token/cost aggregation across threads)
@@ -774,9 +774,9 @@ The runtime API ships with a built-in dev-origin allow-list:
 `http://127.0.0.1:1420`, `tauri://localhost`. To add additional origins (e.g.
 when developing a UI on Vite's default `:5173`), use any of:
 
-- CLI flag (repeatable): `codewhale serve --http --cors-origin http://localhost:5173`
+- CLI flag (repeatable): `nestlone serve --http --cors-origin http://localhost:5173`
 - Env var (comma-separated): `DEEPSEEK_CORS_ORIGINS="http://localhost:5173,http://localhost:8080"`
-- Config (`~/.codewhale/config.toml`):
+- Config (`~/.nestlone/config.toml`):
   ```toml
   [runtime_api]
   cors_origins = ["http://localhost:5173"]
@@ -785,19 +785,19 @@ when developing a UI on Vite's default `:5173`), use any of:
 User-supplied origins **stack on top of** the built-in defaults; they do not
 replace them. Wildcard origins are not supported — the explicit allow-list
 model is preserved. Cross-origin preflights advertise only `Authorization`,
-`Content-Type`, `Accept`, `X-Codewhale-Runtime-Token`, and the compatibility
+`Content-Type`, `Accept`, `X-Nestlone-Runtime-Token`, and the compatibility
 `X-DeepSeek-Runtime-Token` request header; custom request headers are not
 allowed. Added in v0.8.10 (#561), tightened in v0.9.1 (#4454).
 
 ## Runtime SDK Fleet Helpers
 
 The v0.8.60 Runtime SDK fixture lives in `npm/runtime-sdk` and is exposed as
-the `@codewhale/runtime-sdk` workspace package. It is deliberately thin: every
-helper calls the local Rust Runtime API and therefore cannot bypass Codewhale's
+the `@nestlone/runtime-sdk` workspace package. It is deliberately thin: every
+helper calls the local Rust Runtime API and therefore cannot bypass Nestlone's
 sandbox, approval prompts, provider configuration, or fleet ledger authority.
 
 ```js
-import { createRuntimeClient } from "@codewhale/runtime-sdk";
+import { createRuntimeClient } from "@nestlone/runtime-sdk";
 
 const client = createRuntimeClient({
   baseUrl: "http://127.0.0.1:7878",
@@ -831,13 +831,13 @@ generic fetch failures.
 Verification:
 
 ```bash
-npm test --workspace @codewhale/runtime-sdk
+npm test --workspace @nestlone/runtime-sdk
 ```
 
 ## Agent Run Receipts
 
 Sub-agent lanes persist compact run receipts in
-`.codewhale/state/subagents.v1.json`. The Runtime API exposes those receipts as
+`.nestlone/state/subagents.v1.json`. The Runtime API exposes those receipts as
 a read-only inspection surface:
 
 | Operation | Endpoint |
@@ -878,7 +878,7 @@ the TUI and parent model see.
 Contract snapshots live in `crates/protocol/tests/`. Run:
 
 ```bash
-cargo test -p codewhale-protocol --test parity_protocol --locked
+cargo test -p nestlone-protocol --test parity_protocol --locked
 ```
 
 This validates that the app-server's event schema hasn't drifted from the
@@ -888,7 +888,7 @@ The app-server stdio control surface has its own drift guard — the advertised
 `capabilities` method set is pinned in `crates/app-server/src/lib.rs`:
 
 ```bash
-cargo test -p codewhale-app-server capabilities
+cargo test -p nestlone-app-server capabilities
 ```
 
 Before a release, run the headless smoke (stdio probe + optional provider

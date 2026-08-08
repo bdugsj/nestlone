@@ -1,21 +1,21 @@
 # Contributors
 
-Codewhale is built in the open with a growing community of contributors. Every
+Nestlone is built in the open with a growing community of contributors. Every
 issue report and pull request is real project work — welcome at any experience
 level. This is the full per-PR contributor record, grouped into release/time
 bands with the newest band first so it stays scannable. Expand any band to see
 everyone.
 
 For the live list, see the
-[GitHub contributors page](https://github.com/Hmbown/CodeWhale/graphs/contributors),
-[`AUTHOR_MAP`](https://github.com/Hmbown/CodeWhale/blob/main/.github/AUTHOR_MAP),
+[GitHub contributors page](https://github.com/bdugsj/nestlone/graphs/contributors),
+[`AUTHOR_MAP`](https://github.com/bdugsj/nestlone/blob/main/.github/AUTHOR_MAP),
 and [CHANGELOG.md](../CHANGELOG.md).
 
 ## Organizational thanks
 
 - **[DeepSeek](https://github.com/deepseek-ai)** — the models and support that got this project started. 感谢 DeepSeek 提供模型与支持。
 - **[DataWhale](https://github.com/datawhalechina)** 🐋 — for the support and for welcoming us into the Whale Brother family. 感谢 DataWhale 的支持。
-- **[OpenWarp](https://github.com/zerx-lab/warp)** — for prioritizing Codewhale support and collaborating on a better terminal-agent experience.
+- **[OpenWarp](https://github.com/zerx-lab/warp)** — for prioritizing Nestlone support and collaborating on a better terminal-agent experience.
 - **[Open Design](https://github.com/nexu-io/open-design)** — for support and collaboration around design-forward agent workflows.
 
 The maintainer rule: reports and PRs are real project work, even when the final
@@ -26,6 +26,47 @@ notes, and relevant issue/PR comments.
 ---
 
 ## Contributors by time
+
+<details open>
+<summary><strong>v0.0.2 — nestlone rebrand</strong></summary>
+
+The first Nestlone release. The fork was rebranded from Codewhale end to end,
+release engineering moved fully to GitHub Actions, and community PRs and issue
+reports were merged or harvested into the new release lane.
+
+**Merged / harvested contributors:**
+
+- **[greyfreedom](https://github.com/greyfreedom)**
+- **[nightt5879](https://github.com/nightt5879)**
+- **[XhesicaFrost](https://github.com/XhesicaFrost)**
+- **[cyq1017](https://github.com/cyq1017)**
+- **[snail-vs](https://github.com/snail-vs)**
+- **[SparkofSpike](https://github.com/SparkofSpike)**
+- **[GTC2080](https://github.com/GTC2080)**
+- **[h3c-hexin](https://github.com/h3c-hexin)**
+- **[atmosuwiryo](https://github.com/atmosuwiryo)**
+- **[M-Maciej](https://github.com/M-Maciej)**
+- **[raphamorim](https://github.com/raphamorim)**
+- **[LI-Jialu](https://github.com/LI-Jialu)**
+- **[kobihikri](https://github.com/kobihikri)**
+- **[EvanProgramming](https://github.com/EvanProgramming)**
+- **[adity982](https://github.com/adity982)**
+- **[vibecoding-skills](https://github.com/vibecoding-skills)**
+
+**Issue helpers:**
+
+- **[fleitz](https://github.com/fleitz)**
+- **[LmeSzinc](https://github.com/LmeSzinc)**
+- **[antarikshraya](https://github.com/antarikshraya)**
+- **[eugenicum](https://github.com/eugenicum)**
+- **[whp233](https://github.com/whp233)**
+- **[redjade75723](https://github.com/redjade75723)**
+- **[hardy922](https://github.com/hardy922)**
+- **[JayBeest](https://github.com/JayBeest)**
+- **[elijahchan2019](https://github.com/elijahchan2019)**
+- **[cy2311](https://github.com/cy2311)**
+- **[wywsoor](https://github.com/wywsoor)**
+</details>
 
 <details open>
 <summary><strong>v0.9.2 — routing, workflow, localization, and inspectability</strong></summary>
@@ -224,7 +265,7 @@ release evidence. The reports and pull requests below materially shaped it.
 - **[knqiufan](https://github.com/knqiufan)** — Anthropic cache-write token
   pricing at published rates (PR #4348, #4318)
 - **[Chavdar Ivanov / ci4ic4](https://github.com/ci4ic4)** — NetBSD QuickJS
-  bindgen support for codewhale-workflow-js (PR #4349)
+  bindgen support for nestlone-workflow-js (PR #4349)
 - **[eugenicum](https://github.com/eugenicum)** — copy-paste rail-pollution
   report with code-aware fix direction (#4208)
 - **[JayBeest](https://github.com/JayBeest)** — parent
@@ -247,7 +288,7 @@ release evidence. The reports and pull requests below materially shaped it.
   matches on UTF-8 character boundaries; preserve inline skill task text in
   PR #4372 (#4088, #4045, #3915)
 - **[gaord](https://github.com/gaord)** — add the community-maintained
-  CodeWhale for VS Code GUI frontend to the English and Chinese READMEs (#4035)
+  Nestlone for VS Code GUI frontend to the English and Chinese READMEs (#4035)
 - **[Darrell Thomas](https://github.com/DarrellThomas)** — remove the unused
   whale route taxonomy module and its dead tests (#4041)
 - **[Taixin Guo](https://github.com/taixinguo)** — CJK fuzzy-edit panic report
@@ -275,7 +316,7 @@ in several community provider and bridge contributions with release credit.
   ask-rules` view for resolved ask-rule paths, status, and configured
   tool/command/path rules (#3569, merged)
 - **[noaft](https://github.com/noaft)** — `/links` provider docs fallback
-  update, including the current CodeWhale docs URL and a Baidu Qianfan docs
+  update, including the current Nestlone docs URL and a Baidu Qianfan docs
   link (#3621, harvested)
 - **[noaft](https://github.com/noaft)** — OpenModel provider support across
   config, CLI, TUI provider picker, docs, and registry checks (#3585,
@@ -320,7 +361,7 @@ proxying, and DeepSeek thinking tool calls — alongside community contributions
 - **[wuisabel-gif](https://github.com/wuisabel-gif)** — tear down the delegated
   serve/app-server child process when the dispatcher exits (#3259 / #3317)
 - **[nightt5879](https://github.com/nightt5879)** — keep the onboarding marker in
-  the codewhale home view (#3302) and branch-hygiene check hardening (#3348)
+  the nestlone home view (#3302) and branch-hygiene check hardening (#3348)
 - **[gaord](https://github.com/gaord)** — preserve thinking/tool blocks when
   seeding a thread from a saved session, plus Hugging Face provider env (#3329)
 - **[greyfreedom](https://github.com/greyfreedom)** — persist ask-permission rules
@@ -337,7 +378,7 @@ proxying, and DeepSeek thinking tool calls — alongside community contributions
 
 The v0.8.62 release retuned provider/model routing (GLM-5.2 as the default direct
 Z.AI model, `type: "explore"` sub-agents defaulting to the cheaper same-family
-sibling), added TOML comment preservation and the CodeWhale-only skill discovery
+sibling), added TOML comment preservation and the Nestlone-only skill discovery
 gate, and shipped the static Linux x64 musl binary — alongside a broad community
 closeout and a retroactive credit reconciliation pass.
 
@@ -350,8 +391,8 @@ closeout and a retroactive credit reconciliation pass.
 - **[LeoLin990405](https://github.com/LeoLin990405)** — Poppler `pdftotext -v`
   detection (#1667), session persistence before stall/cancel recovery (#2739),
   and debounced thinking-stream re-renders (#1620)
-- **[nightt5879](https://github.com/nightt5879)** — CodeWhale-only skill discovery
-  gate (`[skills].scan_codewhale_only`) ignoring cross-tool directories (#3296) and
+- **[nightt5879](https://github.com/nightt5879)** — Nestlone-only skill discovery
+  gate (`[skills].scan_nestlone_only`) ignoring cross-tool directories (#3296) and
   app-server no-auth loopback docs
 - **[reidliu41](https://github.com/reidliu41)** — slash commands exposed as hotbar
   actions (#3269)
@@ -359,7 +400,7 @@ closeout and a retroactive credit reconciliation pass.
   binaries
 - **[wuisabel-gif](https://github.com/wuisabel-gif)** — per-tool snapshot gate
   respecting `[snapshots].enabled` (#3292) and composer history written under
-  `.codewhale`
+  `.nestlone`
 - **[gaord](https://github.com/gaord)** — `workspace_follow_symlinks` setting for
   symlink-aware tool operations with hardened path handling
 - **[greyfreedom](https://github.com/greyfreedom)** — ask-permission rules honored
@@ -415,7 +456,7 @@ patches, and TUI fixes landed alongside first-time and returning contributor wor
 <summary><strong>Forward track — recent v0.9 work (newest)</strong></summary>
 
 
-- **[xyuai](https://github.com/xyuai)** — canonical CodeWhale settings path,
+- **[xyuai](https://github.com/xyuai)** — canonical Nestlone settings path,
   provider persistence, provider picker, logout-scope, and MiMo auth cleanup
   work (#2730, #2714, #2715, #2717, #2718)
 - **[shenjackyuanjie](https://github.com/shenjackyuanjie)** — HarmonyOS /
@@ -504,7 +545,7 @@ patches, and TUI fixes landed alongside first-time and returning contributor wor
 - **[xieshutao](https://github.com/xieshutao)** — plain Markdown skill fallback (#869)
 - **[GK012](https://github.com/GK012)** — npm wrapper `--version` fallback (#885)
 - **[y0sif](https://github.com/y0sif)** — parent turn-loop wakeup after direct child sub-agent completion (#901)
-- **[mac119](https://github.com/mac119)** and **[leo119](https://github.com/leo119)** — `codewhale update` command documentation (#838, #917)
+- **[mac119](https://github.com/mac119)** and **[leo119](https://github.com/leo119)** — `nestlone update` command documentation (#838, #917)
 - **[dumbjack](https://github.com/dumbjack)** / **浩淼的mac** — command-safety null-byte hardening (#706, #918)
 - **macworkers** — fork confirmation with the new session id (#600, #919)
 - **zero** and **[zerx-lab](https://github.com/zerx-lab)** — notification condition config and richer OSC 9 notification body (#820, #920)
@@ -532,7 +573,7 @@ patches, and TUI fixes landed alongside first-time and returning contributor wor
 - **[mdrkrg](https://github.com/mdrkrg)** — first-run onboarding crash fix when the API key is missing (#1598)
 - **[Aitensa](https://github.com/Aitensa)** — CJK wrapping propagation for diff and pager output (#1622)
 - **[qiyan233](https://github.com/qiyan233)** — legacy DeepSeek CN provider alias compatibility (#1645)
-- **[zlh124](https://github.com/zlh124)** — WSL2/headless startup report, clipboard-init fix, CodeWhale tab-title polish, localized context-menu labels, and approval-dialog fixes (#1772, #1773, #2319, #2320, #2325)
+- **[zlh124](https://github.com/zlh124)** — WSL2/headless startup report, clipboard-init fix, Nestlone tab-title polish, localized context-menu labels, and approval-dialog fixes (#1772, #1773, #2319, #2320, #2325)
 - **[aboimpinto](https://github.com/aboimpinto)** — Windows alt-screen
   logging, Home/End composer, runtime log follow-ups, sidebar command polish,
   and pausable command lifecycle work (#1774, #1776, #1748, #1749, #1782,
@@ -545,11 +586,11 @@ patches, and TUI fixes landed alongside first-time and returning contributor wor
 - **[sximelon](https://github.com/sximelon)** — paste Enter suppression, key handler extraction (#2174, #2042)
 - **[nanookclaw](https://github.com/nanookclaw)** — search provider in doctor output (#2135)
 - **[Sskift](https://github.com/Sskift)** — CLI default env override prevention and statusline footer clearing (#2119, #2248)
-- **[xin1104](https://github.com/xin1104)** — Homebrew codewhale binary install (#2105)
+- **[xin1104](https://github.com/xin1104)** — Homebrew nestlone binary install (#2105)
 - **[mrluanma](https://github.com/mrluanma)** — Metaso search provider (#2059)
 - **[Lellansin](https://github.com/Lellansin)** — skip config merge at home dir (#2055)
 - **[zhuangbiaowei](https://github.com/zhuangbiaowei)** — update release channels and legacy MCP SSE fixes (#2145, #2301)
-- **[cy2311](https://github.com/cy2311)** — Windows `.bat` launcher for CodeWhale (#1861)
+- **[cy2311](https://github.com/cy2311)** — Windows `.bat` launcher for Nestlone (#1861)
 - **[LING71671](https://github.com/LING71671)** — effective cost currency context, custom provider docs, and core tool taxonomy prompt block (#1902, #2287, #2292)
 - **[dzyuan](https://github.com/dzyuan)** — Volcengine provider support with DeepSeek V4 Pro/Flash models (#1993)
 - **[mvanhorn](https://github.com/mvanhorn)** — live request-shape test factories and global `~/.agents/AGENTS.md` fallback (#2107, #2236)

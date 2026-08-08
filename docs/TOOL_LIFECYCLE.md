@@ -13,14 +13,14 @@ describes *what will be done* and the invariants any future diet PR must hold.
   Legacy subagent-name cleanup + guardrail tests in this policy rebase on #2684.
 - PR **#2685** — git-history active + RLM/field errors.
 
-All file:line citations are against the verified tree at the current Codewhale
+All file:line citations are against the verified tree at the current Nestlone
 checkout as of v0.8.52/0.8.53.
 
 ---
 
 ## 1. Purpose and the weaker-model problem
 
-Codewhale ships a large native tool surface. The first-turn *active* partition
+Nestlone ships a large native tool surface. The first-turn *active* partition
 of that surface is what every model sees before it has run a single
 `tool_search_*` call. Today that active set contains several **near-duplicate
 tools** that map to the *same* implementation under different names:
@@ -70,10 +70,10 @@ Work grounding is one seam (#3983): `crates/tui/src/work_grounding.rs` renders
 the To-do snapshot once, hard-bounded in both item count and characters, with
 the in-progress item preserved preferentially and any elision marked. That body
 is appended to each parent turn-loop and sub-agent step request as a transient
-`<codewhale:work_state>` block — rebuilt per request, so a mid-turn
+`<nestlone:work_state>` block — rebuilt per request, so a mid-turn
 `work_update` is visible on the next step — and is never written to session
 history or the stable system prefix.
-Forked agents (`<codewhale:fork_state>`) and `/relay` reuse the same body.
+Forked agents (`<nestlone:fork_state>`) and `/relay` reuse the same body.
 
 Three properties of that seam are load-bearing:
 
@@ -84,7 +84,7 @@ Three properties of that seam are load-bearing:
 - **Per-agent isolation.** Every sub-agent gets the same tail rendered from
   *its own* list (`#4810`), so a worker sees its own progress and never a
   parent's or sibling's. The parent's ledger reaches a forked child only as the
-  immutable `<codewhale:fork_state>` Work section, resolved at the spawn seam so
+  immutable `<nestlone:fork_state>` Work section, resolved at the spawn seam so
   a same-turn `work_update` is included.
 - **Context accounting.** The parent turn-loop preflight token estimate runs
   over the tail message that request actually carries, so it cannot approve a

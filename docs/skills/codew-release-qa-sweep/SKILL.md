@@ -1,11 +1,11 @@
 ---
 name: codew-release-qa-sweep
-description: "Use before claiming CodeWhale release work is done: run the full gate sweep and list the manual QA targets."
+description: "Use before claiming Nestlone release work is done: run the full gate sweep and list the manual QA targets."
 ---
 
-# CodeWhale Release QA Sweep
+# Nestlone Release QA Sweep
 
-Run this before claiming any CodeWhale release work is "done." A green automated
+Run this before claiming any Nestlone release work is "done." A green automated
 gate sweep plus the three manual QA targets is the evidence bar. No sweep, no
 "done" — report exactly what was run and the result of each step.
 
@@ -31,26 +31,26 @@ cargo fmt --all --check
 git diff --check
 
 # 2. Library/protocol/cli/flow/state tests, locked
-cargo test -p codewhale-config -p codewhale-protocol -p codewhale-cli \
-  -p codewhale-workflow -p codewhale-state --locked
+cargo test -p nestlone-config -p nestlone-protocol -p nestlone-cli \
+  -p nestlone-workflow -p nestlone-state --locked
 
 # 3. TUI test binaries, locked
-cargo test -p codewhale-tui --bins --locked
+cargo test -p nestlone-tui --bins --locked
 
 # 4. Real-PTY release runtime QA (sealed HOME + loopback providers)
-cargo test -p codewhale-tui --test release_runtime_qa --locked -- --test-threads=1
+cargo test -p nestlone-tui --test release_runtime_qa --locked -- --test-threads=1
 
 # 5. TUI debug build, locked
-cargo build -p codewhale-tui --locked
+cargo build -p nestlone-tui --locked
 
 # 6. Release build for the shipped binaries, locked
-cargo build --release --locked -p codewhale-cli -p codewhale-tui
+cargo build --release --locked -p nestlone-cli -p nestlone-tui
 
 # 7. Version-drift gate (workspace ↔ npm ↔ Cargo.lock ↔ changelog ↔ README)
 ./scripts/release/check-versions.sh
 
 # 8. Binary smoke
-./target/release/codewhale --version
+./target/release/nestlone --version
 ```
 
 If you are validating a PR for landing, also test mergeability against the

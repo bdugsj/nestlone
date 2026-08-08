@@ -152,12 +152,12 @@ describe("public surface contracts", () => {
 
   it("backs product and install claims with package and documentation content", () => {
     const readme = text("README.md");
-    const npmReadme = text("npm/codewhale/README.md");
+    const npmReadme = text("npm/nestlone/README.md");
     const install = text("docs/INSTALL.md");
     const changelog = text("CHANGELOG.md");
     const license = text("LICENSE");
-    const npmArtifacts = text("npm/codewhale/scripts/artifacts.js");
-    const npmPackage = JSON.parse(text("npm/codewhale/package.json")) as {
+    const npmArtifacts = text("npm/nestlone/scripts/artifacts.js");
+    const npmPackage = JSON.parse(text("npm/nestlone/package.json")) as {
       description: string;
       bin: Record<string, string>;
     };
@@ -222,10 +222,10 @@ describe("public surface contracts", () => {
 
     expect(installDoc).toContain("Two Cargo packages are required");
     expect(installDoc).toContain(
-      "`codewhale-cli` installs the `codewhale` and `codew` commands",
+      "`nestlone-cli` installs the `nestlone` and `nest` commands",
     );
     expect(installDoc).toContain(
-      "Download all three matching `codewhale`, `codew`, and `codewhale-tui`",
+      "Download all three matching `nestlone`, `nest`, and `nestlone-tui`",
     );
     expect(installPage).toContain(
       "# Install two Cargo packages; together they provide three commands",
@@ -253,7 +253,9 @@ describe("public surface contracts", () => {
     }
   });
 
-  it("checks Unix release assets under their manifest filenames before renaming", () => {
+  it.skipIf(process.platform === "win32")(
+    "checks Unix release assets under their manifest filenames before renaming",
+    () => {
     const scratch = mkdtempSync(join(tmpdir(), "nestlone-install-checksum-"));
     const mockBin = join(scratch, "bin");
     const curlPath = join(mockBin, "curl");

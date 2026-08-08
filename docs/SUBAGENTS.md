@@ -20,7 +20,7 @@ The current `agent` implementation delegates to the durable sub-agent runtime
 while that cutover completes. It can still be useful for short in-session
 delegation. Transient provider header/stream/time-out failures are retried with
 backoff inside the child runtime before the worker is marked interrupted; if the
-retry budget is exhausted, Codewhale preserves a checkpoint and returns a
+retry budget is exhausted, Nestlone preserves a checkpoint and returns a
 continuation handle instead of leaving the parent to infer what happened. For
 work that must survive process restarts, sleep, or remote execution, prefer
 Fleet or a Workflow-backed fleet run.
@@ -43,7 +43,7 @@ stance toward the work — not just a different label.
 
 ## Maintainer posture
 
-Sub-agents help Codewhale move faster, but the parent agent still owns the
+Sub-agents help Nestlone move faster, but the parent agent still owns the
 maintainer decision. Use children to gather evidence, review patches, and run
 verification while keeping the community posture in
 [`AGENT_ETHOS.md`](AGENT_ETHOS.md): issues are open intake, PR gates are
@@ -87,14 +87,14 @@ transcript.
 
 Forked state renders concrete Work progress from the To-do ledger — the sole
 canonical Work surface, written by `work_update`. The child's
-`<codewhale:fork_state>` block carries the same bounded body
+`<nestlone:fork_state>` block carries the same bounded body
 (`crates/tui/src/work_grounding.rs`) that the parent's own requests carry, so a
 fork continues from the parent's real progress position rather than a
 paraphrase. That Work section is resolved when the spawn happens, so a
 `work_update` earlier in the same parent turn is included.
 
 Each agent then grounds on **its own** ledger: every sub-agent request carries
-the same transient `<codewhale:work_state>` tail rendered from that agent's
+the same transient `<nestlone:work_state>` tail rendered from that agent's
 private To-do list (#4810), refreshed after the agent's own `work_update`. It is
 request-scoped — never stored in the child transcript or its system prefix — so
 a worker can never read or write a parent's or sibling's **private transient
@@ -123,12 +123,12 @@ becomes Work grounding on its own.
 
 ## Worktree isolation
 
-For parallel edit lanes, launch the child with `worktree: true`. Codewhale
+For parallel edit lanes, launch the child with `worktree: true`. Nestlone
 creates a fresh git worktree and branch for that child, runs the child from the
 isolated checkout, and reports the resulting workspace/branch in the returned
 session projection and worker record. By default the branch is
 `codex/agent-<name>-<id>` and the checkout lives beside the parent repo under
-`.codewhale-worktrees/`, so the parent checkout stays clean.
+`.nestlone-worktrees/`, so the parent checkout stays clean.
 
 Isolation is not write authority. A prompt-only worker starts read-only.
 A writer also declares `write_authority: "workspace_write"` or
@@ -141,7 +141,7 @@ Optional fields:
 - `worktree_branch`: exact branch to create.
 - `worktree_base`: git ref to branch from; defaults to `HEAD`.
 - `worktree_path`: exact checkout path. Relative paths stay under the default
-  sibling `.codewhale-worktrees/` root.
+  sibling `.nestlone-worktrees/` root.
 
 Do not combine `cwd` with `worktree`; `cwd` remains the manual escape hatch for
 an already-created directory inside the parent workspace.
@@ -191,7 +191,7 @@ OUTPUT: VERDICT, EVIDENCE, GAPS, NEXT.
 
 ```text
 QUESTION: Is the focused prompt/subagent test filter valid, and what fails if not?
-SCOPE: cargo test -p codewhale-tui --bin codewhale-tui --locked prompt; subagent filter if needed.
+SCOPE: cargo test -p nestlone-tui --bin nestlone-tui --locked prompt; subagent filter if needed.
 ALREADY_KNOWN: Do not fix failures; capture exact command, exit code, and first relevant assertion.
 EFFORT: medium
 STOP_CONDITION: Stop after one clean PASS or one reproducible failing assertion with command evidence.
@@ -256,7 +256,7 @@ the next turn.
 ## Concurrency cap
 
 Up to **64** sub-agents run concurrently by default (`DEFAULT_MAX_SUBAGENTS`),
-configurable via `[subagents].max_concurrent` in `~/.codewhale/config.toml` up to
+configurable via `[subagents].max_concurrent` in `~/.nestlone/config.toml` up to
 the hard ceiling of **128** (`MAX_SUBAGENTS`). The session admits a bounded
 queue of up to **200** running plus queued sub-agents by default, so a turn can
 request broad fan-out and let the manager drain it without creating an
@@ -395,7 +395,7 @@ Example: keep the parent session on DeepSeek, but run a formatter child on a
 local LM Studio OpenAI-compatible endpoint:
 
 ```toml
-# ~/.codewhale/config.toml or workspace config
+# ~/.nestlone/config.toml or workspace config
 provider = "deepseek"
 
 [providers.deepseek]
@@ -409,7 +409,7 @@ model = "qwen-2.5-7b"
 ```
 
 ```toml
-# .codewhale/agents/local-formatter.toml
+# .nestlone/agents/local-formatter.toml
 id = "local-formatter"
 role_hint = "formatter"
 provider = "lm-studio"
@@ -422,7 +422,7 @@ text = "Use small, local edits. Keep formatting changes mechanical."
 
 Then call `agent(profile: "local-formatter", prompt: "...")`. In-process
 children build a client for `lm-studio`; Fleet workers forward
-`--provider lm-studio` to `codewhale exec`, which resolves the same
+`--provider lm-studio` to `nestlone exec`, which resolves the same
 `[providers.lm-studio]` table. Unknown or unconfigured provider ids fail the
 spawn rather than silently falling back to the parent provider.
 
@@ -433,7 +433,7 @@ per-step timeout so a single stuck request can't pin the parent's
 completion wakeup channel indefinitely. The default is `120` seconds,
 which matches the legacy hardcoded value. Long-thinking children that
 legitimately exceed that, for example heavy plan or review work behind
-`agent`, can extend the timeout in `~/.codewhale/config.toml`:
+`agent`, can extend the timeout in `~/.nestlone/config.toml`:
 
 ```toml
 [subagents]
@@ -469,7 +469,7 @@ Pending → Running → (Completed | Failed(reason) | Cancelled | Interrupted(re
 
 `Interrupted` fires when the manager detects a `Running` agent whose task
 handle is gone — typically after a process restart that loaded the workspace's
-persisted state from `.codewhale/state/subagents.v1.json`. The parent can open a
+persisted state from `.nestlone/state/subagents.v1.json`. The parent can open a
 replacement session with the same assignment or treat it as a terminal state.
 
 ### Session boundaries (#405)
@@ -489,7 +489,7 @@ manager can't match them to the current boot.
 ## Run receipts, follow-up, and takeover
 
 Each compatibility sub-agent has a persisted worker record in
-`.codewhale/state/subagents.v1.json`. The record is the current run-ledger
+`.nestlone/state/subagents.v1.json`. The record is the current run-ledger
 slice for sub-agent lanes until those lanes are backed directly by the fleet
 ledger: it stores `run_id`, objective, role/model,
 workspace/branch, lifecycle events, artifact refs, follow-up target, takeover
@@ -543,7 +543,7 @@ don't go through the standard write-approval flow.
 ## Implementation notes
 
 - Source: `crates/tui/src/tools/subagent/mod.rs`.
-- Persisted state: `<workspace>/.codewhale/state/subagents.v1.json`. Schema
+- Persisted state: `<workspace>/.nestlone/state/subagents.v1.json`. Schema
   version `1` (forward-compatible — new optional fields use
   `#[serde(default)]`).
 - Worker records are pruned by time: completed / failed / cancelled /

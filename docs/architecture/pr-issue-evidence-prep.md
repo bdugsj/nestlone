@@ -22,7 +22,7 @@ tree by running the documented commands.
 
 | AT ID | Check | Result |
 |-------|-------|--------|
-| AT-001 | `cargo test -p codewhale-tui acceptance` (epic_acceptance_harness + eval_harness) | ✅ 2 passed (0 failed) |
+| AT-001 | `cargo test -p nestlone-tui acceptance` (epic_acceptance_harness + eval_harness) | ✅ 2 passed (0 failed) |
 | AT-002 | `every_registered_command_dispatches_to_a_handler` | ✅ Passed (part of 489 command tests) |
 | AT-003 | `every_command_alias_dispatches_to_a_handler` | ✅ Passed (part of 489 command tests) |
 | AT-004 | Help/palette/completion surface tests (included in 489 command tests) | ✅ Passed |
@@ -52,9 +52,9 @@ tree by running the documented commands.
 ### Validation
 
 - `cargo fmt --all -- --check` — clean
-- `cargo check -p codewhale-tui` — clean (no errors, no warnings)
-- `cargo test -p codewhale-tui commands::` — 489 passed (0 failed)
-- `cargo test -p codewhale-tui acceptance` — 2 passed (epic_acceptance_harness: 1 scenario, 3 steps; eval_harness: 1 test)
+- `cargo check -p nestlone-tui` — clean (no errors, no warnings)
+- `cargo test -p nestlone-tui commands::` — 489 passed (0 failed)
+- `cargo test -p nestlone-tui acceptance` — 2 passed (epic_acceptance_harness: 1 scenario, 3 steps; eval_harness: 1 test)
 - `cargo test --workspace` — 5344 passed, 1 failed (known flaky: `run_verifiers_background_starts_shell_jobs_and_returns_task_ids`; passes in isolation — pre-existing papercut, not a FEAT-008 regression), 2 ignored
 - `git diff --check` — clean (both repos)
 - Orphaned file check — no orphaned `.rs` files
@@ -102,13 +102,13 @@ and validation layer).
 | Check | Result |
 |-------|--------|
 | `cargo fmt --all -- --check` | Clean |
-| `cargo check -p codewhale-tui` | Clean (0 errors, 0 warnings) |
-| `cargo test -p codewhale-tui commands::` | 489 passed, 0 failed |
-| `cargo test -p codewhale-tui acceptance` | 2 passed (epic_acceptance_harness: 1, eval_harness: 1) |
+| `cargo check -p nestlone-tui` | Clean (0 errors, 0 warnings) |
+| `cargo test -p nestlone-tui commands::` | 489 passed, 0 failed |
+| `cargo test -p nestlone-tui acceptance` | 2 passed (epic_acceptance_harness: 1, eval_harness: 1) |
 | `cargo test --workspace` | 5344 passed, 1 known-flaky (verifier parallel contention; passes in isolation), 2 ignored |
 | `git diff --check` | Clean (both repos) |
 | Orphaned file check | No orphaned `.rs` files |
-| `git status --porcelain` | Clean (CodeWhale repo) |
+| `git status --porcelain` | Clean (Nestlone repo) |
 
 Paulo Aboim Pinto
 ```
@@ -157,10 +157,10 @@ Replays the completed EPIC-001 command-boundary work onto
 ## Validation
 
 - `cargo fmt --all -- --check`
-- `CARGO_TARGET_DIR=/tmp/codewhale-hunter-target cargo check -p codewhale-tui`
-- `CARGO_TARGET_DIR=/tmp/codewhale-hunter-target cargo test -p codewhale-tui commands::`
-- `CARGO_TARGET_DIR=/tmp/codewhale-hunter-target cargo test -p codewhale-tui command_palette`
-- `CARGO_TARGET_DIR=/tmp/codewhale-hunter-target cargo test -p codewhale-tui slash_completion`
+- `CARGO_TARGET_DIR=/tmp/nestlone-hunter-target cargo check -p nestlone-tui`
+- `CARGO_TARGET_DIR=/tmp/nestlone-hunter-target cargo test -p nestlone-tui commands::`
+- `CARGO_TARGET_DIR=/tmp/nestlone-hunter-target cargo test -p nestlone-tui command_palette`
+- `CARGO_TARGET_DIR=/tmp/nestlone-hunter-target cargo test -p nestlone-tui slash_completion`
 - `git diff --check`
 ```
 
@@ -189,8 +189,8 @@ Record live results here before opening or updating the PR.
 | Check | Result |
 |-------|--------|
 | `cargo fmt --all -- --check` | Pass |
-| `CARGO_TARGET_DIR=/tmp/codewhale-hunter-target cargo check -p codewhale-tui` | Pass |
-| `CARGO_TARGET_DIR=/tmp/codewhale-hunter-target cargo test -p codewhale-tui commands::` | Pass: 456 command tests |
-| `CARGO_TARGET_DIR=/tmp/codewhale-hunter-target cargo test -p codewhale-tui command_palette` | Pass: 18 tests |
-| `CARGO_TARGET_DIR=/tmp/codewhale-hunter-target cargo test -p codewhale-tui slash_completion` | Pass: 17 tests |
+| `CARGO_TARGET_DIR=/tmp/nestlone-hunter-target cargo check -p nestlone-tui` | Pass |
+| `CARGO_TARGET_DIR=/tmp/nestlone-hunter-target cargo test -p nestlone-tui commands::` | Pass: 456 command tests |
+| `CARGO_TARGET_DIR=/tmp/nestlone-hunter-target cargo test -p nestlone-tui command_palette` | Pass: 18 tests |
+| `CARGO_TARGET_DIR=/tmp/nestlone-hunter-target cargo test -p nestlone-tui slash_completion` | Pass: 17 tests |
 | `git diff --check` | Pass |

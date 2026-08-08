@@ -1,11 +1,11 @@
 # Configuration
 
-codewhale reads configuration from a TOML file plus environment variables.
+nestlone reads configuration from a TOML file plus environment variables.
 At process startup it may also load literal built-in-provider credentials from
 a workspace-local `.env` file. Use the tracked `.env.example` as the template;
 copy it to `.env`, then add only credential values.
 
-A workspace is not configuration authority. Codewhale therefore ignores
+A workspace is not configuration authority. Nestlone therefore ignores
 config/profile/home paths, provider/model/base-URL routing, MCP/plugin state,
 approval/sandbox/shell posture, executable paths, runtime settings, and every
 other non-credential `.env` entry. Variable expansion is rejected so a
@@ -17,20 +17,20 @@ linked files are rejected.
 
 ## Constitution, project instructions, and repo authority
 
-Codewhale has several instruction surfaces. They are deliberately separate so a
+Nestlone has several instruction surfaces. They are deliberately separate so a
 personal constitution, repo policy, project instructions, and runtime security
 controls do not blur together.
 
 - **Bundled global Constitution** — the compiled base law in the binary. It is
   the default floor for every session.
 - **User-global constitution** — the normal guided setup output. Manage it with
-  `/constitution` or `/setup`; Codewhale stores structured data at
-  `$CODEWHALE_HOME/constitution.json` (default `~/.codewhale/constitution.json`)
-  and renders it into a separate `<codewhale_user_constitution>` prose block.
+  `/constitution` or `/setup`; Nestlone stores structured data at
+  `$CODEWHALE_HOME/constitution.json` (default `~/.nestlone/constitution.json`)
+  and renders it into a separate `<nestlone_user_constitution>` prose block.
   This can express preferences and stop conditions, but it does not change
   runtime approval policy, sandbox, shell, network, trust, or MCP permissions.
 - **Repo-local constitution** — optional project policy in
-  `.codewhale/constitution.json`, described below.
+  `.nestlone/constitution.json`, described below.
 - **`AGENTS.md`** — cross-agent **project instructions** (prose). This is the
   canonical file for "how should an agent work in this repo." Run `/init` to
   scaffold one. `CLAUDE.md` and `.claude/instructions.md` are read as
@@ -45,7 +45,7 @@ the update checkpoint agree.
 
 ### Managing the user-global constitution (`/setup` and `/constitution`)
 
-On first launch Codewhale runs a short **constitution-first** setup path:
+On first launch Nestlone runs a short **constitution-first** setup path:
 language → provider/model readiness → runtime posture → create or confirm your
 constitution. The bundled/default constitution is always valid, so you can
 defer; reopen the hub any time with `/setup`.
@@ -72,9 +72,9 @@ posture/config.
 Each repo can carry two distinct, complementary files:
 
 - **`AGENTS.md`** — ordinary project working instructions.
-- **`.codewhale/constitution.json`** — Codewhale-specific **repo authority /
-  prioritization policy**: when local sources conflict, which should Codewhale
-  trust first, and what to verify before claiming a task is done. `.codewhale/`
+- **`.nestlone/constitution.json`** — Nestlone-specific **repo authority /
+  prioritization policy**: when local sources conflict, which should Nestlone
+  trust first, and what to verify before claiming a task is done. `.nestlone/`
   lives inside the repo (like `.github/`). Example:
 
   ```json
@@ -110,9 +110,9 @@ Each repo can carry two distinct, complementary files:
   additionally **mechanically enforced** in the tool gate. See
   [Enforced repo-law invariants](#enforced-repo-law-invariants) below.
 
-  This is the **repo-local law** layer in Codewhale's hierarchy: *bundled global
+  This is the **repo-local law** layer in Nestlone's hierarchy: *bundled global
   Constitution* → *user-global constitution* (`$CODEWHALE_HOME/constitution.json`,
-  rendered as prose) → *repo constitution* (`.codewhale/constitution.json`, this
+  rendered as prose) → *repo constitution* (`.nestlone/constitution.json`, this
   file) → *AGENTS/project instructions* → *memory and handoffs* → *current
   request and live evidence for the active turn*. Runtime policy
   (permissions/sandbox/cost limits enforced in code) is separate from all of
@@ -121,12 +121,12 @@ Each repo can carry two distinct, complementary files:
   the current user request.
 
 > **`WHALE.md` is deprecated.** It overlapped confusingly with `AGENTS.md`.
-> Codewhale no longer reads `WHALE.md` as project or global context. If one is
+> Nestlone no longer reads `WHALE.md` as project or global context. If one is
 > present, setup/context diagnostics report it as ignored so you can migrate it.
-> Move ordinary instructions to `AGENTS.md` and Codewhale-specific authority
-> policy to `.codewhale/constitution.json`. Personal standing guidance belongs
+> Move ordinary instructions to `AGENTS.md` and Nestlone-specific authority
+> policy to `.nestlone/constitution.json`. Personal standing guidance belongs
 > in `/constitution` / `$CODEWHALE_HOME/constitution.json`. (The global
-> Codewhale Constitution shipped in the model prompt is a separate thing and is
+> Nestlone Constitution shipped in the model prompt is a separate thing and is
 > unaffected.)
 
 ### Enforced repo-law invariants
@@ -175,7 +175,7 @@ Semantics:
   force-prompts in Ask and Auto-Review. Full Access never opens approval
   modals, so the same hold fails closed as a hard block; `block` always denies.
   Mode cannot turn a hold off.
-- **Repo-local only.** Only the repo's `.codewhale/constitution.json`
+- **Repo-local only.** Only the repo's `.nestlone/constitution.json`
   participates. The user-global constitution stays advisory prose and never
   reaches this mechanism.
 - **Fails safe.** A missing file, parse error, or invalid glob degrades to
@@ -202,7 +202,7 @@ an expert escape hatch, not the normal `/constitution` guided setup output.
 Because this is a prompt trust boundary, it takes **two deliberate steps** — a
 file alone is not enough:
 
-1. Drop the replacement at `~/.codewhale/prompts/constitution.md` (under
+1. Drop the replacement at `~/.nestlone/prompts/constitution.md` (under
    `$CODEWHALE_HOME` when set).
 2. Set the explicit opt-in flag `CODEWHALE_ALLOW_BASE_PROMPT_OVERRIDE=1`
    (`true`/`on`/`yes` also accepted).
@@ -216,22 +216,22 @@ is a no-op**, so existing installs keep the bundled prompt.
 
 Scope is deliberately narrow: only the byte-stable **base prompt segment** is
 overridable. Mode deltas, the approval policy, the tool taxonomy, Context
-Management, and the Compaction Relay are still owned by Codewhale's runtime
+Management, and the Compaction Relay are still owned by Nestlone's runtime
 assembly, so an override **cannot remove safety-relevant guidance** (sandbox,
 approvals) — it only swaps the task/voice framing. To customize ordinary
 personal behavior, prefer `/constitution`; to customize per-repo behavior,
-prefer `AGENTS.md` + `.codewhale/constitution.json` above.
+prefer `AGENTS.md` + `.nestlone/constitution.json` above.
 
 ## Where It Looks
 
 Default config path:
 
-- `~/.codewhale/config.toml`
+- `~/.nestlone/config.toml`
 - Legacy fallback: `~/.deepseek/config.toml`
 
 Overrides:
 
-- CLI: `codewhale --config /path/to/config.toml`
+- CLI: `nestlone --config /path/to/config.toml`
 - Env: `CODEWHALE_CONFIG_PATH=/path/to/config.toml`
 - Legacy env alias: `DEEPSEEK_CONFIG_PATH=/path/to/config.toml`
 
@@ -268,19 +268,19 @@ The legacy `[projects."/absolute/path/to/project"]` table is also accepted for
 this user-owned override.
 
 In interactive mode, the per-project overlay
-`<workspace>/.codewhale/config.toml` is applied after this user entry. A
+`<workspace>/.nestlone/config.toml` is applied after this user entry. A
 project-level `allow_shell = false` can still tighten the session; project-level
 `allow_shell = true` is ignored.
 
 ### Per-project overlay (#485)
 
 When the TUI starts in a workspace that contains a regular-file
-`<workspace>/.codewhale/config.toml`, the safe values declared in that file are
+`<workspace>/.nestlone/config.toml`, the safe values declared in that file are
 merged on top of the global config. Legacy
-`<workspace>/.deepseek/config.toml` files are still read when the Codewhale path
+`<workspace>/.deepseek/config.toml` files are still read when the Nestlone path
 is absent. Symlinked project config files are rejected. This lets a repo suggest
 a model or tighten local safety posture without touching the user's
-`~/.codewhale/config.toml`. Pass `--no-project-config` to skip the overlay for
+`~/.nestlone/config.toml`. Pass `--no-project-config` to skip the overlay for
 one launch.
 
 Supported keys in the project overlay (top-level fields only):
@@ -301,24 +301,24 @@ Credential, endpoint, provider-selection, MCP config, hooks, skills, capacity,
 retry, hotbar bindings, and `instructions = [...]` settings stay user-global.
 If a repo-local config declares `api_key`, `base_url`, `provider`,
 `mcp_config_path`, `hotbar`, `allow_shell = true`, or `instructions`,
-Codewhale ignores that key and keeps the user's global setting.
+Nestlone ignores that key and keeps the user's global setting.
 
-The `codewhale` facade and `codewhale-tui` binary share the same config file for
-DeepSeek auth and model defaults. `codewhale auth set --provider deepseek` (and
-the legacy `codewhale login --api-key ...` alias) saves the key to
-`~/.codewhale/config.toml` (migrating legacy `~/.deepseek/config.toml` on first
-launch when needed), and `codewhale --model deepseek-v4-flash` is forwarded to
+The `nestlone` facade and `nestlone-tui` binary share the same config file for
+DeepSeek auth and model defaults. `nestlone auth set --provider deepseek` (and
+the legacy `nestlone login --api-key ...` alias) saves the key to
+`~/.nestlone/config.toml` (migrating legacy `~/.deepseek/config.toml` on first
+launch when needed), and `nestlone --model deepseek-v4-flash` is forwarded to
 the TUI as `DEEPSEEK_MODEL`.
 
 Credential lookup uses `config -> keyring -> env` after any explicit CLI
-`--api-key`. Run `codewhale auth status` to inspect the active provider's config
+`--api-key`. Run `nestlone auth status` to inspect the active provider's config
 file, OS keyring backend, environment variable, winning source, and last-four
 label without printing the key itself. The command only probes the active
 provider's keyring entry.
 
 For hosted, generic OpenAI-compatible, self-hosted, OpenAI Responses, or native
 Anthropic providers, set `provider = "<id>"` or pass
-`codewhale --provider <id>`. The canonical provider IDs are `deepseek`,
+`nestlone --provider <id>`. The canonical provider IDs are `deepseek`,
 `nvidia-nim`, `openai`, `atlascloud`, `wanjie-ark`, `volcengine`,
 `openrouter`, `xiaomi-mimo`, `novita`, `fireworks`, `siliconflow`, `arcee`,
 `siliconflow-CN`, `moonshot`, `sglang`, `vllm`, `ollama`, `huggingface`,
@@ -329,14 +329,14 @@ default base URLs, model IDs, and capability metadata, see
 [PROVIDERS.md](PROVIDERS.md).
 The facade saves provider credentials to the shared user config and forwards
 the resolved key, base URL, provider, and model to the TUI process. Use
-`codewhale auth set --provider nvidia-nim --api-key "YOUR_NVIDIA_API_KEY"` or
-`codewhale auth set --provider openai --api-key "YOUR_OPENAI_COMPATIBLE_API_KEY"` or
-`codewhale auth set --provider atlascloud --api-key "YOUR_ATLASCLOUD_API_KEY"` or
-`codewhale auth set --provider wanjie-ark --api-key "YOUR_WANJIE_API_KEY"` or
-`codewhale auth set --provider xiaomi-mimo --api-key "YOUR_XIAOMI_KEY"` or
-`codewhale auth set --provider fireworks --api-key "YOUR_FIREWORKS_API_KEY"` or
-`codewhale auth set --provider siliconflow --api-key "YOUR_SILICONFLOW_API_KEY"` or
-`codewhale auth set --provider arcee --api-key "YOUR_ARCEE_API_KEY"` or the
+`nestlone auth set --provider nvidia-nim --api-key "YOUR_NVIDIA_API_KEY"` or
+`nestlone auth set --provider openai --api-key "YOUR_OPENAI_COMPATIBLE_API_KEY"` or
+`nestlone auth set --provider atlascloud --api-key "YOUR_ATLASCLOUD_API_KEY"` or
+`nestlone auth set --provider wanjie-ark --api-key "YOUR_WANJIE_API_KEY"` or
+`nestlone auth set --provider xiaomi-mimo --api-key "YOUR_XIAOMI_KEY"` or
+`nestlone auth set --provider fireworks --api-key "YOUR_FIREWORKS_API_KEY"` or
+`nestlone auth set --provider siliconflow --api-key "YOUR_SILICONFLOW_API_KEY"` or
+`nestlone auth set --provider arcee --api-key "YOUR_ARCEE_API_KEY"` or the
 matching provider ID from [PROVIDERS.md](PROVIDERS.md) to save provider keys
 through the facade. The generic `openai` provider defaults
 to `https://api.openai.com/v1`, accepts `OPENAI_BASE_URL`, and defaults to
@@ -348,7 +348,7 @@ Wanjie Ark's OpenAI-compatible endpoint at
 and passes model IDs through unchanged because Wanjie model access is
 account-scoped. SGLang, vLLM, and Ollama are
 self-hosted and can run without an API key by default. Ollama defaults to
-`http://localhost:11434/v1` and sends model tags such as `codewhale-coder:1.3b`
+`http://localhost:11434/v1` and sends model tags such as `nestlone-coder:1.3b`
 or `qwen2.5-coder:7b` unchanged. Self-hosted providers and loopback custom
 URLs (`localhost`, `127.0.0.1`, `[::1]`, `0.0.0.0`) do not read the secret store
 unless API-key auth is explicitly requested; use an env var or config-file key
@@ -359,7 +359,7 @@ SiliconFlow defaults to `https://api.siliconflow.com/v1`, accepts
 `https://api.siliconflow.cn/v1` with the `[providers.siliconflow_cn]` table and
 `SILICONFLOW_API_KEY` credential slot.
 Arcee AI defaults to `https://api.arcee.ai/api/v1`, accepts `ARCEE_BASE_URL`,
-and uses `trinity-large-thinking` by default for Codewhale agent work.
+and uses `trinity-large-thinking` by default for Nestlone agent work.
 `trinity-large-preview` is also listed as a direct Arcee API model; OpenRouter's
 `arcee-ai/trinity-large-thinking` remains the OpenRouter namespaced form, while
 the direct Arcee provider uses the bare `trinity-large-thinking` ID. Direct
@@ -420,7 +420,7 @@ pay-as-you-go (`https://api.stepfun.ai/v1`) or a Step Plan subscription
 (`https://api.stepfun.ai/step_plan/v1`) — and validates the key against the
 endpoint you pick before saving it. The answer is written to
 `[providers.stepfun].base_url` and nowhere else. If that key already holds a
-base URL Codewhale does not recognize as one of those two routes, the question
+base URL Nestlone does not recognize as one of those two routes, the question
 is skipped and your value is left untouched.
 
 Alibaba Bailian / Model Studio DashScope Qwen routes use the same OpenAI
@@ -437,13 +437,13 @@ context_window = 1000000
 ```
 
 Use the regional DashScope `compatible-mode/v1` base URL that matches the
-region of your API key. Codewhale keeps `qwen-plus` scoped to the `openai`
+region of your API key. Nestlone keeps `qwen-plus` scoped to the `openai`
 provider route and does not infer a different provider from the model prefix.
 The same rule applies to all provider-prefixed model strings: a prefix such as
 `deepseek-ai/...` or `deepseek/...` is a provider-owned wire ID under the
 selected provider, not an automatic switch to the DeepSeek provider.
 Set `context_window` to the gateway/model's real total context window when it
-differs from Codewhale's static model metadata.
+differs from Nestlone's static model metadata.
 
 If the gateway accepts `POST /chat/completions` but rejects
 `/v1/chat/completions`, set a provider-local `path_suffix`:
@@ -460,7 +460,7 @@ does not accidentally rewrite `/models` or `/beta/completions`.
 
 For private gateways with broken or intercepted certificates, use
 `SSL_CERT_FILE` with a trusted CA bundle. The legacy provider-table key
-`insecure_skip_tls_verify = true` is still parsed so `codewhale doctor` can
+`insecure_skip_tls_verify = true` is still parsed so `nestlone doctor` can
 report stale configs, but provider clients reject it instead of disabling TLS
 certificate verification.
 
@@ -469,13 +469,13 @@ when they use localhost or loopback addresses. For a non-local `http://`
 gateway, launch with `DEEPSEEK_ALLOW_INSECURE_HTTP=1` only on a trusted network:
 
 ```bash
-DEEPSEEK_ALLOW_INSECURE_HTTP=1 codewhale
+DEEPSEEK_ALLOW_INSECURE_HTTP=1 nestlone
 ```
 
 Third-party OpenAI-compatible gateways that need extra request headers can set
 `http_headers = { "X-Model-Provider-Id" = "your-model-provider" }` at the top
 level or under a provider table such as `[providers.deepseek]`. When configured,
-codewhale sends those custom headers on model API requests. The equivalent
+nestlone sends those custom headers on model API requests. The equivalent
 environment override is `DEEPSEEK_HTTP_HEADERS`, using comma-separated
 `name=value` pairs such as
 `X-Model-Provider-Id=your-model-provider,X-Gateway-Route=dev`. `Authorization`
@@ -484,7 +484,7 @@ setting.
 
 ### Vision Model
 
-Codewhale's chat provider and `image_analyze` tool are configured separately.
+Nestlone's chat provider and `image_analyze` tool are configured separately.
 The main chat path remains the selected text/tool provider; image analysis runs
 through `[vision_model]` when the `vision_model` feature is enabled.
 
@@ -511,7 +511,7 @@ auto-select MiMo endpoints. Use
 
 ### Auto Model Routing (`[auto.router]`)
 
-With `model = "auto"`, Codewhale routes each turn between a strong and a cheap
+With `model = "auto"`, Nestlone routes each turn between a strong and a cheap
 model. The routing decision comes from a small classifier call, or from a local
 heuristic when no classifier route is available.
 
@@ -532,18 +532,18 @@ configured route has no credentials, Auto mode falls back to the heuristic
 instead of failing. The turn's route receipt (`/status` → Auto) records
 whether the classifier or the heuristic decided.
 
-To bootstrap MCP and skills directories at their resolved paths, run `codewhale-tui setup`.
-To only scaffold MCP, run `codewhale-tui mcp init`.
+To bootstrap MCP and skills directories at their resolved paths, run `nestlone-tui setup`.
+To only scaffold MCP, run `nestlone-tui mcp init`.
 
 Note: setup, doctor, mcp, features, sessions, resume/fork, exec, review, and eval
-are subcommands of the `codewhale-tui` binary. The `codewhale` dispatcher exposes a
+are subcommands of the `nestlone-tui` binary. The `nestlone` dispatcher exposes a
 distinct set of commands (`auth`, `config`, `model`, `thread`, `sandbox`,
 `app-server`, `mcp-server`, `completion`) and forwards plain prompts to
-`codewhale-tui`.
+`nestlone-tui`.
 
 ### Startup Update Checks
 
-By default, the TUI starts a background check for the latest stable Codewhale
+By default, the TUI starts a background check for the latest stable Nestlone
 release and shows a short toast only when a newer release is available and the
 official release assets are complete.
 
@@ -557,13 +557,13 @@ check_for_updates = false
 
 To redirect the startup check, set `update_uri` to an internal endpoint that
 returns GitHub-compatible latest-release JSON. Minimal mirror metadata with a
-`tag_name` field is accepted; if `assets` are present, Codewhale requires the
+`tag_name` field is accepted; if `assets` are present, Nestlone requires the
 same uploaded asset set as the official release before showing the toast.
 
 ```toml
 [update]
 check_for_updates = true
-update_uri = "https://internal.mirror.example/codewhale/releases/latest"
+update_uri = "https://internal.mirror.example/nestlone/releases/latest"
 ```
 
 When `update_uri` is not set, startup checks honor release mirror environment
@@ -628,15 +628,15 @@ default_text_model = "deepseek-ai/DeepSeek-V4-Pro"
 [profiles.ollama]
 provider = "ollama"
 base_url = "http://localhost:11434/v1"
-default_text_model = "codewhale-coder:1.3b"
+default_text_model = "nestlone-coder:1.3b"
 ```
 
 Select a profile with:
 
-- CLI: `codewhale --profile work`
+- CLI: `nestlone --profile work`
 - Env: `DEEPSEEK_PROFILE=work`
 
-If a profile is selected but missing, codewhale exits with an error listing available profiles.
+If a profile is selected but missing, nestlone exits with an error listing available profiles.
 
 ## Harness Profiles
 
@@ -795,18 +795,18 @@ the `CODEWHALE_*` value wins.
 - `CODEWHALE_REQUIREMENTS_PATH`
 - `CODEWHALE_MAX_SUBAGENTS` (clamped to `1..=20`)
 - `CODEWHALE_TASKS_DIR` (runtime task queue/artifact storage, default
-  `~/.codewhale/tasks`, with legacy `~/.deepseek/tasks` fallback when only the
+  `~/.nestlone/tasks`, with legacy `~/.deepseek/tasks` fallback when only the
   legacy directory exists)
 - `CODEWHALE_ALLOW_INSECURE_HTTP` (`1`/`true` allows non-local `http://` base URLs; default is reject)
 - `CODEWHALE_FORCE_HTTP1` (`1|true|yes|on` pins the HTTP client to HTTP/1.1, disabling HTTP/2; useful on Windows or behind proxies that mishandle long-lived H2 streams)
-- `CODEWHALE_HOME` (override the base data directory; defaults to `~/.codewhale`).
+- `CODEWHALE_HOME` (override the base data directory; defaults to `~/.nestlone`).
   If you previously exported `DEEPSEEK_HOME`, rename it to `CODEWHALE_HOME`;
-  the old env var is not used for new Codewhale state paths.
-- `CODEWHALE_RELEASE_BASE_URL` (release asset mirror used by `codewhale update`
+  the old env var is not used for new Nestlone state paths.
+- `CODEWHALE_RELEASE_BASE_URL` (release asset mirror used by `nestlone update`
   and by TUI startup update checks when `[update].update_uri` is not set, or as
   a fallback when that configured URI cannot be fetched)
 - `CODEWHALE_AUTOMATIONS_DIR` (override the automations storage directory; uses
-  `~/.codewhale/automations` by default, with legacy `~/.deepseek/automations`
+  `~/.nestlone/automations` by default, with legacy `~/.deepseek/automations`
   fallback when only the legacy directory exists)
 - `NO_ANIMATIONS` (`1|true|yes|on` forces `low_motion = true` and
   `fancy_animations = false` at startup, regardless of the saved
@@ -826,7 +826,7 @@ concatenated, in declared order, alongside the auto-loaded
 ```toml
 instructions = [
     "./AGENTS.md",
-    "~/.codewhale/global.md",
+    "~/.nestlone/global.md",
     "~/team/agents-shared.md",
 ]
 ```
@@ -839,19 +839,19 @@ Rules:
 - Missing files are skipped with a tracing warning so a stale
   entry doesn't fail the launch.
 - Only user-owned config, profiles, and managed config may set this array.
-  Project config (`<workspace>/.codewhale/config.toml`, or legacy
+  Project config (`<workspace>/.nestlone/config.toml`, or legacy
   `<workspace>/.deepseek/config.toml`) ignores `instructions` so a cloned repo
   cannot choose arbitrary local files to place into the prompt.
 
 ### Hooks
 
 Hooks are a **TUI runtime feature**. They fire from the interactive TUI and
-the engine turn loop it drives; `codewhale exec`, the CLI subcommands, the
+the engine turn loop it drives; `nestlone exec`, the CLI subcommands, the
 app-server / ACP surfaces, and the `workflow` tool do not fire them.
 
 [`docs/HOOKS.md`](HOOKS.md) is the authoritative reference for all eleven hook
 events — their firing points, environment variables, stdin payloads, timeout
-and background semantics, and which three of them can steer Codewhale. The
+and background semantics, and which three of them can steer Nestlone. The
 sections below cover the configuration surface and the steering contracts in
 more depth.
 
@@ -896,7 +896,7 @@ submitted text.
 ```toml
 [[hooks.hooks]]
 event = "message_submit"
-command = "~/.codewhale/hooks/inject-context.sh"
+command = "~/.nestlone/hooks/inject-context.sh"
 timeout_secs = 2
 continue_on_error = true
 ```
@@ -918,7 +918,7 @@ The hook receives JSON on stdin:
 }
 ```
 
-The entire serialized document is capped at 32 KiB. Codewhale retains the
+The entire serialized document is capped at 32 KiB. Nestlone retains the
 largest UTF-8-safe `text` prefix that fits after JSON escaping and bounded
 metadata, and the three `text_*` fields make truncation explicit. Immediate
 messages, restored queue entries, merged steers, and prior-hook replacements
@@ -1025,7 +1025,7 @@ Example input rewrite:
 ```toml
 [[hooks.hooks]]
 event = "tool_call_before"
-command = "~/.codewhale/hooks/clamp-shell-timeout.sh"
+command = "~/.nestlone/hooks/clamp-shell-timeout.sh"
 condition = { type = "tool_name", name = "exec_shell" }
 ```
 
@@ -1039,10 +1039,10 @@ metacharacters in the pattern are matched literally.
 
 ### Project-local hooks
 
-Repositories can ship policy in `<workspace>/.codewhale/hooks.toml`,
+Repositories can ship policy in `<workspace>/.nestlone/hooks.toml`,
 using the same shape as the `[hooks]` table (top-level fields plus
 `[[hooks]]` entries). Project hooks are executable shell
-configuration, so Codewhale only loads them after the workspace has
+configuration, so Nestlone only loads them after the workspace has
 been trusted in user-owned config through the trust prompt or a
 `[projects."<workspace>"] trust_level = "trusted"` entry. Session
 `/trust on` mode does not enable repo-supplied hooks by itself, and
@@ -1053,7 +1053,7 @@ win ties. A malformed trusted project file logs a warning and startup
 falls back to global hooks only.
 
 ```toml
-# .codewhale/hooks.toml
+# .nestlone/hooks.toml
 [[hooks]]
 event = "tool_call_before"
 command = '''echo '{"decision":"deny","reason":"no shell in this repo"}' '''
@@ -1078,7 +1078,7 @@ status text.
 ```toml
 [[hooks.hooks]]
 event = "turn_end"
-command = "~/.codewhale/hooks/turn-audit.sh"
+command = "~/.nestlone/hooks/turn-audit.sh"
 timeout_secs = 2
 continue_on_error = true
 ```
@@ -1153,7 +1153,7 @@ earlier hook exits non-zero.
 ```toml
 [[hooks.hooks]]
 event = "subagent_complete"
-command = "~/.codewhale/hooks/subagent-audit.sh"
+command = "~/.nestlone/hooks/subagent-audit.sh"
 timeout_secs = 2
 continue_on_error = true
 ```
@@ -1211,7 +1211,7 @@ Composer shortcuts keep the same role throughout a session:
 ### Composer stash (`/stash`, Ctrl+G / Ctrl+S)
 
 Press **Ctrl+G** in the composer to park the current draft to
-`~/.codewhale/composer_stash.jsonl`. `/stash list` shows parked
+`~/.nestlone/composer_stash.jsonl`. `/stash list` shows parked
 drafts with one-line previews and timestamps; `/stash pop`
 restores the most recently parked draft (LIFO); `/stash clear`
 wipes the file. Capped at 200 entries; multiline drafts round-trip intact.
@@ -1220,9 +1220,9 @@ reserve Ctrl+S for Save, so Ctrl+G is the portable default.
 
 ## Settings File (Persistent UI Preferences)
 
-codewhale also stores user preferences in:
+nestlone also stores user preferences in:
 
-- `~/.codewhale/settings.toml` on new installs
+- `~/.nestlone/settings.toml` on new installs
 - `~/.deepseek/settings.toml` or the legacy platform config-dir
   `deepseek/settings.toml` when an existing settings file is present
 
@@ -1240,7 +1240,7 @@ Common settings keys:
 - `theme` (`system`, `terminal`, `dark`, `light`, `grayscale`,
   `catppuccin-mocha`, `tokyo-night`, `dracula`, `gruvbox-dark`, `claude`,
   `matrix`, `solarized-light`; default `system`): `system` follows terminal
-  background detection, `dark`/`light` use the Codewhale Whale pair,
+  background detection, `dark`/`light` use the Nestlone Whale pair,
   `terminal` inherits the host terminal, `grayscale` is the low-opinion
   black/white theme, and the named community presets apply across the TUI.
   Aliases such as `whale`, `mono`, `black-white`, `tokyonight`, and `gruvbox`
@@ -1249,7 +1249,7 @@ Common settings keys:
   rose owns danger, violet owns Operate, and green remains completed/verified.
   Text labels, markers, and motion policy carry the same states when color is
   unavailable; color is never the only cue.
-  User-authored overlays live only at `~/.codewhale/themes/<name>.json` (or
+  User-authored overlays live only at `~/.nestlone/themes/<name>.json` (or
   `$CODEWHALE_HOME/themes/<name>.json`) and are selected with
   `/theme custom:<name>`. The filename is a bounded slug, symlinks and files
   over 64 KiB are refused, colors must be `#RRGGBB`, and unknown fields fail
@@ -1319,7 +1319,7 @@ Common settings keys:
   aliases `rmb` and `yuan` normalize to `cny`.
 - `default_mode` (`agent`, `plan`, or `operate`; legacy values are accepted for migration but are not live mode vocabulary)
 - `launch_screen` (`on`/`off`; default `off`): show the pre-session New/
-  Resume/Worktree menu. With it off, Codewhale enters a new session directly;
+  Resume/Worktree menu. With it off, Nestlone enters a new session directly;
   resume remains available in-session.
 - `sidebar_focus` (`pinned`, `auto`, `tasks`, `agents`, `context`, `hidden`; default
   `pinned`): selects the right sidebar focus. `pinned` keeps the right sidebar
@@ -1339,13 +1339,13 @@ Common settings keys:
   session metadata — the rail never reads a transcript per frame, and never
   contacts a provider.
 - `session_auto_resume` (`on`/`off`; default `off`): reattach to this
-  workspace's most recent session when Codewhale starts. Off by default so
-  plain `codewhale` keeps starting fresh. `--resume`, `--continue`, and
+  workspace's most recent session when Nestlone starts. Off by default so
+  plain `nestlone` keeps starting fresh. `--resume`, `--continue`, and
   `--fresh` always take precedence. When it is on, startup still refuses to
   resume a session that is archived, fails to load, or is recorded against a
   different workspace; each of those falls back to a fresh transcript and says
   which session was skipped and why. It applies to the interactive launch only
-  — `codewhale "<prompt>"` and `codewhale exec` are never silently prefixed
+  — `nestlone "<prompt>"` and `nestlone exec` are never silently prefixed
   with a prior conversation.
 - `max_history` (number of submitted input history entries; cleared drafts are
   also kept locally for composer history search)
@@ -1397,7 +1397,7 @@ unless configured.
 
 If you are upgrading from older releases:
 
-- Old: `/codewhale`
+- Old: `/nestlone`
   New: `/links` (aliases: `/dashboard`, `/api`)
 - Old: `/set model deepseek-reasoner`
   New: `/config` and edit the `model` row to `deepseek-v4-pro` or `deepseek-v4-flash`
@@ -1411,20 +1411,20 @@ If you are upgrading from older releases:
 ### Core keys (used by the TUI/engine)
 
 - `provider` (string, optional): `deepseek` (default), `deepseek-anthropic`, `nvidia-nim`, `openai`, `atlascloud`, `wanjie-ark`, `volcengine`, `openrouter`, `xiaomi-mimo`, `novita`, `fireworks`, `siliconflow`, `arcee`, `siliconflow-CN`, `moonshot`, `sglang`, `vllm`, `ollama`, `huggingface`, `together`, `qianfan`, `openai-codex`, `anthropic`, `openmodel`, `zai`, `stepfun`, `minimax`, `deepinfra`, `sakana`, `longcat`, `opencode-go`, `meta`, `telecomjs`, or `xai`. Legacy `deepseek-cn` configs are still accepted as an alias for `deepseek`; DeepSeek uses the same official host [`https://api.deepseek.com`](https://api-docs.deepseek.com/) worldwide. `deepseek-anthropic` targets DeepSeek's Anthropic Messages-compatible endpoint at `https://api.deepseek.com/anthropic` using `DEEPSEEK_API_KEY`; `nvidia-nim` targets NVIDIA's NIM-hosted DeepSeek endpoints through `https://integrate.api.nvidia.com/v1`; `openai` targets a generic OpenAI-compatible endpoint, defaulting to `https://api.openai.com/v1`; `atlascloud` targets AtlasCloud's OpenAI-compatible endpoint at `https://api.atlascloud.ai/v1`; `wanjie-ark` targets Wanjie Ark's OpenAI-compatible endpoint at `https://maas-openapi.wanjiedata.com/api/v1`; `volcengine` targets Volcengine Ark's OpenAI-compatible coding endpoint at `https://ark.cn-beijing.volces.com/api/coding/v3`; `openrouter` targets `https://openrouter.ai/api/v1`; `xiaomi-mimo` targets Xiaomi MiMo's OpenAI-compatible endpoint, using `https://token-plan-sgp.xiaomimimo.com/v1` by default for Token Plan keys (`tp-...`) and `https://api.xiaomimimo.com/v1` for pay-as-you-go keys. For Token Plan accounts outside the Singapore default, set `base_url` explicitly or use `mode = "token-plan-cn"` for China and `mode = "token-plan-ams"` for Europe/Amsterdam; `novita` targets `https://api.novita.ai/openai/v1`; `fireworks` targets `https://api.fireworks.ai/inference/v1`; `siliconflow` targets SiliconFlow, defaulting to `https://api.siliconflow.com/v1`; `arcee` targets Arcee AI's OpenAI-compatible endpoint at `https://api.arcee.ai/api/v1`; `siliconflow-CN` targets the SiliconFlow China regional endpoint through `[providers.siliconflow_cn]`; `moonshot` targets Moonshot/Kimi, defaulting to `https://api.moonshot.ai/v1`; `sglang` targets a self-hosted OpenAI-compatible endpoint, defaulting to `http://localhost:30000/v1`; `vllm` targets a self-hosted vLLM OpenAI-compatible endpoint, defaulting to `http://localhost:8000/v1`; `ollama` targets Ollama's OpenAI-compatible endpoint, defaulting to `http://localhost:11434/v1`; `huggingface` targets Hugging Face Inference Providers at `https://router.huggingface.co/v1`; `together` targets Together AI at `https://api.together.xyz/v1`; `qianfan` targets Baidu Qianfan at `https://api.baiduqianfan.ai/v1`; `openai-codex` targets ChatGPT/Codex OAuth; `anthropic` targets Claude's native Messages API; `openmodel` targets OpenModel's Anthropic-compatible Messages API at `https://api.openmodel.ai`; `zai` targets Z.ai at `https://api.z.ai/api/coding/paas/v4`; `stepfun` targets StepFun at `https://api.stepfun.ai/v1`; `minimax` targets MiniMax at `https://api.minimax.io/v1`; `deepinfra` targets DeepInfra at `https://api.deepinfra.com/v1/openai`; `sakana` targets Sakana AI Fugu at `https://api.sakana.ai/v1`; `longcat` targets Meituan LongCat at `https://api.longcat.chat/openai/v1`; `opencode-go` targets the subscription-backed OpenCode Go Chat Completions route at `https://opencode.ai/zen/go/v1`; `meta` targets Meta Model API; `telecomjs` targets TelecomJS TokenHub at `https://aigw.telecomjs.com/v1`; and `xai` targets xAI's API-key or OAuth route.
-- `opencode-zen` (string provider value): selects the model-aware OpenCode Zen gateway through `[providers.opencode_zen]`. The default base URL is `https://opencode.ai/zen/v1`, the default model is `gpt-5.5`, and credentials come from `api_key`, `OPENCODE_ZEN_API_KEY`, or fallback `OPENCODE_API_KEY`—never ChatGPT/Codex OAuth. `OPENCODE_ZEN_BASE_URL` and `OPENCODE_ZEN_MODEL` are accepted. The selected model is resolved through the curated Zen catalog: GPT uses Responses, Claude/Qwen use Anthropic Messages, and the documented DeepSeek/MiniMax/GLM/Kimi/Grok/free rows use Chat Completions. Gemini and unknown models fail closed because Codewhale has no proven supported wire contract for them. See the exact current model groups in [`PROVIDERS.md`](PROVIDERS.md#opencode-zen-protocol-catalog).
-- `minimax-anthropic` (string provider value): selects MiniMax's Anthropic-compatible Messages route through `[providers.minimax_anthropic]`. The default Base URL is `https://api.minimax.io/anthropic`; set `https://api.minimaxi.com/anthropic` for China. Keep the `/anthropic` suffix because Codewhale appends `/v1/messages`. The route uses `MINIMAX_API_KEY` and defaults to `MiniMax-M3`; `MiniMax-M2.7` is also registered. Official M3 input modalities are text, image, and video, with adaptive or disabled thinking. M2.7 is text-only and always keeps thinking enabled.
+- `opencode-zen` (string provider value): selects the model-aware OpenCode Zen gateway through `[providers.opencode_zen]`. The default base URL is `https://opencode.ai/zen/v1`, the default model is `gpt-5.5`, and credentials come from `api_key`, `OPENCODE_ZEN_API_KEY`, or fallback `OPENCODE_API_KEY`—never ChatGPT/Codex OAuth. `OPENCODE_ZEN_BASE_URL` and `OPENCODE_ZEN_MODEL` are accepted. The selected model is resolved through the curated Zen catalog: GPT uses Responses, Claude/Qwen use Anthropic Messages, and the documented DeepSeek/MiniMax/GLM/Kimi/Grok/free rows use Chat Completions. Gemini and unknown models fail closed because Nestlone has no proven supported wire contract for them. See the exact current model groups in [`PROVIDERS.md`](PROVIDERS.md#opencode-zen-protocol-catalog).
+- `minimax-anthropic` (string provider value): selects MiniMax's Anthropic-compatible Messages route through `[providers.minimax_anthropic]`. The default Base URL is `https://api.minimax.io/anthropic`; set `https://api.minimaxi.com/anthropic` for China. Keep the `/anthropic` suffix because Nestlone appends `/v1/messages`. The route uses `MINIMAX_API_KEY` and defaults to `MiniMax-M3`; `MiniMax-M2.7` is also registered. Official M3 input modalities are text, image, and video, with adaptive or disabled thinking. M2.7 is text-only and always keeps thinking enabled.
 - `api_key` (string, required for hosted providers): must be non-empty for DeepSeek/hosted providers (or set the provider API key env var). Self-hosted SGLang, vLLM, and Ollama can omit it.
-- `auth_mode` (string, optional provider-table key): selects a provider-specific authentication contract. Kimi Code membership uses `auth_mode = "api_key"` (or omit the field), a key created in the [Kimi Code console](https://www.kimi.com/code/console), `base_url = "https://api.kimi.com/coding/v1"`, and bare `model = "k3"` for K3. Codewhale gives that route a safe 262,144-token baseline; set `context_window = 1048576` only when the Kimi Code plan includes 1M access (Allegretto and above). `k3[1m]` is a Claude Code-only convention, not an API model ID, and Codewhale rejects it instead of silently changing the wire model or assuming an entitlement. `model = "kimi-for-coding"` remains the valid K2.7 compatibility route available to all Kimi Code members. Legacy `auth_mode = "kimi_oauth"` fails closed with API-key guidance and never probes, reads, refreshes, or rewrites `kimi_cli`/`kimi_code_cli` credential files. First-class OAuth requires Codewhale's own vendor-registered client identity and remains tracked in #4417.
+- `auth_mode` (string, optional provider-table key): selects a provider-specific authentication contract. Kimi Code membership uses `auth_mode = "api_key"` (or omit the field), a key created in the [Kimi Code console](https://www.kimi.com/code/console), `base_url = "https://api.kimi.com/coding/v1"`, and bare `model = "k3"` for K3. Nestlone gives that route a safe 262,144-token baseline; set `context_window = 1048576` only when the Kimi Code plan includes 1M access (Allegretto and above). `k3[1m]` is a Claude Code-only convention, not an API model ID, and Nestlone rejects it instead of silently changing the wire model or assuming an entitlement. `model = "kimi-for-coding"` remains the valid K2.7 compatibility route available to all Kimi Code members. Legacy `auth_mode = "kimi_oauth"` fails closed with API-key guidance and never probes, reads, refreshes, or rewrites `kimi_cli`/`kimi_code_cli` credential files. First-class OAuth requires Nestlone's own vendor-registered client identity and remains tracked in #4417.
 - `base_url` (string, optional): defaults to `https://api.deepseek.com/beta` for DeepSeek's OpenAI-compatible Chat Completions API, including legacy `provider = "deepseek-cn"` configs. Other defaults are `https://api.deepseek.com/anthropic` for `deepseek-anthropic`, `https://integrate.api.nvidia.com/v1` for `nvidia-nim`, `https://api.openai.com/v1` for `openai`, `https://api.atlascloud.ai/v1` for `atlascloud`, `https://maas-openapi.wanjiedata.com/api/v1` for `wanjie-ark`, `https://ark.cn-beijing.volces.com/api/coding/v3` for `volcengine`, `https://openrouter.ai/api/v1` for `openrouter`, `https://token-plan-sgp.xiaomimimo.com/v1` for `xiaomi-mimo` when the API key starts with `tp-...` and `https://api.xiaomimimo.com/v1` otherwise, `https://api.novita.ai/openai/v1` for `novita`, `https://api.fireworks.ai/inference/v1` for `fireworks`, `https://api.siliconflow.com/v1` for `siliconflow`, `https://api.siliconflow.cn/v1` for `siliconflow-CN`, `https://api.arcee.ai/api/v1` for `arcee`, `https://api.moonshot.ai/v1` for `moonshot`, `https://api.minimax.io/v1` for `minimax`, `https://api.openmodel.ai` for `openmodel`, `https://api.z.ai/api/coding/paas/v4` for `zai`, `https://api.stepfun.ai/v1` for `stepfun`, `https://api.deepinfra.com/v1/openai` for `deepinfra`, `https://api.sakana.ai/v1` for `sakana`, `https://router.huggingface.co/v1` for `huggingface`, `https://api.together.xyz/v1` for `together`, `https://api.baiduqianfan.ai/v1` for `qianfan`, `https://chatgpt.com/backend-api` for `openai-codex`, `https://api.anthropic.com` for `anthropic`, `http://localhost:30000/v1` for `sglang`, `http://localhost:8000/v1` for `vllm`, and `http://localhost:11434/v1` for `ollama`. Set `base_url = "https://token-plan-cn.xiaomimimo.com/v1"` for China-region Xiaomi MiMo Token Plan accounts or `base_url = "https://token-plan-ams.xiaomimimo.com/v1"` for Europe/Amsterdam accounts. Set `https://api.deepseek.com` or `https://api.deepseek.com/v1` explicitly to opt out of DeepSeek beta features.
 - `telecomjs` base URL and catalog: `[providers.telecomjs]` defaults to `https://aigw.telecomjs.com/v1`; `TELECOMJS_BASE_URL` overrides it. With `TELECOMJS_API_KEY`, `/models` refreshes a key-scoped catalog without mixing rows into another provider.
-- `context_window` (integer, optional provider-table key): override the total context window for the active `[providers.<name>]` route when an OpenAI-compatible gateway, hosted model alias, or self-hosted runtime has a different limit than Codewhale's static model table. For example, `[providers.openai] context_window = 1000000` lets an OpenAI-compatible DashScope/Qwen route budget against a 1M-token window instead of the conservative fallback. For Kimi Code K3, keep `model = "k3"` and set `[providers.moonshot] context_window = 1048576` only when the membership plan includes 1M access; otherwise omit it to retain the 262,144-token safe baseline. The value must be greater than 0 and affects prompt context notes, compaction thresholds, context-pressure checks, and request output caps.
+- `context_window` (integer, optional provider-table key): override the total context window for the active `[providers.<name>]` route when an OpenAI-compatible gateway, hosted model alias, or self-hosted runtime has a different limit than Nestlone's static model table. For example, `[providers.openai] context_window = 1000000` lets an OpenAI-compatible DashScope/Qwen route budget against a 1M-token window instead of the conservative fallback. For Kimi Code K3, keep `model = "k3"` and set `[providers.moonshot] context_window = 1048576` only when the membership plan includes 1M access; otherwise omit it to retain the 262,144-token safe baseline. The value must be greater than 0 and affects prompt context notes, compaction thresholds, context-pressure checks, and request output caps.
 - `path_suffix` (string, optional provider-table key): override the chat-completions path for OpenAI-compatible gateways that do not serve `/v1/chat/completions`. For example, `[providers.openai] path_suffix = "/chat/completions"` sends chat requests to the unversioned base URL plus `/chat/completions`; `models` and `beta/*` requests keep their normal routing.
 - `reasoning_stream_style` (string, optional provider-table key): override how streaming reasoning is separated from answer text for the active provider route. Use `separate_field` for `reasoning_content` / `reasoning` deltas, `inline_tags` for gateways that stream `<think>...</think>` inside `delta.content`, or `none` to render incoming content exactly as answer text.
 - `[providers.<name>.auth]` (table, optional): provider-scoped auth source metadata. `source = "command"` stores a command argv plus optional `timeout_ms`; `source = "secret"` stores a `secret_id`. This slice lets provider readiness, `/provider`, and doctor JSON report the auth source class without exposing command argv output or secret values; executing commands and resolving external secret material is handled by the follow-up resolver work.
-- `insecure_skip_tls_verify` (bool, optional provider-table key): legacy compatibility key, disabled by default. When true on the active provider table, provider clients reject the configuration instead of skipping TLS certificate verification. Use `SSL_CERT_FILE` for corporate or private CA bundles; `codewhale doctor` reports stale uses of this setting.
-- `default_text_model` (string, optional): defaults to `deepseek-v4-pro` for DeepSeek, `deepseek-anthropic`, and generic OpenAI-compatible endpoints, `deepseek-ai/deepseek-v4-pro` for NVIDIA NIM, `deepseek-ai/deepseek-v4-flash` for AtlasCloud, `deepseek-reasoner` for Wanjie Ark, `DeepSeek-V4-Pro` for Volcengine Ark, `deepseek/deepseek-v4-pro` for OpenRouter and Novita, `mimo-v2.5-pro` for Xiaomi MiMo, `accounts/fireworks/models/deepseek-v4-pro` for Fireworks, `deepseek-ai/DeepSeek-V4-Pro` for SiliconFlow and DeepInfra, `trinity-large-thinking` for Arcee AI, `kimi-k2.7-code` for Moonshot, `MiniMax-M3` for MiniMax, `GLM-5.2` for Z.ai, `step-3.7-flash` for StepFun, `ernie-4.0-turbo-8k` for Qianfan, `fugu` for Sakana AI, `deepseek-ai/DeepSeek-V4-Pro` for SGLang/vLLM, and `deepseek-coder:1.3b` for Ollama. Hugging Face and Together AI both default to `deepseek-ai/DeepSeek-V4-Pro`; `openai-codex` defaults to `gpt-5.5`; `anthropic` defaults to `claude-sonnet-4-6`; `openmodel` defaults to `deepseek-v4-flash`. Current public DeepSeek IDs are `deepseek-v4-pro` and `deepseek-v4-flash`, both with 1M context windows, 384K max output, and thinking mode enabled by default. DeepSeek retires `deepseek-chat` and `deepseek-reasoner` on July 24, 2026; direct first-party routes migrate both to `deepseek-v4-flash`, with omitted reasoning settings preserving their former non-thinking (`off`) and thinking (`high`) intent. Explicit `reasoning_effort` wins, and provider-owned ids on Wanjie Ark, aggregators, self-hosted runtimes, and custom endpoints are not globally rewritten. SiliconFlow retains its own mapping: `deepseek-reasoner` and `deepseek-r1` select its Pro model while `deepseek-chat` and `deepseek-v3` select Flash. Provider-specific mappings translate `deepseek-v4-pro` / `deepseek-v4-flash` to each provider's model ID where supported. OpenRouter also recognizes recent large IDs such as `arcee-ai/trinity-large-thinking`, `minimax/minimax-m3`, `minimax/minimax-m2.7`, `xiaomi/mimo-v2.5-pro`, `qwen/qwen3.6-flash`, `qwen/qwen3.6-35b-a3b`, `qwen/qwen3.6-max-preview`, `qwen/qwen3.6-27b`, `qwen/qwen3.6-plus`, `qwen/qwen3.7-max`, `google/gemma-4-31b-it`, `moonshotai/kimi-k2.7-code`, `moonshotai/kimi-k2.6`, `nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free`, and `nvidia/nemotron-3-ultra-550b-a55b`; direct Arcee uses bare IDs such as `trinity-large-thinking` and `trinity-large-preview`; direct Moonshot recognizes `kimi-k3`, `kimi-k2.7-code`, and `kimi-k2.6`. The exact Kimi Code endpoint recognizes bare `k3` for K3 and `kimi-for-coding` for K2.7; those membership IDs are distinct from the direct Moonshot IDs and are never rewritten across routes. Direct MiniMax recognizes `MiniMax-M3` and the documented M2.x chat model IDs; direct Sakana recognizes `fugu` and `fugu-ultra-20260615`; direct Xiaomi MiMo recognizes chat IDs `mimo-v2.5-pro`, `mimo-v2.5-pro-ultraspeed`, and `mimo-v2.5`, while TTS IDs are selected through `codewhale speech` / `tts`. Generic `openai`, `atlascloud`, `wanjie-ark`, `xiaomi-mimo`, `arcee`, `moonshot`, `minimax`, `openmodel`, `zai`, `stepfun`, `qianfan`, `sakana`, and Ollama model IDs are passed through unchanged after known aliases are normalized. OpenRouter and SiliconFlow provider configs with a custom `base_url` also preserve explicit model values, which lets OpenAI-compatible gateways accept bare model IDs. Use `/models` or `codewhale models` to discover live IDs from your configured endpoint. `CODEWHALE_MODEL` overrides this for a single process; `DEEPSEEK_MODEL` is the legacy alias.
-- TelecomJS uses `deepseek-v4-pro` only as a conservative pre-refresh fallback. Once its key-scoped `/models` catalog is available, the picker uses those live rows; Codewhale omits unsupported reasoning request fields on this route.
-- `reasoning_effort` (string, optional): `off`, `low`, `medium`, `high`, `max`, `xhigh`, or `ultracode`; defaults to the configured UI tier. DeepSeek Platform receives top-level `thinking` / `reasoning_effort` fields. Direct Moonshot `kimi-k3` on exact `https://api.moonshot.ai/v1` is always-thinking and receives only top-level `reasoning_effort = "low" | "high" | "max"`; `off` normalizes to `low`, and `medium` to `high`. Kimi Code membership `k3` on exact `https://api.kimi.com/coding/v1` instead receives nested `thinking.effort`, and its `off` setting also normalizes to enabled `low`. Normal dispatched `auto` uses Codewhale's auto-reasoning selector and sends a concrete route-normalized tier; only an omitted reasoning setting leaves the provider default in control. Neighboring gateways and model/endpoint combinations retain the generic Moonshot contract. OpenAI Codex normalizes stale `off` to `low` and sends `max` / `ultracode` as Responses `xhigh`. Z.ai receives documented `thinking` controls and treats enabled thinking as the GLM coding high/max lane. NVIDIA NIM receives equivalent settings through `chat_template_kwargs`.
+- `insecure_skip_tls_verify` (bool, optional provider-table key): legacy compatibility key, disabled by default. When true on the active provider table, provider clients reject the configuration instead of skipping TLS certificate verification. Use `SSL_CERT_FILE` for corporate or private CA bundles; `nestlone doctor` reports stale uses of this setting.
+- `default_text_model` (string, optional): defaults to `deepseek-v4-pro` for DeepSeek, `deepseek-anthropic`, and generic OpenAI-compatible endpoints, `deepseek-ai/deepseek-v4-pro` for NVIDIA NIM, `deepseek-ai/deepseek-v4-flash` for AtlasCloud, `deepseek-reasoner` for Wanjie Ark, `DeepSeek-V4-Pro` for Volcengine Ark, `deepseek/deepseek-v4-pro` for OpenRouter and Novita, `mimo-v2.5-pro` for Xiaomi MiMo, `accounts/fireworks/models/deepseek-v4-pro` for Fireworks, `deepseek-ai/DeepSeek-V4-Pro` for SiliconFlow and DeepInfra, `trinity-large-thinking` for Arcee AI, `kimi-k2.7-code` for Moonshot, `MiniMax-M3` for MiniMax, `GLM-5.2` for Z.ai, `step-3.7-flash` for StepFun, `ernie-4.0-turbo-8k` for Qianfan, `fugu` for Sakana AI, `deepseek-ai/DeepSeek-V4-Pro` for SGLang/vLLM, and `deepseek-coder:1.3b` for Ollama. Hugging Face and Together AI both default to `deepseek-ai/DeepSeek-V4-Pro`; `openai-codex` defaults to `gpt-5.5`; `anthropic` defaults to `claude-sonnet-4-6`; `openmodel` defaults to `deepseek-v4-flash`. Current public DeepSeek IDs are `deepseek-v4-pro` and `deepseek-v4-flash`, both with 1M context windows, 384K max output, and thinking mode enabled by default. DeepSeek retires `deepseek-chat` and `deepseek-reasoner` on July 24, 2026; direct first-party routes migrate both to `deepseek-v4-flash`, with omitted reasoning settings preserving their former non-thinking (`off`) and thinking (`high`) intent. Explicit `reasoning_effort` wins, and provider-owned ids on Wanjie Ark, aggregators, self-hosted runtimes, and custom endpoints are not globally rewritten. SiliconFlow retains its own mapping: `deepseek-reasoner` and `deepseek-r1` select its Pro model while `deepseek-chat` and `deepseek-v3` select Flash. Provider-specific mappings translate `deepseek-v4-pro` / `deepseek-v4-flash` to each provider's model ID where supported. OpenRouter also recognizes recent large IDs such as `arcee-ai/trinity-large-thinking`, `minimax/minimax-m3`, `minimax/minimax-m2.7`, `xiaomi/mimo-v2.5-pro`, `qwen/qwen3.6-flash`, `qwen/qwen3.6-35b-a3b`, `qwen/qwen3.6-max-preview`, `qwen/qwen3.6-27b`, `qwen/qwen3.6-plus`, `qwen/qwen3.7-max`, `google/gemma-4-31b-it`, `moonshotai/kimi-k2.7-code`, `moonshotai/kimi-k2.6`, `nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free`, and `nvidia/nemotron-3-ultra-550b-a55b`; direct Arcee uses bare IDs such as `trinity-large-thinking` and `trinity-large-preview`; direct Moonshot recognizes `kimi-k3`, `kimi-k2.7-code`, and `kimi-k2.6`. The exact Kimi Code endpoint recognizes bare `k3` for K3 and `kimi-for-coding` for K2.7; those membership IDs are distinct from the direct Moonshot IDs and are never rewritten across routes. Direct MiniMax recognizes `MiniMax-M3` and the documented M2.x chat model IDs; direct Sakana recognizes `fugu` and `fugu-ultra-20260615`; direct Xiaomi MiMo recognizes chat IDs `mimo-v2.5-pro`, `mimo-v2.5-pro-ultraspeed`, and `mimo-v2.5`, while TTS IDs are selected through `nestlone speech` / `tts`. Generic `openai`, `atlascloud`, `wanjie-ark`, `xiaomi-mimo`, `arcee`, `moonshot`, `minimax`, `openmodel`, `zai`, `stepfun`, `qianfan`, `sakana`, and Ollama model IDs are passed through unchanged after known aliases are normalized. OpenRouter and SiliconFlow provider configs with a custom `base_url` also preserve explicit model values, which lets OpenAI-compatible gateways accept bare model IDs. Use `/models` or `nestlone models` to discover live IDs from your configured endpoint. `CODEWHALE_MODEL` overrides this for a single process; `DEEPSEEK_MODEL` is the legacy alias.
+- TelecomJS uses `deepseek-v4-pro` only as a conservative pre-refresh fallback. Once its key-scoped `/models` catalog is available, the picker uses those live rows; Nestlone omits unsupported reasoning request fields on this route.
+- `reasoning_effort` (string, optional): `off`, `low`, `medium`, `high`, `max`, `xhigh`, or `ultracode`; defaults to the configured UI tier. DeepSeek Platform receives top-level `thinking` / `reasoning_effort` fields. Direct Moonshot `kimi-k3` on exact `https://api.moonshot.ai/v1` is always-thinking and receives only top-level `reasoning_effort = "low" | "high" | "max"`; `off` normalizes to `low`, and `medium` to `high`. Kimi Code membership `k3` on exact `https://api.kimi.com/coding/v1` instead receives nested `thinking.effort`, and its `off` setting also normalizes to enabled `low`. Normal dispatched `auto` uses Nestlone's auto-reasoning selector and sends a concrete route-normalized tier; only an omitted reasoning setting leaves the provider default in control. Neighboring gateways and model/endpoint combinations retain the generic Moonshot contract. OpenAI Codex normalizes stale `off` to `low` and sends `max` / `ultracode` as Responses `xhigh`. Z.ai receives documented `thinking` controls and treats enabled thinking as the GLM coding high/max lane. NVIDIA NIM receives equivalent settings through `chat_template_kwargs`.
 - `verbosity` (string, optional): `normal` or `concise`. `normal` keeps the
   default conversational prompt. `concise` appends a prompt discipline block
   for direct, low-chatter output; CLI noninteractive commands (`exec` and
@@ -1447,7 +1447,7 @@ If you are upgrading from older releases:
   filesystem isolation, workspace-write enforcement, network blocking,
   registry isolation, or AppContainer isolation until those are implemented.
 - `permissions.toml` (sibling file, optional): typed permission rule records
-  loaded next to `config.toml`, for example `~/.codewhale/permissions.toml`.
+  loaded next to `config.toml`, for example `~/.nestlone/permissions.toml`.
   This active user file is the only permission-rule source today; project
   config overlays do not load a project-local `permissions.toml`. A rule's
   optional `workspace` field is its repository scope, not a second source.
@@ -1517,7 +1517,7 @@ If you are upgrading from older releases:
   a disabled/unknown cell instead of silently deleting user config. Trusted
   user config, profiles, and managed config replace the whole list; project
   overlays cannot change hotbar bindings. Setup or wizard flows that persist
-  hotbar bindings write this same schema to the resolved `~/.codewhale/config.toml`
+  hotbar bindings write this same schema to the resolved `~/.nestlone/config.toml`
   path, preserving legacy `~/.deepseek/config.toml` only when that fallback file
   is already the active config.
 
@@ -1639,24 +1639,24 @@ If you are upgrading from older releases:
   parent session, save a Fleet/AgentProfile with explicit `provider` and
   `model` fields (including user-named custom providers such as `lm-studio`)
   and call `agent(profile: "...")`; see [SUBAGENTS.md](SUBAGENTS.md).
-- `skills_dir` (string, optional): defaults to `~/.codewhale/skills` (each skill is
+- `skills_dir` (string, optional): defaults to `~/.nestlone/skills` (each skill is
   a directory containing `SKILL.md`). Workspace-local `.agents/skills` or
   `./skills` are preferred when present; the runtime also discovers global
   agentskills.io-compatible `~/.agents/skills` and the broader Claude-ecosystem
   `~/.claude/skills`. First launch installs versioned bundled skills for common
   workflows including skill creation, delegation, MCP/plugin scaffolding,
   documents, presentations, spreadsheets, PDFs, and Feishu/Lark. Only
-  CodeWhale-owned roots (`<workspace>/.codewhale/skills` and
-  `~/.codewhale/skills`) are writable install/import targets; compatible harness
+  Nestlone-owned roots (`<workspace>/.nestlone/skills` and
+  `~/.nestlone/skills`) are writable install/import targets; compatible harness
   roots stay read-only. Bare `/skills` opens the Skills Manager (owned-only,
   zero network). See [SKILLS.md](SKILLS.md) for the manager, audit statuses,
   provenance markers, and mutation rules, and
   [CLAUDE_PLUGIN_COMPAT.md](CLAUDE_PLUGIN_COMPAT.md) for the supported boundary
   between portable `SKILL.md` bundles and Claude Code plugin runtimes.
-- `[skills].scan_codewhale_only` (bool, default `false`): when `true`, session
+- `[skills].scan_nestlone_only` (bool, default `false`): when `true`, session
   skill discovery ignores cross-tool roots such as `.claude/skills`,
-  `.opencode/skills`, `.cursor/skills`, and `~/.agents/skills`. Codewhale still
-  scans `<workspace>/.codewhale/skills`, `~/.codewhale/skills`, and any explicit
+  `.opencode/skills`, `.cursor/skills`, and `~/.agents/skills`. Nestlone still
+  scans `<workspace>/.nestlone/skills`, `~/.nestlone/skills`, and any explicit
   `skills_dir` override. The Skills Manager can still toggle a local compatible
   audit scan independently of this runtime knob — see [SKILLS.md](SKILLS.md).
 - `[skills].registry_url` / `[skills].max_install_size_bytes` (optional): used by
@@ -1669,21 +1669,21 @@ If you are upgrading from older releases:
   `pass` / `partial` / `fail` into the goal verdict vocabulary
   `hunted` / `wounded` / `escaped`. `"hunt"` is the only shipped policy today;
   unknown values are rejected so future policies can be added deliberately.
-- `mcp_config_path` (string, optional): defaults to `~/.codewhale/mcp.json`, with
-  legacy `~/.deepseek/mcp.json` fallback when the Codewhale path is absent.
+- `mcp_config_path` (string, optional): defaults to `~/.nestlone/mcp.json`, with
+  legacy `~/.deepseek/mcp.json` fallback when the Nestlone path is absent.
   It is visible in `/config` and can be changed from the TUI. The new path is
   used immediately by `/mcp`, but rebuilding the model-visible MCP tool pool
   requires restarting the TUI.
-- `notes_path` (string, optional): defaults to `~/.codewhale/notes.txt`, with
-  legacy `~/.deepseek/notes.txt` fallback when the Codewhale path is absent, and
+- `notes_path` (string, optional): defaults to `~/.nestlone/notes.txt`, with
+  legacy `~/.deepseek/notes.txt` fallback when the Nestlone path is absent, and
   is used by the model-visible `note` tool.
 - `[memory].enabled` (bool, optional): defaults to `false`. When `true`,
   the TUI loads the user memory file into a `<user_memory>` prompt block,
   enables `# foo` quick-capture in the composer, surfaces the `/memory`
   slash command, and registers the `remember` tool. The same toggle is
   available via `DEEPSEEK_MEMORY=on`.
-- `memory_path` (string, optional): defaults to `~/.codewhale/memory.md`, with
-  legacy `~/.deepseek/memory.md` fallback when the Codewhale path is absent.
+- `memory_path` (string, optional): defaults to `~/.nestlone/memory.md`, with
+  legacy `~/.deepseek/memory.md` fallback when the Nestlone path is absent.
   Used by the user-memory feature when enabled — see
   [`MEMORY.md`](MEMORY.md) for the full feature surface (`# foo`
   composer prefix, `/memory` slash command, `remember` tool, opt-in
@@ -1692,7 +1692,7 @@ If you are upgrading from older releases:
   - `[snapshots].enabled` (bool, default `true`)
   - `[snapshots].max_age_days` (int, default `7`)
   - snapshots live under
-    `~/.codewhale/snapshots/<project_hash>/<worktree_hash>/.git`, with legacy
+    `~/.nestlone/snapshots/<project_hash>/<worktree_hash>/.git`, with legacy
     `~/.deepseek/snapshots/...` fallback when only the legacy state exists, and
     never use the workspace's own `.git` directory
 - `context.*` (optional): append-only Fin seam manager, currently opt-in.
@@ -1787,7 +1787,7 @@ User memory is split across one top-level path setting and one opt-in
 toggle table:
 
 ```toml
-memory_path = "~/.codewhale/memory.md"
+memory_path = "~/.nestlone/memory.md"
 
 [memory]
 enabled = true
@@ -1871,7 +1871,7 @@ play of that event) → play. Unknown strings in `events` are ignored.
 
 A desktop notification is a glance surface: on macOS it can appear on the
 lock screen, and on every platform it is visible to anyone near the machine.
-Codewhale therefore builds notifications from a typed payload with a fixed
+Nestlone therefore builds notifications from a typed payload with a fixed
 per-event disclosure policy rather than from whatever text was on hand:
 
 | Event | Shown | Never shown |
@@ -1902,7 +1902,7 @@ the banner to `com.apple.ScriptEditor2`. That attribution supplies the
 Script Editor icon and owns the System Settings → Notifications entry
 (alert style, previews, Do Not Disturb). `display notification` has no
 icon parameter, so this cannot be fixed from the notification code; it
-needs Codewhale to ship a real `.app` bundle. Tracked in
+needs Nestlone to ship a real `.app` bundle. Tracked in
 [#4834](https://github.com/Hmbown/CodeWhale/issues/4834). In the meantime,
 iTerm2, WezTerm, Ghostty, and kitty are matched first and use their own
 notification protocols, and `method = "osc9"` / `"bel"` / `"off"` opt out
@@ -1916,7 +1916,7 @@ These keys are accepted by the config loader but not currently used by the inter
 
 ## Tool Catalog
 
-Codewhale loads a small core native tool catalog by default and leaves less
+Nestlone loads a small core native tool catalog by default and leaves less
 common native tools discoverable through ToolSearch. To keep specific native
 tools loaded on every request, add them to `[tools].always_load`:
 
@@ -1943,10 +1943,10 @@ exec_policy = true
 
 You can also override features for a single run:
 
-- `codewhale-tui --enable web_search`
-- `codewhale-tui --disable subagents`
+- `nestlone-tui --enable web_search`
+- `nestlone-tui --disable subagents`
 
-Use `codewhale-tui features list` to inspect known flags and their effective state.
+Use `nestlone-tui features list` to inspect known flags and their effective state.
 The native `/config` view also includes a read-only **Experimental** section
 for experimental feature flags. It shows each flag's effective enabled/disabled
 state and whether that state comes from the default or a configured override.
@@ -1969,7 +1969,7 @@ receipt records every hop. Missing configuration and network-policy denials
 fail closed without sending the query to another provider.
 
 For a private/internal search service that serves DuckDuckGo-compatible HTML,
-keep `provider = "duckduckgo"` and set `base_url`; Codewhale appends the `q`
+keep `provider = "duckduckgo"` and set `base_url`; Nestlone appends the `q`
 query parameter to that endpoint and applies network policy to its host.
 Custom endpoints do not fall back to public Bing. `CODEWHALE_SEARCH_BASE_URL`
 can override this per process; `DEEPSEEK_SEARCH_BASE_URL` remains accepted as
@@ -1977,13 +1977,13 @@ the legacy alias.
 
 **SearXNG** ([docs](https://docs.searxng.org/dev/search_api.html)) uses the
 configured instance's JSON API. Set `provider = "searxng"` and
-`base_url = "https://your-searxng.example"`; Codewhale calls
-`/search?q=...&format=json`. Codewhale does not use a public SearXNG instance
+`base_url = "https://your-searxng.example"`; Nestlone calls
+`/search?q=...&format=json`. Nestlone does not use a public SearXNG instance
 by default because public instances often disable JSON output or rate-limit API
 traffic.
 
 **Metaso** ([metaso.cn](https://metaso.cn)) requires a user-supplied key. Set
-`METASO_API_KEY` or `[search] api_key`; Codewhale does not ship a shared key.
+`METASO_API_KEY` or `[search] api_key`; Nestlone does not ship a shared key.
 
 **Baidu** uses Baidu AI Search at
 `https://qianfan.baidubce.com/v2/ai_search/web_search`. Set
@@ -2023,7 +2023,7 @@ the composer, press `↑` to select an attachment row, then press `Backspace` or
 
 ## Managed Configuration and Requirements
 
-codewhale supports a policy layering model:
+nestlone supports a policy layering model:
 
 1. user config + profile + env overrides
 2. managed config (if present)
@@ -2044,18 +2044,18 @@ If configured values violate requirements, startup fails with a descriptive erro
 
 See `docs/capacity_controller.md` for formulas, intervention behavior, and telemetry.
 
-## Notes On `codewhale-tui doctor`
+## Notes On `nestlone-tui doctor`
 
-`codewhale-tui doctor` follows the same config resolution rules as the rest of the
+`nestlone-tui doctor` follows the same config resolution rules as the rest of the
 TUI. That means `--config`, `CODEWHALE_CONFIG_PATH`, and the legacy
 `DEEPSEEK_CONFIG_PATH` are respected, and MCP/skills
 checks use the resolved `mcp_config_path` / `skills_dir` (including env overrides).
 
-To bootstrap missing MCP/skills paths, run `codewhale-tui setup --all`. You can
-also run `codewhale-tui setup --skills --local` to create a workspace-local
+To bootstrap missing MCP/skills paths, run `nestlone-tui setup --all`. You can
+also run `nestlone-tui setup --skills --local` to create a workspace-local
 `./skills` dir.
 
-`codewhale-tui doctor --json` prints a machine-readable report that skips the
+`nestlone-tui doctor --json` prints a machine-readable report that skips the
 live API connectivity probe. Plain `doctor` keeps the existing hosted-provider
 connectivity check, but it does not contact loopback or self-hosted provider
 endpoints unless `--probe-local` is supplied. That opt-in request may start a
@@ -2076,7 +2076,7 @@ run. `mcp.probe_scope` is `configuration`, `mcp.live_health_checked` is false,
 and each server separates `checks.configuration` / `checks.command` from
 `checks.process_reachable`, `checks.protocol_initialized`, and
 `checks.backend_tool_health`. The latter three remain `not_checked` in doctor
-output. Run `codewhale mcp validate` to explicitly start enabled servers and
+output. Run `nestlone mcp validate` to explicitly start enabled servers and
 verify protocol initialization/discovery; backend health still requires an
 appropriate explicit tool call.
 
@@ -2093,25 +2093,25 @@ configure reasoning effort.
 
 ## Setup status, clean, and extension dirs
 
-`codewhale-tui setup` accepts a few flags beyond the existing `--mcp`,
+`nestlone-tui setup` accepts a few flags beyond the existing `--mcp`,
 `--skills`, `--local`, `--all`, and `--force`:
 
 - `--status` — print a compact one-screen status (api key, base URL, model,
   MCP/skills/tools/plugins counts, sandbox, `.env` presence). Read-only and
   network-free; safe to run in CI. If `.env` is missing and `.env.example` is
   present in the workspace, the status output points at `cp .env.example .env`.
-- `--tools` — scaffold `~/.codewhale/tools/` with a `README.md` describing the
+- `--tools` — scaffold `~/.nestlone/tools/` with a `README.md` describing the
   self-describing frontmatter convention (`# name:` / `# description:` /
   `# usage:`) and an `example.sh` that follows it. The directory is
   intentionally not auto-loaded; wire individual scripts into the agent via
   MCP, hooks, or skills.
-- `--plugins` — scaffold `~/.codewhale/plugins/` with a `README.md` and an
+- `--plugins` — scaffold `~/.nestlone/plugins/` with a `README.md` and an
   `example/plugin.toml` plus a namespaced example Skill. Bundles are discovered
   read-only, untrusted, and disabled; review them through `/plugin` before
   enabling. v0.9.1 activates only declared Skills and MCP servers. See
   [PLUGIN_BUNDLES.md](PLUGIN_BUNDLES.md).
 - `--all` now scaffolds MCP + skills + tools + plugins together.
-- `--clean` — list `~/.codewhale/sessions/checkpoints/latest.json` and
+- `--clean` — list `~/.nestlone/sessions/checkpoints/latest.json` and
   `offline_queue.json` if they exist. Legacy
   `~/.deepseek/sessions/checkpoints/` files are not scanned automatically; set
   `CODEWHALE_HOME=~/.deepseek` for a one-off legacy cleanup. Pass `--force` to
@@ -2122,10 +2122,10 @@ configure reasoning effort.
 
 ## Why the engine strips XML/`[TOOL_CALL]` text
 
-codewhale sends and receives tool calls only over the API tool channel
+nestlone sends and receives tool calls only over the API tool channel
 (structured `tool_use` / `tool_call` items). The streaming loop in
 `crates/tui/src/core/engine.rs` recognizes a fixed set of fake-wrapper start
-markers — `[TOOL_CALL]`, `<codewhale:tool_call`, `<tool_call`, `<invoke `,
+markers — `[TOOL_CALL]`, `<nestlone:tool_call`, `<tool_call`, `<invoke `,
 `<function_calls>` — and scrubs them from visible assistant text without ever
 turning them into structured tool calls. When a wrapper is stripped, the loop
 emits one compact `status` notice per turn so the user can see why their

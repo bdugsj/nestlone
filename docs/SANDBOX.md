@@ -1,6 +1,6 @@
 # Sandbox threat model
 
-Codewhale can launch shell commands proposed by a model. Approval policy,
+Nestlone can launch shell commands proposed by a model. Approval policy,
 workspace-aware tools, and an operating-system command wrapper are separate
 controls: an approval is not a sandbox, and selecting `workspace-write` does
 not prove that the current platform has an OS wrapper available.
@@ -9,7 +9,7 @@ This document describes only behavior wired into the command execution path.
 
 ## Platform overview
 
-| Mechanism | Platform | Selection | What Codewhale reports |
+| Mechanism | Platform | Selection | What Nestlone reports |
 |---|---|---|---|
 | Seatbelt (`sandbox-exec`) | macOS | Automatic when the runtime probe succeeds | `macos-seatbelt` |
 | Bubblewrap (`/usr/bin/bwrap`) | Linux | `prefer_bwrap = true` and the file is executable | `linux-bwrap` |
@@ -19,12 +19,12 @@ This document describes only behavior wired into the command execution path.
 
 The repository contains Landlock and seccomp implementation modules, plus a
 future Windows helper contract. They are not wired into child-command launch
-in v0.9.1, so Codewhale does not advertise them as active sandboxes. Detecting
+in v0.9.1, so Nestlone does not advertise them as active sandboxes. Detecting
 a Landlock-capable kernel is not enough to claim that a command was restricted.
 
 ## macOS: Seatbelt
 
-Codewhale probes `/usr/bin/sandbox-exec` by running a minimal profile. When the
+Nestlone probes `/usr/bin/sandbox-exec` by running a minimal profile. When the
 probe succeeds and the selected `SandboxPolicy` requests a sandbox, the child
 command is wrapped with a generated Seatbelt profile.
 
@@ -35,7 +35,7 @@ The profile can provide:
   runtime/cache paths needed by supported tools;
 - network access only when the policy enables it.
 
-If the probe fails or `sandbox-exec` is unavailable, Codewhale reports no OS
+If the probe fails or `sandbox-exec` is unavailable, Nestlone reports no OS
 sandbox and launches the command without a Seatbelt wrapper. It does not set a
 Seatbelt marker on that fallback.
 
@@ -47,7 +47,7 @@ Linux command sandboxing is opt-in. Set the top-level configuration key:
 prefer_bwrap = true
 ```
 
-Codewhale selects bubblewrap only when `/usr/bin/bwrap` is a regular executable
+Nestlone selects bubblewrap only when `/usr/bin/bwrap` is a regular executable
 file. The wrapper derives its mounts and network namespace from the resolved
 `SandboxPolicy`:
 
@@ -65,18 +65,18 @@ file. The wrapper derives its mounts and network namespace from the resolved
 That gives the child a read-only root view. For `workspace-write`, every safe,
 existing policy root is mounted read-write: the working directory, configured
 additional roots, `/tmp` and `TMPDIR` unless excluded, and verified Git
-worktree metadata roots. Existing `.codewhale` and `.deepseek` descendants are
+worktree metadata roots. Existing `.nestlone` and `.deepseek` descendants are
 remounted read-only after their writable parent. Missing paths, non-directory
 paths, and `/` are not promoted to writable mounts.
 
 For `read-only`, there are no writable binds, so the working directory remains
 inside the read-only root view. `--unshare-all` isolates the network namespace
-by default. Codewhale adds `--share-net` only when the policy's
+by default. Nestlone adds `--share-net` only when the policy's
 `network_access` is true. `danger-full-access` and `external-sandbox` bypass the
 local wrapper entirely.
 
 If the user does not opt in, or `/usr/bin/bwrap` is missing or non-executable,
-Codewhale reports `none` and launches the command without a Linux OS wrapper.
+Nestlone reports `none` and launches the command without a Linux OS wrapper.
 There is no marker-only Landlock fallback.
 
 Install bubblewrap separately when this opt-in fits the workflow:
@@ -85,7 +85,7 @@ Install bubblewrap separately when this opt-in fits the workflow:
 - Fedora: `dnf install bubblewrap`
 - Arch: `pacman -S bubblewrap`
 
-Codewhale does not vendor bubblewrap.
+Nestlone does not vendor bubblewrap.
 
 ## Windows: no advertised OS sandbox
 
@@ -99,11 +99,11 @@ wired into selection and must not be described as any of the following:
 - restricted-token or AppContainer isolation.
 
 Windows host permissions and approval policy still apply, but they are not a
-Codewhale OS command sandbox.
+Nestlone OS command sandbox.
 
 ## Linux process hardening is not a command sandbox
 
-At startup on Linux, Codewhale best-effort applies `PR_SET_DUMPABLE=0`,
+At startup on Linux, Nestlone best-effort applies `PR_SET_DUMPABLE=0`,
 `PR_SET_NO_NEW_PRIVS=1`, and `RLIMIT_CORE=0` to its own process. Each failure is
 logged and startup continues. These controls reduce process-inspection,
 privilege-escalation, and core-dump risk; they do not create filesystem or
@@ -113,7 +113,7 @@ network isolation for a child command and are not listed as a sandbox backend.
 
 When `sandbox_backend = "opensandbox"` is configured, shell execution is sent
 to the configured OpenSandbox-compatible HTTP endpoint instead of starting a
-local child. Codewhale validates the request/response contract, but isolation
+local child. Nestlone validates the request/response contract, but isolation
 guarantees belong to the configured service and its operator.
 
 ```toml
@@ -137,7 +137,7 @@ sandbox_mode = "workspace-write" # read-only | workspace-write | danger-full-acc
 - `danger-full-access` deliberately bypasses the local OS wrapper.
 - `external-sandbox` declares that execution is already externally isolated
   and bypasses a second local wrapper.
-- When no wrapper is selected, the shell command runs without Codewhale OS
+- When no wrapper is selected, the shell command runs without Nestlone OS
   isolation. Approval rules and workspace-aware native file tools remain
   separate controls.
 
@@ -154,7 +154,7 @@ There is no `CODEWHALE_PREFER_BWRAP` environment override; use the top-level
 
 ## Diagnostics and failure attribution
 
-`codewhale setup --status`, `codewhale doctor`, `codewhale doctor --json`, and
+`nestlone setup --status`, `nestlone doctor`, `nestlone doctor --json`, and
 the `diagnostics` tool report the locally available wrapper after applying the
 resolved bubblewrap preference. An individual command can still bypass that
 wrapper when its policy does not request sandboxing. On Linux, merely finding
@@ -167,7 +167,7 @@ Denial attribution is intentionally conservative:
 - Bubblewrap setup errors must be prefixed by `bwrap:`; a read-only-filesystem
   error from the bwrap filesystem view can also identify the boundary.
 - A child command's generic `Permission denied` or `Operation not permitted`
-  is not, by itself, proof that Codewhale's sandbox blocked it.
+  is not, by itself, proof that Nestlone's sandbox blocked it.
 - Unsandboxed command failures are never labeled sandbox denials.
 
 ## Limitations

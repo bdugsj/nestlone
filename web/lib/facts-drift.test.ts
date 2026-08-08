@@ -41,7 +41,7 @@ function installGitHubFixture(toolCountSource: string | null): void {
             "bubblewrap (Linux, opt-in when installed)",
           ];
         `,
-        "npm/codewhale/package.json": JSON.stringify({ engines: { node: ">=18" } }),
+        "npm/nestlone/package.json": JSON.stringify({ engines: { node: ">=18" } }),
         LICENSE: "MIT License\n",
       };
       if (rawPath === "web/lib/facts.generated.ts") {

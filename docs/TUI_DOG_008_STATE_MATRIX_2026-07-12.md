@@ -16,7 +16,7 @@
 > color grammar and verifying tick added to it.
 
 Dated receipt: 2026-07-12
-Lane: `codex/underwater-tui-20260711` @ worktree `codewhale-underwater-tui`
+Lane: `codex/underwater-tui-20260711` @ worktree `nestlone-underwater-tui`
 Reference basis: current TUI implementation plus real-terminal release QA.
 Private design prototypes are intentionally not part of this public receipt.
 Scope: visual metamorphosis / shell grammar (not Fleet, keybinding, or hitbox siblings)
@@ -32,7 +32,7 @@ Hunter eyeball remains the acceptance gate.
 - `tui::composer_chrome::tests::*` — 4 passed
 - `composer_height_uses_quiet_rule_when_panel_is_not_needed` — passed (quiet baseline now 4)
 - `underwater::tests::phase_markers_make_motion_and_attention_explicit` — passed
-- `cargo check -p codewhale-tui --bin codewhale-tui` — clean at time of check
+- `cargo check -p nestlone-tui --bin nestlone-tui` — clean at time of check
   (siblings concurrently dirty other modules; do not treat full-suite green)
 
 ## State matrix

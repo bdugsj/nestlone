@@ -58,11 +58,11 @@ intentional:
 User commands are markdown files loaded from these locations in precedence
 order:
 
-1. `<workspace>/.codewhale/commands/`
+1. `<workspace>/.nestlone/commands/`
 2. `<workspace>/.deepseek/commands/`
 3. `<workspace>/.claude/commands/`
 4. `<workspace>/.cursor/commands/`
-5. `~/.codewhale/commands/`
+5. `~/.nestlone/commands/`
 6. `~/.deepseek/commands/`
 
 Supported frontmatter fields:

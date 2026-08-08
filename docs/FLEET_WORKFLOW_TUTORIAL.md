@@ -27,12 +27,12 @@ mechanics.
 Run Fleet from the workspace you want workers to inspect or modify:
 
 ```sh
-codewhale fleet init
+nestlone fleet init
 ```
 
-This creates the workspace ledger at `.codewhale/fleet.jsonl`. Worker logs and
-bounded artifacts live under `.codewhale/fleet/`; host adapter logs live under
-`.codewhale/fleet-host/`.
+This creates the workspace ledger at `.nestlone/fleet.jsonl`. Worker logs and
+bounded artifacts live under `.nestlone/fleet/`; host adapter logs live under
+`.nestlone/fleet-host/`.
 
 If you want named reusable workers, open the TUI and run:
 
@@ -43,21 +43,21 @@ If you want named reusable workers, open the TUI and run:
 Pick a role, choose whether that profile inherits the operator route or pins a
 specific provider/model/thinking tier, review the permissions/tools/route
 posture, and save the rendered TOML. Project profiles are saved under
-`.codewhale/agents/<role>.toml`. On Review, press `s` before previewing to save
+`.nestlone/agents/<role>.toml`. On Review, press `s` before previewing to save
 a personal profile under `$CODEWHALE_HOME/agents/<role>.toml`; it is available
 across repositories, while a same-id project profile remains the higher-priority
 override. Fleet task specs can reference either resolved profile with
 `worker.agent_profile` or the shorter `worker.profile` alias.
 
 This makes the Fleet definition cross-repository, not the authority of one
-running session. For a multi-repository operation, launch Codewhale from a
+running session. For a multi-repository operation, launch Nestlone from a
 shared parent workspace. Profile availability does not grant filesystem access;
 the session's workspace, explicit trusted paths, trust mode, and permission
 posture remain authoritative.
 
 ## 2. Write A Fleet Task Spec
 
-`codewhale fleet run` accepts JSON or TOML. The checked-in
+`nestlone fleet run` accepts JSON or TOML. The checked-in
 `docs/examples/fleet-dogfood.toml` file is the realistic manual smoke example;
 the JSON below shows the same authoring shape with one read-only reviewer and
 one bounded docs-note worker. It keeps secrets disabled and caps trust at
@@ -116,7 +116,7 @@ one bounded docs-note worker. It keeps secrets disabled and caps trust at
       },
       "workspace": {
         "required_files": ["docs/FLEET.md"],
-        "writable_paths": [".codewhale/fleet"],
+        "writable_paths": [".nestlone/fleet"],
         "environment": {
           "allowlist": []
         }
@@ -139,7 +139,7 @@ Common task fields:
 | `id`, `name` | Stable task identity and display name. |
 | `objective`, `instructions` | The worker goal and exact operating instructions. |
 | `worker.role` | Built-in or custom role intent, such as `reviewer`, `builder`, `read-only`, or `smoke-runner`. |
-| `worker.profile` / `worker.agent_profile` | Saved Fleet roster profile resolved from project `.codewhale/agents/`, personal `$CODEWHALE_HOME/agents/`, or `[fleet.profiles]`. |
+| `worker.profile` / `worker.agent_profile` | Saved Fleet roster profile resolved from project `.nestlone/agents/`, personal `$CODEWHALE_HOME/agents/`, or `[fleet.profiles]`. |
 | `worker.tools` | Tool names the task expects the worker to use. |
 | `worker.model` | Preferred explicit model pin. Route resolution still owns provider/model validation. |
 | `worker.model_class`, `worker.loadout` | Compatibility routing hints for older task specs; prefer `worker.profile` plus saved profile route pins for new specs. |
@@ -167,26 +167,26 @@ Security policy fields:
 Launch the run:
 
 ```sh
-codewhale fleet run tasks.json --max-workers 4
+nestlone fleet run tasks.json --max-workers 4
 ```
 
 The command prints the run id and worker ids. In another terminal, monitor the
 ledgered state:
 
 ```sh
-codewhale fleet status
-codewhale fleet inspect <worker-id>
-codewhale fleet logs <worker-id>
-codewhale fleet artifacts <worker-id>
+nestlone fleet status
+nestlone fleet inspect <worker-id>
+nestlone fleet logs <worker-id>
+nestlone fleet artifacts <worker-id>
 ```
 
 Use typed controls when a worker needs intervention:
 
 ```sh
-codewhale fleet interrupt <worker-id>
-codewhale fleet restart <worker-id>
-codewhale fleet resume <run-id>
-codewhale fleet stop --all
+nestlone fleet interrupt <worker-id>
+nestlone fleet restart <worker-id>
+nestlone fleet resume <run-id>
+nestlone fleet stop --all
 ```
 
 `resume` is for restart recovery after a manager exit, laptop sleep, or stale
@@ -252,7 +252,7 @@ Current Workflow node wrappers are `agent`, `branch`, `sequence`, `reduce`,
 Fleet roster profile; explicit agent fields override profile defaults.
 
 The model-facing `workflow` tool can start, run, inspect, or cancel a workflow
-from inline source or a `source_path`. When Codewhale uses this path, ask it to
+from inline source or a `source_path`. When Nestlone uses this path, ask it to
 show the plan first if the workflow will launch multiple workers or touch files.
 
 ## 5. Natural Language Intake
@@ -267,7 +267,7 @@ them.
 ```
 
 After reviewing the generated spec, save it as `tasks.json` and run the Fleet
-commands above. For workflows, ask Codewhale to draft a `.workflow.js` file,
+commands above. For workflows, ask Nestlone to draft a `.workflow.js` file,
 show the plan, and use the workflow tool path only after approval.
 
 This review step is intentional. It keeps provider routing, DeepSeek or other

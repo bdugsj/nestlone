@@ -1,6 +1,6 @@
 # Delegated coordination contract
 
-Codewhale records the small amount of shared state that parallel work needs to
+Nestlone records the small amount of shared state that parallel work needs to
 remain attributable. This is coordination metadata, not an approval system and
 not a store for model reasoning or transcripts.
 
@@ -13,7 +13,7 @@ fail validation.
 
 A prompt-only general child starts read-only. Callers that want a writer must
 declare at least one `write_roots`, `exact_files`, or
-`coordination_contracts` value. Codewhale does not infer a repo-wide `.` claim.
+`coordination_contracts` value. Nestlone does not infer a repo-wide `.` claim.
 An active shared-workspace claim blocks another active owner when either tree
 contains the other, exact files collide, or a named contract matches. A real
 isolated worktree may proceed concurrently. Scope expansion uses
@@ -24,11 +24,11 @@ Fleet workers follow the same rule. Write-capable Fleet tasks declare
 `workspace.writable_paths` or `metadata.coordination_contracts`, and the
 resolved values are persisted in their launch manifest.
 
-This record is a cooperative Codewhale coordination boundary, not an operating
+This record is a cooperative Nestlone coordination boundary, not an operating
 system sandbox. Fleet carries a machine-readable outer cap into each worker,
 rechecks structured mutation targets, rejects symlink aliases, and denies
 unbounded shell, Git, code, plugin, and mutating MCP execution. Those checks
-prevent one Codewhale worker from silently exceeding its declared claim; they
+prevent one Nestlone worker from silently exceeding its declared claim; they
 do not promise containment against a separate hostile process racing filesystem
 paths. Use an OS sandbox or an isolated host when that adversarial boundary is
 required.
@@ -46,7 +46,7 @@ concise constraints, evidence handles, version, and sequence. Only the owner
 may change a decision's status. A second accepted decision for the same subject
 cannot silently replace the first.
 
-At child launch, Codewhale projects only accepted decisions whose scope matches
+At child launch, Nestlone projects only accepted decisions whose scope matches
 the child's declared paths, contracts, role, or tool capabilities. The
 projection is deduplicated, limited to eight decisions and 4096 UTF-8 bytes,
 and receipted by child id and decision ids. The task prompt may separately

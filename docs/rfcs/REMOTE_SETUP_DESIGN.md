@@ -1,13 +1,13 @@
-# `codewhale remote-setup` - Tailscale-first design
+# `nestlone remote-setup` - Tailscale-first design
 
 Status: **design / revision**. This RFC revises the earlier cloud-first
 `remote-setup` plan. Keep the accurate implementation work already present:
-`codewhale remote-setup` exists today as a generate-only bundle wizard for
+`nestlone remote-setup` exists today as a generate-only bundle wizard for
 cloud plus chat bridge deployments, and `--apply` is still not implemented.
 
 ## Goal
 
-Give users a guided, education-forward way to reach a local-first CodeWhale
+Give users a guided, education-forward way to reach a local-first Nestlone
 runtime from another surface without accidentally publishing their agent.
 
 Default posture:
@@ -18,7 +18,7 @@ Default posture:
 
 The wizard should ask:
 
-> How do you want to reach CodeWhale?
+> How do you want to reach Nestlone?
 
 and offer these paths, in this order:
 
@@ -62,9 +62,9 @@ Contract for that step:
 
 Verified against the codebase:
 
-- `codewhale app-server --http` is the canonical HTTP/SSE runtime API entrypoint.
+- `nestlone app-server --http` is the canonical HTTP/SSE runtime API entrypoint.
   It delegates to the mature `serve --http` implementation.
-- `codewhale app-server --mobile` is real and serves the phone control page at
+- `nestlone app-server --mobile` is real and serves the phone control page at
   `/mobile`.
 - `--host`, `--port`, `--workers`, `--auth-token`, `--insecure-no-auth`, and
   repeatable `--cors-origin` exist on `app-server --http` / `--mobile`.
@@ -73,8 +73,8 @@ Verified against the codebase:
 - `/health` and `/v1/runtime/info` are public bootstrap/supervision endpoints.
   `/v1/*` control routes require the runtime bearer token unless auth is
   explicitly disabled on a trusted loopback bind.
-- `codewhale doctor --json` exists as the machine-readable local diagnostic.
-- `codewhale remote-setup` exists, but today it is generate-only. Its current
+- `nestlone doctor --json` exists as the machine-readable local diagnostic.
+- `nestlone remote-setup` exists, but today it is generate-only. Its current
   matrix is cloud target (`lighthouse`, `azure`, `digitalocean`) x bridge
   (`feishu`, `telegram`) x provider registry. It does **not** yet model
   localhost, Tailscale, Weixin, or Funnel as first-class choices.
@@ -89,10 +89,10 @@ is required:
 
 ```bash
 # Runtime API only, verified:
-codewhale app-server --http --host 127.0.0.1 --port 7878 --auth-token "$CODEWHALE_RUNTIME_TOKEN"
+nestlone app-server --http --host 127.0.0.1 --port 7878 --auth-token "$CODEWHALE_RUNTIME_TOKEN"
 
 # Runtime API plus /mobile, verified:
-codewhale app-server --mobile --host 127.0.0.1 --port 7878 --auth-token "$CODEWHALE_RUNTIME_TOKEN"
+nestlone app-server --mobile --host 127.0.0.1 --port 7878 --auth-token "$CODEWHALE_RUNTIME_TOKEN"
 ```
 
 ## Common runtime base
@@ -103,7 +103,7 @@ Every path starts from the same local runtime trust boundary.
 CODEWHALE_RUNTIME_TOKEN="$(openssl rand -hex 32)"
 export CODEWHALE_RUNTIME_TOKEN
 
-codewhale app-server --http \
+nestlone app-server --http \
   --host 127.0.0.1 \
   --port 7878 \
   --auth-token "$CODEWHALE_RUNTIME_TOKEN"
@@ -115,7 +115,7 @@ the path needs the built-in `/mobile` page.
 Doctor-style local validation:
 
 ```bash
-codewhale doctor --json
+nestlone doctor --json
 curl -fsS http://127.0.0.1:7878/health
 curl -fsS \
   -H "Authorization: Bearer $CODEWHALE_RUNTIME_TOKEN" \
@@ -124,7 +124,7 @@ curl -fsS \
 
 Runtime mental model:
 
-- Exposed by CodeWhale: only the address it binds. The recommended bind is
+- Exposed by Nestlone: only the address it binds. The recommended bind is
   `127.0.0.1:7878`.
 - Auth token: `CODEWHALE_RUNTIME_TOKEN`, passed as `Authorization: Bearer ...`
   by clients and bridges. Legacy `DEEPSEEK_RUNTIME_TOKEN` remains a fallback.
@@ -136,7 +136,7 @@ Runtime mental model:
 ### 1. This machine only (localhost)
 
 Use this when the TUI, SDK, browser, or local script runs on the same machine as
-CodeWhale.
+Nestlone.
 
 Setup:
 
@@ -144,7 +144,7 @@ Setup:
 CODEWHALE_RUNTIME_TOKEN="$(openssl rand -hex 32)"
 export CODEWHALE_RUNTIME_TOKEN
 
-codewhale app-server --http \
+nestlone app-server --http \
   --host 127.0.0.1 \
   --port 7878 \
   --auth-token "$CODEWHALE_RUNTIME_TOKEN"
@@ -160,7 +160,7 @@ CODEWHALE_RUNTIME_TOKEN=<same value used to start app-server>
 Validation:
 
 ```bash
-codewhale doctor --json
+nestlone doctor --json
 curl -fsS http://127.0.0.1:7878/health
 curl -fsS \
   -H "Authorization: Bearer $CODEWHALE_RUNTIME_TOKEN" \
@@ -176,8 +176,8 @@ Trust boundary:
 
 ### 2. Private devices with Tailscale (Recommended)
 
-Use this to reach CodeWhale from your phone or laptop without opening a LAN or
-public port. Tailscale authenticates devices in your tailnet; CodeWhale still
+Use this to reach Nestlone from your phone or laptop without opening a LAN or
+public port. Tailscale authenticates devices in your tailnet; Nestlone still
 binds to localhost.
 
 Target setup to feature in the wizard:
@@ -186,7 +186,7 @@ Target setup to feature in the wizard:
 CODEWHALE_RUNTIME_TOKEN="$(openssl rand -hex 32)"
 export CODEWHALE_RUNTIME_TOKEN
 
-codewhale app-server --http \
+nestlone app-server --http \
   --host 127.0.0.1 \
   --port 7878 \
   --auth-token "$CODEWHALE_RUNTIME_TOKEN"
@@ -195,11 +195,11 @@ tailscale serve --bg --https=443 localhost:7878
 ```
 
 Then open the Tailscale Serve URL from a phone or laptop in the same tailnet.
-For the current binary's mobile page, start CodeWhale with the verified mobile
+For the current binary's mobile page, start Nestlone with the verified mobile
 variant:
 
 ```bash
-codewhale app-server --mobile \
+nestlone app-server --mobile \
   --host 127.0.0.1 \
   --port 7878 \
   --auth-token "$CODEWHALE_RUNTIME_TOKEN"
@@ -225,7 +225,7 @@ TAILSCALE_SERVE_URL=https://<machine>.<tailnet>.ts.net
 Validation:
 
 ```bash
-codewhale doctor --json
+nestlone doctor --json
 curl -fsS http://127.0.0.1:7878/health
 curl -fsS https://<machine>.<tailnet>.ts.net/health
 curl -fsS \
@@ -237,15 +237,15 @@ tailscale serve status
 Trust boundary:
 
 - Exposed: an HTTPS endpoint reachable by devices authorized in your tailnet.
-- Not exposed: the raw CodeWhale listener; it stays on `127.0.0.1`.
-- Token used: Tailscale identity gates network reachability; CodeWhale still
+- Not exposed: the raw Nestlone listener; it stays on `127.0.0.1`.
+- Token used: Tailscale identity gates network reachability; Nestlone still
   uses `CODEWHALE_RUNTIME_TOKEN` for runtime control.
 - Caveat: Tailscale Serve is private to the tailnet. Tailscale Funnel is public
   internet exposure and belongs only in the advanced path below.
 
 ### 3. Telegram bot
 
-Use this when a Telegram DM should control a local CodeWhale runtime. The bridge
+Use this when a Telegram DM should control a local Nestlone runtime. The bridge
 uses Telegram Bot API long polling, so it does not require a public webhook URL
 or inbound port.
 
@@ -255,7 +255,7 @@ Setup:
 CODEWHALE_RUNTIME_TOKEN="$(openssl rand -hex 32)"
 export CODEWHALE_RUNTIME_TOKEN
 
-codewhale app-server --http \
+nestlone app-server --http \
   --host 127.0.0.1 \
   --port 7878 \
   --auth-token "$CODEWHALE_RUNTIME_TOKEN"
@@ -305,7 +305,7 @@ the bridge.
 Validation:
 
 ```bash
-codewhale doctor --json
+nestlone doctor --json
 curl -fsS http://127.0.0.1:7878/health
 npm run validate:config -- \
   --env .env \
@@ -315,8 +315,8 @@ npm run validate:config -- \
 
 Trust boundary:
 
-- Exposed: no inbound CodeWhale port. Telegram sees messages sent to the bot.
-- Not exposed: CodeWhale remains on `127.0.0.1`; provider keys stay in the
+- Exposed: no inbound Nestlone port. Telegram sees messages sent to the bot.
+- Not exposed: Nestlone remains on `127.0.0.1`; provider keys stay in the
   runtime env, not the Telegram env.
 - Tokens used: `TELEGRAM_BOT_TOKEN` for Telegram, `CODEWHALE_RUNTIME_TOKEN` for
   bridge-to-runtime calls, and `TELEGRAM_CHAT_ALLOWLIST` for user/chat gating.
@@ -335,7 +335,7 @@ Setup:
 CODEWHALE_RUNTIME_TOKEN="$(openssl rand -hex 32)"
 export CODEWHALE_RUNTIME_TOKEN
 
-codewhale app-server --http \
+nestlone app-server --http \
   --host 127.0.0.1 \
   --port 7878 \
   --auth-token "$CODEWHALE_RUNTIME_TOKEN"
@@ -382,7 +382,7 @@ logged open id into `CODEWHALE_CHAT_ALLOWLIST`, then set
 Validation:
 
 ```bash
-codewhale doctor --json
+nestlone doctor --json
 curl -fsS http://127.0.0.1:7878/health
 npm run validate:config -- \
   --env .env \
@@ -392,8 +392,8 @@ npm run validate:config -- \
 
 Trust boundary:
 
-- Exposed: no inbound CodeWhale port. Feishu/Lark sees messages sent to the app.
-- Not exposed: CodeWhale remains on `127.0.0.1`; provider keys stay in runtime
+- Exposed: no inbound Nestlone port. Feishu/Lark sees messages sent to the app.
+- Not exposed: Nestlone remains on `127.0.0.1`; provider keys stay in runtime
   config.
 - Tokens used: `FEISHU_APP_ID` / `FEISHU_APP_SECRET` for the platform,
   `CODEWHALE_RUNTIME_TOKEN` for bridge-to-runtime calls, and
@@ -412,7 +412,7 @@ Setup:
 CODEWHALE_RUNTIME_TOKEN="$(openssl rand -hex 32)"
 export CODEWHALE_RUNTIME_TOKEN
 
-codewhale app-server --http \
+nestlone app-server --http \
   --host 127.0.0.1 \
   --port 7878 \
   --auth-token "$CODEWHALE_RUNTIME_TOKEN"
@@ -440,7 +440,7 @@ CODEWHALE_AUTO_APPROVE=false
 
 WEXIN_CHAT_ALLOWLIST=
 WEXIN_ALLOW_UNLISTED=false
-WEXIN_STATE_DIR=/var/lib/codewhale-weixin-bot-bridge
+WEXIN_STATE_DIR=/var/lib/nestlone-weixin-bot-bridge
 ```
 
 First pairing:
@@ -452,16 +452,16 @@ Set `WEXIN_ALLOW_UNLISTED=true`, start the bridge, scan the QR code, send
 Validation:
 
 ```bash
-codewhale doctor --json
+nestlone doctor --json
 curl -fsS http://127.0.0.1:7878/health
 npm run check
 ```
 
 Trust boundary:
 
-- Exposed: no inbound CodeWhale port. The personal Weixin session and the
+- Exposed: no inbound Nestlone port. The personal Weixin session and the
   bridge state directory become sensitive local state.
-- Not exposed: CodeWhale remains on `127.0.0.1`; provider keys stay in runtime
+- Not exposed: Nestlone remains on `127.0.0.1`; provider keys stay in runtime
   config.
 - Tokens used: the scanned Weixin login/session state for platform access,
   `CODEWHALE_RUNTIME_TOKEN` for bridge-to-runtime calls, and
@@ -481,7 +481,7 @@ Preferred advanced pattern:
 CODEWHALE_RUNTIME_TOKEN="$(openssl rand -hex 32)"
 export CODEWHALE_RUNTIME_TOKEN
 
-codewhale app-server --mobile \
+nestlone app-server --mobile \
   --host 127.0.0.1 \
   --port 7878 \
   --auth-token "$CODEWHALE_RUNTIME_TOKEN"
@@ -500,7 +500,7 @@ PUBLIC_EXPOSURE_ACK=true
 Validation:
 
 ```bash
-codewhale doctor --json
+nestlone doctor --json
 curl -fsS http://127.0.0.1:7878/health
 curl -fsS https://<public-name>/health
 curl -fsS \
@@ -512,11 +512,11 @@ tailscale funnel status
 Trust boundary:
 
 - Exposed: a public HTTPS endpoint, not just your tailnet.
-- Not exposed by CodeWhale directly: the backend still binds to `127.0.0.1`,
+- Not exposed by Nestlone directly: the backend still binds to `127.0.0.1`,
   but the fronting layer makes selected routes reachable from the internet.
 - Token used: `CODEWHALE_RUNTIME_TOKEN` remains mandatory for control routes.
 - Caveat: public does not mean safe. Do not use `--insecure-no-auth`, do not bind
-  CodeWhale to `0.0.0.0`, and do not call this the default.
+  Nestlone to `0.0.0.0`, and do not call this the default.
 
 ## Cloud/VPS posture
 
@@ -539,7 +539,7 @@ choices, not the default cloud path.
 ## Prior art: Hermes Agent (reference only - do not copy)
 
 Nous Research's Hermes Agent validates the table-driven part of this design.
-Use it for ideas; keep CodeWhale's style: Rust core, local runtime, zero-dep
+Use it for ideas; keep Nestlone's style: Rust core, local runtime, zero-dep
 Node bridges where possible, and plain-text replies.
 
 - `gateway/platform_registry.py` maps to our `BridgeSpec` / access-path
@@ -646,7 +646,7 @@ CODEWHALE_MODEL=
   ```env
   CODEWHALE_RUNTIME_URL=http://127.0.0.1:7878
   CODEWHALE_RUNTIME_TOKEN=<same random token>
-  CODEWHALE_WORKSPACE=/opt/whalebro
+  CODEWHALE_WORKSPACE=/opt/nestlone
   # Optional override; leave blank to inherit the runtime's configured provider/model.
 CODEWHALE_MODEL=
   CODEWHALE_MODE=agent
@@ -655,8 +655,8 @@ CODEWHALE_MODEL=
   CODEWHALE_AUTO_APPROVE=false
   ```
 
-- `codewhale-runtime.service`
-- optional `codewhale-<bridge>.service`
+- `nestlone-runtime.service`
+- optional `nestlone-<bridge>.service`
 - optional cloud artifacts: `cloud-init.yaml`, `provision.sh`, `cnb.yml`, or
   cloud-specific runbook steps
 - `RUNBOOK.md` with:
@@ -683,7 +683,7 @@ Existing cloud target design remains accurate:
 - Azure VM: Docker image plus Key Vault, managed identity at boot.
 - DigitalOcean Droplet: native plus systemd, env-file secrets, `doctl` plan.
 
-All cloud plans should bind CodeWhale to `127.0.0.1` and then layer one of the
+All cloud plans should bind Nestlone to `127.0.0.1` and then layer one of the
 reachability paths above.
 
 ## Namespace migration: `DEEPSEEK_*` to `CODEWHALE_*`
@@ -696,7 +696,7 @@ Touch list from the original RFC remains valid:
 1. Bridges: read `CODEWHALE_X ?? DEEPSEEK_X` for runtime URL/token, workspace,
    model, mode, shell/trust/approval flags, allowlists, and timeouts. Templates
    should emit `CODEWHALE_*`.
-2. Deploy units: prefer `/etc/codewhale/*.env`; keep legacy path reads only for
+2. Deploy units: prefer `/etc/nestlone/*.env`; keep legacy path reads only for
    compatibility where needed.
 3. `.env.example` files and `config.example.toml`: lead with `CODEWHALE_*`,
    document legacy aliases.
@@ -739,11 +739,11 @@ New tests for this revision:
 
 ## Command verification ledger
 
-Verified against CodeWhale code/docs in this worktree:
+Verified against Nestlone code/docs in this worktree:
 
-- `codewhale app-server --http --host 127.0.0.1 --port 7878 --auth-token TOKEN`
-- `codewhale app-server --mobile --host 127.0.0.1 --port 7878 --auth-token TOKEN`
-- `codewhale doctor --json`
+- `nestlone app-server --http --host 127.0.0.1 --port 7878 --auth-token TOKEN`
+- `nestlone app-server --mobile --host 127.0.0.1 --port 7878 --auth-token TOKEN`
+- `nestlone doctor --json`
 - `curl /health` and authenticated `curl /v1/runtime/info`
 - `npm run validate:config` for Telegram and Feishu bridges
 - `npm run check` for the Weixin bridge
@@ -751,9 +751,9 @@ Verified against CodeWhale code/docs in this worktree:
 
 Marked proposed or external:
 
-- `codewhale remote-setup --access ...` and access-path registry
+- `nestlone remote-setup --access ...` and access-path registry
 - first-class Tailscale, localhost, Weixin, and Funnel choices in the wizard
 - `--apply` execution
 - Tailscale CLI commands (`tailscale serve ...`, `tailscale funnel ...`) are
   external Tailscale commands. They are the intended RFC examples, but they are
-  not CodeWhale CLI flags.
+  not Nestlone CLI flags.
