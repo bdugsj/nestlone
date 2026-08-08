@@ -40,7 +40,7 @@ BOT_EMAILS = {
 BOT_NAMES = ("claude", "codex", "cursor")
 
 # This commit is already immutable history on origin/main. Its trailer names a
-# local Codewhale automation actor, not a human contributor. It escaped the
+# local Nestlone automation actor, not a human contributor. It escaped the
 # existing gate and is now immutable on origin/main. Rewriting main would
 # invalidate every descendant, while mapping the actor to a human would
 # manufacture contributor credit. Exempt only the exact full SHA + exact actor

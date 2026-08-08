@@ -159,7 +159,7 @@ enum CacheWritePolicy {
     DocumentedAsInputRate(&'static str),
     /// No published cache-write rate was found for this row. A turn that
     /// actually wrote to cache fails closed rather than being billed at a rate
-    /// CodeWhale made up.
+    /// Nestlone made up.
     Unpublished,
 }
 
@@ -219,7 +219,7 @@ pub(crate) const XIAOMI_TOKEN_PLAN_BILLING_SURFACE: &str = "xiaomi-mimo-token-pl
 /// Xiaomi MiMo's ordinary public per-token API.
 pub(crate) const XIAOMI_PAYG_BILLING_SURFACE: &str = "xiaomi-mimo-payg";
 /// An OAuth/subscription-brokered endpoint (Codex, Claude OAuth, Grok OAuth,
-/// OpenCode Go). Never per-token metered from CodeWhale's side.
+/// OpenCode Go). Never per-token metered from Nestlone's side.
 pub(crate) const OAUTH_SUBSCRIPTION_BILLING_SURFACE: &str = "oauth-subscription";
 /// A loopback / self-hosted endpoint with no provider bill at all.
 pub(crate) const LOCAL_BILLING_SURFACE: &str = "local-no-bill";
@@ -228,7 +228,7 @@ pub(crate) const FIRST_PARTY_PAYG_BILLING_SURFACE: &str = "first-party-payg";
 /// An aggregator/reseller endpoint: metered, but priced by the aggregator's own
 /// catalog rather than by the upstream model owner's published rates.
 pub(crate) const AGGREGATOR_BILLING_SURFACE: &str = "aggregator-payg";
-/// A reachable endpoint CodeWhale could not match to any known billing surface.
+/// A reachable endpoint Nestlone could not match to any known billing surface.
 /// Distinct from "not classified yet": this is a positive statement that the
 /// surface is unknown, and it fails closed everywhere it is consumed.
 pub(crate) const UNCLASSIFIED_BILLING_SURFACE: &str = "unclassified";
@@ -308,7 +308,7 @@ pub fn endpoint_metering_for_billing_surface(billing_surface: Option<&str>) -> E
 /// A base URL reduced to the non-secret parts a billing classification may
 /// depend on: scheme, host, normalized path. `None` when the URL carries
 /// embedded credentials, a query, a fragment, a non-default port, or is not
-/// HTTPS — any of which means CodeWhale cannot vouch for which surface it is.
+/// HTTPS — any of which means Nestlone cannot vouch for which surface it is.
 struct EndpointShape {
     host: String,
     path: String,
@@ -341,7 +341,7 @@ fn host_of(url: &str) -> Option<String> {
 /// Reduce a concrete request endpoint to non-secret billing provenance.
 ///
 /// Every reachable endpoint now gets a positive classification, including
-/// [`UNCLASSIFIED_BILLING_SURFACE`] for one CodeWhale cannot place. `None` is
+/// [`UNCLASSIFIED_BILLING_SURFACE`] for one Nestlone cannot place. `None` is
 /// reserved for "no endpoint was supplied", which is a different failure and is
 /// also treated as unknown downstream. Nothing here consults credentials or
 /// echoes a URL, so the result is safe to persist and log.
@@ -943,7 +943,7 @@ pub enum UnpricedReason {
     /// endpoint with no provider bill. Only this reason excuses a turn from
     /// money coverage, and only exact evidence may produce it (#4318).
     NotMoneyMetered,
-    /// The route may or may not meter money and CodeWhale could not establish
+    /// The route may or may not meter money and Nestlone could not establish
     /// which. Distinct from [`Self::NotMoneyMetered`] on purpose: an unknown
     /// basis is counted as *possibly missing spend*, never waved through as a
     /// subscription. A cross-provider child route with no dispatch config is
@@ -982,7 +982,7 @@ pub enum UnpricedReason {
     /// A catalog row contains a NaN, infinite, or negative rate. The whole row
     /// is rejected at the trust boundary rather than partially billed.
     InvalidPricingRow,
-    /// The row is denominated in a currency CodeWhale does not carry. No
+    /// The row is denominated in a currency Nestlone does not carry. No
     /// conversion is invented.
     UnsupportedCurrency,
     /// Provider telemetry assigns more cache-hit/miss/write tokens than the
@@ -1288,7 +1288,7 @@ pub(crate) fn audit_turn_cost_for_provider_on_endpoint_at(
         let classes = pricing.unpriced_used_classes(&classes);
         if classes.is_empty() {
             // Every used class is priced, so the only way the estimate failed
-            // is a currency CodeWhale does not carry. Never convert.
+            // is a currency Nestlone does not carry. Never convert.
             return TurnCostAudit::unpriced(UnpricedReason::UnsupportedCurrency)
                 .with_live_defect(live_defect);
         }
@@ -1303,7 +1303,7 @@ pub(crate) fn audit_turn_cost_for_provider_on_endpoint_at(
     let hand_row = provider_owned_hand_pricing_at(provider, &catalog_model, recorded_at);
 
     // An unverifiable live row with no bundled fallback and no hand row is a
-    // route CodeWhale cannot price truthfully. Say which, rather than reporting
+    // route Nestlone cannot price truthfully. Say which, rather than reporting
     // the unverified rate or a bare "no pricing row".
     match (live_defect, hand_row) {
         (Some(defect), None) => TurnCostAudit::unverified_live(defect),
@@ -1512,7 +1512,7 @@ pub(crate) fn audit_turn_cost_for_route_on_endpoint_at(
 /// - [`BillingPresentation::Subscription`] and [`BillingPresentation::Local`]
 ///   are exact evidence that money is the wrong unit, so those turns are
 ///   `NotMoneyMetered` and drop out of the coverage denominator.
-/// - [`BillingPresentation::Unknown`] is *not* such evidence. It means CodeWhale
+/// - [`BillingPresentation::Unknown`] is *not* such evidence. It means Nestlone
 ///   could not establish the basis, so the turn is `UnknownBillingBasis`: still
 ///   unpriced, but counted as spend the total may be missing.
 ///
@@ -1695,7 +1695,7 @@ fn catalog_cost_estimate_for_route(
 /// undercounted.
 ///
 /// `Usage::reasoning_tokens` is deliberately **not** added to the billable
-/// output. Every provider CodeWhale normalizes reports reasoning as a *subset*
+/// output. Every provider Nestlone normalizes reports reasoning as a *subset*
 /// of the completion count it already bills — OpenAI Responses nests
 /// `reasoning_tokens` under `output_tokens_details` while `output_tokens` is
 /// the total, and Chat Completions nests it under `completion_tokens_details`
@@ -2458,7 +2458,7 @@ mod tests {
                 "{base_url}"
             );
         }
-        // Endpoints CodeWhale cannot place now classify *positively* as
+        // Endpoints Nestlone cannot place now classify *positively* as
         // unclassified rather than returning `None`. Both fail closed
         // identically, but "we looked and could not place this" is a different
         // fact from "no endpoint was supplied", and the audit reports it as

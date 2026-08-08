@@ -1,42 +1,42 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-CODEWHALE_USER="${CODEWHALE_USER:-${DEEPSEEK_USER:-codewhale}}"
-CODEWHALE_ROOT="${CODEWHALE_ROOT:-${DEEPSEEK_ROOT:-/opt/codewhale}}"
-WHALEBRO_ROOT="${WHALEBRO_ROOT:-/opt/whalebro}"
+CODEWHALE_USER="${CODEWHALE_USER:-${DEEPSEEK_USER:-nestlone}}"
+CODEWHALE_ROOT="${CODEWHALE_ROOT:-${DEEPSEEK_ROOT:-/opt/nestlone}}"
+NESTLONE_ROOT="${NESTLONE_ROOT:-/opt/nestlone}"
 if [[ -z "${RUNTIME_ENV:-}" ]]; then
-  if [[ -f /etc/codewhale/runtime.env || ! -f /etc/deepseek/runtime.env ]]; then
-    RUNTIME_ENV="/etc/codewhale/runtime.env"
+  if [[ -f /etc/nestlone/runtime.env || ! -f /etc/deepseek/runtime.env ]]; then
+    RUNTIME_ENV="/etc/nestlone/runtime.env"
   else
     RUNTIME_ENV="/etc/deepseek/runtime.env"
   fi
 fi
-REPO_ROOT="${REPO_ROOT:-${WHALEBRO_ROOT}/codewhale}"
+REPO_ROOT="${REPO_ROOT:-${NESTLONE_ROOT}/nestlone}"
 BRIDGE_KIND="${CODEWHALE_BRIDGE:-${DEEPSEEK_BRIDGE:-feishu}}"
 
 case "${BRIDGE_KIND}" in
   feishu|lark)
     if [[ -z "${BRIDGE_ENV:-}" ]]; then
-      if [[ -f /etc/codewhale/feishu-bridge.env || ! -f /etc/deepseek/feishu-bridge.env ]]; then
-        BRIDGE_ENV="/etc/codewhale/feishu-bridge.env"
+      if [[ -f /etc/nestlone/feishu-bridge.env || ! -f /etc/deepseek/feishu-bridge.env ]]; then
+        BRIDGE_ENV="/etc/nestlone/feishu-bridge.env"
       else
         BRIDGE_ENV="/etc/deepseek/feishu-bridge.env"
       fi
     fi
     BRIDGE_DIR="${BRIDGE_DIR:-${CODEWHALE_ROOT}/bridge}"
-    BRIDGE_UNIT="${BRIDGE_UNIT:-codewhale-feishu-bridge}"
+    BRIDGE_UNIT="${BRIDGE_UNIT:-nestlone-feishu-bridge}"
     BRIDGE_PACKAGE="${BRIDGE_PACKAGE:-integrations/feishu-bridge}"
     ;;
   telegram)
     if [[ -z "${BRIDGE_ENV:-}" ]]; then
-      if [[ -f /etc/codewhale/telegram-bridge.env || ! -f /etc/deepseek/telegram-bridge.env ]]; then
-        BRIDGE_ENV="/etc/codewhale/telegram-bridge.env"
+      if [[ -f /etc/nestlone/telegram-bridge.env || ! -f /etc/deepseek/telegram-bridge.env ]]; then
+        BRIDGE_ENV="/etc/nestlone/telegram-bridge.env"
       else
         BRIDGE_ENV="/etc/deepseek/telegram-bridge.env"
       fi
     fi
     BRIDGE_DIR="${BRIDGE_DIR:-${CODEWHALE_ROOT}/telegram-bridge}"
-    BRIDGE_UNIT="${BRIDGE_UNIT:-codewhale-telegram-bridge}"
+    BRIDGE_UNIT="${BRIDGE_UNIT:-nestlone-telegram-bridge}"
     BRIDGE_PACKAGE="${BRIDGE_PACKAGE:-integrations/telegram-bridge}"
     ;;
   *)
@@ -136,30 +136,30 @@ check_node() {
 
 check_workspace() {
   section "Workspace"
-  [[ -d "${WHALEBRO_ROOT}" ]] && pass "${WHALEBRO_ROOT} exists" || fail "${WHALEBRO_ROOT} is missing"
+  [[ -d "${NESTLONE_ROOT}" ]] && pass "${NESTLONE_ROOT} exists" || fail "${NESTLONE_ROOT} is missing"
   [[ -d "${REPO_ROOT}/.git" ]] && pass "${REPO_ROOT} is a git checkout" || fail "${REPO_ROOT} is not a git checkout"
-  [[ -d "${WHALEBRO_ROOT}/worktrees" ]] && pass "${WHALEBRO_ROOT}/worktrees exists" || warn "${WHALEBRO_ROOT}/worktrees is missing"
-  if [[ -f "${WHALEBRO_ROOT}/AGENTS.md" ]]; then
-    pass "${WHALEBRO_ROOT}/AGENTS.md exists"
+  [[ -d "${NESTLONE_ROOT}/worktrees" ]] && pass "${NESTLONE_ROOT}/worktrees exists" || warn "${NESTLONE_ROOT}/worktrees is missing"
+  if [[ -f "${NESTLONE_ROOT}/AGENTS.md" ]]; then
+    pass "${NESTLONE_ROOT}/AGENTS.md exists"
   else
-    warn "${WHALEBRO_ROOT}/AGENTS.md is missing"
+    warn "${NESTLONE_ROOT}/AGENTS.md is missing"
   fi
 }
 
 check_binaries() {
-  section "CodeWhale binaries"
+  section "Nestlone binaries"
   local cargo_bin="/home/${CODEWHALE_USER}/.cargo/bin"
-  local codewhale="${cargo_bin}/codewhale"
-  local tui="${cargo_bin}/codewhale-tui"
-  if [[ -x "${codewhale}" ]]; then
-    pass "${codewhale} is executable"
-    "${codewhale}" --version 2>/dev/null | sed 's/^/[info] codewhale version: /' || warn "codewhale --version failed"
+  local nestlone="${cargo_bin}/nestlone"
+  local tui="${cargo_bin}/nestlone-tui"
+  if [[ -x "${nestlone}" ]]; then
+    pass "${nestlone} is executable"
+    "${nestlone}" --version 2>/dev/null | sed 's/^/[info] nestlone version: /' || warn "nestlone --version failed"
   else
-    fail "${codewhale} is missing or not executable"
+    fail "${nestlone} is missing or not executable"
   fi
   if [[ -x "${tui}" ]]; then
     pass "${tui} is executable"
-    "${tui}" --version 2>/dev/null | sed 's/^/[info] codewhale-tui version: /' || warn "codewhale-tui --version failed"
+    "${tui}" --version 2>/dev/null | sed 's/^/[info] nestlone-tui version: /' || warn "nestlone-tui --version failed"
   else
     fail "${tui} is missing or not executable"
   fi
@@ -223,9 +223,9 @@ check_env() {
   else
     pass "runtime provider is ${provider}"
   fi
-  [[ "${workspace}" == "${WHALEBRO_ROOT}" || "${workspace}" == "${WHALEBRO_ROOT}/"* ]] \
-    && pass "bridge workspace is under ${WHALEBRO_ROOT}" \
-    || warn "bridge workspace is outside ${WHALEBRO_ROOT}: ${workspace:-unset}"
+  [[ "${workspace}" == "${NESTLONE_ROOT}" || "${workspace}" == "${NESTLONE_ROOT}/"* ]] \
+    && pass "bridge workspace is under ${NESTLONE_ROOT}" \
+    || warn "bridge workspace is outside ${NESTLONE_ROOT}: ${workspace:-unset}"
   if [[ "${BRIDGE_KIND}" != "telegram" ]]; then
     [[ "${domain:-feishu}" == "feishu" || "${domain:-feishu}" == "lark" || "${domain:-feishu}" == https://open.* ]] \
       && pass "FEISHU_DOMAIN is ${domain:-feishu}" \
@@ -250,7 +250,7 @@ check_validator() {
   if [[ "${EUID}" -eq 0 ]] && id -u "${CODEWHALE_USER}" >/dev/null 2>&1 && have_command sudo; then
     runner=(sudo -u "${CODEWHALE_USER}" node)
   fi
-  if "${runner[@]}" "${validator}" --env "${BRIDGE_ENV}" --runtime-env "${RUNTIME_ENV}" --workspace-root "${WHALEBRO_ROOT}" --check-filesystem; then
+  if "${runner[@]}" "${validator}" --env "${BRIDGE_ENV}" --runtime-env "${RUNTIME_ENV}" --workspace-root "${NESTLONE_ROOT}" --check-filesystem; then
     pass "bridge config validator passed"
   else
     fail "bridge config validator reported blocking issues"
@@ -263,7 +263,7 @@ check_systemd() {
     warn "systemd is not available in this environment"
     return
   fi
-  for unit in codewhale-runtime "${BRIDGE_UNIT}"; do
+  for unit in nestlone-runtime "${BRIDGE_UNIT}"; do
     [[ -f "/etc/systemd/system/${unit}.service" ]] \
       && pass "${unit}.service is installed" \
       || fail "${unit}.service is missing"
@@ -347,7 +347,7 @@ check_localhost_health() {
 }
 
 main() {
-  printf 'Tencent Lighthouse CodeWhale doctor (%s bridge)\n' "${BRIDGE_KIND}"
+  printf 'Tencent Lighthouse Nestlone doctor (%s bridge)\n' "${BRIDGE_KIND}"
   check_commands
   check_node
   check_workspace

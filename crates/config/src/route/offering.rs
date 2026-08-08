@@ -76,7 +76,7 @@ pub struct ProviderModelOffering {
 
 // Transport snapshot verified against https://opencode.ai/docs/zen on
 // 2026-07-17. Gemini rows are intentionally absent because they use Google's
-// model-specific wire protocol, which CodeWhale does not currently implement.
+// model-specific wire protocol, which Nestlone does not currently implement.
 pub(crate) const OPENCODE_ZEN_RESPONSES_MODELS: &[&str] = &[
     "gpt-5.6-sol",
     "gpt-5.6-terra",

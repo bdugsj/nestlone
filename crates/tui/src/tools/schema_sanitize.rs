@@ -1191,7 +1191,7 @@ fn sanitize_kimi_parameters_candidate(
 
     // Restore nullable unions collapsed by the registry's provider-neutral
     // sanitizer, translate MFJS-safe scalar const values, and normalize nested
-    // composition. Codewhale still validates tool input before execution, so
+    // composition. Nestlone still validates tool input before execution, so
     // widening oneOf to MFJS's anyOf remains safe; allOf fails closed.
     normalize_kimi_compatibility(parameters, true)?;
 

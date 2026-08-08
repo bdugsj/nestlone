@@ -823,7 +823,7 @@ async fn enroll_device(
         control_plane_url(base, &["api", "runner", "device", "start"], &[])?,
         json!({
             "deviceId": device_id,
-            "deviceLabel": "Codewhale terminal",
+            "deviceLabel": "Nestlone terminal",
             "targetRef": start.target_ref,
             "targetLabel": start.workspace_label,
             "runtimeVersion": start.runtime_version,
@@ -840,13 +840,13 @@ async fn enroll_device(
         .and_then(Value::as_u64)
         .filter(|value| (1..=30).contains(value))
         .ok_or_else(|| {
-            "Codewhale returned an invalid device authorization interval.".to_string()
+            "Nestlone returned an invalid device authorization interval.".to_string()
         })?;
     let expires_in = value
         .get("expiresIn")
         .and_then(Value::as_u64)
         .filter(|value| (60..=1800).contains(value))
-        .ok_or_else(|| "Codewhale returned an invalid device authorization expiry.".to_string())?;
+        .ok_or_else(|| "Nestlone returned an invalid device authorization expiry.".to_string())?;
     validate_authorization_url(&verification_uri, &user_code)?;
     let _ = event_tx.send(RemoteEvent::Notice(format!(
         "Authorize this terminal at {verification_uri} (code {user_code})."
@@ -867,7 +867,7 @@ async fn enroll_device(
             .json(&json!({ "deviceCode": device_code }))
             .send()
             .await
-            .map_err(|_| "Remote-control authorization could not reach Codewhale.".to_string())?;
+            .map_err(|_| "Remote-control authorization could not reach Nestlone.".to_string())?;
         if response.status() == StatusCode::ACCEPTED {
             continue;
         }
@@ -888,12 +888,12 @@ fn enrollment_from_exchange(
     start: &RemoteStart,
 ) -> Result<LiveEnrollment, String> {
     if value.get("status").and_then(Value::as_str) != Some("approved") {
-        return Err("Codewhale returned an invalid runner credential.".to_string());
+        return Err("Nestlone returned an invalid runner credential.".to_string());
     }
     let record = value
         .get("enrollment")
         .filter(|value| value.is_object())
-        .ok_or_else(|| "Codewhale returned an invalid runner credential.".to_string())?;
+        .ok_or_else(|| "Nestlone returned an invalid runner credential.".to_string())?;
     let enrollment_id = opaque_field(record, "id")?;
     let account_ref = opaque_field(record, "userId")?;
     let returned_device = opaque_field(record, "deviceId")?;
@@ -922,7 +922,7 @@ fn enrollment_from_exchange(
         .and_then(|grant| grant.get("grantId"))
         .and_then(Value::as_str)
         .filter(|value| valid_opaque_ref(value))
-        .ok_or_else(|| "Codewhale returned no grant for this session.".to_string())?
+        .ok_or_else(|| "Nestlone returned no grant for this session.".to_string())?
         .to_string();
     Ok(LiveEnrollment {
         persisted: PersistedEnrollment {
@@ -958,7 +958,7 @@ async fn refresh_enrollment(
         }))
         .send()
         .await
-        .map_err(|_| "Remote-control credential refresh could not reach Codewhale.".to_string())?;
+        .map_err(|_| "Remote-control credential refresh could not reach Nestlone.".to_string())?;
     if matches!(
         response.status(),
         StatusCode::UNAUTHORIZED | StatusCode::FORBIDDEN
@@ -972,7 +972,7 @@ async fn refresh_enrollment(
     let record = value
         .get("enrollment")
         .filter(|value| value.is_object())
-        .ok_or_else(|| "Codewhale returned an invalid refreshed credential.".to_string())?;
+        .ok_or_else(|| "Nestlone returned an invalid refreshed credential.".to_string())?;
     if record.get("id").and_then(Value::as_str) != Some(persisted.runner_enrollment_id.as_str())
         || record.get("userId").and_then(Value::as_str) != Some(persisted.account_ref.as_str())
         || record.get("deviceId").and_then(Value::as_str) != Some(persisted.device_id.as_str())
@@ -982,7 +982,7 @@ async fn refresh_enrollment(
             != Some(persisted.runtime_commit.as_str())
         || !exact_capabilities(record.get("capabilities"))
     {
-        return Err("Codewhale returned a mismatched refreshed credential.".to_string());
+        return Err("Nestlone returned a mismatched refreshed credential.".to_string());
     }
     Ok(LiveEnrollment {
         persisted,
@@ -1018,7 +1018,7 @@ async fn connect_runner(
         .and_then(Value::as_str)
         .filter(|value| valid_opaque_ref(value))
         .map(ToString::to_string)
-        .ok_or_else(|| "Codewhale returned an invalid runner lease.".to_string())
+        .ok_or_else(|| "Nestlone returned an invalid runner lease.".to_string())
 }
 
 async fn post_heartbeat(
@@ -1063,14 +1063,14 @@ async fn list_runs(
         .get("runs")
         .and_then(Value::as_array)
         .filter(|runs| runs.len() <= MAX_RUNS)
-        .ok_or_else(|| "Codewhale returned an invalid runner run list.".to_string())?;
+        .ok_or_else(|| "Nestlone returned an invalid runner run list.".to_string())?;
     runs.iter()
         .map(|run| {
             run.get("id")
                 .and_then(Value::as_str)
                 .filter(|value| valid_opaque_ref(value))
                 .map(ToString::to_string)
-                .ok_or_else(|| "Codewhale returned an invalid runner run.".to_string())
+                .ok_or_else(|| "Nestlone returned an invalid runner run.".to_string())
         })
         .collect()
 }
@@ -1105,7 +1105,7 @@ async fn list_commands(
         .get("commands")
         .and_then(Value::as_array)
         .filter(|commands| commands.len() <= MAX_COMMANDS)
-        .ok_or_else(|| "Codewhale returned an invalid command list.".to_string())?;
+        .ok_or_else(|| "Nestlone returned an invalid command list.".to_string())?;
     commands
         .iter()
         .map(|item| {
@@ -1113,12 +1113,12 @@ async fn list_commands(
                 .get("seq")
                 .and_then(Value::as_u64)
                 .filter(|value| *value > since)
-                .ok_or_else(|| "Codewhale returned an invalid command sequence.".to_string())?;
+                .ok_or_else(|| "Nestlone returned an invalid command sequence.".to_string())?;
             let command = item
                 .get("command")
                 .filter(|value| value.is_object())
                 .cloned()
-                .ok_or_else(|| "Codewhale returned an invalid typed command.".to_string())?;
+                .ok_or_else(|| "Nestlone returned an invalid typed command.".to_string())?;
             Ok(ListedCommand {
                 seq,
                 command,
@@ -1242,7 +1242,7 @@ fn parse_remote_command(value: &Value, expected_run_id: &str) -> Result<RemoteCo
                 .map(ToString::to_string);
             Ok(RemoteCommand::Control { action, turn_id })
         }
-        _ => Err("Codewhale sent an unsupported remote command.".to_string()),
+        _ => Err("Nestlone sent an unsupported remote command.".to_string()),
     }
 }
 
@@ -1292,10 +1292,10 @@ async fn public_request(
         .json(&body)
         .send()
         .await
-        .map_err(|_| "Remote control could not reach Codewhale.".to_string())?;
+        .map_err(|_| "Remote control could not reach Nestlone.".to_string())?;
     if !response.status().is_success() {
         return Err(format!(
-            "Codewhale rejected remote-control enrollment ({}).",
+            "Nestlone rejected remote-control enrollment ({}).",
             response.status()
         ));
     }
@@ -1307,17 +1307,17 @@ async fn read_bounded_json(response: reqwest::Response) -> Result<Value, String>
         .content_length()
         .is_some_and(|length| length > MAX_RESPONSE_BYTES as u64)
     {
-        return Err("Codewhale returned an oversized remote-control response.".to_string());
+        return Err("Nestlone returned an oversized remote-control response.".to_string());
     }
     let bytes = response
         .bytes()
         .await
-        .map_err(|_| "Codewhale returned an unreadable response.".to_string())?;
+        .map_err(|_| "Nestlone returned an unreadable response.".to_string())?;
     if bytes.len() > MAX_RESPONSE_BYTES {
-        return Err("Codewhale returned an oversized remote-control response.".to_string());
+        return Err("Nestlone returned an oversized remote-control response.".to_string());
     }
     serde_json::from_slice(&bytes)
-        .map_err(|_| "Codewhale returned an invalid remote-control response.".to_string())
+        .map_err(|_| "Nestlone returned an invalid remote-control response.".to_string())
 }
 
 fn runner_control_plane_base() -> Result<String, String> {
@@ -1414,10 +1414,10 @@ fn access_token(value: &Value) -> Result<String, String> {
         .filter(|value| {
             (64..=8192).contains(&value.len()) && !value.chars().any(char::is_whitespace)
         })
-        .ok_or_else(|| "Codewhale returned an invalid runner access token.".to_string())?
+        .ok_or_else(|| "Nestlone returned an invalid runner access token.".to_string())?
         .to_string();
     if jwt_expiry(&token).is_none_or(|expiry| expiry <= epoch_seconds()) {
-        return Err("Codewhale returned an expired runner access token.".to_string());
+        return Err("Nestlone returned an expired runner access token.".to_string());
     }
     Ok(token)
 }
@@ -1433,7 +1433,7 @@ fn exact_capabilities(value: Option<&Value>) -> bool {
 
 fn validate_authorization_url(value: &str, user_code: &str) -> Result<(), String> {
     let url = Url::parse(value)
-        .map_err(|_| "Codewhale returned an invalid authorization URL.".to_string())?;
+        .map_err(|_| "Nestlone returned an invalid authorization URL.".to_string())?;
     let pairs = url.query_pairs().collect::<Vec<_>>();
     if url.scheme() != "https"
         || url.host_str() != Some("app.codewhale.net")
@@ -1446,7 +1446,7 @@ fn validate_authorization_url(value: &str, user_code: &str) -> Result<(), String
         || pairs[0].0 != "user_code"
         || pairs[0].1 != user_code
     {
-        return Err("Codewhale returned an invalid authorization URL.".to_string());
+        return Err("Nestlone returned an invalid authorization URL.".to_string());
     }
     Ok(())
 }
@@ -1458,7 +1458,7 @@ fn string_field(value: &Value, field: &str) -> Result<String, String> {
         .map(str::trim)
         .filter(|value| !value.is_empty() && value.len() <= 2048)
         .map(ToString::to_string)
-        .ok_or_else(|| format!("Codewhale returned an invalid {field}."))
+        .ok_or_else(|| format!("Nestlone returned an invalid {field}."))
 }
 
 fn secret_field(value: &Value, field: &str) -> Result<String, String> {
@@ -1467,7 +1467,7 @@ fn secret_field(value: &Value, field: &str) -> Result<String, String> {
         .and_then(Value::as_str)
         .filter(|value| valid_secret(value))
         .map(ToString::to_string)
-        .ok_or_else(|| format!("Codewhale returned an invalid {field}."))
+        .ok_or_else(|| format!("Nestlone returned an invalid {field}."))
 }
 
 fn opaque_field(value: &Value, field: &str) -> Result<String, String> {
@@ -1476,7 +1476,7 @@ fn opaque_field(value: &Value, field: &str) -> Result<String, String> {
         .and_then(Value::as_str)
         .filter(|value| valid_opaque_ref(value))
         .map(ToString::to_string)
-        .ok_or_else(|| format!("Codewhale returned an invalid {field}."))
+        .ok_or_else(|| format!("Nestlone returned an invalid {field}."))
 }
 
 fn valid_opaque_ref(value: &str) -> bool {

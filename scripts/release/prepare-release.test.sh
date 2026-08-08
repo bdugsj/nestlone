@@ -12,7 +12,7 @@ make_fixture() {
     "${root}/crates/example" \
     "${root}/crates/tui" \
     "${root}/docs" \
-    "${root}/npm/codewhale" \
+    "${root}/npm/nestlone" \
     "${root}/scripts/remote-smoke" \
     "${root}/scripts/release" \
     "${root}/web/lib" \
@@ -38,7 +38,7 @@ version.workspace = true
 nestlone-core = { path = "../core", version = "0.8.68" }
 EOF
 
-  cat >"${root}/npm/codewhale/package.json" <<'EOF'
+  cat >"${root}/npm/nestlone/package.json" <<'EOF'
 {
   "name": "nestlone",
   "version": "0.8.68",
@@ -52,7 +52,7 @@ EOF
   "lockfileVersion": 3,
   "packages": {
     "": { "name": "fixture" },
-    "npm/codewhale": {
+    "npm/nestlone": {
       "version": "0.8.68",
       "license": "MIT"
     }
@@ -154,9 +154,9 @@ PREPARE_RELEASE_TEST_MARKERS="${success_markers}" \
 
 grep -Fq 'version = "0.9.0"' "${success_root}/Cargo.toml"
 grep -Fq 'version = "0.9.0"' "${success_root}/crates/example/Cargo.toml"
-grep -Fq '"version": "0.9.0"' "${success_root}/npm/codewhale/package.json"
+grep -Fq '"version": "0.9.0"' "${success_root}/npm/nestlone/package.json"
 grep -Fq '"nestloneBinaryVersion": "0.9.0"' \
-  "${success_root}/npm/codewhale/package.json"
+  "${success_root}/npm/nestlone/package.json"
 grep -Fq '"version": "0.9.0"' "${success_root}/package-lock.json"
 grep -Fq 'RELEASE_TAG="${RELEASE_TAG:-v0.9.0}"' \
   "${success_root}/scripts/remote-smoke/setup-vm.sh"
@@ -219,7 +219,7 @@ if [[ -f "${same_markers}/cargo" ]]; then
 fi
 grep -Fq 'version = "0.8.68"' "${same_root}/Cargo.toml"
 grep -Fq 'version = "0.8.68"' "${same_root}/crates/example/Cargo.toml"
-grep -Fq '"version": "0.8.68"' "${same_root}/npm/codewhale/package.json"
+grep -Fq '"version": "0.8.68"' "${same_root}/npm/nestlone/package.json"
 
 same_stale_root="${tmp_dir}/same-stale"
 same_stale_markers="${tmp_dir}/same-stale-markers"
@@ -287,7 +287,7 @@ grep -Fq \
   "${stale_log}"
 grep -Fq 'version = "0.8.68"' "${stale_root}/Cargo.toml"
 grep -Fq 'version = "0.8.68"' "${stale_root}/crates/example/Cargo.toml"
-grep -Fq '"version": "0.8.68"' "${stale_root}/npm/codewhale/package.json"
+grep -Fq '"version": "0.8.68"' "${stale_root}/npm/nestlone/package.json"
 if find "${stale_markers}" -type f -print -quit | grep -q .; then
   echo "stale README validation mutated downstream release state" >&2
   exit 1

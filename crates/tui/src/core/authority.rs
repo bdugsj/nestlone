@@ -329,7 +329,7 @@ pub(crate) fn agent_approval_mode_for_turn(
 ///
 /// Permission posture and filesystem scope are separate controls, but the
 /// named Full Access posture must have a truthful default: outside Plan it
-/// disables Codewhale's own sandbox, matching the product meaning of the
+/// disables Nestlone's own sandbox, matching the product meaning of the
 /// name. An explicit effective sandbox setting may still *tighten* that
 /// default. It can never loosen Plan, Ask, or Auto-Review.
 #[must_use]

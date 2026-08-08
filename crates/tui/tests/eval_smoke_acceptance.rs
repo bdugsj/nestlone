@@ -31,7 +31,7 @@ struct EvalSmokeWorld {
     exit_status: Option<ExitStatus>,
 }
 
-#[given("a clean CodeWhale evaluation workspace")]
+#[given("a clean Nestlone evaluation workspace")]
 fn clean_nestlone_evaluation_workspace(world: &mut EvalSmokeWorld) {
     world._record_dir = Some(TempDir::new().expect("evaluation TempDir"));
 }

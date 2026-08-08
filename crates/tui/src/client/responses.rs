@@ -1,8 +1,8 @@
 //! OpenAI Responses API bridge for the OpenAI Codex / ChatGPT provider.
 //!
-//! Implements a dedicated Responses API client that maps CodeWhale's internal
+//! Implements a dedicated Responses API client that maps Nestlone's internal
 //! message/tool types to the Responses wire format and parses streaming SSE
-//! events back into CodeWhale's `StreamEvent` / `MessageResponse` types.
+//! events back into Nestlone's `StreamEvent` / `MessageResponse` types.
 //!
 //! This is intentionally separate from the Chat Completions path
 //! (`client/chat.rs`) to avoid protocol hacks.
@@ -60,7 +60,7 @@ pub(super) fn build_responses_body(request: &MessageRequest) -> Value {
     // Reasoning configuration. The Codex Responses backend accepts
     // low/medium/high/xhigh, so provider-aware callers normalize inherited
     // DeepSeek-only values before request construction: "off" becomes
-    // "low", and CodeWhale's "auto" falls back to "medium".
+    // "low", and Nestlone's "auto" falls back to "medium".
     if let Some(raw) = request.reasoning_effort.as_deref()
         && let Some(effort) = codex_responses_reasoning_effort(raw)
     {
@@ -547,7 +547,7 @@ impl DeepSeekClient {
     }
 }
 
-/// Convert CodeWhale messages to Responses API input items.
+/// Convert Nestlone messages to Responses API input items.
 fn convert_messages_to_responses_input(request: &MessageRequest) -> Vec<Value> {
     let mut items = Vec::new();
 
@@ -661,7 +661,7 @@ fn convert_messages_to_responses_input(request: &MessageRequest) -> Vec<Value> {
     items
 }
 
-/// Convert a CodeWhale tool definition to a Responses API function tool.
+/// Convert a Nestlone tool definition to a Responses API function tool.
 fn tool_to_responses_function(tool: &Tool) -> Value {
     let mut parameters = tool.input_schema.clone();
     let constraint_note = schema_sanitize::sanitize_for_responses(&mut parameters);

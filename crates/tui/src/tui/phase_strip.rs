@@ -472,7 +472,7 @@ mod tests {
         let mut app = test_app();
         app.runtime_turn_status = Some("completed".to_string());
         app.push_status_toast(
-            "Auto-denied exec_shell: denied earlier; restart Codewhale",
+            "Auto-denied exec_shell: denied earlier; restart Nestlone",
             crate::tui::app::StatusToastLevel::Warning,
             Some(12_000),
         );

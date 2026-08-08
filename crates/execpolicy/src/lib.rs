@@ -825,7 +825,7 @@ pub fn normalize_workspace_scope(value: &str) -> Option<String> {
     let (root, components) = if let Some(path) = value.strip_prefix('/') {
         ("/".to_string(), path.to_string())
     } else if is_windows_absolute_path(&value) {
-        // Windows paths are case-insensitive in the environments CodeWhale
+        // Windows paths are case-insensitive in the environments Nestlone
         // supports. Keep the POSIX branch case-sensitive so two distinct
         // repositories on a case-sensitive filesystem cannot share a grant.
         let value = value.to_ascii_lowercase();
@@ -2439,11 +2439,11 @@ mod tests {
     #[test]
     fn workspace_scope_preserves_posix_case_and_rejects_traversal() {
         assert_eq!(
-            normalize_workspace_scope("/Workspace/CodeWhale"),
-            Some("/Workspace/CodeWhale".to_string())
+            normalize_workspace_scope("/Workspace/Nestlone"),
+            Some("/Workspace/Nestlone".to_string())
         );
         assert_ne!(
-            normalize_workspace_scope("/Workspace/CodeWhale"),
+            normalize_workspace_scope("/Workspace/Nestlone"),
             normalize_workspace_scope("/workspace/nestlone")
         );
         assert_eq!(normalize_workspace_scope("/workspace/../other"), None);

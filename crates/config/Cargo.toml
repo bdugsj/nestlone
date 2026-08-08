@@ -5,7 +5,7 @@ edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
 repository.workspace = true
-description = "Config schema and precedence model for Codewhale"
+description = "Config schema and precedence model for Nestlone"
 
 [dependencies]
 anyhow.workspace = true

@@ -21,7 +21,7 @@ def main() -> int:
         "cargo",
         "test",
         "-p",
-        "codewhale-tui",
+        "nestlone-tui",
         "print_agent_tool_catalog_metrics",
         "--",
         "--ignored",

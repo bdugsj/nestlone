@@ -1,12 +1,12 @@
 # Telegram Bridge
 
-This bridge lets a Telegram chat control a local `codewhale serve --http`
+This bridge lets a Telegram chat control a local `nestlone serve --http`
 runtime from a phone. It uses Telegram Bot API long polling, so the first
 version does not need a public webhook URL or inbound port.
 
 Security model:
 
-- `codewhale serve --http` stays bound to `127.0.0.1`.
+- `nestlone serve --http` stays bound to `127.0.0.1`.
 - `/v1/*` runtime calls use `CODEWHALE_RUNTIME_TOKEN`. Legacy
   `DEEPSEEK_RUNTIME_TOKEN` is accepted only as a compatibility fallback.
 - Telegram chats must be allowlisted unless `TELEGRAM_ALLOW_UNLISTED=true` is
@@ -22,10 +22,10 @@ Security model:
 Create a bot with Telegram's `@BotFather`, then configure the bridge:
 
 ```bash
-cd /opt/codewhale/telegram-bridge
+cd /opt/nestlone/telegram-bridge
 npm install --omit=dev
-cp .env.example /etc/codewhale/telegram-bridge.env
-sudoedit /etc/codewhale/telegram-bridge.env
+cp .env.example /etc/nestlone/telegram-bridge.env
+sudoedit /etc/nestlone/telegram-bridge.env
 node src/index.mjs
 ```
 
@@ -33,9 +33,9 @@ Validate env files before starting the service:
 
 ```bash
 npm run validate:config -- \
-  --env /etc/codewhale/telegram-bridge.env \
-  --runtime-env /etc/codewhale/runtime.env \
-  --workspace-root /opt/whalebro \
+  --env /etc/nestlone/telegram-bridge.env \
+  --runtime-env /etc/nestlone/runtime.env \
+  --workspace-root /opt/nestlone \
   --check-filesystem
 ```
 

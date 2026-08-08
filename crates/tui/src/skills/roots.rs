@@ -3,7 +3,7 @@
 //!
 //! Runtime discovery and (later) audit/mutation share this catalog so
 //! precedence cannot drift between modules. Discovery directories are not
-//! write targets: only explicitly owned CodeWhale roots are writable.
+//! write targets: only explicitly owned Nestlone roots are writable.
 
 use std::collections::HashSet;
 use std::fs;
@@ -27,7 +27,7 @@ impl std::fmt::Display for SkillRootId {
     }
 }
 
-/// External harness layouts that CodeWhale can discover/audit but never owns.
+/// External harness layouts that Nestlone can discover/audit but never owns.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum CompatibleHarness {
     Agents,
@@ -60,8 +60,8 @@ impl CompatibleHarness {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[allow(dead_code)] // BuiltIn / ReviewedPluginSnapshot used by later #4651 stages
 pub enum SkillRootKind {
-    CodeWhaleProject,
-    CodeWhaleGlobal,
+    NestloneProject,
+    NestloneGlobal,
     CompatibleProject(CompatibleHarness),
     CompatibleGlobal(CompatibleHarness),
     /// Explicitly configured `skills_dir` that is not one of the owned roots.
@@ -71,11 +71,11 @@ pub enum SkillRootKind {
     RegistryCache,
 }
 
-/// Whether CodeWhale may mutate files under this root.
+/// Whether Nestlone may mutate files under this root.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[allow(dead_code)] // Immutable used by later #4651 stages
 pub enum SkillRootAccess {
-    /// CodeWhale-owned project/global install targets.
+    /// Nestlone-owned project/global install targets.
     WritableOwned,
     /// Compatible harness roots and unclassified configured dirs — read only.
     ReadOnlyExternal,
@@ -200,14 +200,14 @@ impl SkillRootCatalog {
             "project-cursor",
         );
 
-        // CodeWhale project root — always listed for ownership; runtime
-        // CodeWhale-only mode additionally requires the path stay inside the
+        // Nestlone project root — always listed for ownership; runtime
+        // Nestlone-only mode additionally requires the path stay inside the
         // workspace (symlink escape check happens in path selection helpers).
         let project_owned = workspace.join(".nestlone").join("skills");
         push_descriptor(
             &mut roots,
             &mut precedence,
-            SkillRootKind::CodeWhaleProject,
+            SkillRootKind::NestloneProject,
             SkillRootAccess::WritableOwned,
             SkillScope::Project,
             project_owned,
@@ -258,7 +258,7 @@ impl SkillRootCatalog {
             push_descriptor(
                 &mut roots,
                 &mut precedence,
-                SkillRootKind::CodeWhaleGlobal,
+                SkillRootKind::NestloneGlobal,
                 SkillRootAccess::WritableOwned,
                 SkillScope::Global,
                 global_owned,
@@ -312,7 +312,7 @@ impl SkillRootCatalog {
             push_descriptor(
                 &mut roots,
                 &mut precedence,
-                SkillRootKind::CodeWhaleGlobal,
+                SkillRootKind::NestloneGlobal,
                 SkillRootAccess::WritableOwned,
                 SkillScope::Global,
                 PathBuf::from("/tmp/nestlone/skills"),
@@ -337,7 +337,7 @@ impl SkillRootCatalog {
     }
 
     /// Paths used by runtime discovery for the given mode (existing dirs only,
-    /// first-wins order preserved). CodeWhale-only applies the workspace
+    /// first-wins order preserved). Nestlone-only applies the workspace
     /// containment check for the project owned root.
     #[must_use]
     pub fn runtime_directories(
@@ -354,16 +354,16 @@ impl SkillRootCatalog {
             }
             match mode {
                 super::SkillDiscoveryMode::Compatible => {}
-                super::SkillDiscoveryMode::CodeWhaleOnly => {
+                super::SkillDiscoveryMode::NestloneOnly => {
                     if !matches!(
                         root.kind,
-                        SkillRootKind::CodeWhaleProject
-                            | SkillRootKind::CodeWhaleGlobal
+                        SkillRootKind::NestloneProject
+                            | SkillRootKind::NestloneGlobal
                             | SkillRootKind::Configured
                     ) {
                         continue;
                     }
-                    if root.kind == SkillRootKind::CodeWhaleProject
+                    if root.kind == SkillRootKind::NestloneProject
                         && !nestlone_project_root_is_inside_workspace(workspace, &root.path)
                     {
                         continue;
@@ -385,7 +385,7 @@ impl SkillRootCatalog {
         out
     }
 
-    /// Owned CodeWhale project + global roots (may not exist yet).
+    /// Owned Nestlone project + global roots (may not exist yet).
     #[must_use]
     pub fn owned_writable_roots(&self) -> Vec<&SkillRootDescriptor> {
         self.roots
@@ -437,7 +437,7 @@ pub fn skills_directories_with_home_and_mode(
     SkillRootCatalog::build(workspace, home_dir, None).runtime_directories(workspace, mode)
 }
 
-/// CodeWhale project skills dir when it exists and stays inside the workspace.
+/// Nestlone project skills dir when it exists and stays inside the workspace.
 #[must_use]
 pub fn nestlone_workspace_skills_dir(workspace: &Path) -> Option<PathBuf> {
     let skills_dir = workspace.join(".nestlone").join("skills");
@@ -463,7 +463,7 @@ pub fn existing_skill_dirs(candidates: impl IntoIterator<Item = PathBuf>) -> Vec
 }
 
 /// Classify a configured `skills_dir`: owned only when it is exactly a
-/// CodeWhale project/global root; compatible harness paths stay read-only.
+/// Nestlone project/global root; compatible harness paths stay read-only.
 #[must_use]
 pub fn classify_configured_skills_dir(
     workspace: &Path,
@@ -473,7 +473,7 @@ pub fn classify_configured_skills_dir(
     let project_owned = workspace.join(".nestlone").join("skills");
     if paths_refer_to_same_dir(&project_owned, skills_dir) {
         return (
-            SkillRootKind::CodeWhaleProject,
+            SkillRootKind::NestloneProject,
             SkillRootAccess::WritableOwned,
             SkillScope::Project,
         );
@@ -482,7 +482,7 @@ pub fn classify_configured_skills_dir(
         let global_owned = home.join(".nestlone").join("skills");
         if paths_refer_to_same_dir(&global_owned, skills_dir) {
             return (
-                SkillRootKind::CodeWhaleGlobal,
+                SkillRootKind::NestloneGlobal,
                 SkillRootAccess::WritableOwned,
                 SkillScope::Global,
             );
@@ -826,7 +826,7 @@ mod tests {
         assert_eq!(owned.len(), 2);
         assert!(owned.iter().all(|r| r.is_writable_owned()));
 
-        let runtime = catalog.runtime_directories(&workspace, SkillDiscoveryMode::CodeWhaleOnly);
+        let runtime = catalog.runtime_directories(&workspace, SkillDiscoveryMode::NestloneOnly);
         assert_eq!(
             runtime,
             vec![

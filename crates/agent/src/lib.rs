@@ -1194,7 +1194,7 @@ impl ModelRegistry {
                 };
             }
             // OpenCode Go's catalog spans Chat Completions and Anthropic
-            // Messages, while Codewhale's provider slice intentionally speaks
+            // Messages, while Nestlone's provider slice intentionally speaks
             // Chat only. Resolve a hinted Go model through the shared Chat
             // allowlist and never fall through to a same-named global alias on
             // OpenRouter or MiniMax.

@@ -147,7 +147,7 @@ pub async fn execute_js_execution_tool(
 
     // #3273: Node's built-in `fetch` (undici) ignores HTTP(S)_PROXY env vars
     // unless `NODE_USE_ENV_PROXY` is set (Node >= 24). This child already
-    // inherits CodeWhale's proxy environment, so enabling the flag lets
+    // inherits Nestlone's proxy environment, so enabling the flag lets
     // `js_execution`'s `fetch()` reach the network through the same proxy/VPN
     // as the rest of the app and honor `NO_PROXY`. Only default it on when the
     // user hasn't chosen a value, so an explicit opt-out (`NODE_USE_ENV_PROXY=0`)

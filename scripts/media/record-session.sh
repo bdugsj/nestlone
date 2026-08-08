@@ -27,14 +27,14 @@ command -v ffmpeg >/dev/null || die "ffmpeg is not installed (brew install ffmpe
 [[ -f "${tape}" ]] || die "missing tape: ${tape}"
 
 # Record the exact binary that was dogfooded, not whatever is first on PATH.
-binary="$(command -v codewhale || true)"
-[[ -n "${binary}" ]] || die "codewhale is not on PATH — run scripts/release/install-dogfood.sh first"
+binary="$(command -v nestlone || true)"
+[[ -n "${binary}" ]] || die "nestlone is not on PATH — run scripts/release/install-dogfood.sh first"
 
 version_line="$("${binary}" --version)"
 head_sha="$(git -C "${repo_root}" rev-parse HEAD)"
 short_sha="${head_sha:0:12}"
 if [[ "${version_line}" != *"${short_sha}"* ]]; then
-  die "installed codewhale is not this checkout.
+  die "installed nestlone is not this checkout.
   installed: ${version_line}
   HEAD:      ${short_sha}
   Recording a SHA that is not the release candidate makes the asset a lie about
@@ -63,13 +63,13 @@ fi
 
 # --- Sealed environment -----------------------------------------------------
 sealed="$(mktemp -d)"
-mkdir -p "${sealed}/.codewhale" "${demo_dir}" "${out_dir}"
+mkdir -p "${sealed}/.nestlone" "${demo_dir}" "${out_dir}"
 cleanup() { rm -rf "${sealed}"; }
 trap cleanup EXIT
 
 # Blue Stage dark, selected in the product rather than imitated by the
 # emulator palette (see the tape's note).
-cat > "${sealed}/.codewhale/config.toml" <<'TOML'
+cat > "${sealed}/.nestlone/config.toml" <<'TOML'
 theme = "Blue Stage"
 TOML
 
@@ -81,9 +81,9 @@ echo
 
 pushd "${demo_dir}" >/dev/null
 HOME="${sealed}" \
-CODEWHALE_HOME="${sealed}/.codewhale" \
-CODEWHALE_CONFIG_PATH="${sealed}/.codewhale/config.toml" \
-CODEWHALE_MCP_CONFIG="${sealed}/.codewhale/mcp.json" \
+CODEWHALE_HOME="${sealed}/.nestlone" \
+CODEWHALE_CONFIG_PATH="${sealed}/.nestlone/config.toml" \
+CODEWHALE_MCP_CONFIG="${sealed}/.nestlone/mcp.json" \
   vhs "${tape}"
 popd >/dev/null
 

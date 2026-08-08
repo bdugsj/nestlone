@@ -54,7 +54,7 @@ fn init(app: &mut App) -> CommandResult {
     CommandResult::with_message_and_action(msg, AppAction::SendMessage(prompt))
 }
 
-/// If `workspace` is inside a git repository, ensure workspace-local CodeWhale
+/// If `workspace` is inside a git repository, ensure workspace-local Nestlone
 /// state is listed in the nearest `.gitignore` so snapshots, auto-generated
 /// instructions, and other runtime state are not accidentally committed — while
 /// keeping the authored `.nestlone/constitution.json` repo authority policy

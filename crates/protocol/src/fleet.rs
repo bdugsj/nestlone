@@ -292,7 +292,8 @@ pub enum FleetScorerSpec {
         #[serde(default)]
         args: Vec<String>,
     },
-    CodeWhaleVerifierPrompt {
+    #[serde(rename = "code_whale_verifier_prompt")]
+    NestloneVerifierPrompt {
         prompt: String,
     },
     Manual,

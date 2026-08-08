@@ -33,9 +33,9 @@ pub const DEFAULT_MODELS_DEV_TTL_SECS: u64 = 24 * 60 * 60;
 pub const FETCH_TIMEOUT: Duration = Duration::from_secs(15);
 
 /// Explicit user-agent; no credentials, no session cookies.
-pub const USER_AGENT: &str = concat!("CodeWhale/", env!("CARGO_PKG_VERSION"), " (+models-dev)");
+pub const USER_AGENT: &str = concat!("Nestlone/", env!("CARGO_PKG_VERSION"), " (+models-dev)");
 
-/// Filename under the CodeWhale `catalog` state dir.
+/// Filename under the Nestlone `catalog` state dir.
 pub const CACHE_FILE: &str = "models-dev-catalog.json";
 
 /// Env: override Models.dev base URL or full catalog URL.
@@ -117,7 +117,7 @@ impl std::fmt::Display for ModelsDevRefreshError {
     }
 }
 
-/// Resolve the on-disk cache path under the CodeWhale `catalog` state dir.
+/// Resolve the on-disk cache path under the Nestlone `catalog` state dir.
 #[must_use]
 pub fn cache_path() -> Option<PathBuf> {
     nestlone_config::resolve_state_dir("catalog")

@@ -144,7 +144,7 @@ pub fn resolve_external_credential_path(path: impl AsRef<Path>) -> Result<PathBu
     Ok(normalized)
 }
 
-/// The side-effect envelope Codewhale may use for an external credential.
+/// The side-effect envelope Nestlone may use for an external credential.
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum ExternalCredentialAccess {
@@ -266,7 +266,7 @@ pub fn external_credential_consent_status(
     let route_state = if active { "active" } else { "dormant" };
     let semantics = match access {
         ExternalCredentialAccess::Disabled => {
-            "disabled; no external-credential probing, reading, refresh, discovery, identity-provider or network acquisition, writes, or rewrites; normal requests to the explicitly selected provider may use Codewhale-owned credentials"
+            "disabled; no external-credential probing, reading, refresh, discovery, identity-provider or network acquisition, writes, or rewrites; normal requests to the explicitly selected provider may use Nestlone-owned credentials"
         }
         ExternalCredentialAccess::ReadOnly => EXTERNAL_CREDENTIAL_READ_ONLY_SEMANTICS,
         ExternalCredentialAccess::Managed => {

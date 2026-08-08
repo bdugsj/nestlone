@@ -3914,7 +3914,7 @@ fn guided_constitution_template(locale: Locale) -> UserConstitution {
 enum DraftProvenance {
     /// Rendered deterministically from the guided answers.
     Guided,
-    /// Drafted by the named model, then sanitized and bounded by Codewhale.
+    /// Drafted by the named model, then sanitized and bounded by Nestlone.
     Model(String),
     /// The user's existing `constitution.json`, shown unchanged for the
     /// keep-existing checkpoint completion (#3794).
@@ -3977,7 +3977,7 @@ fn constitution_ratification_text(
         Locale::Ja => {
             let drafted_by = match provenance {
                 DraftProvenance::Model(label) => format!(
-                    "{label} があなたのガイド回答から起草し、Codewhale が構造検証と境界制限を適用しました。"
+                    "{label} があなたのガイド回答から起草し、Nestlone が構造検証と境界制限を適用しました。"
                 ),
                 DraftProvenance::Guided => {
                     "あなたのガイド回答から決定的に生成されました。".to_string()
@@ -3999,7 +3999,7 @@ fn constitution_ratification_text(
             };
             format!(
                 "CODEWHALE · ユーザー憲法\n{RULE}\n\n{drafted_by}\n\n\
-                 これは Codewhale があなたと協働するための常設の基準です。優れた憲法のように、使えるほど短く、\
+                 これは Nestlone があなたと協働するための常設の基準です。優れた憲法のように、使えるほど短く、\
                  網羅的な規則ではなく持続する原則で構成され、あなたの変化に合わせて修正できます。\
                  すべての個別判断を裁くのではなく権限と境界を定め、セッションを越えて協働を継続させます。\
                  ただしこれは記憶ではありません。履歴ではなく原則を保持します。\n\n\
@@ -4017,7 +4017,7 @@ fn constitution_ratification_text(
         Locale::ZhHans => {
             let drafted_by = match provenance {
                 DraftProvenance::Model(label) => format!(
-                    "由 {label} 根据你的引导式答案起草，并已由 Codewhale 完成结构校验与边界限制。"
+                    "由 {label} 根据你的引导式答案起草，并已由 Nestlone 完成结构校验与边界限制。"
                 ),
                 DraftProvenance::Guided => "由你的引导式答案确定性生成。".to_string(),
                 DraftProvenance::Existing => {
@@ -4036,7 +4036,7 @@ fn constitution_ratification_text(
             };
             format!(
                 "CODEWHALE · 用户宪章\n{RULE}\n\n{drafted_by}\n\n\
-                 这是 Codewhale 与你协作时长期遵循的偏好和规则。内容应保持简短、便于执行，以持久原则为主，并可随时调整。\
+                 这是 Nestlone 与你协作时长期遵循的偏好和规则。内容应保持简短、便于执行，以持久原则为主，并可随时调整。\
                  它界定协作方式与行为边界，而不是替你决定每一种情况；它让协作跨会话延续——但它不是记忆，只保留原则，不保留历史。\n\n\
                  {rendered}\n\n\
                  权限层级\n{layer_order}\n你的直接指令始终高于本文件。\n\n\
@@ -4050,7 +4050,7 @@ fn constitution_ratification_text(
         Locale::ZhHant => {
             let drafted_by = match provenance {
                 DraftProvenance::Model(label) => format!(
-                    "由 {label} 根據你的引導式答案起草，並已由 Codewhale 完成結構驗證與邊界限制。"
+                    "由 {label} 根據你的引導式答案起草，並已由 Nestlone 完成結構驗證與邊界限制。"
                 ),
                 DraftProvenance::Guided => "由你的引導式答案確定性生成。".to_string(),
                 DraftProvenance::Existing => {
@@ -4069,7 +4069,7 @@ fn constitution_ratification_text(
             };
             format!(
                 "CODEWHALE · 使用者憲法\n{RULE}\n\n{drafted_by}\n\n\
-                 這是 Codewhale 與你協作的長期準則。像優秀的憲法一樣：足夠簡短因而可用，由持久原則而非詳盡規則構成，並且可以隨你修訂。\
+                 這是 Nestlone 與你協作的長期準則。像優秀的憲法一樣：足夠簡短因而可用，由持久原則而非詳盡規則構成，並且可以隨你修訂。\
                  它界定權力與邊界，而非裁決每個具體決定；它讓協作跨會話延續，但它不是記憶，它承載的是原則，而非歷史。\n\n\
                  {rendered}\n\n\
                  權限層級\n{layer_order}\n你的直接指令始終高於本文件。\n\n\
@@ -4083,7 +4083,7 @@ fn constitution_ratification_text(
         Locale::PtBr => {
             let drafted_by = match provenance {
                 DraftProvenance::Model(label) => format!(
-                    "Rascunhado por {label} a partir das suas respostas guiadas, depois validado por schema e limitado pelo Codewhale."
+                    "Rascunhado por {label} a partir das suas respostas guiadas, depois validado por schema e limitado pelo Nestlone."
                 ),
                 DraftProvenance::Guided => {
                     "Renderizado deterministicamente a partir das suas respostas guiadas.".to_string()
@@ -4105,7 +4105,7 @@ fn constitution_ratification_text(
             };
             format!(
                 "CODEWHALE · CONSTITUIÇÃO DO USUÁRIO\n{RULE}\n\n{drafted_by}\n\n\
-                 Esta é a regra permanente de como o Codewhale trabalha com você. Como boas constituições, \
+                 Esta é a regra permanente de como o Nestlone trabalha com você. Como boas constituições, \
                  ela é curta o bastante para ser usada, formada por princípios duráveis em vez de regras exaustivas, \
                  e pode ser emendada conforme você muda. Ela define poderes e limites em vez de decidir cada caso, \
                  e dá continuidade à colaboração entre sessões. Mas ela não é memória: carrega princípios, não histórico.\n\n\
@@ -4123,7 +4123,7 @@ fn constitution_ratification_text(
         Locale::Es419 => {
             let drafted_by = match provenance {
                 DraftProvenance::Model(label) => format!(
-                    "Redactado por {label} desde tus respuestas guiadas, luego validado por schema y acotado por Codewhale."
+                    "Redactado por {label} desde tus respuestas guiadas, luego validado por schema y acotado por Nestlone."
                 ),
                 DraftProvenance::Guided => {
                     "Renderizado de forma determinística desde tus respuestas guiadas.".to_string()
@@ -4145,7 +4145,7 @@ fn constitution_ratification_text(
             };
             format!(
                 "CODEWHALE · CONSTITUCIÓN DEL USUARIO\n{RULE}\n\n{drafted_by}\n\n\
-                 Esta es la regla permanente de cómo Codewhale trabaja contigo. Como las buenas constituciones, \
+                 Esta es la regla permanente de cómo Nestlone trabaja contigo. Como las buenas constituciones, \
                  es lo bastante breve para usarse, hecha de principios duraderos en vez de reglas exhaustivas, \
                  y enmendable a medida que cambias. Define poderes y límites en vez de decidir cada caso, \
                  y da continuidad a la colaboración entre sesiones. Pero no es memoria: lleva principios, no historial.\n\n\
@@ -4163,7 +4163,7 @@ fn constitution_ratification_text(
         Locale::Vi => {
             let drafted_by = match provenance {
                 DraftProvenance::Model(label) => format!(
-                    "Được {label} soạn từ câu trả lời hướng dẫn của bạn, rồi được Codewhale kiểm tra schema và giới hạn biên."
+                    "Được {label} soạn từ câu trả lời hướng dẫn của bạn, rồi được Nestlone kiểm tra schema và giới hạn biên."
                 ),
                 DraftProvenance::Guided => {
                     "Được kết xuất xác định từ câu trả lời hướng dẫn của bạn.".to_string()
@@ -4185,7 +4185,7 @@ fn constitution_ratification_text(
             };
             format!(
                 "CODEWHALE · HIẾN PHÁP NGƯỜI DÙNG\n{RULE}\n\n{drafted_by}\n\n\
-                 Đây là luật thường trực cho cách Codewhale làm việc với bạn. Giống các hiến pháp tốt, \
+                 Đây là luật thường trực cho cách Nestlone làm việc với bạn. Giống các hiến pháp tốt, \
                  nó đủ ngắn để dùng, gồm các nguyên tắc bền vững thay vì luật lệ cạn kiệt, \
                  và có thể sửa khi bạn thay đổi. Nó định khung quyền hạn và giới hạn thay vì quyết định từng trường hợp, \
                  đồng thời giữ sự liên tục giữa các phiên. Nhưng nó không phải bộ nhớ: nó mang nguyên tắc, không mang lịch sử.\n\n\
@@ -4203,7 +4203,7 @@ fn constitution_ratification_text(
         Locale::Ko => {
             let drafted_by = match provenance {
                 DraftProvenance::Model(label) => format!(
-                    "{label}이(가) 당신의 가이드 답변을 바탕으로 초안을 작성했고, Codewhale이 구조를 검증하고 범위를 제한했습니다."
+                    "{label}이(가) 당신의 가이드 답변을 바탕으로 초안을 작성했고, Nestlone이 구조를 검증하고 범위를 제한했습니다."
                 ),
                 DraftProvenance::Guided => {
                     "당신의 가이드 답변으로부터 결정적으로 생성되었습니다.".to_string()
@@ -4225,7 +4225,7 @@ fn constitution_ratification_text(
             };
             format!(
                 "CODEWHALE · 사용자 헌법\n{RULE}\n\n{drafted_by}\n\n\
-                 이것은 Codewhale이 당신과 함께 일하는 방식에 대한 상시 규칙입니다. 훌륭한 헌법이 그렇듯, \
+                 이것은 Nestlone이 당신과 함께 일하는 방식에 대한 상시 규칙입니다. 훌륭한 헌법이 그렇듯, \
                  사용할 수 있을 만큼 짧고, 소모적인 규칙이 아닌 지속적인 원칙으로 이루어져 있으며, 당신이 변화함에 따라 수정할 수 있습니다. \
                  이는 모든 개별 사례를 판단하는 대신 권한과 한계를 규정하며, 세션을 넘어 협업의 연속성을 부여합니다. \
                  다만 이것은 기억이 아닙니다: 이력이 아니라 원칙을 담습니다.\n\n\
@@ -4243,7 +4243,7 @@ fn constitution_ratification_text(
         Locale::Ca => {
             let drafted_by = match provenance {
                 DraftProvenance::Model(label) => format!(
-                    "Redactat per {label} a partir de les teves respostes guiades, després validat per esquema i acotat per Codewhale."
+                    "Redactat per {label} a partir de les teves respostes guiades, després validat per esquema i acotat per Nestlone."
                 ),
                 DraftProvenance::Guided => {
                     "Generat determinísticament a partir de les teves respostes guiades.".to_string()
@@ -4265,7 +4265,7 @@ fn constitution_ratification_text(
             };
             format!(
                 "CODEWHALE · CONSTITUCIÓ DE L'USUARI\n{RULE}\n\n{drafted_by}\n\n\
-                 Aquesta és la llei permanent de com Codewhale treballa amb tu. Com les bones constitucions, \
+                 Aquesta és la llei permanent de com Nestlone treballa amb tu. Com les bones constitucions, \
                  és prou curta per usar-se, feta de principis duradors en lloc de regles exhaustives, \
                  i esmenable a mesura que canvies. Defineix poders i límits en lloc de decidir cada cas, \
                  i dona continuïtat a la col·laboració entre sessions — però no és memòria: porta principis, no història.\n\n\
@@ -4283,7 +4283,7 @@ fn constitution_ratification_text(
         Locale::De => {
             let drafted_by = match provenance {
                 DraftProvenance::Model(label) => format!(
-                    "Entworfen von {label} aus deinen geführten Antworten, dann schema-geprüft und begrenzt durch Codewhale."
+                    "Entworfen von {label} aus deinen geführten Antworten, dann schema-geprüft und begrenzt durch Nestlone."
                 ),
                 DraftProvenance::Guided => {
                     "Deterministisch aus deinen geführten Antworten erzeugt.".to_string()
@@ -4305,7 +4305,7 @@ fn constitution_ratification_text(
             };
             format!(
                 "CODEWHALE · NUTZERVERFASSUNG\n{RULE}\n\n{drafted_by}\n\n\
-                 Dies ist das geltende Gesetz dafür, wie Codewhale mit dir arbeitet. Wie die besten Verfassungen \
+                 Dies ist das geltende Gesetz dafür, wie Nestlone mit dir arbeitet. Wie die besten Verfassungen \
                  ist sie kurz genug, um genutzt zu werden, besteht aus dauerhaften Prinzipien statt erschöpfender Regeln \
                  und lässt sich ändern, wenn du dich änderst. Sie rahmt Befugnisse und Grenzen, statt jeden Einzelfall zu entscheiden, \
                  und gibt deiner Zusammenarbeit Kontinuität über Sitzungen hinweg — aber sie ist kein Gedächtnis: Sie trägt Prinzipien, nicht Geschichte.\n\n\
@@ -4323,7 +4323,7 @@ fn constitution_ratification_text(
         Locale::Fr => {
             let drafted_by = match provenance {
                 DraftProvenance::Model(label) => format!(
-                    "Rédigé par {label} à partir de vos réponses guidées, puis validé par schéma et borné par Codewhale."
+                    "Rédigé par {label} à partir de vos réponses guidées, puis validé par schéma et borné par Nestlone."
                 ),
                 DraftProvenance::Guided => {
                     "Généré de façon déterministe à partir de vos réponses guidées.".to_string()
@@ -4345,7 +4345,7 @@ fn constitution_ratification_text(
             };
             format!(
                 "CODEWHALE · CONSTITUTION DE L'UTILISATEUR\n{RULE}\n\n{drafted_by}\n\n\
-                 Voici la loi permanente qui régit la façon dont Codewhale travaille avec vous. Comme les meilleures constitutions, \
+                 Voici la loi permanente qui régit la façon dont Nestlone travaille avec vous. Comme les meilleures constitutions, \
                  elle est assez courte pour être utilisée, faite de principes durables plutôt que de règles exhaustives, \
                  et amendable à mesure que vous changez. Elle encadre les pouvoirs et les limites plutôt que de trancher chaque cas, \
                  et donne à votre collaboration une continuité entre les sessions — mais elle n'est pas une mémoire : elle porte des principes, pas un historique.\n\n\
@@ -4363,7 +4363,7 @@ fn constitution_ratification_text(
         Locale::Id => {
             let drafted_by = match provenance {
                 DraftProvenance::Model(label) => format!(
-                    "Disusun oleh {label} dari jawaban terpandu Anda, lalu diperiksa skemanya dan dibatasi oleh Codewhale."
+                    "Disusun oleh {label} dari jawaban terpandu Anda, lalu diperiksa skemanya dan dibatasi oleh Nestlone."
                 ),
                 DraftProvenance::Guided => {
                     "Dihasilkan secara deterministik dari jawaban terpandu Anda.".to_string()
@@ -4385,7 +4385,7 @@ fn constitution_ratification_text(
             };
             format!(
                 "CODEWHALE · KONSTITUSI PENGGUNA\n{RULE}\n\n{drafted_by}\n\n\
-                 Ini adalah hukum tetap tentang cara Codewhale bekerja dengan Anda. Seperti konstitusi terbaik, \
+                 Ini adalah hukum tetap tentang cara Nestlone bekerja dengan Anda. Seperti konstitusi terbaik, \
                  ia cukup singkat untuk dipakai, tersusun dari prinsip yang awet alih-alih aturan yang menyeluruh, \
                  dan dapat diamendemen seiring Anda berubah. Ia membingkai wewenang dan batasan alih-alih memutuskan setiap kasus, \
                  dan memberi kolaborasi Anda kesinambungan lintas sesi — tetapi ia bukan memori: ia membawa prinsip, bukan riwayat.\n\n\
@@ -4403,7 +4403,7 @@ fn constitution_ratification_text(
         Locale::Hi => {
             let drafted_by = match provenance {
                 DraftProvenance::Model(label) => format!(
-                    "{label} द्वारा आपके गाइडेड उत्तरों से तैयार, फिर Codewhale द्वारा स्कीमा-जाँचा और सीमित किया गया।"
+                    "{label} द्वारा आपके गाइडेड उत्तरों से तैयार, फिर Nestlone द्वारा स्कीमा-जाँचा और सीमित किया गया।"
                 ),
                 DraftProvenance::Guided => "आपके गाइडेड उत्तरों से नियत रूप से तैयार किया गया।".to_string(),
                 DraftProvenance::Existing => {
@@ -4423,7 +4423,7 @@ fn constitution_ratification_text(
             };
             format!(
                 "CODEWHALE · उपयोगकर्ता संविधान\n{RULE}\n\n{drafted_by}\n\n\
-                 यह Codewhale आपके साथ कैसे काम करे, इसका स्थायी कानून है। सर्वोत्तम संविधानों की तरह, \
+                 यह Nestlone आपके साथ कैसे काम करे, इसका स्थायी कानून है। सर्वोत्तम संविधानों की तरह, \
                  यह उपयोग के लिए पर्याप्त छोटा है, संपूर्ण नियमों के बजाय टिकाऊ सिद्धांतों से बना है, \
                  और आपके बदलने के साथ संशोधनीय है। यह हर मामले का फ़ैसला करने के बजाय शक्तियों और सीमाओं का ढाँचा देता है, \
                  और आपके सहयोग को सत्रों के पार निरंतरता देता है — लेकिन यह मेमोरी नहीं है: यह इतिहास नहीं, सिद्धांत रखता है।\n\n\
@@ -4441,7 +4441,7 @@ fn constitution_ratification_text(
         Locale::Ru => {
             let drafted_by = match provenance {
                 DraftProvenance::Model(label) => format!(
-                    "Подготовлено {label} на основе ваших ответов на наводящие вопросы, затем проверено по схеме и ограничено Codewhale."
+                    "Подготовлено {label} на основе ваших ответов на наводящие вопросы, затем проверено по схеме и ограничено Nestlone."
                 ),
                 DraftProvenance::Guided => {
                     "Детерминированно построено из ваших ответов на наводящие вопросы.".to_string()
@@ -4463,7 +4463,7 @@ fn constitution_ratification_text(
             };
             format!(
                 "CODEWHALE · КОНСТИТУЦИЯ ПОЛЬЗОВАТЕЛЯ\n{RULE}\n\n{drafted_by}\n\n\
-                 Это постоянный закон о том, как Codewhale работает с вами. Как лучшие конституции, \
+                 Это постоянный закон о том, как Nestlone работает с вами. Как лучшие конституции, \
                  она достаточно коротка, чтобы ей пользоваться, состоит из долговечных принципов, а не исчерпывающих правил, \
                  и может изменяться вместе с вами. Она очерчивает полномочия и границы, а не решает каждый случай, \
                  и придаёт вашему сотрудничеству непрерывность между сессиями — но она не память: она хранит принципы, а не историю.\n\n\
@@ -4481,7 +4481,7 @@ fn constitution_ratification_text(
         Locale::Uk => {
             let drafted_by = match provenance {
                 DraftProvenance::Model(label) => format!(
-                    "Підготовлено {label} на основі ваших відповідей на навідні запитання, потім перевірено за схемою та обмежено Codewhale."
+                    "Підготовлено {label} на основі ваших відповідей на навідні запитання, потім перевірено за схемою та обмежено Nestlone."
                 ),
                 DraftProvenance::Guided => {
                     "Детерміновано побудовано з ваших відповідей на навідні запитання.".to_string()
@@ -4503,7 +4503,7 @@ fn constitution_ratification_text(
             };
             format!(
                 "CODEWHALE · КОНСТИТУЦІЯ КОРИСТУВАЧА\n{RULE}\n\n{drafted_by}\n\n\
-                 Це постійний закон про те, як Codewhale працює з вами. Як найкращі конституції, \
+                 Це постійний закон про те, як Nestlone працює з вами. Як найкращі конституції, \
                  вона достатньо коротка, щоб нею користуватися, складається з довговічних принципів, а не вичерпних правил, \
                  і може змінюватися разом із вами. Вона окреслює повноваження та межі, а не вирішує кожен випадок, \
                  і надає вашій співпраці неперервність між сесіями — але вона не пам'ять: вона зберігає принципи, а не історію.\n\n\
@@ -4521,7 +4521,7 @@ fn constitution_ratification_text(
         _ => {
             let drafted_by = match provenance {
                 DraftProvenance::Model(label) => format!(
-                    "Drafted by {label} from your guided answers, then schema-checked and bounded by Codewhale."
+                    "Drafted by {label} from your guided answers, then schema-checked and bounded by Nestlone."
                 ),
                 DraftProvenance::Guided => {
                     "Rendered deterministically from your guided answers.".to_string()
@@ -4544,7 +4544,7 @@ fn constitution_ratification_text(
             };
             format!(
                 "CODEWHALE · USER CONSTITUTION\n{RULE}\n\n{drafted_by}\n\n\
-                 This is the standing law for how Codewhale works with you. Like the best \
+                 This is the standing law for how Nestlone works with you. Like the best \
                  constitutions, it is short enough to use, made of durable principles rather \
                  than exhaustive rules, and amendable as you change. It frames powers and \
                  limits rather than deciding every case, and it gives your collaboration \
@@ -5297,7 +5297,7 @@ mod tests {
         assert!(visible_copy.contains("宪章"));
         assert!(visible_copy.contains("自定义准则"));
         assert!(visible_copy.contains("可选策略"));
-        assert!(visible_copy.contains("Codewhale"));
+        assert!(visible_copy.contains("Nestlone"));
         assert!(visible_copy.contains("/constitution"));
         assert!(visible_copy.contains("constitution.json"));
     }
@@ -6328,7 +6328,7 @@ mod tests {
                 locale.tag()
             );
             assert!(
-                !body.contains("A Codewhale user who wants"),
+                !body.contains("A Nestlone user who wants"),
                 "locale {} reused English purpose copy",
                 locale.tag()
             );
@@ -6433,7 +6433,7 @@ mod tests {
             &DraftProvenance::Model("GLM-5.2".to_string()),
         );
         assert!(drafted.contains("Drafted by GLM-5.2"));
-        assert!(drafted.contains("schema-checked and bounded by Codewhale"));
+        assert!(drafted.contains("schema-checked and bounded by Nestlone"));
 
         let zh = constitution_ratification_text(
             Locale::ZhHans,

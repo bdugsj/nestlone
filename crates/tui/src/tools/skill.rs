@@ -423,7 +423,7 @@ mod tests {
             .unwrap();
         let registry = crate::skills::discover_in_workspace_with_mode_and_plugins(
             tmp.path(),
-            SkillDiscoveryMode::CodeWhaleOnly,
+            SkillDiscoveryMode::NestloneOnly,
             Some(plugins.as_ref()),
         );
         let skill = registry.get("demo:hello").expect("active plugin skill");
@@ -604,7 +604,7 @@ mod tests {
         write_skill(
             &nestlone_dir,
             "nestlone-only",
-            "CodeWhale skill",
+            "Nestlone skill",
             "Body content marker.",
         );
 
@@ -614,13 +614,13 @@ mod tests {
         let result = tool
             .execute(json!({"name": "nestlone-only"}), &context)
             .await
-            .expect("CodeWhale skill should load");
+            .expect("Nestlone skill should load");
         assert!(result.success);
 
         let err = tool
             .execute(json!({"name": "claude-only"}), &context)
             .await
-            .expect_err("Claude skill should be hidden in CodeWhale-only mode");
+            .expect_err("Claude skill should be hidden in Nestlone-only mode");
         let msg = err.to_string();
         assert!(
             msg.contains("claude-only") && msg.contains("nestlone-only"),

@@ -38,11 +38,11 @@ test("parseEnvText handles comments, export, and quoted values", () => {
     parseEnvText(`
       # ignored
       export FEISHU_DOMAIN="lark"
-      DEEPSEEK_WORKSPACE='/opt/whalebro'
+      DEEPSEEK_WORKSPACE='/opt/nestlone'
     `),
     {
       FEISHU_DOMAIN: "lark",
-      DEEPSEEK_WORKSPACE: "/opt/whalebro"
+      DEEPSEEK_WORKSPACE: "/opt/nestlone"
     }
   );
 });
@@ -175,7 +175,7 @@ test("splitMessage does not split surrogate pairs", () => {
   assert.deepEqual(splitMessage("a🧪b", 2), ["a🧪", "b"]);
 });
 
-test("validateBridgeConfig accepts locked-down whalebro DM config", () => {
+test("validateBridgeConfig accepts locked-down nestlone DM config", () => {
   const result = validateBridgeConfig(
     {
       FEISHU_APP_ID: "cli_valid",
@@ -183,15 +183,15 @@ test("validateBridgeConfig accepts locked-down whalebro DM config", () => {
       FEISHU_DOMAIN: "lark",
       DEEPSEEK_RUNTIME_URL: "http://127.0.0.1:7878",
       DEEPSEEK_RUNTIME_TOKEN: "token-a",
-      DEEPSEEK_WORKSPACE: "/opt/whalebro",
+      DEEPSEEK_WORKSPACE: "/opt/nestlone",
       DEEPSEEK_CHAT_ALLOWLIST: "oc_allowed",
       DEEPSEEK_ALLOW_UNLISTED: "false",
-      FEISHU_THREAD_MAP_PATH: "/var/lib/codewhale-feishu-bridge/thread-map.json",
+      FEISHU_THREAD_MAP_PATH: "/var/lib/nestlone-feishu-bridge/thread-map.json",
       FEISHU_ALLOW_GROUPS: "false",
       FEISHU_REQUIRE_PREFIX_IN_GROUP: "true"
     },
     {
-      workspaceRoot: "/opt/whalebro",
+      workspaceRoot: "/opt/nestlone",
       runtimeEnv: {
         DEEPSEEK_RUNTIME_TOKEN: "token-a",
         DEEPSEEK_API_KEY: "sk-valid",
@@ -211,14 +211,14 @@ test("validateBridgeConfig rejects unsafe group pairing and token mismatch", () 
       FEISHU_DOMAIN: "feishu",
       DEEPSEEK_RUNTIME_URL: "http://127.0.0.1:7878",
       DEEPSEEK_RUNTIME_TOKEN: "bridge-token",
-      DEEPSEEK_WORKSPACE: "/opt/whalebro",
+      DEEPSEEK_WORKSPACE: "/opt/nestlone",
       DEEPSEEK_ALLOW_UNLISTED: "true",
-      FEISHU_THREAD_MAP_PATH: "/var/lib/codewhale-feishu-bridge/thread-map.json",
+      FEISHU_THREAD_MAP_PATH: "/var/lib/nestlone-feishu-bridge/thread-map.json",
       FEISHU_ALLOW_GROUPS: "true",
       FEISHU_REQUIRE_PREFIX_IN_GROUP: "false"
     },
     {
-      workspaceRoot: "/opt/whalebro",
+      workspaceRoot: "/opt/nestlone",
       runtimeEnv: {
         DEEPSEEK_RUNTIME_TOKEN: "runtime-token",
         DEEPSEEK_API_KEY: "replace-with-deepseek-platform-key"

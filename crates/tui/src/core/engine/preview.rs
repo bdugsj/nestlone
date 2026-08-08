@@ -1793,7 +1793,7 @@ mod tests {
             None,
             GoalStatus::Active,
         );
-        let prompt = "answer only this new question\n\nCodewhale paused custom slash command context:\nThe user is not resuming that paused command.";
+        let prompt = "answer only this new question\n\nNestlone paused custom slash command context:\nThe user is not resuming that paused command.";
         let planned = plan(&config, &identity, false, prompt).await;
         let (_, first_wire_body) = assert_preview_matches_first_wire_body(
             &mut engine,

@@ -24,7 +24,7 @@ struct CoreSessionExtractionWorld {
     report: Option<Value>,
 }
 
-#[given("a clean CodeWhale evaluation workspace")]
+#[given("a clean Nestlone evaluation workspace")]
 fn clean_nestlone_evaluation_workspace(world: &mut CoreSessionExtractionWorld) {
     world.record_dir = Some(TempDir::new().expect("evaluation TempDir"));
 }

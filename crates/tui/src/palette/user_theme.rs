@@ -1,4 +1,4 @@
-//! User-authored theme overlays loaded from the Codewhale-owned themes directory.
+//! User-authored theme overlays loaded from the Nestlone-owned themes directory.
 
 use std::fs::{self, File, OpenOptions};
 use std::io::Read;
@@ -170,7 +170,7 @@ pub fn resolve_user_theme(value: &str) -> Result<Option<(ThemeId, UiTheme)>, Str
 pub fn user_themes_dir() -> Result<PathBuf, String> {
     nestlone_config::nestlone_home()
         .map(|home| home.join("themes"))
-        .map_err(|error| format!("failed to resolve Codewhale themes directory: {error}"))
+        .map_err(|error| format!("failed to resolve Nestlone themes directory: {error}"))
 }
 
 fn reject_symlink_directory(path: &Path) -> Result<(), String> {

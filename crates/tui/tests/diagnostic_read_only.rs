@@ -268,7 +268,7 @@ fn diagnostics_read_home_legacy_settings_without_migrating_them() {
         );
         assert!(
             !primary_home.exists(),
-            "diagnostic {args:?} must not create a primary Codewhale home"
+            "diagnostic {args:?} must not create a primary Nestlone home"
         );
     }
 }
@@ -324,7 +324,7 @@ fn doctor_json_does_not_inherit_an_ambient_legacy_secret_from_an_explicit_home()
     );
     assert!(
         !nestlone_home.exists(),
-        "doctor must not create an isolated Codewhale home or secret store"
+        "doctor must not create an isolated Nestlone home or secret store"
     );
 }
 
@@ -711,7 +711,7 @@ impl Drop for CompletionServer {
 
 /// A rustup shim may initialize its own toolchain state below `$HOME` when
 /// `doctor` asks `rustc --version`. Preserve an already-configured toolchain
-/// root so this test isolates Codewhale's own state contract.
+/// root so this test isolates Nestlone's own state contract.
 fn preserve_host_rustup_home(command: &mut Command) {
     let rustup_home = std::env::var_os("RUSTUP_HOME")
         .map(PathBuf::from)

@@ -38,7 +38,7 @@ use std::time::{Duration, SystemTime};
 
 use crate::tools::spec::ToolResult;
 
-/// Name of the spillover directory under the CodeWhale home.
+/// Name of the spillover directory under the Nestlone home.
 pub const SPILLOVER_DIR_NAME: &str = "tool_outputs";
 
 const LEGACY_SPILLOVER_OWNER_SCHEMA_VERSION: u32 = 1;

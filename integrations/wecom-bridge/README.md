@@ -1,6 +1,6 @@
 # WeCom (企业微信) Bridge
 
-此 bridge 让**企业微信**用户通过智能机器人长连接控制本地 `codewhale serve --http` runtime。
+此 bridge 让**企业微信**用户通过智能机器人长连接控制本地 `nestlone serve --http` runtime。
 使用企业微信智能机器人 API（长连接/WebSocket 模式），无需公网 IP。
 
 与 `integrations/weixin-bridge`（个人微信 iLink Bot 协议）不同，此 bridge 面向企业微信组织内部使用，
@@ -8,7 +8,7 @@
 
 ## 安全模型
 
-- `codewhale serve --http` 绑定于 `127.0.0.1`。
+- `nestlone serve --http` 绑定于 `127.0.0.1`。
 - `/v1/*` runtime 调用使用 `CODEWHALE_RUNTIME_TOKEN`。
 - 企业微信用户必须加入白名单（`WECOM_CHAT_ALLOWLIST`），除非首次配对时设置 `WECOM_ALLOW_UNLISTED=true`。
 - 支持私聊和群聊（群聊需要前缀 `/cw`）。
@@ -27,10 +27,10 @@
 ## 设置
 
 ```bash
-cd /opt/codewhale/wecom-bridge
+cd /opt/nestlone/wecom-bridge
 npm install --omit=dev
-cp .env.example /etc/codewhale/wecom-bridge.env
-sudoedit /etc/codewhale/wecom-bridge.env
+cp .env.example /etc/nestlone/wecom-bridge.env
+sudoedit /etc/nestlone/wecom-bridge.env
 node src/index.mjs
 ```
 
@@ -51,7 +51,7 @@ node src/index.mjs
 | `/allow <approval_id> [remember]` | 批准待处理的工具调用 |
 | `/deny <approval_id>` | 拒绝待处理的工具调用 |
 
-其他所有内容均作为 Codewhale 提示发送。群聊中需要在消息前加 `/cw` 前缀。
+其他所有内容均作为 Nestlone 提示发送。群聊中需要在消息前加 `/cw` 前缀。
 
 ## 首次配对
 
@@ -82,13 +82,13 @@ node src/index.mjs
 ## 架构
 
 ```
-企业微信客户端 → 智能机器人长连接(WebSocket) → WeCom Bridge ──HTTP──→ codewhale serve --http
+企业微信客户端 → 智能机器人长连接(WebSocket) → WeCom Bridge ──HTTP──→ nestlone serve --http
                     ◀── aibot_respond_msg ◀──                          (127.0.0.1:7878)
 ```
 
 Bridge 使用 BotID + Secret 获取 access_token，建立 WebSocket 长连接。
 接收 `aibot_msg_callback` 事件，通过 `aibot_respond_msg` 命令回复消息。
-所有消息处理与 Codewhale Runtime API 交互，与 Feishu/Telegram bridge 共享相同逻辑。
+所有消息处理与 Nestlone Runtime API 交互，与 Feishu/Telegram bridge 共享相同逻辑。
 
 ## 与 weixin-bridge 的区别
 

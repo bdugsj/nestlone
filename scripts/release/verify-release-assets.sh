@@ -16,7 +16,7 @@ Checks:
   - remote tag vVERSION resolves to the same commit SHA
   - GitHub Release vVERSION exists
   - a successful Release workflow run used that SHA
-  - npm/codewhale release:check sees the fresh binary/archive/installer matrix
+  - npm/nestlone release:check sees the fresh binary/archive/installer matrix
     and both required checksum manifests
 
 Set GH_BIN=/path/to/gh to choose a GitHub CLI binary. Set
@@ -116,22 +116,22 @@ if [[ -z "${run_summary}" ]]; then
 fi
 printf 'Release workflow OK: %s\n' "${run_summary}"
 
-npm_package_version="$(node -p "require('./npm/codewhale/package.json').version")"
+npm_package_version="$(node -p "require('./npm/nestlone/package.json').version")"
 npm_binary_version="$(
-  node -p "const p=require('./npm/codewhale/package.json'); p.nestloneBinaryVersion || p.deepseekBinaryVersion || p.version"
+  node -p "const p=require('./npm/nestlone/package.json'); p.nestloneBinaryVersion || p.deepseekBinaryVersion || p.version"
 )"
 if [[ "${npm_package_version}" != "${version}" ]]; then
-  echo "npm/codewhale package version ${npm_package_version} does not match ${version}." >&2
+  echo "npm/nestlone package version ${npm_package_version} does not match ${version}." >&2
   exit 1
 fi
 if [[ "${npm_binary_version}" != "${version}" && "${allow_npm_binary_mismatch}" != "1" ]]; then
-  echo "npm/codewhale nestloneBinaryVersion ${npm_binary_version} does not match ${version}." >&2
+  echo "npm/nestlone nestloneBinaryVersion ${npm_binary_version} does not match ${version}." >&2
   echo "Use --allow-npm-binary-mismatch only for an intentional packaging-only npm release." >&2
   exit 1
 fi
 
 (
-  cd npm/codewhale
+  cd npm/nestlone
   env \
     -u NESTLONE_RELEASE_BASE_URL \
     -u NESTLONE_USE_CNB_MIRROR \
@@ -145,4 +145,4 @@ fi
     npm run release:check
 )
 
-echo "Release asset gate OK: ${tag} assets match ${local_sha} and npm/codewhale is ready for publish."
+echo "Release asset gate OK: ${tag} assets match ${local_sha} and npm/nestlone is ready for publish."

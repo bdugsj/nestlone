@@ -228,7 +228,7 @@ fn render_conversation(app: &App) -> String {
         app.api_messages.len()
     };
     let mut out = String::new();
-    out.push_str("# Codewhale conversation export\n\n");
+    out.push_str("# Nestlone conversation export\n\n");
     let _ = writeln!(
         out,
         "- Exported: {}",

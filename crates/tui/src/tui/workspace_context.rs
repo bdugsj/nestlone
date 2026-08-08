@@ -359,16 +359,16 @@ mod tests {
     #[test]
     fn identity_in_git_repo_carries_name_and_branch() {
         let id = identity_from_context(
-            &PathBuf::from("/work/CodeWhale"),
+            &PathBuf::from("/work/Nestlone"),
             Some("codex/v0.8.61 | 3 modified"),
         );
-        assert_eq!(id.name, "CodeWhale");
+        assert_eq!(id.name, "Nestlone");
         assert_eq!(id.branch.as_deref(), Some("codex/v0.8.61"));
         assert!(id.is_git);
         // Full-width render keeps both the repo identity and the branch.
         assert_eq!(
             format_repo_identity(&id, 80),
-            "Repo: CodeWhale @ codex/v0.8.61"
+            "Repo: Nestlone @ codex/v0.8.61"
         );
     }
 
@@ -388,26 +388,26 @@ mod tests {
         // `branch()` encodes detached HEAD as "detached:<hash>"; the footer
         // must surface that verbatim rather than dropping the identity.
         let id = identity_from_context(
-            &PathBuf::from("/work/CodeWhale"),
+            &PathBuf::from("/work/Nestlone"),
             Some("detached:ae101a1 | clean"),
         );
         assert_eq!(id.branch.as_deref(), Some("detached:ae101a1"));
         assert_eq!(
             format_repo_identity(&id, 80),
-            "Repo: CodeWhale @ detached:ae101a1"
+            "Repo: Nestlone @ detached:ae101a1"
         );
     }
 
     #[test]
     fn narrow_width_keeps_identity_over_branch_then_truncates() {
         let id = identity_from_context(
-            &PathBuf::from("/work/CodeWhale"),
+            &PathBuf::from("/work/Nestlone"),
             Some("codex/v0.8.61 | clean"),
         );
 
         // Too narrow for "name @ branch" -> drop the branch, keep the name.
         let dropped = format_repo_identity(&id, 20);
-        assert_eq!(dropped, "Repo: CodeWhale");
+        assert_eq!(dropped, "Repo: Nestlone");
         assert!(dropped.width() <= 20);
 
         // Too narrow even for the name -> truncate but keep the prefix so the

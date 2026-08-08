@@ -376,7 +376,7 @@ impl Engine {
         // app-server, and stream-json stdout must remain byte-clean.
         if self.config.terminal_chrome_enabled {
             crate::tui::notifications::set_taskbar_progress_busy();
-            crate::tui::notifications::start_title_animation("Codewhale");
+            crate::tui::notifications::start_title_animation("Nestlone");
         }
 
         let client = self

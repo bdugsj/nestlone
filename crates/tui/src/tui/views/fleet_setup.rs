@@ -170,7 +170,7 @@ const THINKING_CHOICES: &[Choice] = &[
     },
     Choice {
         label: Cow::Borrowed("auto"),
-        summary: Cow::Borrowed("Let Codewhale choose"),
+        summary: Cow::Borrowed("Let Nestlone choose"),
         description: Cow::Borrowed("Choose a thinking tier from the worker prompt at runtime."),
     },
 ];

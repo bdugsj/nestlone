@@ -231,7 +231,7 @@ pub fn project_tree(root: &Path, max_depth: usize, follow_symlinks: bool) -> Str
 /// Permission policy for atomic writes.
 ///
 /// - [`AtomicWritePermissions::Private`]: keep tempfile's owner-only defaults
-///   (used for CodeWhale internal persistence such as session/history/trust).
+///   (used for Nestlone internal persistence such as session/history/trust).
 /// - [`AtomicWritePermissions::Workspace`]: match ordinary workspace file
 ///   semantics — new files request mode `0666` (kernel applies umask); existing
 ///   files retain ordinary `rwx` bits (not setuid/setgid/sticky).

@@ -57,7 +57,7 @@ fn validate_existing_child_cwd(
     };
     let canonical = resolved.canonicalize().map_err(|e| {
         ToolError::invalid_input(format!(
-            "Invalid cwd '{}': {e} (path may not exist yet — use worktree=true to let Codewhale create an isolated checkout)",
+            "Invalid cwd '{}': {e} (path may not exist yet — use worktree=true to let Nestlone create an isolated checkout)",
             requested_cwd.display()
         ))
     })?;

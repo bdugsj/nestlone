@@ -3,13 +3,13 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "codewhale-verifiers-harness"
+name = "nestlone-verifiers-harness"
 version = "0.1.0"
-description = "Prime Intellect Verifiers v0.2 harness for Codewhale"
+description = "Prime Intellect Verifiers v0.2 harness for Nestlone"
 readme = "README.md"
 requires-python = ">=3.11,<3.14"
 license = { text = "MIT" }
 dependencies = ["verifiers==0.2.0"]
 
 [tool.hatch.build.targets.wheel]
-packages = ["codewhale_harness"]
+packages = ["nestlone_harness"]

@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 use super::{RUNTIME_CONTRACT_SCHEMA_VERSION, terminal::TerminalProcessPolicy};
 
-/// Candidate profiles are implementation experiments, not public Codewhale
+/// Candidate profiles are implementation experiments, not public Nestlone
 /// modes. Plan/Act/Operate and permission posture remain independent axes.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]

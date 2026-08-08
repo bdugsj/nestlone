@@ -82,7 +82,7 @@ pub struct SettingsSection {
     pub theme: UiThemeValue,
     #[schemars(
         title = "Custom theme name",
-        description = "Theme slug from the fixed Codewhale themes directory; used only when theme is custom."
+        description = "Theme slug from the fixed Nestlone themes directory; used only when theme is custom."
     )]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub custom_theme_name: Option<String>,
@@ -1544,7 +1544,7 @@ mod tests {
     #[test]
     fn persisted_config_ui_reasoning_updates_the_startup_precedence_layer() {
         let _lock = lock_test_env();
-        let temp_root = tempfile::tempdir().expect("isolated Codewhale home");
+        let temp_root = tempfile::tempdir().expect("isolated Nestlone home");
         let nestlone_home = temp_root.path().join(".nestlone");
         fs::create_dir_all(&nestlone_home).expect("settings dir");
         fs::write(
@@ -1690,7 +1690,7 @@ background_color = "#1A1B26"
     #[test]
     fn build_document_accepts_every_shipped_locale_from_settings() {
         let _lock = lock_test_env();
-        let temp_root = tempfile::tempdir().expect("isolated Codewhale home");
+        let temp_root = tempfile::tempdir().expect("isolated Nestlone home");
         let nestlone_home = temp_root.path().join(".nestlone");
         fs::create_dir_all(&nestlone_home).expect("settings dir");
         let settings_path = nestlone_home.join("settings.toml");
@@ -1719,7 +1719,7 @@ background_color = "#1A1B26"
     #[test]
     fn custom_theme_round_trips_through_typed_config_document() {
         let _lock = lock_test_env();
-        let temp_root = tempfile::tempdir().expect("isolated Codewhale home");
+        let temp_root = tempfile::tempdir().expect("isolated Nestlone home");
         let nestlone_home = temp_root.path().join(".nestlone");
         let themes_dir = nestlone_home.join("themes");
         fs::create_dir_all(&themes_dir).expect("themes dir");

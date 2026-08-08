@@ -238,7 +238,7 @@ fn tui_prefs_path_from_environment() -> Result<PathBuf> {
         .map(|home| home.join(TUI_PREFS_FILE_NAME));
     if nestlone_config::nestlone_home_is_explicit() {
         return primary.ok_or_else(|| {
-            anyhow::anyhow!("Failed to resolve tui.toml path: no Codewhale home found.")
+            anyhow::anyhow!("Failed to resolve tui.toml path: no Nestlone home found.")
         });
     }
     let legacy_home = nestlone_config::legacy_deepseek_home()
@@ -377,7 +377,7 @@ pub struct Settings {
     pub composer_vim_mode: String,
     /// Transcript spacing rhythm: compact, comfortable, spacious
     pub transcript_spacing: String,
-    /// Show the pre-session launch menu. When false, Codewhale enters a new
+    /// Show the pre-session launch menu. When false, Nestlone enters a new
     /// session directly; resume remains available in-session.
     #[serde(default)]
     pub launch_screen: bool,
@@ -449,7 +449,7 @@ pub struct Settings {
     pub pinned_models: Vec<PinnedModel>,
     /// Header status indicator next to the effort chip. Cycles through a
     /// per-turn animation keyed off `App::turn_started_at`:
-    /// - `"cw"` (default): static typographic Codewhale mark.
+    /// - `"cw"` (default): static typographic Nestlone mark.
     /// - `"whale"`: historical `🐳 → 🐋` 12-frame sequence
     ///   originally shipped in v0.3.5, removed in v0.8.x's "smoother TUI
     ///   streaming" pass, restored in v0.8.30. Idle frame is a steady `🐳`.
@@ -1008,7 +1008,7 @@ impl Settings {
     /// never share an object — a background startup-default drain and a
     /// synchronous Shift+Tab permission write, the concrete pair that lost
     /// `default_mode` / `permission_posture` against each other — and a
-    /// cross-process file lock, which covers a second Codewhale process on the
+    /// cross-process file lock, which covers a second Nestlone process on the
     /// same home directory.
     ///
     /// The closure must not call `transact`, [`with_settings_transaction`],
@@ -1641,7 +1641,7 @@ impl Settings {
             ),
             (
                 "theme",
-                "UI theme: a compiled name or custom:<name> from the Codewhale themes directory",
+                "UI theme: a compiled name or custom:<name> from the Nestlone themes directory",
             ),
             (
                 "background_color",
@@ -1948,7 +1948,7 @@ impl SettingsTransaction {
 ///    `default_mode` / `permission_posture` against each other.
 /// 2. An **advisory file lock on an adjacent `settings.toml.lock`**, following
 ///    the `nestlone_config::config_document` pattern. The process mutex says
-///    nothing about a second Codewhale process (a second TUI, `nestlone exec`,
+///    nothing about a second Nestlone process (a second TUI, `nestlone exec`,
 ///    the runtime HTTP surface in another instance) doing its own
 ///    load/modify/save. Without a cross-process lock those two interleave and
 ///    the later save reverts the earlier one's field — last-save-wins across
@@ -1992,7 +1992,7 @@ pub(crate) fn with_settings_transaction<T>(
 /// The lock file is opened (not followed) with owner-only permissions and is
 /// created if absent. Dropping the `fd_lock` guard — including on an unwind —
 /// releases it, and the OS releases it if the process dies, so a crash cannot
-/// wedge another Codewhale instance out of its settings.
+/// wedge another Nestlone instance out of its settings.
 fn with_settings_file_lock<T>(path: &Path, operation: impl FnOnce() -> Result<T>) -> Result<T> {
     use std::fs;
 
@@ -2073,7 +2073,7 @@ fn reject_settings_lock_symlink(lock_path: &Path) -> Result<()> {
 /// renaming it into place.
 ///
 /// A direct `fs::write` truncates first, so any concurrent reader — another
-/// Codewhale process, an editor, a `cat` — can observe a half-written file and
+/// Nestlone process, an editor, a `cat` — can observe a half-written file and
 /// parse it as truncated TOML, silently losing every key past the tear. A
 /// same-directory temp file plus the platform's replace primitive makes the
 /// swap atomic for readers: they see either the whole previous file or the
@@ -2688,7 +2688,7 @@ mod tests {
     // Cross-process settings integrity
     // -----------------------------------------------------------------------
     //
-    // The in-process mutex says nothing about a *second* Codewhale process on
+    // The in-process mutex says nothing about a *second* Nestlone process on
     // the same home directory — a second TUI, `nestlone exec`, the runtime HTTP
     // surface in another instance. Two of those doing load/modify/save at once
     // is the same last-save-wins bug the in-process lock was added to prevent,

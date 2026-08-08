@@ -8,7 +8,7 @@ The active root `.cnb.yml` does two things:
 
 - runs Feishu bridge and version-drift checks when CNB receives `main`;
 - builds Linux x64 release assets from `v*` tags, creates the CNB release, and
-  uploads `codewhale-linux-x64`, `codewhale-tui-linux-x64`, and
+  uploads `nestlone-linux-x64`, `nestlone-tui-linux-x64`, and
   `deepseek-artifacts-sha256.txt`.
 
 The files in this directory are retained as deploy-button templates for Tencent
@@ -43,7 +43,7 @@ and systemd services installed by the maintainer-owned server setup process.
 ## Safety Notes
 
 - Do not store Feishu App Secret or provider API keys in CNB. They belong in
-  `/etc/codewhale/*.env` on Lighthouse.
+  `/etc/nestlone/*.env` on Lighthouse.
 - Do not expose `127.0.0.1:7878` through EdgeOne, a security group, or a public
   reverse proxy.
 - Start with a manual deploy button. Automatic deploy on every `main` push is

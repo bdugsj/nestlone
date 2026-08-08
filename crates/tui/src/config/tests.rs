@@ -7875,7 +7875,7 @@ api_key = "stale-api-key"
     assert_eq!(
         fs::read_to_string(credential_path)?,
         credential_raw,
-        "Codewhale must never read, refresh, or rewrite Kimi CLI credentials"
+        "Nestlone must never read, refresh, or rewrite Kimi CLI credentials"
     );
     Ok(())
 }

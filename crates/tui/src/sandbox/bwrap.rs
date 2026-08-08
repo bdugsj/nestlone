@@ -31,7 +31,7 @@
 //! - Fedora: `dnf install bubblewrap`
 //! - Arch: `pacman -S bubblewrap`
 //!
-//! If bwrap is not executable, Codewhale reports no Linux OS sandbox and runs
+//! If bwrap is not executable, Nestlone reports no Linux OS sandbox and runs
 //! the command without an OS wrapper. It never labels that fallback as
 //! sandboxed.
 

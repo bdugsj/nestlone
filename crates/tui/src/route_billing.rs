@@ -364,7 +364,7 @@ fn classify(
         // quota is subscription-backed, so a public API price estimate is not
         // truthful spend and must not appear as dollars in the UI. A
         // credentials-only `[providers.zai]` entry still resolves to that
-        // endpoint, because it is also CodeWhale's Z.ai default.
+        // endpoint, because it is also Nestlone's Z.ai default.
         ApiProvider::Zai if base_url.trim().is_empty() => BillingPresentation::Unknown,
         ApiProvider::Zai if is_zai_coding_plan_endpoint(base_url) => {
             BillingPresentation::Subscription("Z.ai Coding Plan quota")
@@ -450,7 +450,7 @@ fn endpoint_shaped_payg_billing(provider: ApiProvider, base_url: &str) -> Billin
 /// purge) that run off a bare client.
 ///
 /// Everything decidable from provider identity plus a classified endpoint is
-/// decided; everything that depends on credentials or an auth mode CodeWhale
+/// decided; everything that depends on credentials or an auth mode Nestlone
 /// cannot see from here stays [`BillingPresentation::Unknown`]. In particular a
 /// local, custom, or plan endpoint is never allowed to fall through to metered
 /// per-token dollars on the strength of a provider name (#4318).
@@ -883,7 +883,7 @@ enum CredentialProduct {
 /// the *same* endpoints and the same `MINIMAX_API_KEY`, so the product can
 /// only come from an explicit pay mode or the credential's own product prefix.
 ///
-/// A key held in the Codewhale secret store / OS keyring is deliberately not
+/// A key held in the Nestlone secret store / OS keyring is deliberately not
 /// probed: classification must never be a reason to open secret storage. When
 /// no product marker is visible the route is `Unprovable`, and [`for_route`]
 /// reports Unknown instead of inventing pay-as-you-go dollars.
@@ -1871,7 +1871,7 @@ mod tests {
             })
             .to_string(),
         )
-        .expect("write Codewhale-owned xAI credential");
+        .expect("write Nestlone-owned xAI credential");
         #[cfg(unix)]
         {
             use std::os::unix::fs::PermissionsExt as _;

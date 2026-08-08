@@ -5,7 +5,7 @@ edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
 repository.workspace = true
-description = "Dynamic Workflow runtime: sandboxed rquickjs scripts that dispatch Codewhale subagents"
+description = "Dynamic Workflow runtime: sandboxed rquickjs scripts that dispatch Nestlone subagents"
 
 [dependencies]
 async-trait.workspace = true

@@ -35,7 +35,8 @@ impl fmt::Display for PluginScope {
 #[serde(rename_all = "snake_case")]
 pub enum PluginOrigin {
     Builtin,
-    CodeWhaleHome,
+    #[serde(rename = "code_whale_home")]
+    NestloneHome,
     Workspace,
 }
 
@@ -44,7 +45,7 @@ impl PluginOrigin {
     pub fn as_str(self) -> &'static str {
         match self {
             Self::Builtin => "nestlone-builtin",
-            Self::CodeWhaleHome => "nestlone-home",
+            Self::NestloneHome => "nestlone-home",
             Self::Workspace => "workspace-nestlone",
         }
     }
@@ -170,7 +171,7 @@ pub struct LoadedPlugin {
     pub manifest: PluginManifest,
     pub base_path: PathBuf,
     pub canonical_root: PathBuf,
-    /// Codewhale-owned, content-addressed copy used for active execution.
+    /// Nestlone-owned, content-addressed copy used for active execution.
     /// `None` means the reviewed bundle has not been staged safely and cannot
     /// become active even if an older state file says it was enabled.
     pub staged_root: Option<PathBuf>,

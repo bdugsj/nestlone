@@ -4,7 +4,7 @@
 # Usage: ./scripts/release/prepare-release.sh <new-version>
 #
 # Touches: Cargo.toml (workspace version), crates/*/Cargo.toml (internal
-# nestlone-* dependency pins), npm/codewhale/package.json (version +
+# nestlone-* dependency pins), npm/nestlone/package.json (version +
 # nestloneBinaryVersion), the root npm lock workspace record, the remote-smoke
 # default tag, README*.md install-tag examples when present, the public fact
 # matrix's source-candidate version, Cargo.lock, crates/tui/CHANGELOG.md (via
@@ -39,7 +39,7 @@ transaction_paths=(
   Cargo.toml
   Cargo.lock
   package-lock.json
-  npm/codewhale/package.json
+  npm/nestlone/package.json
   scripts/remote-smoke/setup-vm.sh
   docs/public-surface-facts.json
   docs/INSTALL.md
@@ -147,7 +147,7 @@ if total == 0:
 
 # 3) npm wrapper.
 bump(
-    "npm/codewhale/package.json",
+    "npm/nestlone/package.json",
     rf'("(?:version|nestloneBinaryVersion)": "){old_re}(")',
     rf"\g<1>{new}\g<2>",
     2,
@@ -214,14 +214,14 @@ if pointer_hits:
 lock = pathlib.Path("package-lock.json")
 lock_text = lock.read_text()
 lock_out, lock_hits = re.subn(
-    rf'("npm/codewhale"\s*:\s*\{{[\s\S]*?"version"\s*:\s*"){old_re}(")',
+    rf'("npm/nestlone"\s*:\s*\{{[\s\S]*?"version"\s*:\s*"){old_re}(")',
     rf"\g<1>{new}\g<2>",
     lock_text,
     count=1,
 )
 if lock_hits != 1:
     sys.exit(
-        "error: expected package-lock.json packages['npm/codewhale'].version "
+        "error: expected package-lock.json packages['npm/nestlone'].version "
         f"to be {old}; made {lock_hits} replacement(s)"
     )
 lock.write_text(lock_out)

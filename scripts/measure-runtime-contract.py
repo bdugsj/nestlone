@@ -17,7 +17,7 @@ def run_metric(test_name: str, marker: str) -> dict:
         "cargo",
         "test",
         "-p",
-        "codewhale-tui",
+        "nestlone-tui",
         test_name,
         "--",
         "--ignored",

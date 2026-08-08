@@ -72,10 +72,10 @@ pub const ALL_HOOK_EVENTS: [HookEvent; 11] = [
     HookEvent::ShellEnv,
 ];
 
-/// How much a hook's result can change what Codewhale does next.
+/// How much a hook's result can change what Nestlone does next.
 ///
 /// This is the steering allowlist. "Observer" is a statement about
-/// Codewhale's control flow only — an observer hook is still an arbitrary
+/// Nestlone's control flow only — an observer hook is still an arbitrary
 /// shell command and can have any external side effect it likes.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum HookSteering {
@@ -85,7 +85,7 @@ pub enum HookSteering {
     DecidesToolCall,
     /// stdout contributes `KEY=VALUE` pairs to one `exec_shell` invocation.
     ContributesShellEnv,
-    /// stdout is ignored and the result cannot change Codewhale's behavior.
+    /// stdout is ignored and the result cannot change Nestlone's behavior.
     Observer,
 }
 
@@ -126,7 +126,7 @@ impl HookEvent {
         }
     }
 
-    /// Whether a hook result for this event can change Codewhale's own
+    /// Whether a hook result for this event can change Nestlone's own
     /// behavior. Never read this as "side-effect free" — see [`HookSteering`].
     #[must_use]
     pub fn can_steer(self) -> bool {
@@ -769,7 +769,7 @@ command = "echo hi"
         assert_eq!(legacy.hooks.len(), 1);
     }
 
-    /// The steering allowlist. Exactly three events can change what Codewhale
+    /// The steering allowlist. Exactly three events can change what Nestlone
     /// does; every other event defaults to observer.
     #[test]
     fn steering_allowlist_is_exactly_three_events() {
@@ -808,7 +808,7 @@ command = "echo hi"
         }
     }
 
-    /// Observer-only is a claim about Codewhale's control flow, not about the
+    /// Observer-only is a claim about Nestlone's control flow, not about the
     /// command. This test exists so the distinction is written down somewhere
     /// executable: an observer hook is still an arbitrary shell command and
     /// its external side effects are entirely real.
@@ -837,7 +837,7 @@ command = "echo hi"
             &crate::hooks::HookContext::new().with_session_id("sess_test"),
         );
 
-        // Codewhale ignored the result...
+        // Nestlone ignored the result...
         assert_eq!(results.len(), 1);
         assert_eq!(HookEvent::SessionEnd.steering(), HookSteering::Observer);
         // ...and the command still changed the filesystem.

@@ -42,7 +42,7 @@ const STASH_FILE_NAME: &str = "composer_stash.jsonl";
 /// use `O_NOFOLLOW` for the final leaf open.
 #[derive(Debug, Clone)]
 pub(crate) struct DiagnosticStashReport {
-    /// Candidate stash path, when the Codewhale home could be resolved.
+    /// Candidate stash path, when the Nestlone home could be resolved.
     pub(crate) path: Option<PathBuf>,
     /// Whether a regular stash file was present at that path.
     pub(crate) present: bool,
@@ -96,7 +96,7 @@ pub(crate) fn diagnostic_stash_report() -> DiagnosticStashReport {
                 present: false,
                 count: 0,
                 error: Some(format!(
-                    "could not resolve the Codewhale stash path: {error}"
+                    "could not resolve the Nestlone stash path: {error}"
                 )),
             };
         }

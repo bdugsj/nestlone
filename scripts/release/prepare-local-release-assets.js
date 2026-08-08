@@ -10,7 +10,7 @@ const {
   BUNDLE_CHECKSUM_MANIFEST,
   CHECKSUM_MANIFEST,
   detectBinaryNames,
-} = require("../../npm/codewhale/scripts/artifacts");
+} = require("../../npm/nestlone/scripts/artifacts");
 
 const WINDOWS_LAUNCHER = "nestlone.bat";
 const WINDOWS_CLI_ASSET = "nestlone-windows-x64.exe";

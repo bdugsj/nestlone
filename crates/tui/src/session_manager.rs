@@ -236,7 +236,7 @@ fn live_session_conflict(session_id: &str) -> std::io::Error {
     std::io::Error::new(
         std::io::ErrorKind::ResourceBusy,
         format!(
-            "session '{session_id}' is open in an interactive Codewhale session; \
+            "session '{session_id}' is open in an interactive Nestlone session; \
              change it there instead — an external write would be reverted by its next autosave"
         ),
     )
@@ -1230,7 +1230,7 @@ fn is_git_metadata_entry(path: &Path) -> bool {
 /// so the first access relocates any legacy `~/.deepseek/sessions` into
 /// `~/.nestlone/sessions` when the primary directory is missing (#3240).
 /// If an older build already created an empty primary sessions directory, copy
-/// missing legacy entries into it without overwriting newer CodeWhale data.
+/// missing legacy entries into it without overwriting newer Nestlone data.
 pub fn default_sessions_dir() -> std::io::Result<PathBuf> {
     let dir = nestlone_config::ensure_state_dir("sessions")
         .map_err(|e| std::io::Error::new(std::io::ErrorKind::NotFound, e.to_string()))?;

@@ -15,7 +15,7 @@
   rev ? "dirty",
 }:
 rustPlatform.buildRustPackage (finalAttrs: {
-  pname = "codewhale";
+  pname = "nestlone";
   version = "git-${rev}";
 
   src = ../.;
@@ -46,9 +46,9 @@ rustPlatform.buildRustPackage (finalAttrs: {
 
   cargoBuildFlags = [
     "--package"
-    "codewhale-cli"
+    "nestlone-cli"
     "--package"
-    "codewhale-tui"
+    "nestlone-tui"
   ];
   cargoTestFlags = finalAttrs.cargoBuildFlags ++ [
     "--lib"
@@ -60,9 +60,9 @@ rustPlatform.buildRustPackage (finalAttrs: {
   '';
 
   meta = {
-    description = "Terminal coding agent for DeepSeek";
-    homepage = "https://github.com/Hmbown/CodeWhale";
+    description = "Terminal coding agent for any model";
+    homepage = "https://github.com/bdugsj/nestlone";
     license = lib.licenses.mit;
-    mainProgram = "codewhale";
+    mainProgram = "nestlone";
   };
 })

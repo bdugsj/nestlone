@@ -1275,7 +1275,7 @@ pub(crate) fn legacy_deepseek_alias_effort_for_route(
 ///
 /// Preferred sources are the live Models.dev catalog and the offline bundled
 /// snapshot via [`crate::provider_lake`]. Call this directly only for
-/// Codewhale-only / local providers Models.dev does not represent, or when
+/// Nestlone-only / local providers Models.dev does not represent, or when
 /// probing the fallback table in tests. Picker, inventory, and subagent
 /// surfaces must go through the provider lake.
 #[must_use]
@@ -1424,7 +1424,7 @@ where
 /// instead of failing with an "unknown variant" error.
 ///
 /// This keeps configuration files forward-compatible. For example, a newer
-/// CodeWhale build may write a header item that an older build does not yet
+/// Nestlone build may write a header item that an older build does not yet
 /// understand; the older build will ignore that item while preserving the
 /// remaining supported entries.
 fn deser_header_items<'de, D>(deserializer: D) -> Result<Option<Vec<HeaderItem>>, D::Error>
@@ -1475,7 +1475,7 @@ pub struct TuiConfig {
     /// header and is not controlled by this list.
     ///
     /// Unknown items are ignored during deserialization so configurations written
-    /// by newer CodeWhale versions remain loadable by older versions.
+    /// by newer Nestlone versions remain loadable by older versions.
     ///
     /// Persisted to `tui.header_items` in `~/.deepseek/config.toml`.
     #[serde(default, deserialize_with = "deser_header_items")]
@@ -2753,10 +2753,10 @@ pub struct SkillsConfig {
     /// this limit are rejected during validation. Defaults to 5 MiB.
     #[serde(default)]
     pub max_install_size_bytes: Option<u64>,
-    /// When true, skill discovery scans only Codewhale-owned skill roots
+    /// When true, skill discovery scans only Nestlone-owned skill roots
     /// (plus any explicit `skills_dir`) instead of importing compatible
     /// directories from other AI tools such as Claude, OpenCode, or Cursor.
-    #[serde(default, alias = "scanCodewhaleOnly")]
+    #[serde(default, alias = "scanNestloneOnly")]
     pub scan_nestlone_only: Option<bool>,
 }
 
@@ -2904,8 +2904,8 @@ pub struct ProviderConfig {
     pub mode: Option<String>,
     #[serde(alias = "authMode")]
     pub auth_mode: Option<String>,
-    /// Validated basename of the active Codewhale-owned xAI OAuth generation.
-    /// The file always lives below Codewhale's private credentials directory.
+    /// Validated basename of the active Nestlone-owned xAI OAuth generation.
+    /// The file always lives below Nestlone's private credentials directory.
     #[serde(default, alias = "oauthCredentialGeneration")]
     pub oauth_credential_generation: Option<String>,
     #[serde(alias = "insecureSkipTlsVerify")]
@@ -4112,7 +4112,7 @@ impl Config {
                     return self.resolve_provider_identity(name);
                 }
                 return Err(format!(
-                    "legacy session records only the generic `custom` provider kind, but the live config does not select exactly one valid named custom route (selected '{}', valid named routes: {}). Restore the original single `[providers.<name>]` route or repair the saved provider identity; Codewhale will not guess or fall back",
+                    "legacy session records only the generic `custom` provider kind, but the live config does not select exactly one valid named custom route (selected '{}', valid named routes: {}). Restore the original single `[providers.<name>]` route or repair the saved provider identity; Nestlone will not guess or fall back",
                     if selected.is_empty() {
                         "<unset>"
                     } else {
@@ -4131,12 +4131,12 @@ impl Config {
             .and_then(|providers| providers.custom_provider_config(exact_key))
             .ok_or_else(|| {
                 format!(
-                    "saved session requires custom provider '{exact_key}', but `[providers.{exact_key}]` is missing from the live config. Restore that exact table and retry; Codewhale will not fall back"
+                    "saved session requires custom provider '{exact_key}', but `[providers.{exact_key}]` is missing from the live config. Restore that exact table and retry; Nestlone will not fall back"
                 )
             })?;
         if !entry.is_openai_compatible_custom() {
             return Err(format!(
-                "saved session requires custom provider '{exact_key}', but `[providers.{exact_key}]` must set `kind = \"openai-compatible\"`. Fix the live config and retry; Codewhale will not fall back"
+                "saved session requires custom provider '{exact_key}', but `[providers.{exact_key}]` must set `kind = \"openai-compatible\"`. Fix the live config and retry; Nestlone will not fall back"
             ));
         }
         let base_url = entry
@@ -4146,17 +4146,17 @@ impl Config {
             .filter(|base_url| !base_url.is_empty())
             .ok_or_else(|| {
                 format!(
-                    "saved session requires custom provider '{exact_key}', but `[providers.{exact_key}]` has no `base_url`. Fix the live config and retry; Codewhale will not fall back"
+                    "saved session requires custom provider '{exact_key}', but `[providers.{exact_key}]` has no `base_url`. Fix the live config and retry; Nestlone will not fall back"
                 )
             })?;
         let parsed = reqwest::Url::parse(base_url).map_err(|err| {
             format!(
-                "saved session requires custom provider '{exact_key}', but `[providers.{exact_key}].base_url` is invalid: {err}. Fix the live config and retry; Codewhale will not fall back"
+                "saved session requires custom provider '{exact_key}', but `[providers.{exact_key}].base_url` is invalid: {err}. Fix the live config and retry; Nestlone will not fall back"
             )
         })?;
         if !matches!(parsed.scheme(), "http" | "https") || parsed.host_str().is_none() {
             return Err(format!(
-                "saved session requires custom provider '{exact_key}', but `[providers.{exact_key}].base_url` must be an http(s) URL with a host. Fix the live config and retry; Codewhale will not fall back"
+                "saved session requires custom provider '{exact_key}', but `[providers.{exact_key}].base_url` must be an http(s) URL with a host. Fix the live config and retry; Nestlone will not fall back"
             ));
         }
 
@@ -4177,7 +4177,7 @@ impl Config {
         let id = persisted.trim();
         if id.is_empty() {
             return Err(
-                "persisted provider route has an empty exact provider id; Codewhale will not guess or fall back"
+                "persisted provider route has an empty exact provider id; Nestlone will not guess or fall back"
                     .to_string(),
             );
         }
@@ -4188,14 +4188,14 @@ impl Config {
             .is_some();
         if id.eq_ignore_ascii_case(ApiProvider::Custom.as_str()) && !has_exact_custom_table {
             return Err(format!(
-                "persisted provider route requires exact custom provider '{id}', but `[providers.{id}]` is missing from the live config. Restore that exact table and retry; Codewhale will not fall back"
+                "persisted provider route requires exact custom provider '{id}', but `[providers.{id}]` is missing from the live config. Restore that exact table and retry; Nestlone will not fall back"
             ));
         }
 
         let identity = self.resolve_provider_identity(id)?;
         if identity.provider == ApiProvider::Custom && identity.persisted_id() != Some(id) {
             return Err(format!(
-                "persisted provider route requires exact custom provider '{id}', but the live config only provides the legacy root-level custom route. Restore `[providers.{id}]` and retry; Codewhale will not fall back"
+                "persisted provider route requires exact custom provider '{id}', but the live config only provides the legacy root-level custom route. Restore `[providers.{id}]` and retry; Nestlone will not fall back"
             ));
         }
         Ok(identity)
@@ -4229,7 +4229,7 @@ impl Config {
             return id.map_or_else(
                 || {
                     Err(
-                        "persisted provider route has neither a provider kind nor an exact provider id; Codewhale will not guess or fall back"
+                        "persisted provider route has neither a provider kind nor an exact provider id; Nestlone will not guess or fall back"
                             .to_string(),
                     )
                 },
@@ -4245,7 +4245,7 @@ impl Config {
                 && id != kind
             {
                 return Err(format!(
-                    "persisted provider route has legacy identity '{kind}' but exact provider id '{id}'; repair the mismatched fields because Codewhale will not guess or fall back"
+                    "persisted provider route has legacy identity '{kind}' but exact provider id '{id}'; repair the mismatched fields because Nestlone will not guess or fall back"
                 ));
             }
             return match id {
@@ -4259,7 +4259,7 @@ impl Config {
                 let identity = self.resolve_exact_provider_identity(id)?;
                 if identity.provider != ApiProvider::Custom {
                     return Err(format!(
-                        "persisted provider route declares generic kind 'custom' but exact provider id '{id}' resolves as built-in '{}'; use the matching built-in kind or restore `[providers.{id}]`. Codewhale will not guess or fall back",
+                        "persisted provider route declares generic kind 'custom' but exact provider id '{id}' resolves as built-in '{}'; use the matching built-in kind or restore `[providers.{id}]`. Nestlone will not guess or fall back",
                         identity.provider.as_str()
                     ));
                 }
@@ -4281,7 +4281,7 @@ impl Config {
             && ApiProvider::parse(id) != Some(provider)
         {
             return Err(format!(
-                "persisted provider route declares built-in kind '{}' but exact provider id '{id}' names a different route; repair the mismatched fields because Codewhale will not guess or fall back",
+                "persisted provider route declares built-in kind '{}' but exact provider id '{id}' names a different route; repair the mismatched fields because Nestlone will not guess or fall back",
                 provider.as_str()
             ));
         }
@@ -4298,7 +4298,7 @@ impl Config {
             .is_some()
         {
             return Err(format!(
-                "persisted provider route requires built-in '{}', but an exact `[providers.{}]` custom route shadows the same selector. Rename the custom route or update the saved provider kind/id pair; Codewhale will not guess or fall back",
+                "persisted provider route requires built-in '{}', but an exact `[providers.{}]` custom route shadows the same selector. Rename the custom route or update the saved provider kind/id pair; Nestlone will not guess or fall back",
                 provider.as_str(),
                 provider.as_str()
             ));
@@ -4333,7 +4333,7 @@ impl Config {
     fn validate_legacy_literal_custom_route(&self) -> std::result::Result<(), String> {
         if self.has_literal_custom_provider_table() {
             return Err(
-                "legacy `provider = \"custom\"` is ambiguous because `[providers.custom]` is also present. Move the route to one named `[providers.<name>]` table and update the saved provider identity; Codewhale will not guess or fall back"
+                "legacy `provider = \"custom\"` is ambiguous because `[providers.custom]` is also present. Move the route to one named `[providers.<name>]` table and update the saved provider identity; Nestlone will not guess or fall back"
                     .to_string(),
             );
         }
@@ -4345,7 +4345,7 @@ impl Config {
         let selected = self.provider.as_deref().map(str::trim).unwrap_or_default();
         if !self.selects_literal_custom_provider() {
             return Err(format!(
-                "legacy session records only the generic `custom` provider kind, but the live config selects '{}'. Only an unchanged legacy config with `provider = \"custom\"` and root-level `base_url`/`default_text_model` can load this session; Codewhale will not guess or fall back",
+                "legacy session records only the generic `custom` provider kind, but the live config selects '{}'. Only an unchanged legacy config with `provider = \"custom\"` and root-level `base_url`/`default_text_model` can load this session; Nestlone will not guess or fall back",
                 if selected.is_empty() {
                     "<unset>"
                 } else {
@@ -4360,17 +4360,17 @@ impl Config {
             .map(str::trim)
             .filter(|base_url| !base_url.is_empty())
             .ok_or_else(|| {
-                "legacy `provider = \"custom\"` requires a non-empty root-level `base_url` to load a saved session; Codewhale will not use the custom-provider placeholder or fall back"
+                "legacy `provider = \"custom\"` requires a non-empty root-level `base_url` to load a saved session; Nestlone will not use the custom-provider placeholder or fall back"
                     .to_string()
             })?;
         let parsed = reqwest::Url::parse(base_url).map_err(|err| {
             format!(
-                "legacy `provider = \"custom\"` has an invalid root-level `base_url`: {err}. Fix the live config and retry; Codewhale will not fall back"
+                "legacy `provider = \"custom\"` has an invalid root-level `base_url`: {err}. Fix the live config and retry; Nestlone will not fall back"
             )
         })?;
         if !matches!(parsed.scheme(), "http" | "https") || parsed.host_str().is_none() {
             return Err(
-                "legacy `provider = \"custom\"` requires a root-level `base_url` with an http(s) scheme and host; Codewhale will not fall back"
+                "legacy `provider = \"custom\"` requires a root-level `base_url` with an http(s) scheme and host; Nestlone will not fall back"
                     .to_string(),
             );
         }
@@ -4381,12 +4381,12 @@ impl Config {
             .map(str::trim)
             .filter(|model| !model.is_empty())
             .ok_or_else(|| {
-                "legacy `provider = \"custom\"` requires a non-empty root-level `default_text_model` to load a saved session; Codewhale will not guess or fall back"
+                "legacy `provider = \"custom\"` requires a non-empty root-level `default_text_model` to load a saved session; Nestlone will not guess or fall back"
                     .to_string()
             })?;
         if model.eq_ignore_ascii_case("auto") || normalize_custom_model_id(model).is_none() {
             return Err(
-                "legacy `provider = \"custom\"` requires one explicit, valid root-level `default_text_model` (not `auto`) to load a saved session; Codewhale will not guess or fall back"
+                "legacy `provider = \"custom\"` requires one explicit, valid root-level `default_text_model` (not `auto`) to load a saved session; Nestlone will not guess or fall back"
                     .to_string(),
             );
         }
@@ -4594,7 +4594,7 @@ impl Config {
     }
 
     /// Mirror a successful native xAI login into the live route config.
-    /// Codewhale-owned OAuth storage supersedes any dormant Grok CLI consent.
+    /// Nestlone-owned OAuth storage supersedes any dormant Grok CLI consent.
     pub(crate) fn mark_nestlone_owned_xai_oauth(&mut self, generation: String) {
         let entry = self.provider_config_for_mut(ApiProvider::Xai);
         entry.auth_mode = Some("oauth".to_string());
@@ -5452,14 +5452,14 @@ impl Config {
             let credential_help =
                 credential_help_for_provider_route(provider, &self.deepseek_base_url());
             anyhow::bail!(
-                "Kimi CLI credential import is unsupported. Codewhale does not impersonate or reuse Kimi OAuth clients; configure an API key from {} instead.",
+                "Kimi CLI credential import is unsupported. Nestlone does not impersonate or reuse Kimi OAuth clients; configure an API key from {} instead.",
                 credential_help
                     .credential_url
                     .unwrap_or("the selected provider's API-key console")
             );
         }
 
-        // xAI OAuth prefers Codewhale-owned device-login storage. An existing
+        // xAI OAuth prefers Nestlone-owned device-login storage. An existing
         // Grok CLI file is considered only with provider/path-scoped read-only
         // consent. Activated by [providers.xai] auth_mode = "oauth".
         if provider == ApiProvider::Xai
@@ -5473,7 +5473,7 @@ impl Config {
         }
 
         // OpenAI Codex (ChatGPT) can read an existing Codex CLI OAuth login
-        // only after exact read-only consent. Codewhale never refreshes or
+        // only after exact read-only consent. Nestlone never refreshes or
         // rewrites that file. Explicit env overrides remain process-scoped.
         if provider == ApiProvider::OpenaiCodex && !custom_endpoint {
             if let Some(credentials) = crate::oauth::credentials_from_env() {
@@ -5645,7 +5645,7 @@ impl Config {
                      Run 'nestlone auth set --provider xai', set XAI_API_KEY, or add \
                      [providers.xai] api_key.\n\
                      OAuth alternative: run `nestlone auth xai-device` for \
-                     Codewhale-owned storage and set [providers.xai] auth_mode = \"oauth\"."
+                     Nestlone-owned storage and set [providers.xai] auth_mode = \"oauth\"."
                 );
             }
             // Self-hosted deployments commonly run without auth on localhost.
@@ -8741,7 +8741,7 @@ fn load_single_config_file(path: &Path) -> Result<Config> {
 }
 
 /// Build a one-line warning when top-level-only keys are nested under a section
-/// Codewhale does not define (`[general]` / `[sandbox]`). TOML silently drops
+/// Nestlone does not define (`[general]` / `[sandbox]`). TOML silently drops
 /// those keys, so e.g. `[general]\nallow_shell = true` never takes effect and
 /// the shell tools (`exec_shell`, `task_shell_start`, …) are absent from the
 /// catalog with no explanation. Returns `None` when nothing is misplaced.
@@ -8750,7 +8750,7 @@ fn load_single_config_file(path: &Path) -> Result<Config> {
 /// belong at the top of the file, above any `[section]` header.
 fn warn_on_misplaced_top_level_keys(raw: &str) -> Option<String> {
     let doc = toml::from_str::<toml::Value>(raw).ok()?;
-    // Sections Codewhale does not recognize but users nest settings under.
+    // Sections Nestlone does not recognize but users nest settings under.
     const UNKNOWN_SECTIONS: &[&str] = &["general", "sandbox"];
     // Keys that are only ever read from the top level of the config.
     const TOP_LEVEL_KEYS: &[&str] = &[
@@ -8775,7 +8775,7 @@ fn warn_on_misplaced_top_level_keys(raw: &str) -> Option<String> {
         return None;
     }
     Some(format!(
-        "Ignoring {} — Codewhale has no `[general]` or `[sandbox]` section, so these \
+        "Ignoring {} — Nestlone has no `[general]` or `[sandbox]` section, so these \
          keys are silently dropped. Move them to the TOP of the config file (above any \
          `[section]` header), e.g. `allow_shell = true`. Until then, shell tools stay \
          disabled. (#2589)",
@@ -9021,7 +9021,7 @@ pub enum SavedCredential {
         /// Absolute path to the credential-free config metadata file.
         path: PathBuf,
     },
-    /// Stored in the Codewhale config file only. Fallback when the selected
+    /// Stored in the Nestlone config file only. Fallback when the selected
     /// secret backend cannot be written, or under `cfg(test)` so unit tests do
     /// not pollute the host credential store.
     ConfigFile(PathBuf),
@@ -9608,7 +9608,7 @@ fn save_api_key_for_identity_unlocked(
     let provider = identity.provider;
     if provider == ApiProvider::OpenaiCodex {
         anyhow::bail!(
-            "OpenAI Codex uses OAuth. Run `codex login`, then grant exact read-only access with `nestlone auth external-consent --provider openai-codex --mode read-only`, or set OPENAI_CODEX_ACCESS_TOKEN for this process; Codewhale does not store an API key for this provider."
+            "OpenAI Codex uses OAuth. Run `codex login`, then grant exact read-only access with `nestlone auth external-consent --provider openai-codex --mode read-only`, or set OPENAI_CODEX_ACCESS_TOKEN for this process; Nestlone does not store an API key for this provider."
         );
     }
     let is_legacy_literal_custom = provider == ApiProvider::Custom

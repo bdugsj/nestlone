@@ -2,14 +2,14 @@
 
 ## Overview
 
-The WeCom Bridge integrates CodeWhale with WeCom (企业微信) Smart Bot
+The WeCom Bridge integrates Nestlone with WeCom (企业微信) Smart Bot
 WebSocket long-connection mode, enabling remote terminal agent interaction
 without a public IP.
 
 ## Prerequisites
 
 1. **WeCom admin access** to create a Smart Bot (智能机器人)
-2. **CodeWhale runtime API** running at `http://127.0.0.1:7878`
+2. **Nestlone runtime API** running at `http://127.0.0.1:7878`
 3. **Node.js 18+** for the bridge runtime
 
 ### Create a WeCom Smart Bot
@@ -25,7 +25,7 @@ Use two terminals. In the first terminal, start the local runtime API:
 
 ```bash
 export CODEWHALE_RUNTIME_TOKEN="$(openssl rand -hex 32)"
-codewhale serve --http --host 127.0.0.1 --port 7878 --auth-token "$CODEWHALE_RUNTIME_TOKEN"
+nestlone serve --http --host 127.0.0.1 --port 7878 --auth-token "$CODEWHALE_RUNTIME_TOKEN"
 ```
 
 In the second terminal, start the bridge:
@@ -92,7 +92,7 @@ Expected output: `ℹ tests 16  ℹ pass 16  ℹ fail 0`
 ## Architecture
 
 ```
-WeCom Client → Smart Bot WebSocket → WeCom Bridge ──HTTP──→ codewhale serve --http
+WeCom Client → Smart Bot WebSocket → WeCom Bridge ──HTTP──→ nestlone serve --http
                 ◀── aibot_respond_msg ◀──                   (127.0.0.1:7878)
 ```
 
@@ -104,7 +104,7 @@ The bridge:
 
 ## Security Boundaries
 
-- **No public port exposure**: `codewhale serve --http` binds to `127.0.0.1` only
+- **No public port exposure**: `nestlone serve --http` binds to `127.0.0.1` only
 - **Token authentication**: all `/v1/*` runtime calls require `CODEWHALE_RUNTIME_TOKEN`
 - **Chat allowlist**: only chats/users in `WECOM_CHAT_ALLOWLIST` are served
 - **Approval gate**: tool calls from WeCom require explicit approval (`/allow` or natural-language keywords)
@@ -129,7 +129,7 @@ Run the runtime API and bridge under the process manager you already use
 commands to supervise are:
 
 ```bash
-codewhale serve --http --host 127.0.0.1 --port 7878 --auth-token "$CODEWHALE_RUNTIME_TOKEN"
+nestlone serve --http --host 127.0.0.1 --port 7878 --auth-token "$CODEWHALE_RUNTIME_TOKEN"
 npm run start --prefix integrations/wecom-bridge
 ```
 
@@ -148,5 +148,5 @@ the process after crashes or host reboots.
 ## Related Documentation
 
 - [WeCom Bridge README](README.md)
-- [CodeWhale Security Policy](../../SECURITY.md)
-- [CodeWhale Contributing Guide](../../CONTRIBUTING.md)
+- [Nestlone Security Policy](../../SECURITY.md)
+- [Nestlone Contributing Guide](../../CONTRIBUTING.md)

@@ -1,4 +1,4 @@
-//! Lifecycle hooks for the Codewhale **TUI runtime**.
+//! Lifecycle hooks for the Nestlone **TUI runtime**.
 //!
 //! Scope, stated plainly: every firing point in this system lives in the
 //! interactive TUI (`crates/tui/src/tui/`) and the engine turn loop it drives.

@@ -62,19 +62,19 @@ pub fn agents_global_skills_dir() -> Option<PathBuf> {
 /// Session-time skill discovery scope.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SkillDiscoveryMode {
-    /// Preserve the existing broad compatibility scan across CodeWhale,
+    /// Preserve the existing broad compatibility scan across Nestlone,
     /// agentskills.io, Claude, OpenCode, Cursor, and legacy DeepSeek roots.
     Compatible,
-    /// Scan only CodeWhale-owned roots. Callers that also pass an explicit
+    /// Scan only Nestlone-owned roots. Callers that also pass an explicit
     /// `skills_dir` still get that directory because it is user configuration.
-    CodeWhaleOnly,
+    NestloneOnly,
 }
 
 impl SkillDiscoveryMode {
     #[must_use]
     pub fn from_nestlone_only(value: bool) -> Self {
         if value {
-            Self::CodeWhaleOnly
+            Self::NestloneOnly
         } else {
             Self::Compatible
         }
@@ -745,10 +745,10 @@ fn normalize_skill_name_segment(name: &str) -> String {
 /// 3. `<workspace>/.opencode/skills` — OpenCode interop.
 /// 4. `<workspace>/.claude/skills` — Claude Code interop.
 /// 5. `<workspace>/.cursor/skills` — Cursor interop.
-/// 6. `<workspace>/.nestlone/skills` — CodeWhale workspace skills.
+/// 6. `<workspace>/.nestlone/skills` — Nestlone workspace skills.
 /// 7. [`agents_global_skills_dir`] — agentskills.io global.
 /// 8. `~/.claude/skills` — Claude-ecosystem global (#902).
-/// 9. `~/.nestlone/skills` — CodeWhale global, primary install target.
+/// 9. `~/.nestlone/skills` — Nestlone global, primary install target.
 /// 10. `~/.deepseek/skills` — legacy DeepSeek global fallback.
 ///
 /// Compatible audit may also observe `.codex/skills`, but that root is
@@ -2004,7 +2004,7 @@ body";
             &workspace,
             &configured_dir,
             Some(&home),
-            super::SkillDiscoveryMode::CodeWhaleOnly,
+            super::SkillDiscoveryMode::NestloneOnly,
         );
         let names: Vec<&str> = registry.list().iter().map(|s| s.name.as_str()).collect();
 
@@ -2012,7 +2012,7 @@ body";
         assert!(names.contains(&"configured-nestlone"));
         assert!(
             !names.contains(&"from-claude") && !names.contains(&"from-agents"),
-            "CodeWhale-only mode must not import cross-tool skills: {names:?}"
+            "Nestlone-only mode must not import cross-tool skills: {names:?}"
         );
     }
 
@@ -2034,7 +2034,7 @@ body";
             &workspace,
             &configured_dir,
             Some(&home),
-            super::SkillDiscoveryMode::CodeWhaleOnly,
+            super::SkillDiscoveryMode::NestloneOnly,
         );
         let names: Vec<&str> = registry.list().iter().map(|s| s.name.as_str()).collect();
 
@@ -2060,12 +2060,12 @@ body";
             &workspace,
             &tmpdir.path().join("missing-configured-skills"),
             Some(&home),
-            super::SkillDiscoveryMode::CodeWhaleOnly,
+            super::SkillDiscoveryMode::NestloneOnly,
         );
 
         assert!(
             registry.get("escaped-skill").is_none(),
-            "CodeWhale-only mode must not follow workspace .nestlone/skills outside the workspace"
+            "Nestlone-only mode must not follow workspace .nestlone/skills outside the workspace"
         );
     }
 

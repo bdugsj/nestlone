@@ -1,11 +1,11 @@
 //! Provider-free acceptance lock for the public headless launch contract that
-//! makes CodeWhale embeddable as a future Verifiers v1 harness (#4641).
+//! makes Nestlone embeddable as a future Verifiers v1 harness (#4641).
 //!
 //! Everything here is loopback and sealed: a `wiremock` OpenAI-compatible
 //! fixture stands in for the interception endpoint, `CODEWHALE_HOME` is a fresh
 //! per-run directory, the credential is delivered only through the route's
 //! `api_key_env`, and a sentinel secret must never escape the child process.
-//! No provider credential, network egress, or installed CodeWhale is required.
+//! No provider credential, network egress, or installed Nestlone is required.
 
 #![cfg(unix)]
 

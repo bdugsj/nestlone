@@ -358,7 +358,7 @@ where
             let mut request = client.post(url).json(redacted_body);
             if let Some(secret_env) = secret_env {
                 request = request.header(
-                    "X-CodeWhale-Webhook-Secret",
+                    "X-Nestlone-Webhook-Secret",
                     required_secret(resolver, secret_env)?,
                 );
             }
@@ -410,7 +410,7 @@ fn safe_event_payload(event: &FleetAlertEvent) -> Value {
 
 fn slack_body(event: &FleetAlertEvent, channel: Option<&str>) -> Value {
     let text = format!(
-        "Codewhale fleet {}: run={} task={} reason={}",
+        "Nestlone fleet {}: run={} task={} reason={}",
         alert_class_label(event.class),
         event.run_id.0,
         event.task_id.as_deref().unwrap_or("-"),
@@ -450,7 +450,7 @@ fn pagerduty_body(event: &FleetAlertEvent, severity: &str, routing_key: String) 
         "routing_key": routing_key,
         "event_action": "trigger",
         "payload": {
-            "summary": format!("Codewhale fleet {}: {}", alert_class_label(event.class), short_reason(&event.reason)),
+            "summary": format!("Nestlone fleet {}: {}", alert_class_label(event.class), short_reason(&event.reason)),
             "severity": severity,
             "source": "nestlone",
             "custom_details": safe_event_payload(event),
@@ -475,7 +475,7 @@ fn alert_class_label(class: FleetAlertEventClass) -> &'static str {
 
 fn redacted_secret_header(secret_env: Option<&str>) -> Value {
     match secret_env {
-        Some(name) => json!({ "X-CodeWhale-Webhook-Secret": redacted_env(name) }),
+        Some(name) => json!({ "X-Nestlone-Webhook-Secret": redacted_env(name) }),
         None => json!({}),
     }
 }

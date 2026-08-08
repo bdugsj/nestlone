@@ -1,4 +1,4 @@
-//! Dynamic Workflow runtime for CodeWhale.
+//! Dynamic Workflow runtime for Nestlone.
 //!
 //! This crate is the imperative half of Workflow: a sandboxed QuickJS
 //! (rquickjs) runtime that executes a model-authored JS program which

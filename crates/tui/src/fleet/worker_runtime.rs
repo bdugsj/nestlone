@@ -626,7 +626,7 @@ fn fleet_task_prompt_with_profile(
     let role = effective_fleet_role(task_spec.worker.as_ref(), agent_profile)
         .unwrap_or_else(|| "general".to_string());
     let mut prompt = String::new();
-    prompt.push_str("You have been summoned as a Codewhale Fleet member (");
+    prompt.push_str("You have been summoned as a Nestlone Fleet member (");
     prompt.push_str(&role);
     prompt.push_str(") by the Fleet orchestrator.\n\n");
     prompt.push_str("Fleet operating contract:\n");
@@ -1880,7 +1880,7 @@ mod tests {
 
         let prompt = fleet_task_prompt(&task);
 
-        assert!(prompt.contains("summoned as a Codewhale Fleet member (general)"));
+        assert!(prompt.contains("summoned as a Nestlone Fleet member (general)"));
         assert!(prompt.contains("Fleet operating contract:"));
         assert!(prompt.contains("keep sibling or topology assumptions out of your answer"));
         assert!(prompt.contains("Review protocol"));
@@ -1936,7 +1936,7 @@ mod tests {
         assert_eq!(spec.agent_type, FleetRole::Reviewer);
         assert!(
             spec.objective
-                .contains("summoned as a Codewhale Fleet member (reviewer)")
+                .contains("summoned as a Nestlone Fleet member (reviewer)")
         );
         assert!(spec.objective.contains("Fleet profile: reviewer"));
         assert!(

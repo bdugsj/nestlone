@@ -2832,7 +2832,7 @@ const SHELL_ENV_TOTAL_MAX_BYTES: usize = 256 * 1024;
 /// rather than carried into `exec_shell`'s environment. A `shell_env` hook is
 /// a normal process whose stdout can contain anything — including a NUL
 /// straight out of a binary — and "the hook printed something odd" must never
-/// become "Codewhale aborted the tool call".
+/// become "Nestlone aborted the tool call".
 fn is_valid_env_key(key: &str) -> bool {
     !key.is_empty()
         && !key.contains('=')

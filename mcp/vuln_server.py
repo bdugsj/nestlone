@@ -11,7 +11,7 @@ Setup:
     pip install mcp
     # Optional: set NVD_API_KEY, GITHUB_TOKEN env vars
 
-CodeWhale .mcp.json:
+Nestlone .mcp.json:
 {
   "mcpServers": {
     "nestlone-vuln": {

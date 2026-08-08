@@ -93,7 +93,7 @@ pub fn canonical_member_key(value: &str) -> String {
     value.trim().to_ascii_lowercase()
 }
 
-/// Selector tokens that are legal elsewhere in CodeWhale but are exactly what
+/// Selector tokens that are legal elsewhere in Nestlone but are exactly what
 /// the exact schema exists to forbid. Rejecting them by value (in addition to
 /// `deny_unknown_fields` rejecting `model_strength`/`loadout`/`model_class` as
 /// keys) is what keeps "exact" honest.
@@ -232,7 +232,7 @@ pub struct PermissionCeiling {
     /// (fetch, browse, HTTP).
     ///
     /// This is deliberately *not* a statement about transport. Host-owned
-    /// provider inference — the ordinary API call CodeWhale makes on the
+    /// provider inference — the ordinary API call Nestlone makes on the
     /// member's behalf — always happens over the network and is not governed
     /// by this field. A member with `network_tool = false` still runs on a
     /// remote model; it simply has no tool with which to reach the network

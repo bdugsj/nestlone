@@ -53,7 +53,7 @@ pub fn default_user_plugins_dir() -> PathBuf {
             tracing::warn!(
                 target: "plugins",
                 %error,
-                "Codewhale home could not be resolved; user plugin discovery is disabled"
+                "Nestlone home could not be resolved; user plugin discovery is disabled"
             );
             std::env::temp_dir()
                 .join(format!(
@@ -104,7 +104,7 @@ pub(crate) fn discover_with_context(
     scan_root(
         &config.user_plugins_dir,
         PluginScope::User,
-        PluginOrigin::CodeWhaleHome,
+        PluginOrigin::NestloneHome,
         &mut candidates,
         &mut diagnostics,
     );
@@ -275,7 +275,7 @@ fn load_plugin(
     let validated = PluginManifest::validate_from_path(manifest_path)?;
     if validated.canonical_root.parent() != Some(canonical_discovery_root) {
         return Err(format!(
-            "plugin bundle resolved outside its Codewhale-owned discovery root: {}",
+            "plugin bundle resolved outside its Nestlone-owned discovery root: {}",
             validated.canonical_root.display()
         ));
     }
@@ -302,7 +302,7 @@ fn load_plugin(
     // Skill parsing happens after hashing. Revalidate once so a concurrent
     // bundle edit cannot pair a reviewed hash with different in-memory Skill
     // instructions or MCP configuration. Active Skill bodies are replaced by
-    // snapshots parsed from the Codewhale-owned staged tree in `apply_state`.
+    // snapshots parsed from the Nestlone-owned staged tree in `apply_state`.
     let refreshed = PluginManifest::validate_from_path(manifest_path)?;
     if refreshed.content_hash != validated.content_hash
         || refreshed.capability_hash != validated.capability_hash
@@ -484,7 +484,7 @@ pub(crate) fn load_plugin_for_test(manifest_path: &Path) -> Result<LoadedPlugin,
         manifest_path,
         &discovery_root,
         PluginScope::User,
-        PluginOrigin::CodeWhaleHome,
+        PluginOrigin::NestloneHome,
     )
 }
 

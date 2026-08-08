@@ -566,7 +566,7 @@ export function formatValidationReport(result) {
 
 export function helpText() {
   return [
-    "CodeWhale Telegram bridge commands:",
+    "Nestlone Telegram bridge commands:",
     "/menu - open tappable controls",
     "/help - show this help",
     "/status - runtime and workspace status",
@@ -579,6 +579,6 @@ export function helpText() {
     "/allow <approval_id> [remember] - approve a pending tool call",
     "/deny <approval_id> - deny a pending tool call",
     "",
-    "Anything else is sent as a CodeWhale prompt."
+    "Anything else is sent as a Nestlone prompt."
   ].join("\n");
 }

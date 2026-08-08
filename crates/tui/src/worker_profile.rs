@@ -1,4 +1,4 @@
-//! Worker runtime profile — the per-role capability contract for a CodeWhale
+//! Worker runtime profile — the per-role capability contract for a Nestlone
 //! worker (#3217, #3211, #3213, and the child-permission-intersection issues
 //! #414 / #426 / #1186).
 //!

@@ -985,7 +985,7 @@ enabled = true
     // provider tables must survive every supported mutation.
     // ------------------------------------------------------------------
 
-    const GOLDEN_CONFIG: &str = r#"# CodeWhale golden config fixture, top note.
+    const GOLDEN_CONFIG: &str = r#"# Nestlone golden config fixture, top note.
 # api_key = "sk-placeholder" (uncomment to set the key by hand)
 model = "deepseek-v4-pro" # pinned for release QA
 
@@ -1060,7 +1060,7 @@ action = "mode.plan"
 
         let body = fs::read_to_string(&path).unwrap();
         for comment in [
-            "# CodeWhale golden config fixture, top note.",
+            "# Nestlone golden config fixture, top note.",
             "# api_key = \"sk-placeholder\" (uncomment to set the key by hand)",
             "# pinned for release QA",
             "# workspace trust note",

@@ -1,4 +1,4 @@
-# cargo-audit configuration for CodeWhale
+# cargo-audit configuration for Nestlone
 # https://github.com/rustsec/rustsec/blob/main/cargo-audit/audit.toml.example
 
 [advisories]

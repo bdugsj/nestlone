@@ -1,11 +1,11 @@
-# @codewhale/runtime-sdk
+# @nestlone/runtime-sdk
 
-Small JavaScript helpers and TypeScript declarations for Codewhale's local
+Small JavaScript helpers and TypeScript declarations for Nestlone's local
 Runtime API. The package is intentionally transport-only: it never bypasses the
 Rust runtime, sandbox, approvals, provider configuration, or fleet ledger.
 
 ```js
-import { createRuntimeClient } from "@codewhale/runtime-sdk";
+import { createRuntimeClient } from "@nestlone/runtime-sdk";
 
 const client = createRuntimeClient({
   baseUrl: "http://127.0.0.1:7878",

@@ -7,7 +7,7 @@
 #      crate must inherit `version.workspace = true`.
 #   2. Every crate inherits the workspace MSRV through
 #      `rust-version.workspace = true`.
-#   3. `npm/codewhale/package.json` and the root workspace lock entry match
+#   3. `npm/nestlone/package.json` and the root workspace lock entry match
 #      the workspace `version` in the root `Cargo.toml`.
 #      (`npm/deepseek-tui/` still exists only as an unpublished compatibility
 #      notice and must stay private.)
@@ -64,14 +64,14 @@ fi
 
 # 3) Workspace ↔ npm package.json ↔ root package lock.
 workspace_version="$(grep -E '^version = "' Cargo.toml | head -n1 | sed -E 's/^version = "([^"]+)".*/\1/')"
-npm_version="$(node -p "require('./npm/codewhale/package.json').version")"
+npm_version="$(node -p "require('./npm/nestlone/package.json').version")"
 if [[ "${workspace_version}" != "${npm_version}" ]]; then
-  echo "::error::npm/codewhale/package.json version (${npm_version}) does not match workspace Cargo.toml (${workspace_version})." >&2
+  echo "::error::npm/nestlone/package.json version (${npm_version}) does not match workspace Cargo.toml (${workspace_version})." >&2
   fail=1
 fi
-lock_npm_version="$(node -p "require('./package-lock.json').packages?.['npm/codewhale']?.version ?? ''")"
+lock_npm_version="$(node -p "require('./package-lock.json').packages?.['npm/nestlone']?.version ?? ''")"
 if [[ "${workspace_version}" != "${lock_npm_version}" ]]; then
-  echo "::error::package-lock.json npm/codewhale version (${lock_npm_version:-<missing>}) does not match workspace Cargo.toml (${workspace_version})." >&2
+  echo "::error::package-lock.json npm/nestlone version (${lock_npm_version:-<missing>}) does not match workspace Cargo.toml (${workspace_version})." >&2
   echo "Run: npm install --package-lock-only --ignore-scripts" >&2
   fail=1
 fi

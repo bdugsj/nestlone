@@ -1030,7 +1030,7 @@ AGENTS.md 与协作准则
 
 AGENTS.md 和项目说明是项目规则/实现指导。它们可以描述构建命令、仓库规范和本地流程；按优先级顺序，它们低于当前用户请求和内置基础准则，高于用户全局长期偏好、记忆和交接。
 
-WHALE.md 已忽略。将普通项目说明迁移到 AGENTS.md，将 Codewhale 专属权限策略迁移到 .nestlone/constitution.json。
+WHALE.md 已忽略。将普通项目说明迁移到 AGENTS.md，将 Nestlone 专属权限策略迁移到 .nestlone/constitution.json。
 
 运行时姿态是独立设置。协作准则可以建议主动性，但不会改变批准策略、沙盒、Shell、网络、信任、MCP 权限或默认模式。使用 /constitution posture 查看这些控制。"
         }

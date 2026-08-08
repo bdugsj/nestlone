@@ -675,8 +675,8 @@ fn acp_auth_methods(config: &Config) -> Value {
     json!([
         {
             "id": "nestlone-terminal-auth",
-            "name": "Set Codewhale API key",
-            "description": format!("Run Codewhale's terminal credential setup for the {provider} provider."),
+            "name": "Set Nestlone API key",
+            "description": format!("Run Nestlone's terminal credential setup for the {provider} provider."),
             "type": "terminal",
             "args": ["auth", "set", "--provider", provider],
             "env": {}

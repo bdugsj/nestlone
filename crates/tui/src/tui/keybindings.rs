@@ -316,8 +316,8 @@ pub const KEYBINDINGS: &[KeybindingEntry] = &[
     },
     KeybindingEntry {
         // Terminal-native copy chords are normally consumed by the local
-        // terminal and never become Codewhale key events. Ctrl+C is the
-        // reliable in-app copy path when a Codewhale selection is active.
+        // terminal and never become Nestlone key events. Ctrl+C is the
+        // reliable in-app copy path when a Nestlone selection is active.
         chord: "Ctrl+C (selection)",
         description_id: crate::localization::MessageId::KbCopySelection,
         section: KeybindingSection::Clipboard,

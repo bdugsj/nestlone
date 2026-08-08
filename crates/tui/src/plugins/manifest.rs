@@ -28,7 +28,7 @@ const MAX_MCP_TIMEOUT_SECS: u64 = 3_600;
 #[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct PluginManifest {
-    /// Missing means the legacy, pre-versioned Codewhale manifest. Legacy
+    /// Missing means the legacy, pre-versioned Nestlone manifest. Legacy
     /// manifests remain readable, but `/plugin validate` reports the migration.
     #[serde(default)]
     pub schema_version: u32,
@@ -161,7 +161,7 @@ impl ResolvedPluginComponents {
 pub struct PluginInventory {
     pub skills: usize,
     pub mcp_servers: usize,
-    /// MCP servers that launch a child process under the Codewhale user's
+    /// MCP servers that launch a child process under the Nestlone user's
     /// host permissions. Kept separate from remote MCP so the review screen
     /// cannot imply that an empty declared filesystem/network list is a
     /// sandbox boundary.

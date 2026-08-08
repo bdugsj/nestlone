@@ -69,7 +69,7 @@ impl std::fmt::Debug for SessionCommandWorld {
     }
 }
 
-#[given("a CodeWhale session workspace with one user message")]
+#[given("a Nestlone session workspace with one user message")]
 fn workspace_with_one_user_message(world: &mut SessionCommandWorld) {
     let tmpdir = TempDir::new().expect("session workflow TempDir");
     let mut app = create_test_app_with_tmpdir(&tmpdir);
@@ -93,7 +93,7 @@ fn workspace_with_one_user_message(world: &mut SessionCommandWorld) {
     world.tmpdir = Some(tmpdir);
 }
 
-#[given("a CodeWhale persisted session workspace with one user message")]
+#[given("a Nestlone persisted session workspace with one user message")]
 fn persisted_workspace_with_one_user_message(world: &mut SessionCommandWorld) {
     workspace_with_one_user_message(world);
     let original_id = "original-session".to_string();
@@ -103,7 +103,7 @@ fn persisted_workspace_with_one_user_message(world: &mut SessionCommandWorld) {
     persist_active_session(world);
 }
 
-#[given("a CodeWhale session workspace with stale and fresh saved sessions")]
+#[given("a Nestlone session workspace with stale and fresh saved sessions")]
 fn workspace_with_stale_and_fresh_saved_sessions(world: &mut SessionCommandWorld) {
     workspace_with_one_user_message(world);
     persist_session_with_age(world, "fresh-session", "Fresh session", 1);
@@ -323,12 +323,12 @@ fn exported_markdown_contains_active_transcript(world: &mut SessionCommandWorld)
     let content = std::fs::read_to_string(export_path)
         .unwrap_or_else(|err| panic!("read exported transcript {export_path:?}: {err}"));
 
-    assert!(content.contains("# Codewhale conversation export"));
+    assert!(content.contains("# Nestlone conversation export"));
     assert!(content.contains("## 1. user"));
     assert!(content.contains("Remember the whale migration"));
 }
 
-#[then("CodeWhale should defer the session-loaded receipt to the event loop")]
+#[then("Nestlone should defer the session-loaded receipt to the event loop")]
 fn nestlone_defers_session_loaded_receipt(world: &mut SessionCommandWorld) {
     assert_eq!(
         world.last_message, None,
@@ -378,7 +378,7 @@ fn active_session_is_forked_session(world: &mut SessionCommandWorld) {
     assert_app_contains_message(app, "Remember the whale migration");
 }
 
-#[then("CodeWhale should reject the fork because there are no messages")]
+#[then("Nestlone should reject the fork because there are no messages")]
 fn nestlone_rejects_empty_fork(world: &mut SessionCommandWorld) {
     assert_eq!(
         world.last_result_is_error,
@@ -489,7 +489,7 @@ fn session_picker_should_be_open(world: &mut SessionCommandWorld) {
     assert_eq!(app.view_stack.top_kind(), Some(ModalKind::SessionPicker));
 }
 
-#[then("CodeWhale should report that one session was pruned")]
+#[then("Nestlone should report that one session was pruned")]
 fn nestlone_reports_one_session_pruned(world: &mut SessionCommandWorld) {
     let message = world
         .last_message
@@ -526,7 +526,7 @@ fn stale_session_no_longer_loadable(world: &mut SessionCommandWorld) {
     );
 }
 
-#[then("CodeWhale should trigger context compaction")]
+#[then("Nestlone should trigger context compaction")]
 fn nestlone_triggers_context_compaction(world: &mut SessionCommandWorld) {
     assert_eq!(
         world.last_result_is_error,
@@ -543,7 +543,7 @@ fn nestlone_triggers_context_compaction(world: &mut SessionCommandWorld) {
     );
 }
 
-#[then("CodeWhale should trigger context purge")]
+#[then("Nestlone should trigger context purge")]
 fn nestlone_triggers_context_purge(world: &mut SessionCommandWorld) {
     assert_eq!(
         world.last_result_is_error,
@@ -560,7 +560,7 @@ fn nestlone_triggers_context_purge(world: &mut SessionCommandWorld) {
     );
 }
 
-#[then(regex = r#"^CodeWhale should send a session relay instruction focused on "([^"]+)"$"#)]
+#[then(regex = r#"^Nestlone should send a session relay instruction focused on "([^"]+)"$"#)]
 fn nestlone_sends_session_relay_instruction_focused_on(
     world: &mut SessionCommandWorld,
     focus: String,
@@ -587,7 +587,7 @@ fn nestlone_sends_session_relay_instruction_focused_on(
     );
 }
 
-#[then("CodeWhale should reject the unknown session command")]
+#[then("Nestlone should reject the unknown session command")]
 fn nestlone_rejects_unknown_session_command(world: &mut SessionCommandWorld) {
     assert_eq!(
         world.last_result_is_error,

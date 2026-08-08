@@ -7,7 +7,7 @@
 //! slash completions, and subagent validation should read model lists from here.
 //!
 //! [`crate::config::model_completion_names_for_provider`] is retained only as a
-//! compatibility fallback for CodeWhale-only / local providers that Models.dev
+//! compatibility fallback for Nestlone-only / local providers that Models.dev
 //! does not represent (and for unbundled gateways until the live catalog covers
 //! them).
 
@@ -323,7 +323,7 @@ fn catalog_models_from_offerings<'a>(
 /// Precedence: live Models.dev rows (when published) override bundled offline
 /// rows on `(provider, wire_model_id)`; if the merged catalog still has no rows
 /// for the provider, fall back to
-/// [`crate::config::model_completion_names_for_provider`] so CodeWhale-only /
+/// [`crate::config::model_completion_names_for_provider`] so Nestlone-only /
 /// local providers (and gateways not yet in the offline seed) keep defaults.
 #[must_use]
 pub fn all_catalog_models_for_provider(provider: ApiProvider) -> Vec<String> {
@@ -349,7 +349,7 @@ pub fn all_catalog_models_for_provider(provider: ApiProvider) -> Vec<String> {
 ///
 /// Returns the live-over-bundled row when present so picker metadata (context,
 /// pricing, tools, reasoning, freshness) can be projected without a second
-/// catalog walk. `None` for CodeWhale-only / legacy-fallback ids that have no
+/// catalog walk. `None` for Nestlone-only / legacy-fallback ids that have no
 /// Models.dev row.
 #[must_use]
 pub fn catalog_offering_for_model(
@@ -549,7 +549,7 @@ mod tests {
         }
     }
 
-    /// #4188: CodeWhale-only / local providers keep defaults via the legacy
+    /// #4188: Nestlone-only / local providers keep defaults via the legacy
     /// fallback when Models.dev (live or bundled) has no rows for them.
     #[test]
     fn nestlone_only_providers_keep_legacy_defaults() {
@@ -579,7 +579,7 @@ mod tests {
     }
 
     /// #4116 / #4188 (AC): a provider with no bundled/live catalog coverage must
-    /// fall back to the legacy table verbatim, so CodeWhale-only routes stay
+    /// fall back to the legacy table verbatim, so Nestlone-only routes stay
     /// usable. We assert this for every currently-unbundled provider that still
     /// carries a non-empty legacy list, and require at least one such provider
     /// to exist so the fallback path is actually exercised.
@@ -774,7 +774,7 @@ mod tests {
         );
 
         // Live rows use the Models.dev alias id; lake merge must normalize onto
-        // CodeWhale `moonshot` and not leave a parallel `moonshotai` bucket.
+        // Nestlone `moonshot` and not leave a parallel `moonshotai` bucket.
         let live = CatalogSnapshot {
             offerings: vec![
                 CatalogOffering {
@@ -843,7 +843,7 @@ mod tests {
         );
     }
 
-    /// #4188: when live Models.dev emits both an alias id and the CodeWhale id
+    /// #4188: when live Models.dev emits both an alias id and the Nestlone id
     /// for the same provider, compiling through `live_offerings_from_models_dev`
     /// then merging into the lake must not produce duplicate model rows.
     #[test]

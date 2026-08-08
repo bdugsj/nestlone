@@ -51,7 +51,7 @@ pub fn render(f: &mut Frame, area: Rect, app: &App) {
     if !lines.is_empty() {
         let mut panel = Block::default()
             .title(Line::from(Span::styled(
-                " Codewhale ",
+                " Nestlone ",
                 Style::default()
                     .fg(palette::WHALE_HUMAN)
                     .add_modifier(Modifier::BOLD),
@@ -237,7 +237,7 @@ pub fn mark_onboarded() -> std::io::Result<PathBuf> {
     let path = default_marker_path().ok_or_else(|| {
         std::io::Error::new(
             std::io::ErrorKind::NotFound,
-            "Codewhale home directory not found",
+            "Nestlone home directory not found",
         )
     })?;
     mark_onboarded_at_path(path)
@@ -595,7 +595,7 @@ mod tests {
         let _env_lock = crate::test_support::lock_test_env();
         let tmp = tempfile::tempdir().expect("tempdir");
         let ambient_home = tmp.path().join("ambient profile");
-        let isolated_home = tmp.path().join("isolated Codewhale state");
+        let isolated_home = tmp.path().join("isolated Nestlone state");
         let ambient_legacy = ambient_home.join(".deepseek").join(ONBOARDED_MARKER_FILE);
         std::fs::create_dir_all(ambient_legacy.parent().expect("legacy parent"))
             .expect("mkdir legacy");

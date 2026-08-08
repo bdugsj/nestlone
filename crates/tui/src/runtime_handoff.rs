@@ -72,9 +72,9 @@ const RESTORED_CHECKPOINT_TURN_META: &str = concat!(
     "</turn_meta>",
 );
 
-const RESTORED_COMPLETION_HEADER: &str = "[Codewhale restored sub-agent checkpoint]";
-const RESTORED_COMPLETIONS_HEADER: &str = "[Codewhale restored sub-agent checkpoints]";
-const RESTORED_RUNNING_HEADER: &str = "[Codewhale restored sub-agent runtime checkpoint]";
+const RESTORED_COMPLETION_HEADER: &str = "[Nestlone restored sub-agent checkpoint]";
+const RESTORED_COMPLETIONS_HEADER: &str = "[Nestlone restored sub-agent checkpoints]";
+const RESTORED_RUNNING_HEADER: &str = "[Nestlone restored sub-agent runtime checkpoint]";
 
 const DONE_SENTINEL_START: &str = "<nestlone:subagent.done>";
 const DONE_SENTINEL_END: &str = "</nestlone:subagent.done>";

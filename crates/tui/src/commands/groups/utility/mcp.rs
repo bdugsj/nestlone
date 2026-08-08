@@ -162,7 +162,7 @@ fn recommended_mcp_text() -> &'static str {
     "Recommended MCP servers (suggestions only; nothing is installed automatically)\n\
      \n\
      • hugging-face — remote Hugging Face MCP endpoint\n\
-       provenance: bundled Codewhale recommendation\n\
+       provenance: bundled Nestlone recommendation\n\
        add explicitly: /mcp add recommended hugging-face\n\
        then inspect: /mcp doctor · reload all configured servers: /mcp restart\n\
      \n\

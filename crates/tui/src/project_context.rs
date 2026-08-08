@@ -1,4 +1,4 @@
-//! Project context loading for Codewhale.
+//! Project context loading for Nestlone.
 //!
 //! This module handles loading project-specific context files that provide
 //! instructions and context to the AI agent. These include:
@@ -9,7 +9,7 @@
 //! - `.nestlone/instructions.md` - Hidden instructions file (compat)
 //! - `.deepseek/instructions.md` - Hidden instructions file (legacy)
 //!
-//! Codewhale-specific repo authority/prioritization policy lives separately in
+//! Nestlone-specific repo authority/prioritization policy lives separately in
 //! `.nestlone/constitution.json` and is rendered as its own higher-authority
 //! block. The loaded content is injected into the system prompt to give the
 //! agent context about the project's conventions, structure, and requirements.
@@ -25,11 +25,11 @@ use thiserror::Error;
 /// Names of project context files to look for, in priority order.
 ///
 /// `AGENTS.md` is the canonical cross-agent project-instructions file.
-/// `WHALE.md` is no longer an active context surface; when present, Codewhale
-/// reports a migration warning but ignores it. Codewhale-specific repo
+/// `WHALE.md` is no longer an active context surface; when present, Nestlone
+/// reports a migration warning but ignores it. Nestlone-specific repo
 /// authority now lives in `.nestlone/constitution.json`, not a bespoke
 /// markdown file. `CLAUDE.md` and the `*/instructions.md` variants are
-/// read-only compatibility fallbacks; Codewhale never creates or recommends
+/// read-only compatibility fallbacks; Nestlone never creates or recommends
 /// them.
 const PROJECT_CONTEXT_FILES: &[&str] = &[
     "AGENTS.md",
@@ -40,20 +40,20 @@ const PROJECT_CONTEXT_FILES: &[&str] = &[
 ];
 
 /// Rules directories auto-discovered at workspace level, in priority order.
-/// `.nestlone/rules/` is Codewhale-native; `.claude/rules/` is Claude compatibility.
+/// `.nestlone/rules/` is Nestlone-native; `.claude/rules/` is Claude compatibility.
 /// All `.md` files in these directories are loaded as project rules in filename order.
 /// Security model: same trust class as AGENTS.md — workspace-contained content only,
 /// no absolute-path escape. Does not require #417 project-config relaxation.
 const RULES_DIRS: &[&str] = &[".nestlone/rules", ".claude/rules"];
 
-/// File name of the deprecated Codewhale-native instructions file.
+/// File name of the deprecated Nestlone-native instructions file.
 const DEPRECATED_WHALE_FILENAME: &str = "WHALE.md";
 
 /// Warning surfaced when an ignored `WHALE.md` is present.
 const WHALE_IGNORED_WARNING: &str = "WHALE.md is ignored; move project instructions to AGENTS.md, or security authority policy to .nestlone/constitution.json.";
 
 /// Relative path (within a workspace or one of its parents) to the
-/// Codewhale-specific repo authority/prioritization policy.
+/// Nestlone-specific repo authority/prioritization policy.
 const REPO_CONSTITUTION_RELATIVE_PATH: &[&str] = &[".nestlone", "constitution.json"];
 
 /// `schema_version` understood by this build of the constitution loader.
@@ -160,7 +160,7 @@ pub struct ProjectContext {
     /// Any warnings during loading
     pub warnings: Vec<String>,
     /// Rendered `.nestlone/constitution.json` authority block, if present.
-    /// Codewhale-specific repo authority/prioritization policy — distinct from
+    /// Nestlone-specific repo authority/prioritization policy — distinct from
     /// the cross-agent prose in `instructions`.
     pub constitution_block: Option<String>,
     /// Path to the repo constitution file that produced `constitution_block`.
@@ -194,7 +194,7 @@ impl ProjectContext {
 
     /// Get the instructions as a formatted block for system prompt.
     ///
-    /// The Codewhale repo constitution (`.nestlone/constitution.json`), when
+    /// The Nestlone repo constitution (`.nestlone/constitution.json`), when
     /// present, is emitted first as a higher-authority block, followed by the
     /// cross-agent `<project_instructions>` prose. Either may be absent.
     pub fn as_system_block(&self) -> Option<String> {
@@ -238,7 +238,7 @@ impl ProjectContext {
     }
 }
 
-/// Codewhale-specific repo authority/prioritization policy, loaded from
+/// Nestlone-specific repo authority/prioritization policy, loaded from
 /// `.nestlone/constitution.json`. All fields are optional so a minimal file
 /// (or a future schema) still parses; unknown fields are ignored.
 #[derive(Debug, Clone, Default, Deserialize)]
@@ -466,7 +466,7 @@ impl RepoConstitution {
             }
         }
         format!(
-            "<nestlone_repo_constitution source=\"{}\">\nCodewhale-specific repo authority policy (local law: subordinate to the global Constitution and the current user request, but above memory and old handoffs; WHALE.md is ignored and should be migrated, not treated as law).\n\n{}</nestlone_repo_constitution>",
+            "<nestlone_repo_constitution source=\"{}\">\nNestlone-specific repo authority policy (local law: subordinate to the global Constitution and the current user request, but above memory and old handoffs; WHALE.md is ignored and should be migrated, not treated as law).\n\n{}</nestlone_repo_constitution>",
             source.display(),
             body.trim_end()
         )
@@ -1015,7 +1015,7 @@ fn load_project_context_with_parents_and_home(
 
     // Generate a bounded in-memory fallback when no context file exists
     // anywhere. This keeps prompt shape stable without creating project-local
-    // `.nestlone/` files merely because Codewhale was opened in a directory.
+    // `.nestlone/` files merely because Nestlone was opened in a directory.
     if !ctx.has_instructions()
         && let Some(generated) = generate_ephemeral_context(workspace)
     {
@@ -1023,7 +1023,7 @@ fn load_project_context_with_parents_and_home(
         ctx.source_path = None;
     }
 
-    // Load the Codewhale-specific repo authority policy
+    // Load the Nestlone-specific repo authority policy
     // (.nestlone/constitution.json) independently of the prose instructions —
     // it is a distinct, higher-authority artifact and may exist with or without
     // an AGENTS.md. Legacy WHALE.md files are ignored and reported as
@@ -1260,7 +1260,7 @@ fn generate_ephemeral_context(workspace: &Path) -> Option<String> {
 
     Some(format!(
         "# Project Context (Auto-generated, ephemeral)\n\n\
-         > This context was generated in memory by Codewhale.\n\
+         > This context was generated in memory by Nestlone.\n\
          > No .nestlone/instructions.md file was written.\n\n\
          {overview}"
     ))
@@ -1453,7 +1453,7 @@ pub fn create_default_agents_md(workspace: &Path) -> std::io::Result<PathBuf> {
 
     let default_content = r#"# Project Agent Instructions
 
-This file provides guidance to AI agents (Codewhale, Claude Code, etc.) when working with code in this repository.
+This file provides guidance to AI agents (Nestlone, Claude Code, etc.) when working with code in this repository.
 
 ## File Location
 
@@ -2371,7 +2371,7 @@ mod tests {
         let nestlone_dir = home.path().join(".nestlone");
         fs::create_dir(&nestlone_dir).expect("mkdir .nestlone");
         let nestlone_agents = nestlone_dir.join("AGENTS.md");
-        fs::write(&nestlone_agents, "Codewhale-specific instructions")
+        fs::write(&nestlone_agents, "Nestlone-specific instructions")
             .expect("write nestlone agents");
 
         let agents_dir = home.path().join(".agents");
@@ -2384,8 +2384,8 @@ mod tests {
         assert!(ctx.has_instructions());
         let instructions = ctx.instructions.as_ref().unwrap();
         assert!(
-            instructions.contains("Codewhale-specific instructions"),
-            "Codewhale-specific global file should win:\n{instructions}"
+            instructions.contains("Nestlone-specific instructions"),
+            "Nestlone-specific global file should win:\n{instructions}"
         );
         assert!(
             !instructions.contains("Vendor-neutral instructions"),

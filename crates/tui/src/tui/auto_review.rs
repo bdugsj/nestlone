@@ -1440,7 +1440,7 @@ mod tests {
             ),
             (
                 "Web",
-                json!({"action": "search", "query": "Codewhale"}),
+                json!({"action": "search", "query": "Nestlone"}),
                 ToolCategory::Network,
                 ToolActionKind::Network,
             ),

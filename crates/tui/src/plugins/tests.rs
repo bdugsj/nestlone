@@ -196,7 +196,7 @@ fn aba_source_skill_body_is_replaced_by_the_staged_snapshot_before_activation() 
         active.skill_snapshots[0]
             .path
             .starts_with(active.staged_root.as_ref().unwrap()),
-        "active Skill paths must point into the Codewhale-owned staged tree"
+        "active Skill paths must point into the Nestlone-owned staged tree"
     );
 }
 

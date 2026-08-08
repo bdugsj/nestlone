@@ -109,7 +109,7 @@ impl Default for RouteResolver {
 }
 
 impl RouteResolver {
-    /// Construct a resolver with CodeWhale's bundled offline offerings.
+    /// Construct a resolver with Nestlone's bundled offline offerings.
     ///
     /// The default offerings are the committed Models.dev-shaped catalog asset
     /// (`crate::catalog::bundled_catalog_offerings`, real context windows and
@@ -290,7 +290,7 @@ impl RouteResolver {
         require_catalog_match: bool,
     ) -> Result<ResolvedOffering, RouteError> {
         // OpenCode Go publishes one combined model roster across two wire
-        // protocols. Codewhale's provider is deliberately Chat Completions
+        // protocols. Nestlone's provider is deliberately Chat Completions
         // only, so this allowlist must sit at the sole route-candidate seam.
         // In particular, a custom base URL must not reopen generic
         // LocalOrCustom pass-through for Messages-only model ids.

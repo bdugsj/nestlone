@@ -115,7 +115,7 @@ impl StepfunBillingRoute {
 
 /// Whether the StepFun billing-route choice applies to `base_url`.
 ///
-/// Only the two endpoints Codewhale can classify are offered. A hand-edited
+/// Only the two endpoints Nestlone can classify are offered. A hand-edited
 /// endpoint (regional proxy, gateway, anything unrecognized) is a deliberate
 /// user choice, so the stage is skipped rather than silently rewriting it.
 fn stepfun_route_is_selectable(provider: ApiProvider, base_url: &str) -> bool {

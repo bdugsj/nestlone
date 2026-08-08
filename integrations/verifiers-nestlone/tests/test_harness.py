@@ -66,17 +66,17 @@ def install_verifiers_stubs() -> None:
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 install_verifiers_stubs()
-harness_module = importlib.import_module("codewhale_harness.harness")
+harness_module = importlib.import_module("nestlone_harness.harness")
 
-CodewhaleHarness = harness_module.CodewhaleHarness
-CodewhaleHarnessConfig = harness_module.CodewhaleHarnessConfig
+NestloneHarness = harness_module.NestloneHarness
+NestloneHarnessConfig = harness_module.NestloneHarnessConfig
 ProgramResult = sys.modules["verifiers.v1.runtimes"].ProgramResult
 
 
 def event(event_type: str, **fields) -> str:
     return json.dumps(
         {
-            "schema": "codewhale.exec-stream",
+            "schema": "nestlone.exec-stream",
             "schema_version": 1,
             "type": event_type,
             **fields,
@@ -121,7 +121,7 @@ class FakeRuntime:
     async def run(self, argv, env):
         self.runs.append((argv, env))
         if argv[-1:] == ["--version"]:
-            return ProgramResult(0, "codewhale 0.9.1 (candidate)", "")
+            return ProgramResult(0, "nestlone 0.9.1 (candidate)", "")
         return ProgramResult(0, "", "")
 
     async def run_program(self, argv, env):
@@ -144,19 +144,19 @@ def trace(prompt="Do the task", system_prompt="Use evidence"):
 
 class HarnessTests(unittest.IsolatedAsyncioTestCase):
     async def test_preinstalled_candidate_requires_exact_version(self):
-        config = CodewhaleHarnessConfig(
-            version="0.9.1", binary_path="/candidate/codewhale"
+        config = NestloneHarnessConfig(
+            version="0.9.1", binary_path="/candidate/nestlone"
         )
         runtime = FakeRuntime()
 
-        await CodewhaleHarness(config).setup(runtime)
+        await NestloneHarness(config).setup(runtime)
 
-        self.assertEqual(runtime.runs, [(["/candidate/codewhale", "--version"], {})])
+        self.assertEqual(runtime.runs, [(["/candidate/nestlone", "--version"], {})])
 
     async def test_launch_isolates_config_routes_interception_and_keeps_safe_receipt(self):
-        config = CodewhaleHarnessConfig(
+        config = NestloneHarnessConfig(
             version="0.9.1",
-            binary_path="/candidate/codewhale",
+            binary_path="/candidate/nestlone",
             max_turns=17,
             disabled_tools=["web_run"],
             env={"CALLER_SETTING": "kept", "OPENAI_API_KEY": "must-not-win"},
@@ -165,7 +165,7 @@ class HarnessTests(unittest.IsolatedAsyncioTestCase):
         rollout = trace()
         ctx = SimpleNamespace(model="test/model")
 
-        await CodewhaleHarness(config).launch(
+        await NestloneHarness(config).launch(
             ctx,
             rollout,
             runtime,
@@ -176,7 +176,7 @@ class HarnessTests(unittest.IsolatedAsyncioTestCase):
 
         self.assertEqual(len(runtime.programs), 1)
         argv, env = runtime.programs[0]
-        self.assertEqual(argv[0], "/candidate/codewhale")
+        self.assertEqual(argv[0], "/candidate/nestlone")
         self.assertIn("--no-project-config", argv)
         self.assertIn("--skip-onboarding", argv)
         self.assertEqual(argv[argv.index("--sandbox") + 1], "workspace-write")
@@ -194,14 +194,14 @@ class HarnessTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(len(runtime.writes), 1)
         mcp_path, mcp_bytes = runtime.writes[0]
         self.assertEqual(mcp_path, env["CODEWHALE_MCP_CONFIG"])
-        self.assertTrue(mcp_path.startswith(".vf-codewhale/"))
+        self.assertTrue(mcp_path.startswith(".vf-nestlone/"))
         self.assertNotIn(rollout.id, mcp_path)
         self.assertEqual(
             json.loads(mcp_bytes),
             {"servers": {"grader": {"url": "http://127.0.0.1:8123/mcp"}}},
         )
 
-        receipt = rollout.info["codewhale"]
+        receipt = rollout.info["nestlone"]
         self.assertEqual(receipt["events"], {"content": 1, "done": 1, "metadata": 1})
         self.assertNotIn("sensitive model output", json.dumps(receipt))
         self.assertNotIn("private-session-id", json.dumps(receipt))
@@ -209,7 +209,7 @@ class HarnessTests(unittest.IsolatedAsyncioTestCase):
         self.assertNotIn("vf-session-secret", json.dumps(receipt))
 
     async def test_isolated_runtime_uses_external_sandbox_without_elevation_flag(self):
-        config = CodewhaleHarnessConfig(binary_path="/candidate/codewhale")
+        config = NestloneHarnessConfig(binary_path="/candidate/nestlone")
         runtime = FakeRuntime(
             runtime_type="prime",
             result=ProgramResult(
@@ -217,7 +217,7 @@ class HarnessTests(unittest.IsolatedAsyncioTestCase):
             ),
         )
 
-        await CodewhaleHarness(config).launch(
+        await NestloneHarness(config).launch(
             SimpleNamespace(model="test/model"),
             trace(),
             runtime,
@@ -233,10 +233,10 @@ class HarnessTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_success_without_exact_terminal_receipt_fails_closed(self):
         runtime = FakeRuntime(result=ProgramResult(0, event("content", content="ok"), ""))
-        config = CodewhaleHarnessConfig(binary_path="/candidate/codewhale")
+        config = NestloneHarnessConfig(binary_path="/candidate/nestlone")
 
         with self.assertRaisesRegex(RuntimeError, "omitted terminal metadata"):
-            await CodewhaleHarness(config).launch(
+            await NestloneHarness(config).launch(
                 SimpleNamespace(model="test/model"),
                 trace(),
                 runtime,
@@ -248,10 +248,10 @@ class HarnessTests(unittest.IsolatedAsyncioTestCase):
     async def test_non_resolved_terminal_receipt_fails_closed(self):
         stdout = successful_stream().replace('"resolved"', '"approval_required"')
         runtime = FakeRuntime(result=ProgramResult(0, stdout, ""))
-        config = CodewhaleHarnessConfig(binary_path="/candidate/codewhale")
+        config = NestloneHarnessConfig(binary_path="/candidate/nestlone")
 
         with self.assertRaisesRegex(RuntimeError, "was not resolved"):
-            await CodewhaleHarness(config).launch(
+            await NestloneHarness(config).launch(
                 SimpleNamespace(model="test/model"),
                 trace(),
                 runtime,
@@ -263,10 +263,10 @@ class HarnessTests(unittest.IsolatedAsyncioTestCase):
     async def test_oversized_terminal_receipt_fails_closed_without_copying_content(self):
         stdout = successful_stream().replace("test/model", "x" * 513)
         runtime = FakeRuntime(result=ProgramResult(0, stdout, ""))
-        config = CodewhaleHarnessConfig(binary_path="/candidate/codewhale")
+        config = NestloneHarnessConfig(binary_path="/candidate/nestlone")
 
         with self.assertRaisesRegex(RuntimeError, "exceeded its string bound"):
-            await CodewhaleHarness(config).launch(
+            await NestloneHarness(config).launch(
                 SimpleNamespace(model="x" * 513),
                 trace(),
                 runtime,
@@ -278,24 +278,24 @@ class HarnessTests(unittest.IsolatedAsyncioTestCase):
     def test_exact_version_rejects_prerelease_and_longer_tokens(self):
         has_version = harness_module._has_version
 
-        self.assertTrue(has_version("codewhale 0.9.1 (abc123)", "0.9.1"))
-        self.assertFalse(has_version("codewhale 0.9.1-rc.1", "0.9.1"))
-        self.assertFalse(has_version("codewhale 0.9.10", "0.9.1"))
+        self.assertTrue(has_version("nestlone 0.9.1 (abc123)", "0.9.1"))
+        self.assertFalse(has_version("nestlone 0.9.1-rc.1", "0.9.1"))
+        self.assertFalse(has_version("nestlone 0.9.10", "0.9.1"))
 
     async def test_invalid_config_rejects_shell_and_tool_injection(self):
         for config in [
-            CodewhaleHarnessConfig(version="0.9.1; touch /tmp/pwned"),
-            CodewhaleHarnessConfig(disabled_tools=["read_file,exec_shell"]),
-            CodewhaleHarnessConfig(max_turns=0),
+            NestloneHarnessConfig(version="0.9.1; touch /tmp/pwned"),
+            NestloneHarnessConfig(disabled_tools=["read_file,exec_shell"]),
+            NestloneHarnessConfig(max_turns=0),
         ]:
             with self.assertRaises(ValueError):
-                await CodewhaleHarness(config).setup(FakeRuntime())
+                await NestloneHarness(config).setup(FakeRuntime())
 
     async def test_install_is_pinned_and_checksum_verified(self):
-        config = CodewhaleHarnessConfig(version="0.9.1")
+        config = NestloneHarnessConfig(version="0.9.1")
         runtime = FakeRuntime()
 
-        await CodewhaleHarness(config).setup(runtime)
+        await NestloneHarness(config).setup(runtime)
 
         self.assertEqual(len(runtime.runs), 1)
         argv, env = runtime.runs[0]
@@ -303,7 +303,7 @@ class HarnessTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(env, {})
         command = argv[2]
         self.assertIn("releases/download", command)
-        self.assertIn("codewhale-artifacts-sha256.txt", command)
+        self.assertIn("nestlone-artifacts-sha256.txt", command)
         self.assertIn("sha256sum", command)
         self.assertIn("flock", command)
         self.assertIn("util-linux", command)

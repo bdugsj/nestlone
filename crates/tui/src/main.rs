@@ -1,4 +1,4 @@
-//! CLI entry point for Codewhale.
+//! CLI entry point for Nestlone.
 
 #![allow(clippy::uninlined_format_args)]
 
@@ -183,8 +183,8 @@ fn install_rustls_crypto_provider() {
     bin_name = "nestlone-tui",
     author,
     version = env!("DEEPSEEK_BUILD_VERSION"),
-    about = "Nestlone — security agent platform (Kali + pentest + RE)",
-    long_about = "Terminal-native TUI and CLI for security analysis and penetration testing.\n\nRun 'nestlone' to start.\n\nProvider routes include DeepSeek, Arcee, Hugging Face, OpenRouter, Xiaomi MiMo, local vLLM/SGLang/Ollama, and more."
+    about = "Nestlone — terminal coding agent",
+    long_about = "Terminal-native TUI and CLI for coding with any model — bring your own\nmodel, hosted or local, none privileged.\n\nRun 'nestlone' to start.\n\nProvider routes include DeepSeek, Arcee, Hugging Face, OpenRouter, Xiaomi MiMo, local vLLM/SGLang/Ollama, and more."
 )]
 struct Cli {
     /// Subcommand to run
@@ -830,7 +830,7 @@ fn resolve_exec_resume_route(
             .map_err(anyhow::Error::msg)
             .with_context(|| {
                 format!(
-                    "saved session provider '{}' is unavailable; Codewhale will not fall back",
+                    "saved session provider '{}' is unavailable; Nestlone will not fall back",
                     saved_provider_identity
                 )
             })?;
@@ -1249,7 +1249,7 @@ enum McpCommand {
     /// For the HTTP/SSE runtime API, use `nestlone serve --http` directly instead.
     #[command(
         name = "add-self",
-        long_about = "Register this Nestlone binary as a local MCP stdio server.\n\nAdds a config entry to ~/.nestlone/mcp.json that launches `nestlone serve --mcp`\nvia the stdio transport. Other Codewhale sessions (or any MCP client) can then\ndiscover and call tools exposed by this server.\n\nUse `nestlone serve --http` instead if you need the HTTP/SSE runtime API."
+        long_about = "Register this Nestlone binary as a local MCP stdio server.\n\nAdds a config entry to ~/.nestlone/mcp.json that launches `nestlone serve --mcp`\nvia the stdio transport. Other Nestlone sessions (or any MCP client) can then\ndiscover and call tools exposed by this server.\n\nUse `nestlone serve --http` instead if you need the HTTP/SSE runtime API."
     )]
     AddSelf {
         /// Server name in mcp.json (default: "nestlone")
@@ -2008,7 +2008,7 @@ fn load_workspace_dotenv_credentials_from_path(path: &Path) -> Result<WorkspaceD
 
         // SAFETY: this loader runs synchronously in `main` before the runtime
         // owner or Tokio workers are spawned. No concurrent environment reader
-        // exists inside Codewhale, and later startup code treats this process
+        // exists inside Nestlone, and later startup code treats this process
         // environment as immutable.
         unsafe { std::env::set_var(&key, value) };
         report.loaded.insert(key);
@@ -2825,7 +2825,7 @@ fn init_tools_dir(tools_dir: &Path, force: bool) -> Result<(PathBuf, WriteStatus
 
 fn plugins_readme_template() -> &'static str {
     "# Local plugins\n\n\
-     Each Codewhale plugin bundle lives in its own subdirectory with a\n\
+     Each Nestlone plugin bundle lives in its own subdirectory with a\n\
      versioned `plugin.toml`. User bundles live here; workspace bundles live\n\
      under `<workspace>/.nestlone/plugins/`. Both are discovered read-only,\n\
      untrusted, and disabled by default.\n\n\
@@ -2855,7 +2855,7 @@ fn plugin_example_manifest_template() -> &'static str {
      [plugin]\n\
      name = \"example\"\n\
      version = \"0.1.0\"\n\
-     description = \"Starter Codewhale plugin bundle\"\n\n\
+     description = \"Starter Nestlone plugin bundle\"\n\n\
      [skills]\n\
      path = \"skills\"\n"
 }
@@ -3321,7 +3321,7 @@ fn run_setup_status(
             "✓".truecolor(aqua_r, aqua_g, aqua_b)
         ),
         ApiKeySource::OAuth => println!(
-            "  {} oauth: Codewhale-owned storage selected (availability not probed)",
+            "  {} oauth: Nestlone-owned storage selected (availability not probed)",
             "✓".truecolor(aqua_r, aqua_g, aqua_b)
         ),
         ApiKeySource::ExternalConsent => println!(
@@ -3680,7 +3680,7 @@ async fn run_doctor(
     println!("  active: {}", crate::utils::display_path(active_root));
     if active_root != &code_home {
         println!(
-            "  note: legacy {} found; start Codewhale once to trigger safe migration where available.",
+            "  note: legacy {} found; start Nestlone once to trigger safe migration where available.",
             crate::utils::display_path(&legacy_home)
         );
     }
@@ -4994,7 +4994,7 @@ fn print_doctor_legacy_state_report(
             }
         }
         println!(
-            "    Start Codewhale once to trigger safe migration where available, then rerun `nestlone doctor`."
+            "    Start Nestlone once to trigger safe migration where available, then rerun `nestlone doctor`."
         );
     }
 
@@ -5070,7 +5070,7 @@ fn print_doctor_session_recovery_report(
                 crate::utils::display_path(&report.primary_sessions_path),
             );
             println!(
-                "      2. Close other Codewhale processes, then run `nestlone sessions`; migration adds only missing files, never overwrites primary files, and leaves legacy originals in place."
+                "      2. Close other Nestlone processes, then run `nestlone sessions`; migration adds only missing files, never overwrites primary files, and leaves legacy originals in place."
             );
             println!(
                 "      3. Rerun `nestlone doctor`. If filenames remain, keep both backups and report only the listed source/destination names."
@@ -8055,7 +8055,7 @@ async fn run_mcp_command(
             );
             save_mcp_config(&config_path, &cfg)?;
             println!(
-                "Registered Codewhale as MCP server '{name}' in {}",
+                "Registered Nestlone as MCP server '{name}' in {}",
                 config_path.display()
             );
             println!("  command: {exe_str}");

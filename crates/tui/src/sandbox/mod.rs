@@ -3,7 +3,7 @@
 //! Sandbox module for secure command execution.
 //!
 //! This module provides sandboxing capabilities for shell commands executed by
-//! CodeWhale. Sandboxing restricts what system resources a command can access,
+//! Nestlone. Sandboxing restricts what system resources a command can access,
 //! preventing accidental or malicious damage to the system.
 //!
 //! # Platform Support
@@ -344,7 +344,7 @@ pub fn get_platform_sandbox() -> Option<SandboxType> {
 /// Detect the sandbox wrapper the configured command path can actually use.
 ///
 /// Linux bubblewrap is deliberately opt-in. A Landlock ABI probe alone does
-/// not make commands sandboxed because Codewhale does not yet launch them
+/// not make commands sandboxed because Nestlone does not yet launch them
 /// through a Landlock helper.
 pub fn get_platform_sandbox_with_bwrap_preference(prefer_bwrap: bool) -> Option<SandboxType> {
     #[cfg(target_os = "macos")]

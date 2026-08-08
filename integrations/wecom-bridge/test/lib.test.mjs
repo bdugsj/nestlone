@@ -9,7 +9,7 @@ import { ThreadStore, validateBridgeConfig, isApprovalResponse, isDenyResponse }
 // ─── ThreadStore ─────────────────────────────────────────────────
 
 test("ThreadStore writes private state files", async () => {
-  const dir = await mkdtemp(path.join(tmpdir(), "codewhale-wecom-"));
+  const dir = await mkdtemp(path.join(tmpdir(), "nestlone-wecom-"));
   try {
     const statePath = path.join(dir, "nested", "thread-map.json");
     const store = await ThreadStore.open(statePath);

@@ -5,7 +5,7 @@ edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
 repository.workspace = true
-description = "Execution policy and approval model for Codewhale"
+description = "Execution policy and approval model for Nestlone"
 
 [dependencies]
 anyhow.workspace = true

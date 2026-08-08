@@ -191,7 +191,7 @@ impl WebSearchTool {
     /// Search via a configured SearXNG JSON API.
     ///
     /// SearXNG exposes `/search?q=...&format=json`, but public instances often
-    /// disable JSON output or rate-limit automation. CodeWhale therefore uses
+    /// disable JSON output or rate-limit automation. Nestlone therefore uses
     /// only the trusted instance configured in `[search] base_url`.
     async fn run_searxng_search(
         &self,

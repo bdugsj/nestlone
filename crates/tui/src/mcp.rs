@@ -587,7 +587,7 @@ pub struct McpServerConfig {
     #[serde(skip_serializing_if = "HashMap::is_empty")]
     pub env_headers: HashMap<String, String>,
     /// Environment variable containing a bearer token. When present and set,
-    /// CodeWhale sends `Authorization: Bearer <value>` for URL-based servers.
+    /// Nestlone sends `Authorization: Bearer <value>` for URL-based servers.
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub bearer_token_env_var: Option<String>,
@@ -723,7 +723,7 @@ impl ReviewedPluginMcpSource {
         // Catalog exposure is an authority boundary too: stale tool, prompt,
         // or resource descriptions can steer the model even when the later
         // operation would be denied. Revalidate both the mutable reviewed
-        // source and the Codewhale-owned stage before publishing any entry.
+        // source and the Nestlone-owned stage before publishing any entry.
         crate::plugins::registry::verify_plugin_authority(&self.authority).is_ok()
     }
 }

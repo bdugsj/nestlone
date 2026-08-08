@@ -1,4 +1,4 @@
-//! Runtime HTTP/SSE API for local Codewhale automation.
+//! Runtime HTTP/SSE API for local Nestlone automation.
 
 use std::convert::Infallible;
 use std::fs;
@@ -454,10 +454,10 @@ pub async fn run_http_server(
         bail!("Port must be > 0");
     }
     if options.web && options.host != "127.0.0.1" {
-        bail!("Codewhale web is loopback-only and must bind to 127.0.0.1");
+        bail!("Nestlone web is loopback-only and must bind to 127.0.0.1");
     }
     if options.web && options.insecure_no_auth {
-        bail!("Codewhale web requires Runtime authentication; remove --insecure");
+        bail!("Nestlone web requires Runtime authentication; remove --insecure");
     }
 
     let task_cfg = TaskManagerConfig::from_runtime(
@@ -503,7 +503,7 @@ pub async fn run_http_server(
     let (web, web_bootstrap) = if options.web {
         runtime_token
             .as_ref()
-            .context("Codewhale web requires a Runtime authentication token")?;
+            .context("Nestlone web requires a Runtime authentication token")?;
         let (web, bootstrap) = web::RuntimeWebState::new();
         (Some(web), Some(bootstrap))
     } else {
@@ -561,13 +561,13 @@ pub async fn run_http_server(
         );
     }
     if let Some(bootstrap) = web_bootstrap {
-        println!("Codewhale web enabled at http://{bound_addr}/");
+        println!("Nestlone web enabled at http://{bound_addr}/");
         let bootstrap_url = web::bootstrap_url(bound_addr, &bootstrap);
         if let Err(error) = crate::utils::open_url(&bootstrap_url) {
             scheduler_cancel.cancel();
             scheduler_handle.abort();
             return Err(error)
-                .context("Failed to open the Codewhale web client in the default browser");
+                .context("Failed to open the Nestlone web client in the default browser");
         }
     }
     let is_loopback = options.host == "127.0.0.1" || options.host == "::1";

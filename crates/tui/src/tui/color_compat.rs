@@ -306,7 +306,7 @@ pub(crate) fn ascii_safe_enabled() -> bool {
     env_flag_enabled(std::env::var(ASCII_SAFE_ENV).ok().as_deref())
 }
 
-/// Narrow every CodeWhale-authored decorative glyph to a semantic ASCII
+/// Narrow every Nestlone-authored decorative glyph to a semantic ASCII
 /// alternative. Scope is deliberate: box drawing, block elements (whale
 /// mark, meters, rails), braille state markers, geometric role/state marks,
 /// arrows, and typographic chrome. Language text — CJK labels, accented

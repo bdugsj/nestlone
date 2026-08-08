@@ -6476,7 +6476,7 @@ mod tests {
         );
     }
 
-    /// #4208: `CODEWHALE_ASCII_SAFE=1` must narrow every CodeWhale-authored
+    /// #4208: `CODEWHALE_ASCII_SAFE=1` must narrow every Nestlone-authored
     /// decorative glyph — whale mark, fish, bubble, context meter, borders,
     /// braille state markers — across real rendered surfaces, not a
     /// hand-picked symbol list.

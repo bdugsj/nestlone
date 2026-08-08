@@ -1,4 +1,4 @@
-//! Codewhale bundle lifecycle and legacy executable plugin-tool inventory.
+//! Nestlone bundle lifecycle and legacy executable plugin-tool inventory.
 //!
 //! `/plugin` owns declarative bundles (`plugin.toml`). Script tools under
 //! `[tools].plugin_dir` remain supported, but are labeled as legacy executable
@@ -364,7 +364,7 @@ fn render_permissions(plugin: &LoadedPlugin) -> String {
         )
     };
     format!(
-        "filesystem_roots=[{filesystem}] network_hosts=[{network}] (exact allowlist for Codewhale-managed remote requests; redirects stay same-origin) lifecycle_mutation={} stdio_runtime=[{stdio_authority}]",
+        "filesystem_roots=[{filesystem}] network_hosts=[{network}] (exact allowlist for Nestlone-managed remote requests; redirects stay same-origin) lifecycle_mutation={} stdio_runtime=[{stdio_authority}]",
         plugin.inventory.lifecycle_mutation
     )
 }

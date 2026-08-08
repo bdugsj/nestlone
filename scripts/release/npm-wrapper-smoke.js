@@ -8,7 +8,7 @@ const path = require("path");
 const { spawn } = require("child_process");
 
 const repoRoot = path.resolve(__dirname, "..", "..");
-const packageDir = path.join(repoRoot, "npm", "codewhale");
+const packageDir = path.join(repoRoot, "npm", "nestlone");
 const prepareAssetsScript = path.join(
   repoRoot,
   "scripts",

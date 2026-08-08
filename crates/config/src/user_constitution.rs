@@ -286,7 +286,7 @@ pub struct UserConstitution {
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub clauses: Vec<ConstitutionClause>,
     /// Unknown top-level fields, preserved verbatim across load/migrate/save so
-    /// a newer Codewhale's file survives a round-trip through an older one.
+    /// a newer Nestlone's file survives a round-trip through an older one.
     ///
     /// This map is **cleared** on the untrusted-draft path
     /// ([`UserConstitution::from_untrusted_json`]) and is outside
@@ -559,7 +559,7 @@ impl UserConstitution {
     /// Parse an untrusted draft (e.g. model output) into a bounded, sanitized
     /// constitution.
     ///
-    /// This is the single ingestion gate for text CodeWhale did not author:
+    /// This is the single ingestion gate for text Nestlone did not author:
     ///
     /// - Extracts the first JSON object, so fenced or prose-wrapped output
     ///   still parses; anything without one is [`Invalid`].
@@ -927,7 +927,7 @@ impl MigrationReceipt {
 /// Why a constitution file could not be migrated.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum MigrationRejection {
-    /// Written by a newer Codewhale. Refused rather than downgraded, so its
+    /// Written by a newer Nestlone. Refused rather than downgraded, so its
     /// content cannot be silently dropped.
     UnsupportedFutureVersion { found: u64, supported: u32 },
     /// The file carries a runtime-authority key the constitution may not hold.
@@ -1265,7 +1265,7 @@ mod tests {
 
     fn sample() -> UserConstitution {
         UserConstitution {
-            about: Some("Maintainer of CodeWhale.".to_string()),
+            about: Some("Maintainer of Nestlone.".to_string()),
             working_style: vec!["Be concise.".to_string(), "Show diffs.".to_string()],
             priorities: vec!["Correctness over speed.".to_string()],
             autonomy_preference: AutonomyPreference::Balanced,
@@ -1637,7 +1637,7 @@ mod tests {
     fn v1_file() -> String {
         serde_json::json!({
             "schema_version": 1,
-            "about": "Maintainer of CodeWhale.",
+            "about": "Maintainer of Nestlone.",
             "working_style": ["Be concise."],
             "autonomy_preference": "balanced",
         })
@@ -1665,7 +1665,7 @@ mod tests {
         assert!(
             constitution
                 .render_body()
-                .contains("Maintainer of CodeWhale.")
+                .contains("Maintainer of Nestlone.")
         );
 
         // Deterministic: same bytes in, same outcome out.

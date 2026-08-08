@@ -47,7 +47,7 @@ const config = {
   allowUnlisted: parseBool(process.env.CODEWHALE_ALLOW_UNLISTED ?? process.env.DEEPSEEK_ALLOW_UNLISTED, false),
   threadMapPath:
     process.env.FEISHU_THREAD_MAP_PATH ||
-    "/var/lib/codewhale-feishu-bridge/thread-map.json",
+    "/var/lib/nestlone-feishu-bridge/thread-map.json",
   allowGroups: parseBool(process.env.FEISHU_ALLOW_GROUPS, false),
   requirePrefixInGroup: parseBool(process.env.FEISHU_REQUIRE_PREFIX_IN_GROUP, true),
   groupPrefix: process.env.FEISHU_GROUP_PREFIX || "/ds",

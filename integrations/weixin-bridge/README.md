@@ -1,6 +1,6 @@
 # Weixin Bot Bridge
 
-此 bridge 让微信个人账号通过扫码登录控制本地 `codewhale serve --http` runtime。
+此 bridge 让微信个人账号通过扫码登录控制本地 `nestlone serve --http` runtime。
 使用腾讯 iLink Bot 协议（参考 `@tencent-weixin/openclaw-weixin`），
 无需公众号注册即可工作。
 
@@ -9,7 +9,7 @@
 
 ## 安全模型
 
-- `codewhale serve --http` 绑定于 `127.0.0.1`。
+- `nestlone serve --http` 绑定于 `127.0.0.1`。
 - `/v1/*` runtime 调用使用 `CODEWHALE_RUNTIME_TOKEN`。
 - 微信用户必须加入白名单，除非首次配对时设置 `WEIXIN_ALLOW_UNLISTED=true`。
 - 仅支持私聊；暂不支持群聊。
@@ -19,10 +19,10 @@
 ## 设置
 
 ```bash
-cd /opt/codewhale/weixin-bot-bridge
+cd /opt/nestlone/weixin-bot-bridge
 npm install --omit=dev
-cp .env.example /etc/codewhale/weixin-bot-bridge.env
-sudoedit /etc/codewhale/weixin-bot-bridge.env
+cp .env.example /etc/nestlone/weixin-bot-bridge.env
+sudoedit /etc/nestlone/weixin-bot-bridge.env
 node src/index.mjs
 ```
 
@@ -41,7 +41,7 @@ node src/index.mjs
 - `/allow <approval_id> [remember]`
 - `/deny <approval_id>`
 
-其他所有内容均作为 Codewhale 提示发送。
+其他所有内容均作为 Nestlone 提示发送。
 
 ## 首次配对
 
@@ -73,7 +73,7 @@ node src/index.mjs
 ## 架构
 
 ```
-微信客户端 ──getUpdates 长轮询──▶ Weixin Bot Bridge ──HTTP──▶ codewhale serve --http
+微信客户端 ──getUpdates 长轮询──▶ Weixin Bot Bridge ──HTTP──▶ nestlone serve --http
                   ◀──sendMessage──                                  (127.0.0.1:7878)
 ```
 

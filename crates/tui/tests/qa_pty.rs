@@ -1707,7 +1707,7 @@ fn legacy_work_ctrl_t_save_export_and_restart_are_consistent() -> anyhow::Result
         "export mutated graph-backed Work state"
     );
     assert!(
-        std::fs::read_to_string(&export_path)?.contains("# Codewhale conversation export"),
+        std::fs::read_to_string(&export_path)?.contains("# Nestlone conversation export"),
         "full export artifact missing"
     );
     let _ = h.shutdown();
@@ -1974,7 +1974,7 @@ fn paste_bracketed_from_macos_client_into_linux_ssh_stays_in_composer() -> anyho
     Ok(())
 }
 
-/// End-to-end regression for SSH inside stock tmux: make a real Codewhale
+/// End-to-end regression for SSH inside stock tmux: make a real Nestlone
 /// selection, press the in-app Ctrl+C binding, and verify the text reaches the
 /// tmux paste buffer through `load-buffer -w`. A stock `/dev/null` tmux config
 /// keeps `allow-passthrough` off, which is the case the old DCS wrapper lost.

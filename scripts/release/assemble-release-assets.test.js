@@ -14,7 +14,7 @@ const {
   BUNDLE_CHECKSUM_MANIFEST,
   CHECKSUM_MANIFEST,
   checksummedReleaseAssetNames,
-} = require("../../npm/codewhale/scripts/artifacts");
+} = require("../../npm/nestlone/scripts/artifacts");
 const {
   assemble,
   parseChecksumManifest,

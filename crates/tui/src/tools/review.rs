@@ -908,7 +908,7 @@ mod tests {
     async fn staged_diff_with_base_compares_merge_base_to_index() {
         let repo = tempfile::TempDir::new().expect("temp git repository");
         fixture_git(repo.path(), &["init"]);
-        fixture_git(repo.path(), &["config", "user.name", "Codewhale Test"]);
+        fixture_git(repo.path(), &["config", "user.name", "Nestlone Test"]);
         fixture_git(
             repo.path(),
             &["config", "user.email", "nestlone-test@example.invalid"],

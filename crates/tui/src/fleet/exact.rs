@@ -796,7 +796,7 @@ pub(crate) fn preflight_route(
 ///
 /// Preflight resolves a route from *configuration*; this proves the same route
 /// can be turned into a working client — the step that fails on a malformed
-/// base URL, an unusable auth mode, or a transport CodeWhale cannot construct.
+/// base URL, an unusable auth mode, or a transport Nestlone cannot construct.
 /// Doing it at Workflow start, for every member, is what stops a Fleet from
 /// paying for a Router decision and only then discovering that the worker it
 /// decided for could never have been launched.
@@ -2651,7 +2651,7 @@ permissions = "read_only"
     }
 
     /// The capability must report the tier the route *sends*, not the tier the
-    /// selector named. CodeWhale's own normalizer coerces `low`/`medium` to
+    /// selector named. Nestlone's own normalizer coerces `low`/`medium` to
     /// `high` on every non-Codex route, so a receipt saying `low` would name a
     /// request that never happened.
     #[test]

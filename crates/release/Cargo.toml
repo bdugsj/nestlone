@@ -5,7 +5,7 @@ edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
 repository.workspace = true
-description = "Shared Codewhale release discovery and version comparison helpers"
+description = "Shared Nestlone release discovery and version comparison helpers"
 
 [dependencies]
 anyhow.workspace = true

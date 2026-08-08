@@ -517,7 +517,7 @@ fn canonical_git_run_and_web_actions_use_semantic_history_cells() {
         &mut app,
         "Web-search",
         "Web",
-        &serde_json::json!({"action": "search", "query": "Codewhale"}),
+        &serde_json::json!({"action": "search", "query": "Nestlone"}),
     );
     let active = app.active_cell.as_ref().expect("active cell");
     assert!(matches!(
@@ -4012,7 +4012,7 @@ fn project_runtime_provenance_only_blocks_values_startup_would_accept() {
     let workspace = Settings::path()
         .expect("settings path")
         .parent()
-        .expect("Codewhale home")
+        .expect("Nestlone home")
         .parent()
         .expect("temporary home")
         .join("project");
@@ -4076,7 +4076,7 @@ fn saved_full_access_baseline_allows_project_approval_tightening() {
     let workspace = Settings::path()
         .expect("settings path")
         .parent()
-        .expect("Codewhale home")
+        .expect("Nestlone home")
         .parent()
         .expect("temporary home")
         .join("project");
@@ -5546,7 +5546,7 @@ fn provider_picker_reselecting_active_provider_preserves_current_model() {
 async fn provider_switch_clears_turn_cache_history() {
     // `switch_provider` persists the new provider to `Settings`, which
     // writes through settings path resolution. Without redirecting the
-    // CodeWhale/legacy config homes we would clobber the developer's real
+    // Nestlone/legacy config homes we would clobber the developer's real
     // preferences and leave `default_provider = "ollama"` behind.
     let _home = SettingsHomeGuard::new();
 
@@ -19997,7 +19997,7 @@ fn terminal_input_child_pause_drains_nestlone_events_before_editor_handoff() {
 
     assert!(
         pending_terminal_events.is_empty(),
-        "pending CodeWhale terminal events must not leak into the editor handoff"
+        "pending Nestlone terminal events must not leak into the editor handoff"
     );
     assert!(
         input.try_recv().expect("drained channel").is_none(),

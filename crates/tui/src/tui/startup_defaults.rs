@@ -58,7 +58,7 @@
 //! So the atomicity of a single load/modify/save belongs one level down, in
 //! [`Settings::transact`], which holds a per-settings-path process mutex *and*
 //! a cross-process advisory lock on an adjacent `settings.toml.lock` across the
-//! whole cycle — the second one because a user can easily have two Codewhale
+//! whole cycle — the second one because a user can easily have two Nestlone
 //! processes open on the same home directory. Every reachable settings writer
 //! goes through it. What stays here is the part `transact` cannot provide:
 //! **ordering**. A lock makes concurrent transactions safe but says nothing

@@ -43,7 +43,7 @@ struct ToolLifecycleWorld {
     requests: Vec<Value>,
 }
 
-#[given("an offline CodeWhale workspace containing:")]
+#[given("an offline Nestlone workspace containing:")]
 fn offline_nestlone_workspace_containing(world: &mut ToolLifecycleWorld, step: &Step) {
     let workspace = TempDir::new().expect("workspace tempdir");
     let home = TempDir::new().expect("home tempdir");
@@ -133,7 +133,7 @@ async fn user_asks(world: &mut ToolLifecycleWorld, prompt: String) {
     world.llm_server = Some(server);
 }
 
-#[then("CodeWhale should send the user request to the mocked LLM")]
+#[then("Nestlone should send the user request to the mocked LLM")]
 fn nestlone_should_send_user_request_to_mocked_llm(world: &mut ToolLifecycleWorld) {
     let first_request = world
         .requests
@@ -192,7 +192,7 @@ fn public_tool_result_should_return_directory_entries(world: &mut ToolLifecycleW
     }
 }
 
-#[then("CodeWhale should send the tool result back to the mocked LLM")]
+#[then("Nestlone should send the tool result back to the mocked LLM")]
 fn nestlone_should_send_tool_result_back_to_mocked_llm(world: &mut ToolLifecycleWorld) {
     let request = world
         .requests
@@ -234,7 +234,7 @@ fn public_tool_result_should_report_error_for(world: &mut ToolLifecycleWorld, to
     );
 }
 
-#[then("CodeWhale should send the tool error back to the mocked LLM")]
+#[then("Nestlone should send the tool error back to the mocked LLM")]
 fn nestlone_should_send_tool_error_back_to_mocked_llm(world: &mut ToolLifecycleWorld) {
     let request = world
         .requests
@@ -290,7 +290,7 @@ fn public_tool_result_should_report_malformed_arguments_for(
     assert_malformed_arguments_text(output);
 }
 
-#[then("CodeWhale should send the malformed argument error back to the mocked LLM")]
+#[then("Nestlone should send the malformed argument error back to the mocked LLM")]
 fn nestlone_should_send_malformed_argument_error_back_to_mocked_llm(
     world: &mut ToolLifecycleWorld,
 ) {
@@ -336,7 +336,7 @@ fn public_tool_result_should_report_real_error(
     );
 }
 
-#[then("CodeWhale should send the real tool error back to the mocked LLM")]
+#[then("Nestlone should send the real tool error back to the mocked LLM")]
 fn nestlone_should_send_real_tool_error_back_to_mocked_llm(world: &mut ToolLifecycleWorld) {
     let request = world
         .requests
@@ -366,7 +366,7 @@ fn public_tool_result_should_be_an_empty_list(world: &mut ToolLifecycleWorld) {
     );
 }
 
-#[then("CodeWhale should send the empty tool result back to the mocked LLM")]
+#[then("Nestlone should send the empty tool result back to the mocked LLM")]
 fn nestlone_should_send_empty_tool_result_back_to_mocked_llm(world: &mut ToolLifecycleWorld) {
     let request = world
         .requests

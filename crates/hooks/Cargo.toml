@@ -5,7 +5,7 @@ edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
 repository.workspace = true
-description = "Hook dispatch and notifications support for Codewhale"
+description = "Hook dispatch and notifications support for Nestlone"
 
 [dependencies]
 anyhow.workspace = true

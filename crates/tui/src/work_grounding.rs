@@ -1,6 +1,6 @@
 //! Canonical model-facing Work grounding (#3983).
 //!
-//! Codewhale has exactly one Work surface: the To-do ledger. This module owns
+//! Nestlone has exactly one Work surface: the To-do ledger. This module owns
 //! the single bounded renderer for a [`TodoListSnapshot`] and the transient
 //! wrapper the engine appends to each parent turn-loop and sub-agent step
 //! request.

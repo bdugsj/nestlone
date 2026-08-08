@@ -6813,7 +6813,7 @@ fn git_repo_root_finds_repo_from_direct_cwd() {
 fn git_repo_root_discovers_one_level_nested_repo_from_harness() {
     let repo = init_subagent_git_repo();
     let harness = tempdir().expect("harness dir");
-    let nested = harness.path().join("CodeWhale");
+    let nested = harness.path().join("Nestlone");
     Command::new("git")
         .args([
             "clone",
@@ -6949,7 +6949,7 @@ fn init_git_repo_at(path: &std::path::Path) {
 #[test]
 fn create_isolated_worktree_discovers_nested_repo_from_harness_parent() {
     let harness = tempdir().expect("harness");
-    let nested = harness.path().join("CodeWhale");
+    let nested = harness.path().join("Nestlone");
     std::fs::create_dir_all(&nested).expect("nested checkout dir");
     init_git_repo_at(&nested);
     let worktree_home = tempdir().expect("worktree home");
@@ -12046,7 +12046,7 @@ fn coordination_process_lock_rejects_second_process() {
                 .unwrap()
                 .ensure_coordination_process_lock()
                 .expect_err("second process must fail closed");
-            assert!(error.contains("another Codewhale process"), "{error}");
+            assert!(error.contains("another Nestlone process"), "{error}");
         }
         return;
     }

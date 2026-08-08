@@ -1,4 +1,4 @@
-//! Tool specification traits for the CodeWhale agent system.
+//! Tool specification traits for the Nestlone agent system.
 //!
 //! This module defines the core abstractions for tools:
 //! - `ToolSpec`: The main trait that all tools must implement
@@ -461,7 +461,7 @@ pub struct ToolExecutionState {
     pub mcp_config_path: PathBuf,
     /// Explicit skills directory used for model-visible skill discovery.
     pub skills_dir: Option<PathBuf>,
-    /// Restrict skill discovery to CodeWhale-owned roots plus `skills_dir`.
+    /// Restrict skill discovery to Nestlone-owned roots plus `skills_dir`.
     pub skills_scan_nestlone_only: bool,
     /// Immutable registry snapshot for this workspace/engine context.
     pub plugin_registry: Option<Arc<crate::plugins::PluginRegistry>>,

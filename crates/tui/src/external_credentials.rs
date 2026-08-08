@@ -94,11 +94,11 @@ pub(crate) fn read_to_string(grant: &ExternalCredentialReadGrant) -> Result<Opti
     Ok(Some(contents))
 }
 
-/// Read one Codewhale-owned credential file through the same no-follow,
+/// Read one Nestlone-owned credential file through the same no-follow,
 /// bounded I/O boundary used for external grants. On Unix the opened handle
 /// must belong to the effective user and have no group/other permission bits.
 /// The caller is responsible for constraining `path` to a validated basename
-/// below Codewhale's credentials directory before invoking this function.
+/// below Nestlone's credentials directory before invoking this function.
 pub(crate) fn read_nestlone_owned_to_string(path: &Path) -> Result<Option<String>> {
     let mut file = match open_secure_regular_file(path, true) {
         Ok(file) => file,
@@ -106,7 +106,7 @@ pub(crate) fn read_nestlone_owned_to_string(path: &Path) -> Result<Option<String
         Err(error) => {
             return Err(error).with_context(|| {
                 format!(
-                    "securely opening Codewhale-owned credential file {}",
+                    "securely opening Nestlone-owned credential file {}",
                     nestlone_config::quote_os_path(path)
                 )
             });
@@ -118,20 +118,20 @@ pub(crate) fn read_nestlone_owned_to_string(path: &Path) -> Result<Option<String
         .read_to_end(&mut bytes)
         .with_context(|| {
             format!(
-                "reading Codewhale-owned credential file {}",
+                "reading Nestlone-owned credential file {}",
                 nestlone_config::quote_os_path(path)
             )
         })?;
     if bytes.len() as u64 > MAX_EXTERNAL_CREDENTIAL_BYTES {
         bail!(
-            "Codewhale-owned credential file {} exceeds the {} byte safety limit",
+            "Nestlone-owned credential file {} exceeds the {} byte safety limit",
             nestlone_config::quote_os_path(path),
             MAX_EXTERNAL_CREDENTIAL_BYTES
         );
     }
     String::from_utf8(bytes).map(Some).with_context(|| {
         format!(
-            "Codewhale-owned credential file {} is not valid UTF-8",
+            "Nestlone-owned credential file {} is not valid UTF-8",
             nestlone_config::quote_os_path(path)
         )
     })
@@ -234,7 +234,7 @@ fn open_secure_regular_file(path: &Path, require_owner_only: bool) -> io::Result
         {
             return Err(io::Error::new(
                 io::ErrorKind::PermissionDenied,
-                "Codewhale-owned credential file must be singly linked, owned by this user, and mode 0600 or stricter",
+                "Nestlone-owned credential file must be singly linked, owned by this user, and mode 0600 or stricter",
             ));
         }
     }
@@ -329,7 +329,7 @@ fn open_secure_regular_file(path: &Path, require_owner_only: bool) -> io::Result
         if information.nNumberOfLinks != 1 {
             return Err(io::Error::new(
                 io::ErrorKind::PermissionDenied,
-                "Codewhale-owned credential file must be singly linked",
+                "Nestlone-owned credential file must be singly linked",
             ));
         }
         verify_windows_owner_only_handle(handle)?;
@@ -466,13 +466,13 @@ fn verify_windows_owner_only_handle(
     if owner.is_null() || unsafe { EqualSid(owner, user.sid()) } == 0 {
         return Err(io::Error::new(
             io::ErrorKind::PermissionDenied,
-            "Codewhale-owned credential file owner is not the current user",
+            "Nestlone-owned credential file owner is not the current user",
         ));
     }
     if dacl.is_null() {
         return Err(io::Error::new(
             io::ErrorKind::PermissionDenied,
-            "Codewhale-owned credential file must have an owner-only DACL",
+            "Nestlone-owned credential file must have an owner-only DACL",
         ));
     }
     let mut count = 0;
@@ -487,7 +487,7 @@ fn verify_windows_owner_only_handle(
     if count != 1 || entries.is_null() {
         return Err(io::Error::new(
             io::ErrorKind::PermissionDenied,
-            "Codewhale-owned credential file DACL must grant only one user",
+            "Nestlone-owned credential file DACL must grant only one user",
         ));
     }
     // SAFETY: `count == 1` proves the first returned entry is initialized.
@@ -501,7 +501,7 @@ fn verify_windows_owner_only_handle(
     if !current_user_only {
         return Err(io::Error::new(
             io::ErrorKind::PermissionDenied,
-            "Codewhale-owned credential file DACL is not current-user-only",
+            "Nestlone-owned credential file DACL is not current-user-only",
         ));
     }
     Ok(())

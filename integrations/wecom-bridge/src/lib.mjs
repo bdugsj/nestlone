@@ -103,7 +103,7 @@ export function commandAction(command) {
 
 export function helpText() {
   return [
-    "CodeWhale 企业微信桥接命令:",
+    "Nestlone 企业微信桥接命令:",
     "/help - 显示帮助",
     "/status - runtime 和工作区状态",
     "/threads - 最近的 runtime 线程",
@@ -115,7 +115,7 @@ export function helpText() {
     "/allow <approval_id> [remember] - 批准待处理的工具调用",
     "/deny <approval_id> - 拒绝待处理的工具调用",
     "",
-    "其他所有内容均作为 CodeWhale 提示发送。"
+    "其他所有内容均作为 Nestlone 提示发送。"
   ].join("\n");
 }
 

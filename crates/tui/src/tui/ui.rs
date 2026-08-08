@@ -226,31 +226,26 @@ const VERSION_HINT_TOAST_TTL_MS: u64 = 12_000;
 
 const REQUIRED_RELEASE_ASSETS: &[&str] = &[
     "nestlone-artifacts-sha256.txt",
-    "codew-android-arm64",
-    "nestlone-android-arm64",
-    "nestlone-android-arm64.tar.gz",
-    "nestlone-tui-android-arm64",
-    "nestlone-linux-arm64",
-    "nestlone-linux-arm64.tar.gz",
     "nestlone-linux-x64",
     "nestlone-linux-x64.tar.gz",
-    "nestlone-macos-arm64",
-    "nestlone-macos-arm64.tar.gz",
+    "nest-linux-x64",
+    "nestlone-tui-linux-x64",
+    "nestlone-linux-arm64",
+    "nestlone-linux-arm64.tar.gz",
+    "nest-linux-arm64",
+    "nestlone-tui-linux-arm64",
     "nestlone-macos-x64",
     "nestlone-macos-x64.tar.gz",
-    "nestlone-tui-linux-arm64",
-    "nestlone-tui-linux-x64",
-    "nestlone-tui-macos-arm64",
+    "nest-macos-x64",
     "nestlone-tui-macos-x64",
-    "nestlone-tui-windows-x64.exe",
+    "nestlone-macos-arm64",
+    "nestlone-macos-arm64.tar.gz",
+    "nest-macos-arm64",
+    "nestlone-tui-macos-arm64",
     "nestlone-windows-x64.exe",
-    "nestlone-windows-x64-portable.zip",
-    "nestlone-windows-x64.zip",
-    "codew-windows-arm64.exe",
-    "nestlone-tui-windows-arm64.exe",
-    "nestlone-windows-arm64.exe",
-    "nestlone-windows-arm64-portable.zip",
-    "nestlone-windows-arm64.zip",
+    "nestlone-windows-x64.tar.gz",
+    "nest-windows-x64.exe",
+    "nestlone-tui-windows-x64.exe",
 ];
 
 fn is_session_approved_for_tool(app: &App, tool_name: &str, grouping_key: &str) -> bool {
@@ -1175,7 +1170,7 @@ fn start_remote_control_session(app: &mut App) {
         .file_name()
         .and_then(|value| value.to_str())
         .filter(|value| !value.is_empty())
-        .unwrap_or("Codewhale session")
+        .unwrap_or("Nestlone session")
         .to_string();
     let runtime_commit = option_env!("NESTLONE_BUILD_COMMIT")
         .unwrap_or("")
@@ -1313,7 +1308,7 @@ pub async fn run_tui(
     };
     if use_alt_screen {
         execute!(stdout, EnterAlternateScreen)?;
-        // Windows also suppresses Codewhale's own verbose CLI logger while
+        // Windows also suppresses Nestlone's own verbose CLI logger while
         // the alt-screen is active. The stderr redirect above catches raw
         // writes; this prevents the known verbose source at the origin.
         #[cfg(windows)]
@@ -1760,8 +1755,8 @@ fn require_interactive_terminal(stdin_is_tty: bool, stdout_is_tty: bool) -> Resu
         return Ok(());
     }
     Err(anyhow::anyhow!(
-        "Codewhale TUI requires an interactive terminal (stdin and stdout must be a TTY).\n\
-         Open a real terminal (Terminal.app, iTerm, Windows Terminal, …) and run `codew` \
+        "Nestlone TUI requires an interactive terminal (stdin and stdout must be a TTY).\n\
+         Open a real terminal (Terminal.app, iTerm, Windows Terminal, …) and run `nest` \
          or `nestlone` there — not from a pipe, cron job, or non-TTY launcher.\n\
          For headless prompts use `nestlone exec \"…\"` instead."
     ))
@@ -5421,7 +5416,7 @@ async fn run_event_loop(
                     Err(err) => {
                         tracing::warn!(error = %err, "failed to restart terminal input pump");
                         app.push_status_toast(
-                            "Terminal input stalled; recovery failed. Restart Codewhale if keys stop responding.",
+                            "Terminal input stalled; recovery failed. Restart Nestlone if keys stop responding.",
                             StatusToastLevel::Error,
                             None,
                         );
@@ -9619,7 +9614,7 @@ fn paused_command_note(title: &str, resume: bool) -> String {
         "The user is not resuming that paused command. Answer only the new message and do not continue the paused command."
     };
     format!(
-        "\n\nCodewhale paused custom slash command context:\n\
+        "\n\nNestlone paused custom slash command context:\n\
 Paused custom slash command: {title}\n\
 Paused command: {title}\n\
 {instruction}"
@@ -13096,7 +13091,7 @@ fn handle_shell_job_action(app: &mut App, action: crate::tui::app::ShellJobActio
         Err(_) => {
             add_shell_job_message(
                 app,
-                "Shell tracking hit an internal error — restart Codewhale to recover.".to_string(),
+                "Shell tracking hit an internal error — restart Nestlone to recover.".to_string(),
             );
             return;
         }
@@ -16816,7 +16811,7 @@ fn apply_loaded_session(
     )
     .map_err(|reason| {
         format!(
-            "saved session provider '{}' could not be resolved from the live config: {reason}. Codewhale will not fall back",
+            "saved session provider '{}' could not be resolved from the live config: {reason}. Nestlone will not fall back",
             provider_identity.key
         )
     })?;
@@ -17617,7 +17612,7 @@ pub(crate) fn request_foreground_shell_background(app: &mut App) {
         }
         Err(_) => {
             app.status_message = Some(
-                "Shell tracking hit an internal error — restart Codewhale to recover.".to_string(),
+                "Shell tracking hit an internal error — restart Nestlone to recover.".to_string(),
             );
         }
     }

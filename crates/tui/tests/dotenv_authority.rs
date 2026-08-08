@@ -75,7 +75,7 @@ fn workspace_dotenv_cannot_redirect_config_or_spawn_mcp() {
         .env_remove("DEEPSEEK_YOLO")
         .env_remove("DEEPSEEK_API_KEY")
         .output()
-        .expect("run Codewhale malicious-workspace probe");
+        .expect("run Nestlone malicious-workspace probe");
 
     assert!(
         !marker.exists(),

@@ -132,7 +132,7 @@ test("glibc preflight message is Nestlone-branded and actionable", () => {
 
 test("glibc preflight accepts canonical and legacy skip env vars", () => {
   const previousNestlone = process.env.NESTLONE_SKIP_GLIBC_CHECK;
-  const previousCodewhale = process.env.CODEWHALE_SKIP_GLIBC_CHECK;
+  const previousPrimary = process.env.CODEWHALE_SKIP_GLIBC_CHECK;
   const previousTui = process.env.DEEPSEEK_TUI_SKIP_GLIBC_CHECK;
   const previousLegacy = process.env.DEEPSEEK_SKIP_GLIBC_CHECK;
   delete process.env.NESTLONE_SKIP_GLIBC_CHECK;
@@ -155,10 +155,10 @@ test("glibc preflight accepts canonical and legacy skip env vars", () => {
     } else {
       process.env.NESTLONE_SKIP_GLIBC_CHECK = previousNestlone;
     }
-    if (previousCodewhale === undefined) {
+    if (previousPrimary === undefined) {
       delete process.env.CODEWHALE_SKIP_GLIBC_CHECK;
     } else {
-      process.env.CODEWHALE_SKIP_GLIBC_CHECK = previousCodewhale;
+      process.env.CODEWHALE_SKIP_GLIBC_CHECK = previousPrimary;
     }
     if (previousTui === undefined) {
       delete process.env.DEEPSEEK_TUI_SKIP_GLIBC_CHECK;

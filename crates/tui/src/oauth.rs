@@ -1,7 +1,7 @@
 //! OpenAI Codex / ChatGPT OAuth credential loading.
 //!
 //! External Codex CLI credentials are read only after an exact, provider-scoped
-//! consent grant. Codewhale never refreshes or rewrites that external file.
+//! consent grant. Nestlone never refreshes or rewrites that external file.
 //!
 //! # Security
 //!
@@ -94,7 +94,7 @@ fn token_is_expired(access_token: &str) -> bool {
             now + 60 >= exp
         }
         // If we can't prove freshness, fail closed. External credentials are
-        // never refreshed by Codewhale.
+        // never refreshed by Nestlone.
         None => true,
     }
 }
@@ -175,7 +175,7 @@ pub fn missing_auth_message() -> String {
     format!(
         "OpenAI Codex OAuth credentials are unavailable.\n\
          \n\
-         Codewhale checks OPENAI_CODEX_ACCESS_TOKEN and CODEX_ACCESS_TOKEN automatically.\n\
+         Nestlone checks OPENAI_CODEX_ACCESS_TOKEN and CODEX_ACCESS_TOKEN automatically.\n\
          Access to the Codex CLI file is disabled by default. After `codex login`, grant read-only access explicitly with:\n\
          `nestlone auth external-consent --provider openai-codex --mode read-only --path {}`\n\
          Read-only access never refreshes or rewrites the Codex CLI file.",

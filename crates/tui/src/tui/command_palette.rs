@@ -1261,7 +1261,7 @@ mod tests {
         std::fs::create_dir_all(&nestlone_skill_dir).expect("create nestlone skill dir");
         std::fs::write(
             nestlone_skill_dir.join("SKILL.md"),
-            "---\nname: nestlone-skill\ndescription: CodeWhale skill\n---\nbody",
+            "---\nname: nestlone-skill\ndescription: Nestlone skill\n---\nbody",
         )
         .expect("write nestlone skill");
 

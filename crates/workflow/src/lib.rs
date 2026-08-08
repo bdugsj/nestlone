@@ -1,4 +1,4 @@
-//! Typed Workflow IR and validation for CodeWhale.
+//! Typed Workflow IR and validation for Nestlone.
 //!
 //! This crate deliberately stops at the Rust-owned IR boundary. Runtime tool
 //! exposure, worktree application, replay, and model execution are layered on

@@ -224,7 +224,7 @@ pub struct EngineConfig {
     pub mcp_config_path: PathBuf,
     /// Directory containing discoverable skills.
     pub skills_dir: PathBuf,
-    /// Restrict skill discovery to CodeWhale-owned roots plus explicit
+    /// Restrict skill discovery to Nestlone-owned roots plus explicit
     /// `skills_dir` configuration.
     pub skills_scan_nestlone_only: bool,
     /// Immutable plugin authority snapshot scoped to `workspace`. Normal App

@@ -19,7 +19,7 @@ try {
     : null;
   const result = validateBridgeConfig(bridgeEnv, {
     runtimeEnv,
-    workspaceRoot: args.workspaceRoot || "/opt/whalebro"
+    workspaceRoot: args.workspaceRoot || "/opt/nestlone"
   });
 
   if (args.checkFilesystem) {
@@ -41,7 +41,7 @@ function parseArgs(argv) {
   const parsed = {
     env: "",
     runtimeEnv: "",
-    workspaceRoot: "/opt/whalebro",
+    workspaceRoot: "/opt/nestlone",
     checkFilesystem: false,
     json: false
   };
@@ -149,7 +149,7 @@ function printHelp() {
 Options:
   --env FILE             Read bridge env from FILE instead of process.env.
   --runtime-env FILE     Read runtime env and verify the shared bearer token.
-  --workspace-root DIR   Expected remote workspace root (default: /opt/whalebro).
+  --workspace-root DIR   Expected remote workspace root (default: /opt/nestlone).
   --check-filesystem     Verify workspace and thread-map paths are usable.
   --json                 Print machine-readable JSON.
   -h, --help             Show this help.

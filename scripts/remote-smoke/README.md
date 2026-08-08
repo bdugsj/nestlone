@@ -4,7 +4,7 @@ Status: experimental smoke-lab scripts for the US-first remote-workbench lane
 (issue #1990). Not part of the supported install paths until the smoke passes
 and this graduates into a documented setup.
 
-This concretizes `docs/REMOTE_VM_US.md`: a cheap US VPS running the Codewhale
+This concretizes `docs/REMOTE_VM_US.md`: a cheap US VPS running the Nestlone
 runtime on `127.0.0.1` plus the Telegram long-polling bridge, reusing the
 provider-agnostic Ubuntu scripts under `scripts/tencent-lighthouse/` (audited:
 nothing in them is Tencent-specific).
@@ -21,7 +21,7 @@ nothing in them is Tencent-specific).
 - `aws-lightsail/provision.sh`, `aws-lightsail/teardown.sh` — kept as the
   AWS alternative; same flow, needs `aws configure` first.
 - `agent-session.sh` — sourceable helper for interactive/tmux agent sessions
-  as the `codewhale` user.  Sources `/etc/codewhale/runtime.env` so the
+  as the `nestlone` user.  Sources `/etc/nestlone/runtime.env` so the
   provider key is available outside of systemd.
 
 Both provisioners print the API-reported monthly price and require a typed
@@ -43,8 +43,8 @@ China.
 - Telegram uses outbound long polling — no webhook, no public ingress.
 - Telegram chats are allowlisted (`TELEGRAM_CHAT_ALLOWLIST`); unlisted chats
   are refused. `TELEGRAM_ALLOW_UNLISTED=true` only for first pairing.
-- Secrets travel as a chmod-600 file over scp, land in `/etc/codewhale/*.env`
-  (0640 root:codewhale), and the transfer file is shredded. Never in argv,
+- Secrets travel as a chmod-600 file over scp, land in `/etc/nestlone/*.env`
+  (0640 root:nestlone), and the transfer file is shredded. Never in argv,
   shell history, or logs.
 
 ## Run order — DigitalOcean (from the laptop)
@@ -91,13 +91,13 @@ docs/REMOTE_VM_US.md default spec).
 ## Known sharp edges (from the 2026-06-09 audit)
 
 - The Rust binary reads only `DEEPSEEK_RUNTIME_TOKEN`/`--auth-token` and
-  `--port`; the `CODEWHALE_RUNTIME_*` names in `/etc/codewhale/runtime.env`
+  `--port`; the `CODEWHALE_RUNTIME_*` names in `/etc/nestlone/runtime.env`
   work because the systemd unit expands them into flags. Don't start
-  `codewhale serve` by hand and expect the env file to apply.
-- `codewhale-runtime.service` hard-fails activation if
-  `/home/codewhale/.codewhale` or `/home/codewhale/.deepseek` don't exist
+  `nestlone serve` by hand and expect the env file to apply.
+- `nestlone-runtime.service` hard-fails activation if
+  `/home/nestlone/.nestlone` or `/home/nestlone/.deepseek` don't exist
   (`ReadWritePaths`); `setup-vm.sh` pre-creates them.
-- Both binaries are required (`codewhale` delegates to `codewhale-tui`).
+- Both binaries are required (`nestlone` delegates to `nestlone-tui`).
 - Exactly one bridge process per bot token — a second poller causes endless
   Telegram 409s. Stop any local bridge before starting the VM one.
 - `/interrupt` is queued behind an active streaming turn (known limitation,
@@ -114,8 +114,8 @@ commits have a stable identity:
 
 ```bash
 gh auth setup-git
-git config --global user.name "whalebro-agent"
-git config --global user.email "whalebro-agent@users.noreply.github.com"
+git config --global user.name "nestlone-agent"
+git config --global user.email "nestlone-agent@users.noreply.github.com"
 ```
 
 ```bash
@@ -126,15 +126,15 @@ gh issue list --repo Hmbown/CodeWhale --label agent-ready --state open --json nu
 gh issue edit <N> --add-label agent-in-progress --remove-label agent-ready
 
 # 3. Isolate in a worktree
-git -C /opt/whalebro/codewhale fetch origin
-git -C /opt/whalebro/codewhale worktree add \
-  /opt/whalebro/worktrees/issue-<N> -b agent/<N>-<slug> origin/main
-cd /opt/whalebro/worktrees/issue-<N>
+git -C /opt/nestlone/nestlone fetch origin
+git -C /opt/nestlone/nestlone worktree add \
+  /opt/nestlone/worktrees/issue-<N> -b agent/<N>-<slug> origin/main
+cd /opt/nestlone/worktrees/issue-<N>
 
 # 4. Execute (run inside a tmux session for SSH-disconnect safety)
-. /opt/whalebro/codewhale/scripts/remote-smoke/agent-session.sh
+. /opt/nestlone/nestlone/scripts/remote-smoke/agent-session.sh
 gh issue view <N> --json body -q .body | \
-  codewhale exec --auto --output-format stream-json "$(cat)"
+  nestlone exec --auto --output-format stream-json "$(cat)"
 
 # 5. Verify (run the issue's Verification block verbatim)
 # 6. Deliver

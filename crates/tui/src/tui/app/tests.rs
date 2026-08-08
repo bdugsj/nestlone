@@ -2216,7 +2216,7 @@ fn cached_skills_respect_nestlone_only_scan_config() {
     std::fs::create_dir_all(&nestlone_dir).expect("nestlone skill dir");
     std::fs::write(
         nestlone_dir.join("SKILL.md"),
-        "---\nname: nestlone-skill\ndescription: CodeWhale skill\n---\nbody\n",
+        "---\nname: nestlone-skill\ndescription: Nestlone skill\n---\nbody\n",
     )
     .expect("write nestlone skill");
 
@@ -2239,7 +2239,7 @@ fn cached_skills_respect_nestlone_only_scan_config() {
         app.cached_skills
             .iter()
             .any(|(name, _)| name == "nestlone-skill"),
-        "CodeWhale skill should be cached: {:?}",
+        "Nestlone skill should be cached: {:?}",
         app.cached_skills
     );
     assert!(
@@ -2321,7 +2321,7 @@ fn cached_skills_preserve_configured_directory_in_nestlone_only_scan() {
     std::fs::create_dir_all(&nestlone_skill_dir).expect("workspace nestlone skill dir");
     std::fs::write(
         nestlone_skill_dir.join("SKILL.md"),
-        "---\nname: workspace-nestlone\ndescription: Workspace CodeWhale skill\n---\nbody\n",
+        "---\nname: workspace-nestlone\ndescription: Workspace Nestlone skill\n---\nbody\n",
     )
     .expect("write workspace nestlone skill");
 
@@ -2352,7 +2352,7 @@ fn cached_skills_preserve_configured_directory_in_nestlone_only_scan() {
         app.cached_skills
             .iter()
             .any(|(name, _)| name == "workspace-nestlone"),
-        "workspace CodeWhale skill should still be cached: {:?}",
+        "workspace Nestlone skill should still be cached: {:?}",
         app.cached_skills
     );
     assert!(
@@ -2401,7 +2401,7 @@ fn cached_skills_reject_nestlone_only_workspace_symlink_escape() {
         !app.cached_skills
             .iter()
             .any(|(name, _)| name == "escaped-skill"),
-        "strict app cache must not follow escaped workspace CodeWhale symlinks: {:?}",
+        "strict app cache must not follow escaped workspace Nestlone symlinks: {:?}",
         app.cached_skills
     );
 }

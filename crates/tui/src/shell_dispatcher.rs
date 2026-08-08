@@ -1,7 +1,7 @@
-//! Shell abstraction layer for Codewhale.
+//! Shell abstraction layer for Nestlone.
 //!
 //! Detects the user's shell at startup and provides a single entry point for
-//! all command execution. Codewhale never calls `Command::new("cmd")` (or
+//! all command execution. Nestlone never calls `Command::new("cmd")` (or
 //! `"sh"`, `"pwsh"`, ...) directly — it asks the [`ShellDispatcher`] to build
 //! a correctly configured [`std::process::Command`].
 //!

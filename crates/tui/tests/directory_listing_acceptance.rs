@@ -20,7 +20,7 @@ struct DirectoryListingWorld {
     fixture_records: Vec<serde_json::Value>,
 }
 
-#[given("an offline CodeWhale evaluation workspace")]
+#[given("an offline Nestlone evaluation workspace")]
 fn offline_nestlone_evaluation_workspace(world: &mut DirectoryListingWorld) {
     world.record_dir = Some(TempDir::new().expect("record tempdir"));
 }

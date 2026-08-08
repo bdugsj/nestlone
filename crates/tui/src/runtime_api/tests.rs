@@ -170,7 +170,7 @@ fn workspace_status_reports_head_and_dirty_counts() -> Result<()> {
         &repo,
         &[
             "-c",
-            "user.name=CodeWhale Test",
+            "user.name=Nestlone Test",
             "-c",
             "user.email=nestlone@example.invalid",
             "commit",
@@ -940,7 +940,7 @@ fn write_fake_fleet_binary(root: &Path, marker: &Path) -> Result<PathBuf> {
 #[cfg(windows)]
 fn write_fake_fleet_binary(root: &Path, marker: &Path) -> Result<PathBuf> {
     // Exercise the same executable/Job Object path as a released Windows
-    // Codewhale binary. A `.cmd` fake introduces an extra `cmd.exe` wrapper
+    // Nestlone binary. A `.cmd` fake introduces an extra `cmd.exe` wrapper
     // whose lifetime can end before the Fleet host attaches its Job Object,
     // making the test race a process topology production does not use.
     let source = root.join("fake-nestlone.rs");
@@ -1423,7 +1423,7 @@ async fn thread_summary_includes_workspace_branch_metadata() -> Result<()> {
         &repo,
         &[
             "-c",
-            "user.name=CodeWhale Test",
+            "user.name=Nestlone Test",
             "-c",
             "user.email=nestlone@example.invalid",
             "commit",
@@ -5608,12 +5608,12 @@ fn resolve_skills_dir_rejects_nestlone_only_symlink_escaping_workspace() {
     let canon_escape = fs::canonicalize(&escape_target).expect("canon escape");
     assert_ne!(
         resolved, canon_escape,
-        "CodeWhale-only symlink escaping workspace must not be resolved as skills dir"
+        "Nestlone-only symlink escaping workspace must not be resolved as skills dir"
     );
     assert_eq!(
         resolved,
         config.skills_dir(),
-        "with no valid in-workspace CodeWhale skills dir, resolution should fall back to config"
+        "with no valid in-workspace Nestlone skills dir, resolution should fall back to config"
     );
 }
 

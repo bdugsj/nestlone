@@ -470,7 +470,7 @@ function startBrowserClient() {
         // The status line is enough when the response is not JSON.
       }
       if (response.status === 401) {
-        message = "This browser session is not authenticated. Restart `codewhale web` to open a fresh one-time session.";
+        message = "This browser session is not authenticated. Restart `nestlone web` to open a fresh one-time session.";
       }
       throw new Error(message);
     }
@@ -871,7 +871,7 @@ function startBrowserClient() {
     if (item.kind === "user_message" || item.kind === "agent_message") {
       const role = item.kind === "user_message" ? "user" : "agent";
       const card = element("article", `message ${role} ${item.status === "in_progress" ? "in-progress" : ""}`.trim());
-      card.append(element("div", "message-label", role === "user" ? "You" : "Codewhale"));
+      card.append(element("div", "message-label", role === "user" ? "You" : "Nestlone"));
       card.append(element("div", "message-body", detail));
       return card;
     }
@@ -911,7 +911,7 @@ function startBrowserClient() {
     const card = element("article", "attention-card");
     card.append(element("p", "eyebrow", "Approval required"));
     card.append(element("h2", "", approval.tool_name || "Tool request"));
-    card.append(element("p", "", approval.intent_summary || approval.description || "Codewhale is waiting for permission."));
+    card.append(element("p", "", approval.intent_summary || approval.description || "Nestlone is waiting for permission."));
     const actions = element("div", "attention-actions");
     const rememberLabel = element("label", "remember-field");
     const remember = document.createElement("input");
@@ -954,7 +954,7 @@ function startBrowserClient() {
   function renderUserInput(inputId, envelope) {
     const card = element("form", "attention-card");
     card.append(element("p", "eyebrow", "Input required"));
-    card.append(element("h2", "", "Codewhale has a question"));
+    card.append(element("h2", "", "Nestlone has a question"));
     const questions = Array.isArray(envelope.request?.questions) ? envelope.request.questions : [];
     const groups = [];
     for (const question of questions) {

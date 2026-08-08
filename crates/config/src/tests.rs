@@ -297,7 +297,7 @@ fn provider_command_auth_source_deserializes() {
         r#"
         [providers.deepseek.auth]
         source = "command"
-        command = ["keepassxc-cli", "show", "CodeWhale/DeepSeek", "--attribute", "password"]
+        command = ["keepassxc-cli", "show", "Nestlone/DeepSeek", "--attribute", "password"]
         timeout_ms = 2000
         "#,
     )
@@ -2951,7 +2951,7 @@ fn state_migration_notice_explains_preserved_data_and_canonical_root() {
 
     let notice = migration.user_notice();
 
-    assert!(notice.contains("Codewhale migrated legacy state"));
+    assert!(notice.contains("Nestlone migrated legacy state"));
     assert!(notice.contains("/home/alice/.deepseek/sessions"));
     assert!(notice.contains("/home/alice/.nestlone/sessions"));
     assert!(notice.contains("Your data was preserved"));
@@ -3966,7 +3966,7 @@ fn provider_kind_parses_openrouter_and_novita_aliases() {
     assert_eq!(parsed.provider, ProviderKind::Siliconflow);
 }
 
-/// Models.dev publishes provider ids that do not always match CodeWhale's
+/// Models.dev publishes provider ids that do not always match Nestlone's
 /// canonical id (`fireworks-ai`, `togetherai`, `novita-ai`, `moonshotai`).
 /// These MUST normalize onto the right [`ProviderKind`] via
 /// [`ProviderKind::parse`], which is the seam `ModelReferenceCard::from_offering`
@@ -3990,7 +3990,7 @@ fn provider_kind_normalizes_models_dev_provider_ids() {
         ("xiaomi", ProviderKind::XiaomiMimo),
         ("deepinfra", ProviderKind::Deepinfra),
         ("siliconflow", ProviderKind::Siliconflow),
-        // Models.dev spells the China endpoint `siliconflow-cn`; CodeWhale's
+        // Models.dev spells the China endpoint `siliconflow-cn`; Nestlone's
         // canonical id is `siliconflow-CN` and `parse` is case-insensitive.
         ("siliconflow-cn", ProviderKind::SiliconflowCN),
         ("openrouter", ProviderKind::Openrouter),

@@ -142,7 +142,7 @@ fn bug_report_diagnostics_hint() -> &'static str {
     "Before filing, first check whether this looks like a model issue or an environment/tool issue: \
      command exit, network/service, sandbox/approval, missing dependency/path, timeout, or an unclosed turn. \
      If you have a local JSONL log, run `nestlone session-diagnostics <path>` and include the redacted category summary. \
-     Include the Codewhale version, OS/terminal, the tool name, and redacted timestamps or log handles when available. \
+     Include the Nestlone version, OS/terminal, the tool name, and redacted timestamps or log handles when available. \
      Do not paste prompts, secrets, raw command output, full local paths, or conversation transcripts."
 }
 

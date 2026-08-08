@@ -275,8 +275,8 @@ pub fn verify_task_result(
             format!("external scorer command configured: {command}"),
             "run the configured scorer command to finalize this receipt",
         ),
-        Some(FleetScorerSpec::CodeWhaleVerifierPrompt { .. }) => partial(
-            "Codewhale verifier prompt configured",
+        Some(FleetScorerSpec::NestloneVerifierPrompt { .. }) => partial(
+            "Nestlone verifier prompt configured",
             "run a verifier prompt pass to finalize this receipt",
         ),
         Some(FleetScorerSpec::Manual) => partial(

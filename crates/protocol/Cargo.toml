@@ -5,7 +5,7 @@ edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
 repository.workspace = true
-description = "App-server protocol frames for Codewhale runtime integrations"
+description = "App-server protocol frames for Nestlone runtime integrations"
 
 [dependencies]
 chrono.workspace = true

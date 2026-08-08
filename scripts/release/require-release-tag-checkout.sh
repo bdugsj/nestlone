@@ -37,8 +37,8 @@ if [[ -n "${dirty}" ]]; then
 fi
 
 workspace_version="$(grep -E '^version = "' Cargo.toml | head -n1 | sed -E 's/^version = "([^"]+)".*/\1/')"
-npm_version="$(node -p "require('./npm/codewhale/package.json').version")"
-binary_version="$(node -p "require('./npm/codewhale/package.json').nestloneBinaryVersion")"
+npm_version="$(node -p "require('./npm/nestlone/package.json').version")"
+binary_version="$(node -p "require('./npm/nestlone/package.json').nestloneBinaryVersion")"
 for pair in "workspace:${workspace_version}" "npm:${npm_version}"; do
   label="${pair%%:*}"
   actual="${pair#*:}"

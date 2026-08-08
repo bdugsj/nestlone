@@ -1,4 +1,4 @@
-//! First-run primer for Codewhale's two independent control axes.
+//! First-run primer for Nestlone's two independent control axes.
 
 use ratatui::style::{Modifier, Style};
 use ratatui::text::{Line, Span};

@@ -302,7 +302,7 @@ impl StateStore {
 
     /// Apply connection-level SQLite settings that must hold for every open.
     ///
-    /// Enables WAL so readers and writers from concurrent CodeWhale processes
+    /// Enables WAL so readers and writers from concurrent Nestlone processes
     /// do not block each other as aggressively as the default rollback journal,
     /// and sets a multi-second busy timeout so a second process retries on
     /// `SQLITE_BUSY` instead of failing immediately (issue #4734).
@@ -2191,7 +2191,7 @@ mod tests {
         );
     }
 
-    /// Two independent connections (as two CodeWhale processes would open)
+    /// Two independent connections (as two Nestlone processes would open)
     /// must be able to write concurrently without failing with SQLITE_BUSY
     /// once WAL + busy_timeout are applied at open (#4734).
     ///

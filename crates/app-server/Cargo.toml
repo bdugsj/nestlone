@@ -5,8 +5,8 @@ edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
 repository.workspace = true
-description = "App-server transport for Codewhale runtime integrations"
-# `codewhale app-server` is owned by nestlone-cli; this crate is library-only.
+description = "App-server transport for Nestlone runtime integrations"
+# `nestlone app-server` is owned by nestlone-cli; this crate is library-only.
 autobins = false
 
 [dependencies]

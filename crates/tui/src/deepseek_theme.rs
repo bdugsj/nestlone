@@ -1,4 +1,4 @@
-//! Codewhale terminal theme tokens (legacy module path).
+//! Nestlone terminal theme tokens (legacy module path).
 //!
 //! A small, deliberately flat module that names the color, border, and
 //! padding choices the TUI is making. Values follow the semantic grammar

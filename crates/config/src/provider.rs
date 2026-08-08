@@ -54,7 +54,7 @@ pub enum CredentialAcquisition {
     ApiKeyOrOAuth,
     /// A self-hosted route that is keyless by default but can be configured with auth.
     LocalOptional,
-    /// An OAuth-only route; Codewhale does not collect an API key for it.
+    /// An OAuth-only route; Nestlone does not collect an API key for it.
     OAuth,
     /// A user-defined route whose credential source belongs in configuration.
     Configuration,
@@ -312,7 +312,7 @@ pub const fn credential_help(kind: ProviderKind) -> CredentialHelp {
             acquisition: OAuth,
             credential_url: None,
             docs_url: Some("https://developers.openai.com/codex/"),
-            guidance: "Run `codex login`, then explicitly grant Codewhale read-only access to that exact Codex credential file; or use a process-scoped token environment variable.",
+            guidance: "Run `codex login`, then explicitly grant Nestlone read-only access to that exact Codex credential file; or use a process-scoped token environment variable.",
         },
         ProviderKind::Anthropic => CredentialHelp {
             acquisition: ApiKey,
@@ -386,7 +386,7 @@ pub const fn credential_help(kind: ProviderKind) -> CredentialHelp {
             acquisition: ApiKeyOrOAuth,
             credential_url: Some("https://console.x.ai/"),
             docs_url: None,
-            guidance: "Use an xAI Console API key or Codewhale's native device login. Reading an existing Grok CLI file requires explicit provider-scoped read-only consent.",
+            guidance: "Use an xAI Console API key or Nestlone's native device login. Reading an existing Grok CLI file requires explicit provider-scoped read-only consent.",
         },
         ProviderKind::Telecomjs => CredentialHelp {
             acquisition: ApiKey,
@@ -496,7 +496,7 @@ pub fn credential_help_for_route(kind: ProviderKind, base_url: &str) -> Credenti
             acquisition: CredentialAcquisition::ApiKey,
             credential_url: Some(KIMI_CODE_MEMBERSHIP_PLAN_CONSOLE_URL),
             docs_url: None,
-            guidance: "Create a Kimi Code membership-plan API key in the Kimi Code console. This route uses api.kimi.com/coding/v1; Codewhale does not import Kimi CLI credentials.",
+            guidance: "Create a Kimi Code membership-plan API key in the Kimi Code console. This route uses api.kimi.com/coding/v1; Nestlone does not import Kimi CLI credentials.",
         };
     }
 

@@ -604,7 +604,7 @@ fn legacy_binary_message(current_exe: &Path) -> String {
 this binary ({exe}) is using the legacy deepseek/deepseek-tui command name.
 
 The package has been renamed to `nestlone`. This update will install canonical
-Codewhale binaries (`nestlone` and, when present, `nestlone-tui`) beside the
+Nestlone binaries (`nestlone` and, when present, `nestlone-tui`) beside the
 legacy command when the install directory is writable. DeepSeek provider support
 is unchanged.
 
@@ -1078,7 +1078,7 @@ fn release_tag_from_github_release_url(url: &reqwest::Url) -> Option<String> {
 fn release_tag_from_github_release_html(body: &str) -> Option<String> {
     const MARKERS: &[&str] = &[
         "/bdugsj/nestlone/releases/tag/",
-        "/hmbown/CodeWhale/releases/tag/",
+        "/hmbown/Nestlone/releases/tag/",
         "/releases/tag/",
     ];
     for marker in MARKERS {
@@ -1098,7 +1098,7 @@ fn release_tag_from_github_release_html(body: &str) -> Option<String> {
 
 fn fetch_latest_beta_release_from_url(url: &str, proxy: Option<&Proxy>) -> Result<Release> {
     let body = fetch_release_json(url, "release list", proxy)?;
-    // GitHub caps this endpoint at 100 releases per page. Codewhale uses the
+    // GitHub caps this endpoint at 100 releases per page. Nestlone uses the
     // first page as the latest-beta search window, matching GitHub's ordering.
     let releases: Vec<Release> = serde_json::from_str(&body).with_context(|| {
         format!("failed to parse release list JSON from GitHub API. Response: {body}")
@@ -1311,7 +1311,7 @@ fn glibc_compatibility_message(
     };
     format!(
         "\
-Prebuilt Codewhale asset `{asset_name}` requires GLIBC_{required}, but {host_line}
+Prebuilt Nestlone asset `{asset_name}` requires GLIBC_{required}, but {host_line}
 
 Official Linux release binaries are GNU libc builds. Ubuntu 22.04 ships glibc
 2.35, so it cannot run a binary that was built against Ubuntu 24.04/glibc 2.39.
@@ -1940,7 +1940,7 @@ mod tests {
             "nestlone-tui"
         );
         assert_eq!(
-            binary_prefix_for_exe(Path::new("CodeWhale-TUI.exe")),
+            binary_prefix_for_exe(Path::new("Nestlone-TUI.exe")),
             "nestlone-tui"
         );
         assert_eq!(
@@ -2245,7 +2245,7 @@ mod tests {
             Some(GlibcVersion::new(2, 35, 0)),
         );
 
-        assert!(message.contains("Prebuilt Codewhale asset `nestlone-linux-x64`"));
+        assert!(message.contains("Prebuilt Nestlone asset `nestlone-linux-x64`"));
         assert!(message.contains("requires GLIBC_2.39"));
         assert!(message.contains("this system has glibc 2.35"));
         assert!(message.contains("cargo install nestlone-cli --locked"));

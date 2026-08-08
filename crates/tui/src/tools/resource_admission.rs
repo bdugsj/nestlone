@@ -1,6 +1,6 @@
 //! Cross-process admission for expensive local commands.
 //!
-//! Fleet and Workflow workers execute in separate Codewhale processes, so an
+//! Fleet and Workflow workers execute in separate Nestlone processes, so an
 //! in-process semaphore cannot protect the host. Heavy shell commands instead
 //! take one of a small number of filesystem-backed permits under
 //! `CODEWHALE_HOME`. The default of two permits is deliberately conservative

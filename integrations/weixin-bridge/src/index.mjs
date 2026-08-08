@@ -162,10 +162,10 @@ const config = {
   ),
   stateDir:
     weixinEnv("WEIXIN_STATE_DIR") ||
-    "/var/lib/codewhale-weixin-bot-bridge",
+    "/var/lib/nestlone-weixin-bot-bridge",
   threadMapPath:
     weixinEnv("WEIXIN_THREAD_MAP_PATH") ||
-    "/var/lib/codewhale-weixin-bot-bridge/thread-map.json",
+    "/var/lib/nestlone-weixin-bot-bridge/thread-map.json",
   maxReplyChars: Number(weixinEnv("WEIXIN_MAX_REPLY_CHARS") || 3500),
   longPollTimeoutMs: Number(
     weixinEnv("WEIXIN_LONGPOLL_TIMEOUT_MS") || 35000
@@ -866,7 +866,7 @@ function sleep(ms) {
 // ============================================================================
 
 async function main() {
-  console.log("Starting CodeWhale Weixin Bot Bridge");
+  console.log("Starting Nestlone Weixin Bot Bridge");
   console.log(`Runtime: ${config.runtimeUrl}`);
   console.log(`Workspace: ${config.workspace}`);
   console.log(`State dir: ${config.stateDir}`);

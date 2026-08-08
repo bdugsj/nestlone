@@ -5,7 +5,7 @@ edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
 repository.workspace = true
-description = "Model/provider registry and fallback strategy for Codewhale"
+description = "Model/provider registry and fallback strategy for Nestlone"
 
 [dependencies]
 nestlone-config = { path = "../config", version = "0.0.2" }

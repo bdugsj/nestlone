@@ -3167,7 +3167,7 @@ fn config_choice_label(locale: Locale, key: &str, value: &str) -> String {
         ("work_surface_placement", "left") => "Left sidebar".to_string(),
         ("work_surface_placement", "right") => "Right sidebar".to_string(),
         ("reasoning_effort", "default") => "Provider default".to_string(),
-        ("status_indicator", "cw") => "Codewhale mark".to_string(),
+        ("status_indicator", "cw") => "Nestlone mark".to_string(),
         ("status_indicator", "whale") => "Animated whale".to_string(),
         ("status_indicator", "dots") => "Animated dots".to_string(),
         ("status_indicator", "off") => "Off".to_string(),

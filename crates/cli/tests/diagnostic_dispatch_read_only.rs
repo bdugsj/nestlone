@@ -114,7 +114,7 @@ fn dispatcher_diagnostics_leave_legacy_secret_state_unchanged() {
         );
         assert!(
             !primary_home.exists(),
-            "dispatcher {args:?} must not create a primary Codewhale home or migrated state"
+            "dispatcher {args:?} must not create a primary Nestlone home or migrated state"
         );
         assert!(
             !nestlone_home.exists(),

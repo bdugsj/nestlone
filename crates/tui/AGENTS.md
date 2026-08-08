@@ -49,10 +49,10 @@ The default shell is the underwater system (`src/tui/underwater.rs`,
 ## Verification
 
 ```sh
-cargo test -p codewhale-tui --bins --locked            # full unit suite
-cargo test -p codewhale-tui --test qa_pty --locked     # PTY snapshots
-cargo test -p codewhale-tui --test release_runtime_qa --locked
-cargo test -p codewhale-tui --test terminal_matrix_qa --locked  # #3758 matrix
+cargo test -p nestlone-tui --bins --locked            # full unit suite
+cargo test -p nestlone-tui --test qa_pty --locked     # PTY snapshots
+cargo test -p nestlone-tui --test release_runtime_qa --locked
+cargo test -p nestlone-tui --test terminal_matrix_qa --locked  # #3758 matrix
 cargo clippy --workspace --all-targets --locked -- -D warnings
 ```
 
@@ -71,7 +71,7 @@ Real-terminal QA gotchas (learned the hard way):
 - Judge motion from repeated captures diffed over time, never single
   screenshots. Layout gates: 40x12, 60x16, 80x24, 100x32, 140x40.
 - `CODEWHALE_TUI_DEBUG=1` writes per-frame diff sizes to
-  `~/.codewhale/logs/tui-render.log`. Streaming should be tens of cells per
+  `~/.nestlone/logs/tui-render.log`. Streaming should be tens of cells per
   frame; a multi-thousand-cell frame is only acceptable on a genuine
   layout transition.
 

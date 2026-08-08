@@ -153,7 +153,7 @@ struct PluginE2EWorld {
 // Given steps
 // ---------------------------------------------------------------------------
 
-#[given("an offline CodeWhale workspace with a configured plugin directory")]
+#[given("an offline Nestlone workspace with a configured plugin directory")]
 fn offline_workspace_with_plugin_dir(world: &mut PluginE2EWorld) {
     let workspace = TempDir::new().expect("workspace tempdir");
     let plugin_dir = TempDir::new().expect("plugin tempdir");

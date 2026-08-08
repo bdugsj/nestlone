@@ -304,7 +304,7 @@ pub fn make_sealed_workspace() -> Result<SealedWorkspace> {
         home.join(".nestlone").join("config.toml"),
         silent_notifications,
     )
-    .context("write silent CodeWhale PTY config")?;
+    .context("write silent Nestlone PTY config")?;
     std::fs::write(
         home.join(".deepseek").join("config.toml"),
         silent_notifications,

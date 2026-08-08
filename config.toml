@@ -1,5 +1,5 @@
 # ╔══════════════════════════════════════════════════════════════════════════════╗
-# ║                         Codewhale Configuration                               ║
+# ║                         Nestlone Configuration                               ║
 # ║                                                                              ║
 # ║  Terminal coding agent for any model — open models first.                ║
 # ╚══════════════════════════════════════════════════════════════════════════════╝
@@ -100,12 +100,12 @@ cost_currency = "usd" # usd | cny
 # ─────────────────────────────────────────────────────────────────────────────────
 # Startup update check
 # ─────────────────────────────────────────────────────────────────────────────────
-# The TUI checks for newer Codewhale releases in the background at startup.
+# The TUI checks for newer Nestlone releases in the background at startup.
 # Set check_for_updates = false in managed or air-gapped environments.
 # update_uri may point at a GitHub-compatible latest-release JSON endpoint.
 [update]
 check_for_updates = true
-# update_uri = "https://internal.mirror.example/codewhale/releases/latest"
+# update_uri = "https://internal.mirror.example/nestlone/releases/latest"
 
 # ─────────────────────────────────────────────────────────────────────────────────
 # Hotbar slots (#2061 / #2064)
@@ -137,16 +137,16 @@ check_for_updates = true
 # ─────────────────────────────────────────────────────────────────────────────────
 # Paths
 # ─────────────────────────────────────────────────────────────────────────────────
-# New installs write product state under ~/.codewhale/. Existing ~/.deepseek/
-# files are still read as compatibility fallbacks when the .codewhale file is
+# New installs write product state under ~/.nestlone/. Existing ~/.deepseek/
+# files are still read as compatibility fallbacks when the .nestlone file is
 # absent.
-skills_dir = "~/.codewhale/skills"
-mcp_config_path = "~/.codewhale/mcp.json"
-notes_path = "~/.codewhale/notes.txt"
+skills_dir = "~/.nestlone/skills"
+mcp_config_path = "~/.nestlone/mcp.json"
+notes_path = "~/.nestlone/notes.txt"
 
-memory_path = "~/.codewhale/memory.md"
+memory_path = "~/.nestlone/memory.md"
 
-# instructions = ["./AGENTS.md", "~/.codewhale/global.md"]
+# instructions = ["./AGENTS.md", "~/.nestlone/global.md"]
 #
 # Optional list of additional instruction files concatenated into the
 # system prompt in declared order (#454). Useful for layering
@@ -154,7 +154,7 @@ memory_path = "~/.codewhale/memory.md"
 # is expanded so `~` and env vars work; missing files are skipped with
 # a tracing warning. Files are capped at 100 KiB per entry.
 #
-# Project-level config (.codewhale/config.toml in the workspace) replaces
+# Project-level config (.nestlone/config.toml in the workspace) replaces
 # the user-level array wholesale rather than merging — list `~/global.md`
 # inside the project array if you want both. An explicit empty array
 # (`instructions = []`) clears the user list for the current repo.
@@ -218,7 +218,7 @@ sandbox_mode = "workspace-write" # read-only | workspace-write | danger-full-acc
 # uses the same lock as approval-card appends, and atomically replaces the file.
 # `/config ask-rules` remains a compatibility entry to the same list.
 #
-# Example ~/.codewhale/permissions.toml:
+# Example ~/.nestlone/permissions.toml:
 #
 # [[rules]]
 # tool = "exec_shell"
@@ -399,7 +399,7 @@ max_subagents = 10 # optional (1-20)
 # model = "deepseek-v4-pro"
 # [providers.deepseek.auth] # provider-scoped auth source metadata; command execution lands in a follow-up slice
 # source = "command"
-# command = ["secret-tool", "lookup", "service", "codewhale-deepseek"]
+# command = ["secret-tool", "lookup", "service", "nestlone-deepseek"]
 # timeout_ms = 2000
 # insecure_skip_tls_verify = true # last resort for private gateways; prefer SSL_CERT_FILE
 
@@ -473,7 +473,7 @@ max_subagents = 10 # optional (1-20)
 # mode = "token-plan-cn"               # China cluster
 # mode = "token-plan-ams"              # Europe cluster
 # mode = "pay-as-you-go"               # standard API / sk- keys
-# TTS aliases are also accepted by `codewhale speech`: tts, voice-design, voice-clone
+# TTS aliases are also accepted by `nestlone speech`: tts, voice-design, voice-clone
 # TTS model IDs: mimo-v2.5-tts, mimo-v2.5-tts-voicedesign, mimo-v2.5-tts-voiceclone, mimo-v2-tts
 
 # Novita AI-hosted inference (https://novita.ai)
@@ -525,8 +525,8 @@ max_subagents = 10 # optional (1-20)
 # context_window = 262144                    # manually cap k3 to the Moderato/256K window
 # context_window = 1048576                   # Allegretto+ only; do not claim an unavailable entitlement
 # Alternatively use model = "k3-256k" with context_window = 262144 for the fixed 256K route.
-# Omit context_window to keep Codewhale's safe 262144-token bare-k3 baseline.
-# `k3[1m]` is a Claude Code-only convention, not an API model ID; Codewhale rejects it.
+# Omit context_window to keep Nestlone's safe 262144-token bare-k3 baseline.
+# `k3[1m]` is a Claude Code-only convention, not an API model ID; Nestlone rejects it.
 # Kimi Code K2.7 remains available to all members as model = "kimi-for-coding".
 # Kimi OAuth is not supported. Legacy auth_mode = "kimi_oauth" fails closed
 # to the API-key guidance above without probing Kimi CLI credential files.
@@ -622,7 +622,7 @@ max_subagents = 10 # optional (1-20)
 # OpenCode Zen (https://opencode.ai/docs/zen/)
 # Model-aware gateway: GPT models use Responses, Claude/Qwen use Anthropic
 # Messages, and DeepSeek/MiniMax/GLM/Kimi/Grok/free models use Chat Completions.
-# Gemini uses a Google-specific protocol that Codewhale does not implement and
+# Gemini uses a Google-specific protocol that Nestlone does not implement and
 # therefore fails closed instead of being sent with the wrong request shape.
 # Env vars: OPENCODE_ZEN_API_KEY (preferred), OPENCODE_API_KEY,
 # OPENCODE_ZEN_BASE_URL, OPENCODE_ZEN_MODEL
@@ -651,9 +651,9 @@ max_subagents = 10 # optional (1-20)
 #
 # Auth modes:
 #   api_key (default) — console.x.ai pay-per-use key via api_key / XAI_API_KEY / keyring
-#   oauth             — `codewhale auth xai-device` uses Codewhale-owned storage.
+#   oauth             — `nestlone auth xai-device` uses Nestlone-owned storage.
 #                       Reading an existing Grok CLI file requires explicit
-#                       `codewhale auth external-consent --provider xai --mode read-only`.
+#                       `nestlone auth external-consent --provider xai --mode read-only`.
 [providers.xai]
 # api_key = "YOUR_XAI_API_KEY"
 # auth_mode = "oauth"                      # or "device_code" / "grok_cli"
@@ -682,8 +682,8 @@ max_subagents = 10 # optional (1-20)
 # ─────────────────────────────────────────────────────────────────────────────────
 # OpenAI Codex (ChatGPT) Provider — EXPERIMENTAL
 # Run `codex login`, then explicitly grant read-only access to that exact file:
-#   codewhale auth external-consent --provider openai-codex --mode read-only
-# Codewhale never refreshes or rewrites the Codex CLI file. No API key is
+#   nestlone auth external-consent --provider openai-codex --mode read-only
+# Nestlone never refreshes or rewrites the Codex CLI file. No API key is
 # stored here. Talks to the OpenAI Responses API at /codex/responses.
 # Env var aliases: OPENAI_CODEX_ACCESS_TOKEN / CODEX_ACCESS_TOKEN (token override),
 #   OPENAI_CODEX_BASE_URL / CODEX_BASE_URL, OPENAI_CODEX_MODEL / CODEX_MODEL,
@@ -786,7 +786,7 @@ max_subagents = 10 # optional (1-20)
 # deny = []
 # proxy = ["github.com", ".githubusercontent.com"]
 # proxy_fake_ip_cidrs = ["198.18.0.0/15"] # requires both matching host and address
-# audit = true            # one line per call to ~/.codewhale/audit.log
+# audit = true            # one line per call to ~/.nestlone/audit.log
 
 # ─────────────────────────────────────────────────────────────────────────────────
 # Verifier preview (#2093)
@@ -817,7 +817,7 @@ max_subagents = 10 # optional (1-20)
 # [skills]
 # registry_url = "https://raw.githubusercontent.com/Hmbown/deepseek-skills/main/index.json"
 # max_install_size_bytes = 5_242_880
-# scan_codewhale_only = false # true: ignore Claude/OpenCode/Cursor/agentskills.io skill dirs
+# scan_nestlone_only = false # true: ignore Claude/OpenCode/Cursor/agentskills.io skill dirs
 
 # ─────────────────────────────────────────────────────────────────────────────────
 # TUI
@@ -954,7 +954,7 @@ fallback_default_prior = 3.8
 # ─────────────────────────────────────────────────────────────────────────────────
 # Harness Profiles (preview schema; runtime consumption follows later)
 # ─────────────────────────────────────────────────────────────────────────────────
-# Harness profiles let future Codewhale runtime slices select model-specific
+# Harness profiles let future Nestlone runtime slices select model-specific
 # prompt, context, tool, and subagent posture. v0.9 parses, validates, and can
 # resolve profiles for tests/status plumbing, but normal Agent and Workflow
 # runs do not silently promote or mutate behavior from these profiles yet.
@@ -974,7 +974,8 @@ fallback_default_prior = 3.8
 # ─────────────────────────────────────────────────────────────────────────────────
 # Profile Example (for multiple environments)
 # ─────────────────────────────────────────────────────────────────────────────────
-# Select a profile with `deepseek --profile <name>` or `DEEPSEEK_PROFILE=<name>`.
+# Select a profile with `nestlone --profile <name>` or the legacy
+# `CODEWHALE_PROFILE` / `DEEPSEEK_PROFILE` env var.
 [profiles.work]
 api_key = "WORK_DEEPSEEK_API_KEY"
 base_url = "https://api.deepseek.com/beta"
@@ -1036,7 +1037,7 @@ default_text_model = "deepseek-ai/deepseek-v4-pro"
 # Each turn the TUI takes a `pre-turn:<seq>` and `post-turn:<seq>` snapshot of
 # your workspace into a side-git repo at:
 #
-#     ~/.codewhale/snapshots/<project_hash>/<worktree_hash>/.git
+#     ~/.nestlone/snapshots/<project_hash>/<worktree_hash>/.git
 #
 # Your own `.git` is never touched — `--git-dir` and `--work-tree` are always
 # set together when shelling out to git. Use `/restore N` (slash command) or
@@ -1053,7 +1054,7 @@ default_text_model = "deepseek-ai/deepseek-v4-pro"
 # max_workspace_gb = 2  # Snapshots self-disable on first init when the
 #                         # non-excluded workspace exceeds this size in GB
 #                         # (v0.8.32). Default 2 GB protects against running
-#                         # codewhale in directories with hundreds of GB
+#                         # nestlone in directories with hundreds of GB
 #                         # of datasets / model weights / docker dumps where
 #                         # `git add -A` would hang the TUI for hours. Set
 #                         # to 0 to disable the cap (v0.8.31 behaviour);
@@ -1122,7 +1123,7 @@ default_text_model = "deepseek-ai/deepseek-v4-pro"
 # Configure as `[[hooks.hooks]]` under a `[hooks]` table.
 #
 # SCOPE: hooks are a TUI runtime feature. They fire from the interactive TUI
-# and the engine turn loop it drives. `codewhale exec`, the CLI subcommands,
+# and the engine turn loop it drives. `nestlone exec`, the CLI subcommands,
 # the app-server / ACP surfaces, and the `workflow` tool do NOT fire them.
 #
 # Available events (all 11): session_start, session_end, message_submit,
@@ -1131,7 +1132,7 @@ default_text_model = "deepseek-ai/deepseek-v4-pro"
 # See docs/HOOKS.md for the per-event payload, env var, and steering contract.
 #
 # `message_submit`, `tool_call_before`, and `shell_env` are the only events
-# whose result can change what Codewhale does. The rest are observer-only —
+# whose result can change what Nestlone does. The rest are observer-only —
 # which means their RESULT is ignored, not that the command is harmless. Every
 # hook is an arbitrary shell command running with your credentials.
 #
@@ -1167,7 +1168,7 @@ default_text_model = "deepseek-ai/deepseek-v4-pro"
 # `shell_env` values are TRANSMITTED to it. Later hooks override
 # earlier ones. Use this for ephemeral credentials, per-skill PATH adjustments,
 # or short-lived tokens. The resolved KEY names (NEVER values) are written to
-# `~/.codewhale/audit.log` so each session can be reconciled later. Hook
+# `~/.nestlone/audit.log` so each session can be reconciled later. Hook
 # failure / timeout simply contributes no vars — it does not abort the shell
 # call.
 #
@@ -1177,7 +1178,7 @@ default_text_model = "deepseek-ai/deepseek-v4-pro"
 #
 # [[hooks.hooks]]
 # event = "session_start"
-# command = "echo 'Codewhale session started'"
+# command = "echo 'Nestlone session started'"
 #
 # # Inject ephemeral creds into every shell call. Output one
 # # KEY=VALUE per line on stdout (export prefix optional).
@@ -1195,10 +1196,10 @@ default_text_model = "deepseek-ai/deepseek-v4-pro"
 # [[hooks.hooks]]
 # name = "subagent-audit"
 # event = "subagent_complete"
-# command = "~/.codewhale/hooks/subagent-audit.sh"
+# command = "~/.nestlone/hooks/subagent-audit.sh"
 
 # ─────────────────────────────────────────────────────────────────────────────────
-# Runtime API (`deepseek serve --http`) (#561)
+# Runtime API (`nestlone serve --http`) (#561)
 # ─────────────────────────────────────────────────────────────────────────────────
 # Tuning knobs for the local HTTP/SSE daemon. The server binds to 127.0.0.1
 # by default and is intended for local UIs (whalescale-desktop, dashboards,
@@ -1232,8 +1233,8 @@ default_text_model = "deepseek-ai/deepseek-v4-pro"
 # JSON `ToolResult` (`{"content": "...", "success": true}`) on **stdout**.
 #
 # [tools]
-# # Custom plugin directory (defaults to `~/.codewhale/tools/`)
-# plugin_dir = "~/.codewhale/tools"
+# # Custom plugin directory (defaults to `~/.nestlone/tools/`)
+# plugin_dir = "~/.nestlone/tools"
 #
 # [tools.overrides]
 # # Disable a tool entirely — removes it from the model-visible catalog.
@@ -1249,12 +1250,12 @@ default_text_model = "deepseek-ai/deepseek-v4-pro"
 # "fetch_url" = { type = "script", path = "cached-fetch.sh", args = ["--ttl", "300"] }
 
 # ──────────── Enterprise example: audit-logging exec_shell wrapper ──────────────
-# Drop `audit-exec-shell.sh` in `~/.codewhale/tools/` and enable with:
+# Drop `audit-exec-shell.sh` in `~/.nestlone/tools/` and enable with:
 #
 # [tools.overrides]
 # "exec_shell" = { type = "script", path = "audit-exec-shell.sh" }
 #
-# The wrapper logs every request to `~/.codewhale/audit/exec_shell.log`, then
+# The wrapper logs every request to `~/.nestlone/audit/exec_shell.log`, then
 # delegates to your own approved shell executor. Do not pipe the raw JSON
 # request into `sh -s`; parse the command field and enforce your policy first.
 #
@@ -1263,7 +1264,7 @@ default_text_model = "deepseek-ai/deepseek-v4-pro"
 # # name: exec_shell
 # # description: Audit-logging wrapper for exec_shell
 # # approval: required
-# LOGDIR="${HOME}/.codewhale/audit"
+# LOGDIR="${HOME}/.nestlone/audit"
 # mkdir -p "$LOGDIR"
 # LOGFILE="$LOGDIR/exec_shell.log"
 # input=$(cat)
@@ -1336,7 +1337,7 @@ default_text_model = "deepseek-ai/deepseek-v4-pro"
 # # Built-in profiles are always available: manager, operator, scout, builder,
 # # reviewer, verifier, synthesizer, general. User-defined profiles under
 # # [fleet.profiles] override or extend the built-in set by id. Precedence
-# # is Workspace (.codewhale/agents/*.toml) > Config ([fleet.profiles]) > BuiltIn.
+# # is Workspace (.nestlone/agents/*.toml) > Config ([fleet.profiles]) > BuiltIn.
 # # See /fleet setup for an in-app profile-authoring wizard.
 # [fleet.profiles.ci-linter]
 # slot = "verifier"
@@ -1366,4 +1367,3 @@ default_text_model = "deepseek-ai/deepseek-v4-pro"
 # ─────────────────────────────────────────────────────────────────────────────────
 # allowed_approval_policies = ["on-request", "untrusted", "never"]
 # allowed_sandbox_modes = ["read-only", "workspace-write"]
-test

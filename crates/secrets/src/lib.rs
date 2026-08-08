@@ -1,4 +1,4 @@
-//! Secret storage for CodeWhale API keys.
+//! Secret storage for Nestlone API keys.
 //!
 //! Provides a small abstraction (`KeyringStore`) plus a default
 //! file-based implementation (`FileKeyringStore`), an opt-in OS keyring
@@ -20,7 +20,7 @@ use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
 /// Default OS keychain service name. Kept as `deepseek` for compatibility
-/// with credentials saved before the CodeWhale rename. macOS users can verify
+/// with credentials saved before the Nestlone rename. macOS users can verify
 /// entries with `security find-generic-password -s deepseek -a <provider>`.
 pub const DEFAULT_SERVICE: &str = "deepseek";
 /// Select the secret storage backend. Supported values are `file` (default)
@@ -364,11 +364,11 @@ pub struct FileKeyringStore {
 /// File-backed secret lookup that never migrates or changes either store.
 ///
 /// Normal runtime credential resolution keeps its additive legacy migration:
-/// older entries under `~/.deepseek/secrets/` are copied into the Codewhale
+/// older entries under `~/.deepseek/secrets/` are copied into the Nestlone
 /// location before use. Diagnostic commands need the same read precedence
 /// without creating that destination, so this store reads the primary file
 /// first and falls back to the legacy file only when the primary has no entry
-/// and the Codewhale home is not explicitly isolated.
+/// and the Nestlone home is not explicitly isolated.
 #[derive(Debug, Clone)]
 struct ReadOnlyFileKeyringStore {
     primary: FileKeyringStore,
@@ -394,11 +394,11 @@ impl FileKeyringStore {
     /// `CODEWHALE_HOME`, then `HOME`, `USERPROFILE`, and finally the platform
     /// home directory from the `dirs` crate. On first use, non-conflicting
     /// entries from the legacy `<home>/.deepseek/secrets/secrets.json` file are
-    /// copied into the CodeWhale store — unless `CODEWHALE_HOME` is explicit,
+    /// copied into the Nestlone store — unless `CODEWHALE_HOME` is explicit,
     /// in which case ambient `$HOME/.deepseek` credentials are never imported.
     pub fn default_path() -> Result<PathBuf, SecretsError> {
         let primary = default_nestlone_secrets_path()?;
-        // Match the diagnostic isolation boundary: an explicit Codewhale home
+        // Match the diagnostic isolation boundary: an explicit Nestlone home
         // must not silently pull ambient legacy DeepSeek credentials.
         if !nestlone_home_is_explicit() {
             match legacy_deepseek_secrets_path() {
@@ -692,7 +692,7 @@ fn legacy_deepseek_secrets_path() -> Result<PathBuf, SecretsError> {
         .join("secrets.json"))
 }
 
-/// Match the state/config isolation boundary: an explicit Codewhale home must
+/// Match the state/config isolation boundary: an explicit Nestlone home must
 /// not fall back to ambient legacy data under `$HOME/.deepseek`.
 fn nestlone_home_is_explicit() -> bool {
     ["NESTLONE_HOME", "CODEWHALE_HOME"]
@@ -823,7 +823,7 @@ impl Secrets {
     /// or legacy migration.
     ///
     /// The selected backend and lookup precedence match [`Self::auto_detect`],
-    /// but file-backed lookup reads the Codewhale location first and the legacy
+    /// but file-backed lookup reads the Nestlone location first and the legacy
     /// location second instead of copying legacy entries into a new file. This
     /// lets status and doctor reports label a saved credential without changing
     /// user state.
@@ -897,7 +897,7 @@ impl Secrets {
     /// Construct a file-backed diagnostic store without migration or write
     /// capability.
     ///
-    /// This reads the Codewhale file first and the legacy file second (unless
+    /// This reads the Nestlone file first and the legacy file second (unless
     /// `CODEWHALE_HOME` is explicit), but never copies legacy entries into a
     /// primary store. It intentionally bypasses an opted-in OS keyring so
     /// callers that only need non-secret diagnostics do not cause a platform

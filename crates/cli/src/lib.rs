@@ -230,7 +230,7 @@ struct Cli {
 enum Commands {
     /// Run interactive/non-interactive flows via the TUI binary.
     Run(RunArgs),
-    /// Run Codewhale diagnostics.
+    /// Run Nestlone diagnostics.
     Doctor(TuiPassthroughArgs),
     /// List live provider API models via the TUI binary.
     Models(TuiPassthroughArgs),
@@ -241,7 +241,7 @@ enum Commands {
     Sessions(TuiPassthroughArgs),
     /// Resume a saved TUI session.
     Resume(TuiPassthroughArgs),
-    /// Launch an interactive session and hand it to the Codewhale web app.
+    /// Launch an interactive session and hand it to the Nestlone web app.
     Rc(TuiPassthroughArgs),
     /// Fork a saved TUI session.
     Fork(TuiPassthroughArgs),
@@ -249,7 +249,7 @@ enum Commands {
     Init(TuiPassthroughArgs),
     /// Bootstrap MCP config and/or skills directories.
     Setup(TuiPassthroughArgs),
-    /// Generate a remote Codewhale agent deploy bundle (cloud + chat bridge).
+    /// Generate a remote Nestlone agent deploy bundle (cloud + chat bridge).
     RemoteSetup(RemoteSetupArgs),
     /// Run a non-interactive prompt through the TUI runtime.
     #[command(after_help = "\
@@ -312,7 +312,7 @@ same receipt (`--json`). `lane stop` is a compatibility spelling of
 lifecycle generation you observed.
 ")]
     Lane(LaneArgs),
-    /// Run a Codewhale-powered code review over a git diff.
+    /// Run a Nestlone-powered code review over a git diff.
     Review(TuiPassthroughArgs),
     /// Apply a patch file or stdin to the working tree.
     Apply(TuiPassthroughArgs),
@@ -749,7 +749,7 @@ fn start_lane(request: LaneStartRequest) -> Result<()> {
         log_proxy: (kind == RuntimeBackendKind::Tmux)
             .then(std::env::current_exe)
             .transpose()
-            .context("resolve current Codewhale executable for tmux log proxy")?,
+            .context("resolve current Nestlone executable for tmux log proxy")?,
         worktree,
     };
     let backend = resolve_backend(kind);
@@ -2244,7 +2244,7 @@ fn external_credential_target(
             grok_auth_file_path(),
         ),
         ProviderKind::Moonshot => bail!(
-            "Kimi is API-key-only in Codewhale. Create a key at https://platform.kimi.ai/console/api-keys; Kimi CLI OAuth import is unsupported."
+            "Kimi is API-key-only in Nestlone. Create a key at https://platform.kimi.ai/console/api-keys; Kimi CLI OAuth import is unsupported."
         ),
         _ => bail!(
             "{} has no supported external CLI credential source",
@@ -2333,7 +2333,7 @@ enum XaiAuthDiagnosticRoute {
     /// Normal API-key diagnostics apply. This includes custom endpoints, where
     /// xAI OAuth is intentionally inactive.
     ApiKey,
-    /// A syntactically valid Codewhale-owned generation pointer selects the
+    /// A syntactically valid Nestlone-owned generation pointer selects the
     /// owned OAuth route. Diagnostics deliberately do not inspect the file.
     OwnedOAuth,
     /// A configured but unsafe/malformed generation pointer blocks external
@@ -2538,7 +2538,7 @@ fn xai_status_summary_source(
 ) -> String {
     match diagnostics.route {
         XaiAuthDiagnosticRoute::OwnedOAuth => {
-            "Codewhale-owned OAuth configured/unprobed (valid generation pointer)".to_string()
+            "Nestlone-owned OAuth configured/unprobed (valid generation pointer)".to_string()
         }
         XaiAuthDiagnosticRoute::NeedsRepair => {
             let api_key = api_key
@@ -2562,7 +2562,7 @@ fn xai_credential_route_label(
 ) -> String {
     match diagnostics.route {
         XaiAuthDiagnosticRoute::OwnedOAuth => {
-            "Codewhale-owned OAuth configured/unprobed (valid generation pointer; storage unprobed)"
+            "Nestlone-owned OAuth configured/unprobed (valid generation pointer; storage unprobed)"
                 .to_string()
         }
         XaiAuthDiagnosticRoute::NeedsRepair => {
@@ -2570,7 +2570,7 @@ fn xai_credential_route_label(
                 .and_then(XaiRuntimeApiKey::source_with_last4)
                 .unwrap_or_else(|| "no runtime-effective API key".to_string());
             format!(
-                "xAI OAuth needs repair (invalid Codewhale-owned generation pointer; Grok CLI consent blocked; API-key fallback: {api_key})"
+                "xAI OAuth needs repair (invalid Nestlone-owned generation pointer; Grok CLI consent blocked; API-key fallback: {api_key})"
             )
         }
         XaiAuthDiagnosticRoute::ExternalConsent => {
@@ -2652,10 +2652,10 @@ fn xai_storage_detail(
 fn xai_lookup_order(diagnostics: &XaiAuthDiagnostics) -> String {
     match diagnostics.route {
         XaiAuthDiagnosticRoute::OwnedOAuth => {
-            "lookup order: configured Codewhale-owned OAuth generation (storage unprobed); Grok CLI consent blocked".to_string()
+            "lookup order: configured Nestlone-owned OAuth generation (storage unprobed); Grok CLI consent blocked".to_string()
         }
         XaiAuthDiagnosticRoute::NeedsRepair => {
-            "lookup order: invalid Codewhale-owned OAuth generation blocks Grok CLI consent; runtime-effective API-key fallback: CLI -> config -> secret store -> env".to_string()
+            "lookup order: invalid Nestlone-owned OAuth generation blocks Grok CLI consent; runtime-effective API-key fallback: CLI -> config -> secret store -> env".to_string()
         }
         XaiAuthDiagnosticRoute::ExternalConsent => {
             "lookup order: configured consent-gated exact Grok CLI file (availability unprobed)".to_string()
@@ -2672,7 +2672,7 @@ fn xai_lookup_order(diagnostics: &XaiAuthDiagnostics) -> String {
 fn xai_get_line(diagnostics: &XaiAuthDiagnostics, api_key: Option<&XaiRuntimeApiKey>) -> String {
     match diagnostics.route {
         XaiAuthDiagnosticRoute::OwnedOAuth => {
-            "xai: configured (source: Codewhale-owned OAuth generation; valid pointer; storage unprobed)".to_string()
+            "xai: configured (source: Nestlone-owned OAuth generation; valid pointer; storage unprobed)".to_string()
         }
         XaiAuthDiagnosticRoute::NeedsRepair => {
             let api_key = match api_key.and_then(XaiRuntimeApiKey::source_name) {
@@ -2684,7 +2684,7 @@ fn xai_get_line(diagnostics: &XaiAuthDiagnostics, api_key: Option<&XaiRuntimeApi
                 None => "no runtime-effective API key".to_string(),
             };
             format!(
-                "xai: needs repair (invalid Codewhale-owned OAuth generation pointer; Grok CLI consent blocked; API-key fallback: {api_key})"
+                "xai: needs repair (invalid Nestlone-owned OAuth generation pointer; Grok CLI consent blocked; API-key fallback: {api_key})"
             )
         }
         XaiAuthDiagnosticRoute::ExternalConsent => {
@@ -3104,28 +3104,28 @@ fn xai_auth_status_lines_for_provider(
         XaiOAuthGenerationPointer::Valid
             if diagnostics.route == XaiAuthDiagnosticRoute::OwnedOAuth =>
         {
-            "xAI OAuth generation: configured Codewhale-owned pointer (storage unprobed)"
+            "xAI OAuth generation: configured Nestlone-owned pointer (storage unprobed)"
                 .to_string()
         }
         XaiOAuthGenerationPointer::Valid => {
             "xAI OAuth generation: valid but inactive for this route".to_string()
         }
         XaiOAuthGenerationPointer::Invalid => {
-            "xAI OAuth generation: invalid Codewhale-owned pointer".to_string()
+            "xAI OAuth generation: invalid Nestlone-owned pointer".to_string()
         }
     });
 
     match diagnostics.route {
         XaiAuthDiagnosticRoute::OwnedOAuth => {
             lines.push(
-                "external credentials: blocked by the configured Codewhale-owned xAI OAuth generation (file not probed)"
+                "external credentials: blocked by the configured Nestlone-owned xAI OAuth generation (file not probed)"
                     .to_string(),
             );
             return lines;
         }
         XaiAuthDiagnosticRoute::NeedsRepair => {
             lines.push(
-                "external credentials: blocked by the invalid Codewhale-owned xAI OAuth generation pointer (file not probed)"
+                "external credentials: blocked by the invalid Nestlone-owned xAI OAuth generation pointer (file not probed)"
                     .to_string(),
             );
             lines.push(
@@ -3249,7 +3249,7 @@ fn run_auth_command_with_secrets_and_runtime(
             }
             if mode == ExternalCredentialModeArg::Managed {
                 bail!(
-                    "managed external credential access is unsupported in v0.9.1: no provider has a reviewed schema-safe preservation adapter. Use --mode read-only, or use Codewhale-owned login/API-key storage."
+                    "managed external credential access is unsupported in v0.9.1: no provider has a reviewed schema-safe preservation adapter. Use --mode read-only, or use Nestlone-owned login/API-key storage."
                 );
             }
             confirm_external_consent(yes)?;
@@ -5710,7 +5710,7 @@ model = "qwen-2.5-7b"
                 .windows(2)
                 .any(|pair| pair == ["--profile", "workflow-profile"])
         );
-        assert!(!joined.contains("Run the CodeWhale"));
+        assert!(!joined.contains("Run the Nestlone"));
         assert!(joined.contains("\"source_path\":\"workflows/stopship.workflow.js\""));
         assert!(joined.contains("\"fleet\":\"stopship\""));
         assert!(joined.contains("\"issue\":\"4375\""));
@@ -6616,19 +6616,19 @@ model = "qwen-2.5-7b"
         let scoped = auth_status_lines_for_provider(&store, &secrets, ProviderKind::Xai).join("\n");
         assert!(
             scoped.contains(
-                "credential route: Codewhale-owned OAuth configured/unprobed (valid generation pointer; storage unprobed)"
+                "credential route: Nestlone-owned OAuth configured/unprobed (valid generation pointer; storage unprobed)"
             ),
             "{scoped}"
         );
-        assert!(scoped.contains("external credentials: blocked by the configured Codewhale-owned xAI OAuth generation"), "{scoped}");
+        assert!(scoped.contains("external credentials: blocked by the configured Nestlone-owned xAI OAuth generation"), "{scoped}");
         assert!(
             scoped.contains(
-                "xAI OAuth generation: configured Codewhale-owned pointer (storage unprobed)"
+                "xAI OAuth generation: configured Nestlone-owned pointer (storage unprobed)"
             ),
             "{scoped}"
         );
         assert!(
-            !scoped.contains("active source: Codewhale-owned OAuth"),
+            !scoped.contains("active source: Nestlone-owned OAuth"),
             "a valid pointer is configured/unprobed, not an active credential: {scoped}"
         );
         assert!(
@@ -6642,7 +6642,7 @@ model = "qwen-2.5-7b"
             .find(|line| line.starts_with("xai"))
             .expect("xAI status row");
         assert!(
-            xai_row.contains("Codewhale-owned OAuth configured/unprobed"),
+            xai_row.contains("Nestlone-owned OAuth configured/unprobed"),
             "{xai_row}"
         );
 
@@ -6663,7 +6663,7 @@ model = "qwen-2.5-7b"
             &CliRuntimeOverrides::default(),
         );
         assert!(
-            get.starts_with("xai: configured (source: Codewhale-owned OAuth generation"),
+            get.starts_with("xai: configured (source: Nestlone-owned OAuth generation"),
             "{get}"
         );
         assert!(!get.starts_with("xai: set"), "{get}");
@@ -6725,7 +6725,7 @@ model = "qwen-2.5-7b"
             scoped.contains("API-key fallback: config (last4: ...1234)"),
             "{scoped}"
         );
-        assert!(scoped.contains("external credentials: blocked by the invalid Codewhale-owned xAI OAuth generation pointer"), "{scoped}");
+        assert!(scoped.contains("external credentials: blocked by the invalid Nestlone-owned xAI OAuth generation pointer"), "{scoped}");
         assert!(
             scoped.contains("repair: run `nestlone auth xai-device`"),
             "{scoped}"
@@ -7248,7 +7248,7 @@ model = "qwen-2.5-7b"
             },
             &secrets,
         )
-        .expect("Codewhale-owned API key should supersede external consent");
+        .expect("Nestlone-owned API key should supersede external consent");
         assert!(store.config.providers.xai.external_credentials.is_none());
         assert_eq!(
             std::fs::read_to_string(&external_path).expect("external file still unchanged"),
@@ -7509,7 +7509,7 @@ model = "qwen-2.5-7b"
             )?;
             Ok(())
         })
-        .expect("seed Codewhale-owned xAI credentials");
+        .expect("seed Nestlone-owned xAI credentials");
         std::fs::write(credentials.join("other-provider.json"), "preserve").unwrap();
 
         let secrets = no_keyring_secrets();

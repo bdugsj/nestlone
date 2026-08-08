@@ -75,7 +75,7 @@ fn skill_discovery_mode(app: &App) -> crate::skills::SkillDiscoveryMode {
 fn skill_discovery_mode_label(mode: crate::skills::SkillDiscoveryMode) -> &'static str {
     match mode {
         crate::skills::SkillDiscoveryMode::Compatible => "compatible",
-        crate::skills::SkillDiscoveryMode::CodeWhaleOnly => "nestlone-only",
+        crate::skills::SkillDiscoveryMode::NestloneOnly => "nestlone-only",
     }
 }
 
@@ -505,7 +505,7 @@ fn install_skill(app: &mut App, args: &str) -> CommandResult {
         Ok(s) => s,
         Err(err) => return CommandResult::error(format!("Invalid install source: {err}")),
     };
-    // Legacy no-scope install maps to the CodeWhale global owned root.
+    // Legacy no-scope install maps to the Nestlone global owned root.
     let target = scope.unwrap_or(SkillTargetScope::Global);
     let workspace = app.workspace.clone();
     let home = crate::config::effective_home_dir();
@@ -1388,7 +1388,7 @@ mod tests {
         std::fs::create_dir_all(&nestlone_skill_dir).unwrap();
         std::fs::write(
             nestlone_skill_dir.join("SKILL.md"),
-            "---\nname: nestlone-skill\ndescription: CodeWhale skill\n---\nbody",
+            "---\nname: nestlone-skill\ndescription: Nestlone skill\n---\nbody",
         )
         .unwrap();
 
@@ -1425,7 +1425,7 @@ mod tests {
         std::fs::create_dir_all(&nestlone_skill_dir).unwrap();
         std::fs::write(
             nestlone_skill_dir.join("SKILL.md"),
-            "---\nname: nestlone-skill\ndescription: CodeWhale skill\n---\nbody",
+            "---\nname: nestlone-skill\ndescription: Nestlone skill\n---\nbody",
         )
         .unwrap();
 
@@ -1473,7 +1473,7 @@ mod tests {
     fn test_skill_trust_message_marks_marker_advisory() {
         let tmpdir = TempDir::new().unwrap();
         let _home = IsolatedHome::new(&tmpdir);
-        // Mutations only touch CodeWhale-owned roots; place under project scope.
+        // Mutations only touch Nestlone-owned roots; place under project scope.
         let skill_dir = tmpdir
             .path()
             .join(".nestlone")
@@ -1510,7 +1510,7 @@ mod tests {
         let (scope, rest) = parse_scope_args("github:o/r").unwrap();
         assert_eq!(scope, None);
         assert_eq!(rest, "github:o/r");
-        // Bare install (no --project/--global) maps to the CodeWhale global root.
+        // Bare install (no --project/--global) maps to the Nestlone global root.
         assert_eq!(
             scope.unwrap_or(SkillTargetScope::Global),
             SkillTargetScope::Global

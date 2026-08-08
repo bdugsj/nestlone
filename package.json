@@ -2,7 +2,7 @@
   "name": "nestlone",
   "private": true,
   "workspaces": [
-    "npm/codewhale",
+    "npm/nestlone",
     "npm/deepseek-tui",
     "npm/runtime-sdk"
   ],

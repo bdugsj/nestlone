@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Models.dev catalog refresh / snapshot automation for CodeWhale (#4117).
+"""Models.dev catalog refresh / snapshot automation for Nestlone (#4117).
 
 Fetches the public Models.dev combined catalog, validates offline bundled seed
 shape, and supports OpenRouter public-listing inspection. The automation is
@@ -37,7 +37,7 @@ from typing import Any
 
 DEFAULT_MODELS_DEV_URL = "https://models.dev/catalog.json"
 DEFAULT_OPENROUTER_MODELS_URL = "https://openrouter.ai/api/v1/models"
-USER_AGENT = "CodeWhale-catalog-automation/0.9.0 (+https://github.com/Hmbown/CodeWhale)"
+USER_AGENT = "Nestlone-catalog-automation/0.9.0 (+https://github.com/Hmbown/CodeWhale)"
 FETCH_TIMEOUT_SECS = 60
 
 
@@ -110,7 +110,7 @@ def load_models_dev_catalog() -> tuple[dict[str, Any], str, bool]:
 def ensure_models_dev_shape(data: Any, source: str) -> dict[str, Any]:
     if not isinstance(data, dict):
         die(f"{source}: expected object root")
-    # Allow optional _meta (CodeWhale offline seed) and require models+providers
+    # Allow optional _meta (Nestlone offline seed) and require models+providers
     # when present so we never write a partial secret leak document.
     models = data.get("models")
     providers = data.get("providers")

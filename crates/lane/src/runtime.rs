@@ -57,7 +57,7 @@ pub struct LaneStartSpec {
     /// Lane record or command argv; tmux bridges them through a private 0600
     /// environment file that the detached shell removes before execution.
     pub environment: Vec<(String, String)>,
-    /// Executable that exposes Codewhale's hidden `lane-log-proxy` command.
+    /// Executable that exposes Nestlone's hidden `lane-log-proxy` command.
     /// Required by tmux so arbitrary/binary child output is framed as valid
     /// NDJSON without trusting a shell pipeline.
     pub log_proxy: Option<PathBuf>,

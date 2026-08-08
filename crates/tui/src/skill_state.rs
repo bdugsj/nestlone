@@ -58,7 +58,7 @@ impl SkillStateStore {
     }
 
     /// Refresh the in-memory snapshot under the same shared lock used by
-    /// other Codewhale processes. Long-running Runtime API servers call this
+    /// other Nestlone processes. Long-running Runtime API servers call this
     /// before listing Skills so an external toggle becomes visible without a
     /// restart.
     pub fn refresh(&mut self) -> Result<()> {
@@ -118,7 +118,7 @@ fn default_state_path() -> Result<PathBuf> {
     // Listing, prompt construction, and doctor are read-only. The explicit
     // mutation path creates the parent from `persist` when needed.
     Ok(nestlone_config::nestlone_home()
-        .context("could not resolve Codewhale state directory")?
+        .context("could not resolve Nestlone state directory")?
         .join(STATE_FILE_NAME))
 }
 

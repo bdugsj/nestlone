@@ -46,7 +46,7 @@ const config = {
   autoApprove: parseBool(process.env.CODEWHALE_AUTO_APPROVE, false),
   allowlist: parseList(process.env.WECOM_CHAT_ALLOWLIST),
   allowUnlisted: parseBool(process.env.WECOM_ALLOW_UNLISTED, false),
-  threadMapPath: process.env.WECOM_THREAD_MAP_PATH || "/var/lib/codewhale-wecom-bridge/thread-map.json",
+  threadMapPath: process.env.WECOM_THREAD_MAP_PATH || "/var/lib/nestlone-wecom-bridge/thread-map.json",
   maxReplyChars: Number(process.env.WECOM_MAX_REPLY_CHARS || 3500),
   turnTimeoutMs: Number(process.env.CODEWHALE_TURN_TIMEOUT_MS || 900000),
   approvalTimeoutMs: Number(process.env.CODEWHALE_APPROVAL_TIMEOUT_MS || 300000)
@@ -81,7 +81,7 @@ client.on("error", (error) => {
   console.error("WeCom client error:", error);
 });
 
-console.log("Starting CodeWhale WeCom bridge");
+console.log("Starting Nestlone WeCom bridge");
 console.log(`Runtime: ${config.runtimeUrl}`);
 console.log(`Workspace: ${config.workspace}`);
 if (!config.allowlist.length && !config.allowUnlisted) {
@@ -146,7 +146,7 @@ async function handleEvent(frame) {
   if (eventType === "enter_chat") {
     const chatId = body.chatid;
     if (chatId) {
-      await client.replyWelcome(frame, { msgtype: "text", text: { content: "欢迎使用 CodeWhale！发送 /help 查看可用命令。" } });
+      await client.replyWelcome(frame, { msgtype: "text", text: { content: "欢迎使用 Nestlone！发送 /help 查看可用命令。" } });
     }
   }
 }

@@ -7,7 +7,7 @@
 //!    refreshed or rewritten.
 //! 2. **Native device-code** — request a code from `auth.x.ai`, print the
 //!    verification URL + user code, poll the token endpoint, and write tokens
-//!    to Codewhale-owned storage.
+//!    to Nestlone-owned storage.
 //!
 //! Access tokens are sent as `Authorization: Bearer` on the OpenAI-compatible
 //! xAI Chat Completions route (`https://api.x.ai/v1`). Token values are never
@@ -139,7 +139,7 @@ pub struct PendingXaiDeviceLogin {
     token: TokenResponse,
 }
 
-/// Receipt for the committed Codewhale-owned xAI OAuth generation.
+/// Receipt for the committed Nestlone-owned xAI OAuth generation.
 #[derive(Debug)]
 pub struct XaiDeviceActivation {
     #[allow(dead_code)]
@@ -199,7 +199,7 @@ pub fn auth_file_path() -> PathBuf {
     nestlone_config::resolve_external_credential_path(&path).unwrap_or(path)
 }
 
-/// Codewhale-owned xAI token file. Native login and refresh never target the
+/// Nestlone-owned xAI token file. Native login and refresh never target the
 /// Grok CLI's file.
 pub fn nestlone_auth_file_path() -> Result<PathBuf> {
     nestlone_config::legacy_xai_oauth_path()
@@ -225,7 +225,7 @@ pub fn credentials_present(config: &Config) -> bool {
 /// exact read-only consent has been validated.
 #[must_use]
 pub fn credentials_valid(config: &Config) -> bool {
-    // Codewhale-owned OAuth bytes are inert until the xAI provider explicitly
+    // Nestlone-owned OAuth bytes are inert until the xAI provider explicitly
     // selects OAuth. A failed post-login config finalization can therefore
     // never make a newly written token silently ready on the next launch.
     if !config
@@ -281,8 +281,8 @@ pub fn credentials_valid(config: &Config) -> bool {
     select_entry(&mut file).is_some_and(|(_, entry)| entry_access_token_is_fresh(&entry))
 }
 
-/// Load xAI OAuth credentials. Codewhale-owned credentials may refresh and
-/// rewrite Codewhale-owned storage. External credentials are read-only.
+/// Load xAI OAuth credentials. Nestlone-owned credentials may refresh and
+/// rewrite Nestlone-owned storage. External credentials are read-only.
 pub fn get_access_token(config: &Config) -> Result<String> {
     Ok(get_credentials(config)?.access_token)
 }
@@ -294,7 +294,7 @@ pub fn get_credentials(config: &Config) -> Result<XaiOAuthCredentials> {
                 .provider_config_for(ApiProvider::Xai)
                 .and_then(|entry| entry.auth_mode.as_deref())
                 .is_some_and(auth_mode_uses_xai_oauth),
-        "Codewhale-owned xAI OAuth credentials are inactive until the xAI route explicitly selects OAuth"
+        "Nestlone-owned xAI OAuth credentials are inactive until the xAI route explicitly selects OAuth"
     );
     if let Some(owned_path) = configured_owned_auth_file_path(config)? {
         return get_owned_credentials(&owned_path);
@@ -313,7 +313,7 @@ pub fn get_credentials(config: &Config) -> Result<XaiOAuthCredentials> {
     let mut file = load_external_auth_file(&grant)?;
     let (scope, entry) = select_entry(&mut file).ok_or_else(|| {
         anyhow::anyhow!(
-            "xAI OAuth credentials at {} have no usable entry. Run `grok login` again or use `nestlone auth xai-device` for Codewhale-owned storage.",
+            "xAI OAuth credentials at {} have no usable entry. Run `grok login` again or use `nestlone auth xai-device` for Nestlone-owned storage.",
             nestlone_config::quote_os_path(grant.path())
         )
     })?;
@@ -335,16 +335,16 @@ fn get_owned_credentials(path: &Path) -> Result<XaiOAuthCredentials> {
     let directory = nestlone_config::xai_oauth_credentials_dir()?;
     anyhow::ensure!(
         path.parent() == Some(directory.as_path()),
-        "Codewhale-owned xAI OAuth path escaped the credentials directory"
+        "Nestlone-owned xAI OAuth path escaped the credentials directory"
     );
     let name = path
         .file_name()
         .and_then(|name| name.to_str())
-        .context("Codewhale-owned xAI OAuth path must have a UTF-8 basename")?;
+        .context("Nestlone-owned xAI OAuth path must have a UTF-8 basename")?;
     anyhow::ensure!(
         name == nestlone_config::LEGACY_XAI_OAUTH_FILE_NAME
             || nestlone_config::is_valid_xai_oauth_generation(name),
-        "Codewhale-owned xAI OAuth path has an invalid basename"
+        "Nestlone-owned xAI OAuth path has an invalid basename"
     );
     nestlone_config::with_xai_oauth_lifecycle_lock(|store| {
         get_owned_credentials_locked(store, name, refresh_access_token)
@@ -362,13 +362,13 @@ where
     let path = store.path_for(name)?;
     let mut file = load_owned_auth_file_from_store(store, name)?.ok_or_else(|| {
         anyhow::anyhow!(
-            "Codewhale-owned xAI OAuth credentials were not found at {}. Run `nestlone auth xai-device` again.",
+            "Nestlone-owned xAI OAuth credentials were not found at {}. Run `nestlone auth xai-device` again.",
             nestlone_config::quote_os_path(&path)
         )
     })?;
     let (scope, mut entry) = select_entry(&mut file).ok_or_else(|| {
         anyhow::anyhow!(
-            "Codewhale-owned xAI OAuth credentials at {} have no usable entry. Run `nestlone auth xai-device` again.",
+            "Nestlone-owned xAI OAuth credentials at {} have no usable entry. Run `nestlone auth xai-device` again.",
             nestlone_config::quote_os_path(&path)
         )
     })?;
@@ -579,7 +579,7 @@ fn activate_device_login_locked(
             Some(name) => load_owned_auth_file_from_store(store, name)?.ok_or_else(|| {
                 let path = store.directory().join(name);
                 anyhow::anyhow!(
-                    "the active Codewhale-owned xAI OAuth generation is missing at {}",
+                    "the active Nestlone-owned xAI OAuth generation is missing at {}",
                     nestlone_config::quote_os_path(&path)
                 )
             })?,
@@ -658,7 +658,7 @@ fn activate_device_login_locked(
         );
     }
     eprintln!(
-        "Signed in. Codewhale-owned credentials activated at {}.",
+        "Signed in. Nestlone-owned credentials activated at {}.",
         nestlone_config::quote_os_path(&auth_path)
     );
     Ok(XaiDeviceActivation {
@@ -1527,7 +1527,7 @@ mod tests {
         let _home = crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", dir.path());
         let _grok = crate::test_support::EnvVarGuard::set("GROK_AUTH_PATH", &grok_path);
 
-        let owned = nestlone_auth_file_path().expect("Codewhale-owned auth path");
+        let owned = nestlone_auth_file_path().expect("Nestlone-owned auth path");
         assert_eq!(owned, dir.path().join("credentials/xai-auth.json"));
         assert_ne!(owned, auth_file_path());
     }

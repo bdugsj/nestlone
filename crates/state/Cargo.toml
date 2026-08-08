@@ -5,7 +5,7 @@ edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
 repository.workspace = true
-description = "Session/thread persistence and recovery model for Codewhale"
+description = "Session/thread persistence and recovery model for Nestlone"
 
 [dependencies]
 anyhow.workspace = true

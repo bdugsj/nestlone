@@ -34,7 +34,7 @@ pub const AUDIT_MAX_DEPTH: usize = package_digest::PACKAGE_DIGEST_MAX_DEPTH;
 /// Which roots the auditor visits.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SkillAuditMode {
-    /// CodeWhale-owned project/global roots only.
+    /// Nestlone-owned project/global roots only.
     OwnedOnly,
     /// Owned + compatible roots (including `.codex/skills`). Does not change runtime.
     Compatible,
@@ -50,8 +50,8 @@ pub struct AuditedSkillId {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum SkillSourceKind {
-    CodeWhaleManaged,
-    CodeWhaleManual,
+    NestloneManaged,
+    NestloneManual,
     CompatibleExternal,
     BuiltIn,
     ReviewedPluginSnapshot,
@@ -325,7 +325,7 @@ pub fn action_policy(skill: &AuditedSkill) -> Vec<SkillActionKind> {
     }
 
     match skill.source_kind {
-        SkillSourceKind::CodeWhaleManaged => {
+        SkillSourceKind::NestloneManaged => {
             let mut actions = Vec::new();
             if matches!(skill.parser, ParserState::Valid | ParserState::Warning(_))
                 && !matches!(skill.integrity, IntegrityState::BrokenManagedInstall)
@@ -343,7 +343,7 @@ pub fn action_policy(skill: &AuditedSkill) -> Vec<SkillActionKind> {
             }
             actions
         }
-        SkillSourceKind::CodeWhaleManual => Vec::new(),
+        SkillSourceKind::NestloneManual => Vec::new(),
         SkillSourceKind::CompatibleExternal => {
             // Import is offered for fresh candidates and for same-name owned
             // peers (exact duplicate → AlreadyPresent, conflict → replace confirm).
@@ -853,12 +853,12 @@ fn classify_source(
 
     match marker {
         MarkerParse::Absent => (
-            SkillSourceKind::CodeWhaleManual,
+            SkillSourceKind::NestloneManual,
             ProvenanceState::Manual,
             IntegrityState::Unknown,
         ),
         MarkerParse::Broken(_) => (
-            SkillSourceKind::CodeWhaleManaged,
+            SkillSourceKind::NestloneManaged,
             ProvenanceState::Managed {
                 spec: None,
                 safe_url: None,
@@ -867,7 +867,7 @@ fn classify_source(
             IntegrityState::BrokenManagedInstall,
         ),
         MarkerParse::V1(m) => (
-            SkillSourceKind::CodeWhaleManaged,
+            SkillSourceKind::NestloneManaged,
             ProvenanceState::Managed {
                 spec: m.spec.clone(),
                 safe_url: m.url.as_deref().map(sanitize_url_for_display),
@@ -885,7 +885,7 @@ fn classify_source(
                 (_, DigestState::Unknown(_)) => IntegrityState::Unknown,
             };
             (
-                SkillSourceKind::CodeWhaleManaged,
+                SkillSourceKind::NestloneManaged,
                 ProvenanceState::Managed {
                     spec: m.spec.clone(),
                     safe_url: m.url.as_deref().map(sanitize_url_for_display),
@@ -1078,7 +1078,7 @@ mod tests {
         let owned = snap
             .skills
             .iter()
-            .find(|s| s.root.kind == SkillRootKind::CodeWhaleProject)
+            .find(|s| s.root.kind == SkillRootKind::NestloneProject)
             .expect("owned");
         assert_eq!(owned.precedence, PrecedenceState::Active);
     }
@@ -1238,7 +1238,7 @@ mod tests {
 
         let snap = scan(&workspace, Some(&home), SkillAuditMode::OwnedOnly, None);
         let skill = &snap.skills[0];
-        assert_eq!(skill.source_kind, SkillSourceKind::CodeWhaleManaged);
+        assert_eq!(skill.source_kind, SkillSourceKind::NestloneManaged);
         assert_eq!(skill.integrity, IntegrityState::LegacyMetadataUnknown);
         assert!(skill.available_actions.contains(&SkillActionKind::Update));
         assert!(skill.available_actions.contains(&SkillActionKind::Remove));
@@ -1363,7 +1363,7 @@ mod tests {
             "not-the-bundled-body",
         );
         let snap = scan(&workspace, Some(&home), SkillAuditMode::OwnedOnly, None);
-        assert_eq!(snap.skills[0].source_kind, SkillSourceKind::CodeWhaleManual);
+        assert_eq!(snap.skills[0].source_kind, SkillSourceKind::NestloneManual);
         assert!(snap.skills[0].available_actions.is_empty());
     }
 
@@ -1384,7 +1384,7 @@ mod tests {
         let snap = scan(&workspace, Some(&home), SkillAuditMode::OwnedOnly, None);
         assert_eq!(
             snap.skills[0].source_kind,
-            SkillSourceKind::CodeWhaleManaged
+            SkillSourceKind::NestloneManaged
         );
         assert!(
             snap.skills[0]

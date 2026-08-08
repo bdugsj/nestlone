@@ -5,7 +5,7 @@ edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
 repository.workspace = true
-description = "Core runtime boundaries for Codewhale"
+description = "Core runtime boundaries for Nestlone"
 
 [dependencies]
 anyhow.workspace = true

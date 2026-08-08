@@ -10,7 +10,7 @@
 #
 # Usage:
 #   scripts/v0867-setup-qa.sh            # build (release) if needed, then probe
-#   CODEWHALE_BIN=/path/to/codewhale-tui scripts/v0867-setup-qa.sh   # use a prebuilt binary
+#   CODEWHALE_BIN=/path/to/nestlone-tui scripts/v0867-setup-qa.sh   # use a prebuilt binary
 #
 # Exit 0 = every probe passed. Non-zero = a contract regressed; the failing
 # probe prints what it expected vs. observed. Requires `jq`.
@@ -27,12 +27,12 @@ fi
 
 BIN="${CODEWHALE_BIN:-}"
 if [[ -z "$BIN" ]]; then
-  if [[ -x "target/release/codewhale-tui" ]]; then
-    BIN="target/release/codewhale-tui"
+  if [[ -x "target/release/nestlone-tui" ]]; then
+    BIN="target/release/nestlone-tui"
   else
-    echo "Building release codewhale-tui (set CODEWHALE_BIN to skip)…" >&2
-    cargo build --release -p codewhale-tui >&2
-    BIN="target/release/codewhale-tui"
+    echo "Building release nestlone-tui (set CODEWHALE_BIN to skip)…" >&2
+    cargo build --release -p nestlone-tui >&2
+    BIN="target/release/nestlone-tui"
   fi
 fi
 if [[ "$BIN" != /* ]]; then
@@ -73,17 +73,17 @@ expect_jq_select() {
 doctor_json_in() {
   local home="$1"
   shift
-  CODEWHALE_HOME="$home/codewhale-home" \
+  CODEWHALE_HOME="$home/nestlone-home" \
   HOME="$home/home" \
   USERPROFILE="$home/home" \
-  DEEPSEEK_CONFIG_PATH="$home/codewhale-home/config.toml" \
+  DEEPSEEK_CONFIG_PATH="$home/nestlone-home/config.toml" \
     "$BIN" doctor --json "$@" 2>/dev/null
 }
 
 new_home() {
   local d
   d="$(mktemp -d)"
-  mkdir -p "$d/codewhale-home" "$d/home"
+  mkdir -p "$d/nestlone-home" "$d/home"
   echo "$d"
 }
 
@@ -130,7 +130,7 @@ rm -rf "$H"
 echo "[secret safety] configured key absent from doctor --json"
 H="$(new_home)"
 SECRET="CANARY_apikey_do_not_leak_0000"
-cat > "$H/codewhale-home/config.toml" <<EOF
+cat > "$H/nestlone-home/config.toml" <<EOF
 model = "deepseek-v4-pro"
 [providers.deepseek]
 api_key = "$SECRET"
@@ -147,8 +147,8 @@ rm -rf "$H"
 echo "[repo law] enforced invariant surfaces in context diagnostics, body not loaded verbatim"
 H="$(new_home)"
 WS="$(mktemp -d)"
-mkdir -p "$WS/.codewhale"
-cat > "$WS/.codewhale/constitution.json" <<'EOF'
+mkdir -p "$WS/.nestlone"
+cat > "$WS/.nestlone/constitution.json" <<'EOF'
 {
   "authority": ["AGENTS.md"],
   "protected_invariants": [
@@ -156,7 +156,7 @@ cat > "$WS/.codewhale/constitution.json" <<'EOF'
   ]
 }
 EOF
-CTX="$(cd "$WS" && CODEWHALE_HOME="$H/codewhale-home" HOME="$H/home" USERPROFILE="$H/home" \
+CTX="$(cd "$WS" && CODEWHALE_HOME="$H/nestlone-home" HOME="$H/home" USERPROFILE="$H/home" \
   "$BIN" doctor --context-json 2>/dev/null || true)"
 if echo "$CTX" | jq -e '.entries[] | select(.source_kind == "repo_constitution")' >/dev/null 2>&1; then
   pass "repo constitution surfaces in --context-json"
@@ -170,7 +170,7 @@ echo "[WHALE.md migration] legacy file reported, body never surfaced"
 H="$(new_home)"
 WS="$(mktemp -d)"
 printf 'SECRET_WHALE_BODY_SHOULD_NOT_APPEAR\n' > "$WS/WHALE.md"
-CTX="$(cd "$WS" && CODEWHALE_HOME="$H/codewhale-home" HOME="$H/home" USERPROFILE="$H/home" \
+CTX="$(cd "$WS" && CODEWHALE_HOME="$H/nestlone-home" HOME="$H/home" USERPROFILE="$H/home" \
   "$BIN" doctor --context-json 2>/dev/null || true)"
 if echo "$CTX" | grep -q "SECRET_WHALE_BODY_SHOULD_NOT_APPEAR"; then
   fail "legacy WHALE.md body leaked into context report"

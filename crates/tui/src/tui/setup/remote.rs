@@ -37,7 +37,7 @@ const RUNTIME_HOST_VARS: [&str; 2] = ["CODEWHALE_RUNTIME_HOST", "DEEPSEEK_RUNTIM
 /// Placeholder substituted for every secret in the generated plan preview.
 const REDACTED: &str = "<redacted>";
 
-/// The four ways a Codewhale runtime can be reached.
+/// The four ways a Nestlone runtime can be reached.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(super) enum RemoteMode {
     LocalOnly,
@@ -372,7 +372,7 @@ so no plan can be generated for it."
 
     let mut out = String::from(
         "Preview only. Nothing below has been written, applied, or provisioned.\n\
-Every secret is shown as <redacted>; Codewhale never reads their values here.\n\n",
+Every secret is shown as <redacted>; Nestlone never reads their values here.\n\n",
     );
     for file in bundle::render_bundle(&inputs) {
         out.push_str(&format!("── {} ──\n", file.relative_path));

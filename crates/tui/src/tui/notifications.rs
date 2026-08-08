@@ -365,7 +365,7 @@ const TITLE_FRAME_HOLD: Duration = Duration::from_millis(800);
 const TITLE_WHALE_FRAMES: &[&str] = &["🐳", "🐋", "🐳", "🐋"];
 
 fn title_animation_base() -> &'static Mutex<String> {
-    TITLE_ANIMATION_BASE.get_or_init(|| Mutex::new("Codewhale".to_string()))
+    TITLE_ANIMATION_BASE.get_or_init(|| Mutex::new("Nestlone".to_string()))
 }
 
 fn title_activity_verb() -> &'static Mutex<String> {
@@ -398,7 +398,7 @@ pub fn set_title_activity_verb(verb: &str) {
     }
     let base = title_animation_base()
         .lock()
-        .map_or_else(|_| "Codewhale".to_string(), |base| base.clone());
+        .map_or_else(|_| "Nestlone".to_string(), |base| base.clone());
     set_terminal_title(&title_activity_label(
         &base,
         Duration::ZERO,
@@ -508,7 +508,7 @@ pub fn set_terminal_focused(focused: bool) {
     }
     let base = title_animation_base()
         .lock()
-        .map_or_else(|_| "Codewhale".to_string(), |base| base.clone());
+        .map_or_else(|_| "Nestlone".to_string(), |base| base.clone());
     let motion = TITLE_MOTION_ENABLED.load(Ordering::SeqCst);
     set_terminal_title(&title_activity_label(
         &base,
@@ -541,7 +541,7 @@ pub fn stop_title_animation_quietly() {
     TITLE_ANIMATION_RUNNING.store(false, Ordering::SeqCst);
     TITLE_ANIMATION_GENERATION.fetch_add(1, Ordering::SeqCst);
     COMPLETION_MARKER_SHOWN.store(false, Ordering::SeqCst);
-    set_terminal_title("Codewhale");
+    set_terminal_title("Nestlone");
 }
 
 /// Clear the completion marker from the title when the user interacts.
@@ -550,7 +550,7 @@ pub fn stop_title_animation_quietly() {
 /// marker doesn't persist once the user is back at the terminal.
 pub fn reset_title_on_interaction() {
     if COMPLETION_MARKER_SHOWN.swap(false, Ordering::SeqCst) {
-        set_terminal_title("Codewhale");
+        set_terminal_title("Nestlone");
     }
 }
 
@@ -671,7 +671,7 @@ fn completion_sound_state_for_tests() -> (crate::config::CompletionSound, Option
 /// Runs on a dedicated background thread so the caller is not blocked.
 ///
 /// The notification includes:
-/// - **Title**: "Codewhale"
+/// - **Title**: "Nestlone"
 /// - **Subtitle**: [`NotificationPayload::headline`] (≤ 80 chars)
 /// - **Body**: [`NotificationPayload::body`] (≤ 322 chars: a ≤ 120-char
 ///   detail, a separator, and a ≤ 200-char preview)
@@ -722,7 +722,7 @@ fn macos_display_notification(payload: &NotificationPayload) {
                 "-e".to_string(),
                 "set theSubtitle to item 2 of argv".to_string(),
                 "-e".to_string(),
-                "display notification theBody with title \"Codewhale\" subtitle theSubtitle sound name \"default\"".to_string(),
+                "display notification theBody with title \"Nestlone\" subtitle theSubtitle sound name \"default\"".to_string(),
                 "-e".to_string(),
                 "end run".to_string(),
                 "--".to_string(),
@@ -958,19 +958,19 @@ mod tests {
             "working…".clone_into(&mut *verb);
         }
         assert_eq!(
-            title_activity_label("Codewhale", Duration::ZERO, true, true),
+            title_activity_label("Nestlone", Duration::ZERO, true, true),
             "🐳 working…"
         );
         assert_eq!(
-            title_activity_label("Codewhale", Duration::ZERO, false, false),
+            title_activity_label("Nestlone", Duration::ZERO, false, false),
             "🐳 working…"
         );
         assert_eq!(
-            title_activity_label("Codewhale", Duration::ZERO, false, true),
+            title_activity_label("Nestlone", Duration::ZERO, false, true),
             "🐳 working…"
         );
         assert_eq!(
-            title_activity_label("Codewhale", Duration::from_millis(800), false, true),
+            title_activity_label("Nestlone", Duration::from_millis(800), false, true),
             "🐋 working…"
         );
     }

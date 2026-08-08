@@ -1,6 +1,6 @@
 //! Lossless, serialized `config.toml` mutation.
 //!
-//! Every Codewhale config writer coordinates through the adjacent lock owned
+//! Every Nestlone config writer coordinates through the adjacent lock owned
 //! here. Mutations re-read only after acquiring the lock, so a stale process
 //! cannot resurrect revoked credential authority. Callers that still serialize
 //! a full typed snapshot must supply the exact bytes they originally loaded and

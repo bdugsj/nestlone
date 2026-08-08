@@ -40,7 +40,7 @@ fn default_history_path() -> Option<PathBuf> {
     history_path_with_home(crate::config::effective_home_dir())
 }
 
-/// Resolve the composer-history file under `home`, preferring the CodeWhale
+/// Resolve the composer-history file under `home`, preferring the Nestlone
 /// root and only falling back to the legacy `.deepseek` root when a legacy
 /// file already exists.
 ///

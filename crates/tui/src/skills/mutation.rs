@@ -1,4 +1,4 @@
-//! Unique skill mutation controller for CodeWhale-owned roots.
+//! Unique skill mutation controller for Nestlone-owned roots.
 //!
 //! All install / import / update / remove / trust writes go through this
 //! module. Compatible harness roots, built-ins, and plugin snapshots are
@@ -25,7 +25,7 @@ use super::roots::{
     SkillRootCatalog, SkillRootDescriptor, SkillRootKind, SkillScope, safe_display_path,
 };
 
-/// Project vs global CodeWhale-owned install target.
+/// Project vs global Nestlone-owned install target.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SkillTargetScope {
     Project,
@@ -141,18 +141,18 @@ fn owned_anchor<'a>(
 
 /// Return whether `path` is an existing real directory, rejecting links and
 /// non-directory components. `symlink_metadata` is intentional: following a
-/// link before checking it would turn a lexical CodeWhale-owned root into an
+/// link before checking it would turn a lexical Nestlone-owned root into an
 /// attacker-selected write target.
 fn checked_real_directory(path: &Path) -> Result<bool> {
     match fs::symlink_metadata(path) {
         Ok(meta) if meta.file_type().is_symlink() => {
             bail!(
-                "refusing to mutate symlinked CodeWhale skills path component {}",
+                "refusing to mutate symlinked Nestlone skills path component {}",
                 path.display()
             )
         }
         Ok(meta) if !meta.is_dir() => bail!(
-            "refusing to mutate through non-directory CodeWhale skills path component {}",
+            "refusing to mutate through non-directory Nestlone skills path component {}",
             path.display()
         ),
         Ok(_) => Ok(true),
@@ -171,7 +171,7 @@ fn validate_owned_target_chain(
     let expected = anchor.join(".nestlone").join("skills");
     if skills_dir != expected {
         bail!(
-            "refusing to mutate non-canonical CodeWhale skills root {}",
+            "refusing to mutate non-canonical Nestlone skills root {}",
             skills_dir.display()
         );
     }
@@ -264,8 +264,8 @@ fn target_scope_for_root(root: &SkillRootDescriptor) -> Result<SkillTargetScope>
         bail!("refusing to mutate non-owned root {}", root.path.display());
     }
     match root.kind {
-        SkillRootKind::CodeWhaleProject => Ok(SkillTargetScope::Project),
-        SkillRootKind::CodeWhaleGlobal => Ok(SkillTargetScope::Global),
+        SkillRootKind::NestloneProject => Ok(SkillTargetScope::Project),
+        SkillRootKind::NestloneGlobal => Ok(SkillTargetScope::Global),
         _ => bail!("refusing to mutate non-owned root {}", root.path.display()),
     }
 }
@@ -346,7 +346,7 @@ fn validate_owned_skill_path(
     Ok(skills_dir)
 }
 
-/// Resolve the on-disk CodeWhale-owned skills directory for a target scope.
+/// Resolve the on-disk Nestlone-owned skills directory for a target scope.
 pub fn resolve_owned_target(
     workspace: &Path,
     home: Option<&Path>,
@@ -354,8 +354,8 @@ pub fn resolve_owned_target(
 ) -> Result<PathBuf> {
     let catalog = SkillRootCatalog::build(workspace, home, None);
     let kind = match target {
-        SkillTargetScope::Project => SkillRootKind::CodeWhaleProject,
-        SkillTargetScope::Global => SkillRootKind::CodeWhaleGlobal,
+        SkillTargetScope::Project => SkillRootKind::NestloneProject,
+        SkillTargetScope::Global => SkillRootKind::NestloneGlobal,
     };
     let root = catalog
         .owned_writable_roots()
@@ -370,7 +370,7 @@ pub fn resolve_owned_target(
     Ok(root.path.clone())
 }
 
-/// Execute a mutation request against CodeWhale-owned roots only.
+/// Execute a mutation request against Nestlone-owned roots only.
 pub async fn execute(
     request: SkillMutationRequest,
     ctx: &MutationContext<'_>,
@@ -470,8 +470,8 @@ fn resolve_owned_skill_by_name(
 
     if let Some(scope) = scope {
         let want = match scope {
-            SkillTargetScope::Project => SkillRootKind::CodeWhaleProject,
-            SkillTargetScope::Global => SkillRootKind::CodeWhaleGlobal,
+            SkillTargetScope::Project => SkillRootKind::NestloneProject,
+            SkillTargetScope::Global => SkillRootKind::NestloneGlobal,
         };
         matches.retain(|s| s.root.kind == want);
     }
@@ -495,7 +495,7 @@ fn resolve_owned_skill_by_name(
                      import it with /skills (refusing to write external harness directories)"
                 );
             }
-            bail!("skill '{name}' not found in CodeWhale-owned project/global roots");
+            bail!("skill '{name}' not found in Nestlone-owned project/global roots");
         }
         [only] => {
             let DigestState::Known(digest) = &only.digest else {
@@ -507,7 +507,7 @@ fn resolve_owned_skill_by_name(
             })
         }
         _ => bail!(
-            "skill '{name}' exists in both project and global CodeWhale roots; \
+            "skill '{name}' exists in both project and global Nestlone roots; \
              specify --project or --global"
         ),
     }
@@ -676,8 +676,8 @@ fn import_external(
     let anchor = owned_anchor(ctx.workspace, ctx.home, target)?;
 
     let want_kind = match target {
-        SkillTargetScope::Project => SkillRootKind::CodeWhaleProject,
-        SkillTargetScope::Global => SkillRootKind::CodeWhaleGlobal,
+        SkillTargetScope::Project => SkillRootKind::NestloneProject,
+        SkillTargetScope::Global => SkillRootKind::NestloneGlobal,
     };
     let existing_in_target: Vec<&AuditedSkill> = owned_snap
         .skills
@@ -861,18 +861,18 @@ async fn update_skill(
 ) -> Result<SkillMutationReceipt> {
     let (skill, path) = find_audited_skill(ctx, &skill_id)?;
     if !skill.root.is_writable_owned() {
-        bail!("refusing to update skill outside CodeWhale-owned roots");
+        bail!("refusing to update skill outside Nestlone-owned roots");
     }
-    if skill.source_kind != SkillSourceKind::CodeWhaleManaged {
-        bail!("only CodeWhale managed skills can be updated");
+    if skill.source_kind != SkillSourceKind::NestloneManaged {
+        bail!("only Nestlone managed skills can be updated");
     }
     let skills_dir = validate_owned_skill_path(ctx, &skill, &path)?;
     // Imported skills carry `import:…` provenance and must not hit the registry.
     ensure_remote_updatable(&path)?;
     let before = verify_expected_digest(&path, expected_digest.as_deref())?;
     let scope = match skill.root.kind {
-        SkillRootKind::CodeWhaleProject => SkillScope::Project,
-        SkillRootKind::CodeWhaleGlobal => SkillScope::Global,
+        SkillRootKind::NestloneProject => SkillScope::Project,
+        SkillRootKind::NestloneGlobal => SkillScope::Global,
         _ => SkillScope::Logical,
     };
 
@@ -939,16 +939,16 @@ fn remove_skill(
 ) -> Result<SkillMutationReceipt> {
     let (skill, path) = find_audited_skill(ctx, &skill_id)?;
     if !skill.root.is_writable_owned() {
-        bail!("refusing to remove skill outside CodeWhale-owned roots");
+        bail!("refusing to remove skill outside Nestlone-owned roots");
     }
-    if skill.source_kind != SkillSourceKind::CodeWhaleManaged {
-        bail!("only CodeWhale managed skills can be removed");
+    if skill.source_kind != SkillSourceKind::NestloneManaged {
+        bail!("only Nestlone managed skills can be removed");
     }
     let skills_dir = validate_owned_skill_path(ctx, &skill, &path)?;
     let before = verify_expected_digest(&path, expected_digest.as_deref())?;
     let scope = match skill.root.kind {
-        SkillRootKind::CodeWhaleProject => SkillScope::Project,
-        SkillRootKind::CodeWhaleGlobal => SkillScope::Global,
+        SkillRootKind::NestloneProject => SkillScope::Project,
+        SkillRootKind::NestloneGlobal => SkillScope::Global,
         _ => SkillScope::Logical,
     };
     let package_name = on_disk_package_name(&skill_id)?;
@@ -972,18 +972,18 @@ fn trust_skill(
 ) -> Result<SkillMutationReceipt> {
     let (skill, path) = find_audited_skill(ctx, &skill_id)?;
     if !skill.root.is_writable_owned() {
-        bail!("refusing to trust skill outside CodeWhale-owned roots");
+        bail!("refusing to trust skill outside Nestlone-owned roots");
     }
-    if skill.source_kind != SkillSourceKind::CodeWhaleManaged {
-        bail!("only CodeWhale managed skills can be trusted");
+    if skill.source_kind != SkillSourceKind::NestloneManaged {
+        bail!("only Nestlone managed skills can be trusted");
     }
     validate_owned_skill_path(ctx, &skill, &path)?;
     let before = verify_expected_digest(&path, Some(&expected_digest))?;
     validate_owned_skill_path(ctx, &skill, &path)?;
     write_trust_v2(&path, &expected_digest)?;
     let scope = match skill.root.kind {
-        SkillRootKind::CodeWhaleProject => SkillScope::Project,
-        SkillRootKind::CodeWhaleGlobal => SkillScope::Global,
+        SkillRootKind::NestloneProject => SkillScope::Project,
+        SkillRootKind::NestloneGlobal => SkillScope::Global,
         _ => SkillScope::Logical,
     };
     Ok(SkillMutationReceipt {

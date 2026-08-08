@@ -1993,7 +1993,7 @@ struct SpawnRequest {
     /// inside the parent's workspace. For first-class git worktree isolation,
     /// use `worktree` instead of pre-creating a cwd by hand.
     cwd: Option<PathBuf>,
-    /// Optional first-class git worktree isolation. When set, Codewhale
+    /// Optional first-class git worktree isolation. When set, Nestlone
     /// creates a sibling worktree/branch and runs the child from that checkout.
     worktree: Option<SubAgentWorktreeRequest>,
     /// Optional file path for cache-aware resident mode (#529). When set,
@@ -3075,7 +3075,7 @@ impl CoordinationProcessLock {
             Ok(Err(error)) => {
                 let _ = thread.join();
                 Err(anyhow!(
-                    "another Codewhale process owns delegated coordination for {}: {error}",
+                    "another Nestlone process owns delegated coordination for {}: {error}",
                     workspace.display()
                 ))
             }
@@ -11204,7 +11204,7 @@ fn fallback_subagent_assignment_route(
 /// Enumerates through the catalog-backed [`crate::provider_lake`] facade rather
 /// than the raw legacy `model_completion_names_for_provider` table (#4116 /
 /// #4188). The facade prefers live Models.dev, then the offline bundled
-/// snapshot, and only then the legacy hardcoded table for Codewhale-only /
+/// snapshot, and only then the legacy hardcoded table for Nestlone-only /
 /// unbundled providers. This consumer only reads the first entry.
 fn operator_model_for_subagent(runtime: &SubAgentRuntime) -> String {
     let provider = runtime.client.api_provider();

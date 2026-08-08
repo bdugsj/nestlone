@@ -247,7 +247,7 @@ pub(crate) fn credential_state_for_provider(
             .as_deref()
             .is_some_and(crate::config::auth_mode_uses_kimi_imported_token);
     if uses_kimi_imported_token {
-        // Kimi remains API-key-only until Codewhale has its own registered
+        // Kimi remains API-key-only until Nestlone has its own registered
         // OAuth client identity. Never inspect Kimi CLI storage here.
         return CredentialState::MissingKey;
     }

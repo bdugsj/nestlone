@@ -2,7 +2,7 @@
 //!
 //! Scope, stated precisely so these assertions are not over-read:
 //!
-//! * They validate **deterministic Codewhale behavior** — which skills install,
+//! * They validate **deterministic Nestlone behavior** — which skills install,
 //!   which parse, which become ambient catalogue entries, which stay explicitly
 //!   loadable, how aliases resolve, and how much prompt budget the catalogue
 //!   costs.

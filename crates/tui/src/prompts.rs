@@ -48,7 +48,7 @@ pub struct PromptSessionContext<'a> {
     /// Optional output-verbosity mode. `concise` appends a short output
     /// discipline block; unset keeps the normal conversational prompt.
     pub verbosity: Option<&'a str>,
-    /// Restrict skill discovery to Codewhale-owned roots plus explicit
+    /// Restrict skill discovery to Nestlone-owned roots plus explicit
     /// `skills_dir` configuration.
     pub skills_scan_nestlone_only: bool,
     /// Immutable plugin snapshot owned by this App/Engine workspace context.
@@ -453,7 +453,7 @@ static PROMPT_OVERRIDE_NOTICES: LazyLock<Mutex<Vec<String>>> =
 ///
 /// This hook only replaces the byte-stable base/personality prompt segment.
 /// Mode deltas, approval policy, tool taxonomy, Core Execution, and the
-/// Compaction Relay stay owned by Codewhale's system prompt assembly.
+/// Compaction Relay stay owned by Nestlone's system prompt assembly.
 #[non_exhaustive]
 #[derive(Debug)]
 pub struct StaticPromptCtx<'a> {
@@ -466,7 +466,7 @@ pub struct StaticPromptCtx<'a> {
     pub default_layers: &'a str,
 }
 
-/// Embedder hook for replacing Codewhale's byte-stable base/personality prompt
+/// Embedder hook for replacing Nestlone's byte-stable base/personality prompt
 /// segment.
 pub type StaticPromptComposer = dyn Fn(&StaticPromptCtx<'_>) -> String + Send + Sync + 'static;
 
@@ -579,7 +579,7 @@ pub fn set_static_prompt_composer_override(
 
 // ── Config-directory prompt overrides (issue #3638) ──
 // Bridge the embedder override hooks above to a user-facing source: an
-// optional file in the Codewhale config directory. This lets users repurpose
+// optional file in the Nestlone config directory. This lets users repurpose
 // the TUI for non-software use cases (e.g. long-form writing) by swapping the
 // constitutional base prompt, without editing in-tree files or shipping a
 // custom embedder build.
@@ -687,7 +687,7 @@ pub fn load_config_dir_prompt_overrides(config_dir: &Path) -> Vec<&'static str> 
     applied
 }
 
-/// Resolve the Codewhale config directory and load any prompt overrides found
+/// Resolve the Nestlone config directory and load any prompt overrides found
 /// there. Convenience wrapper around [`load_config_dir_prompt_overrides`] for
 /// startup wiring; silently does nothing when the config home cannot be
 /// resolved.
@@ -1382,7 +1382,7 @@ pub fn system_prompt_for_mode_with_context_skills_session_and_approval(
 
     // 3. Skills block. #432: default discovery walks every compatible
     // workspace/global skill directory so skills installed for other AI-tool
-    // conventions show up in the catalogue. Users can opt into a Codewhale-only
+    // conventions show up in the catalogue. Users can opt into a Nestlone-only
     // scan with `[skills] scan_nestlone_only = true`. When an explicit
     // `skills_dir` is configured, union it with the workspace view instead of
     // treating it as a fallback; the workspace view often returns Some and
@@ -2016,7 +2016,7 @@ start it",
             compose_prompt_with_approval_model_and_shell(Personality::Calm, "moonshotai/kimi-k2.6");
         assert!(
             flash.contains("You are Nestlone"),
-            "0.9.0 preamble must open with the model-agnostic Codewhale stance"
+            "0.9.0 preamble must open with the model-agnostic Nestlone stance"
         );
         assert!(
             !flash.contains("You are deepseek-v4-flash")
@@ -2201,7 +2201,7 @@ start it",
             prompt.contains("Take the work seriously. Don't take"),
             "Preamble should carry tone guidance (take the work, not yourself, seriously)"
         );
-        // Verify the preamble still carries the Codewhale identity.
+        // Verify the preamble still carries the Nestlone identity.
         assert!(prompt.contains("You are Nestlone"));
         assert!(prompt.contains("Let the work speak"));
     }
@@ -2664,7 +2664,7 @@ start it",
             crate::test_support::EnvVarGuard::set("CODEWHALE_HOME", nestlone_home.as_os_str());
 
         let constitution = nestlone_config::UserConstitution {
-            about: Some("Maintains Codewhale release lanes.".to_string()),
+            about: Some("Maintains Nestlone release lanes.".to_string()),
             working_style: vec!["Prefer live verification before claims.".to_string()],
             priorities: vec!["Keep release gates green.".to_string()],
             autonomy_preference: nestlone_config::AutonomyPreference::Balanced,
@@ -2701,7 +2701,7 @@ start it",
             "user constitution should be its own layer after the base/project context and before volatile environment data"
         );
         assert!(prompt.contains("source=\"user-global\""));
-        assert!(prompt.contains("Maintains Codewhale release lanes."));
+        assert!(prompt.contains("Maintains Nestlone release lanes."));
         assert!(prompt.contains("Prefer live verification before claims."));
         assert!(
             !prompt.contains(&nestlone_home.display().to_string()),

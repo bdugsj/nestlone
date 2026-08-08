@@ -180,7 +180,7 @@ if [ "$MODE" = "docker" ] || [ "$MODE" = "both" ]; then
         exit 1
     fi
 
-    # docker-compose.yml lives one level up (beside the CodeWhale checkout)
+    # docker-compose.yml lives one level up (beside the Nestlone checkout)
     COMPOSE_DIR="$SCRIPT_DIR"
     if [ -f "$SCRIPT_DIR/../docker-compose.yml" ]; then
         COMPOSE_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"

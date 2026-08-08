@@ -224,10 +224,10 @@ const LEGACY_ALLOW_INSECURE_HTTP_ENV: &str = "DEEPSEEK_ALLOW_INSECURE_HTTP";
 fn client_user_agent(api_provider: ApiProvider) -> &'static str {
     // The ChatGPT Codex backend is the sole route with a documented
     // compatibility exception. Kimi Code, including K3, must keep the normal
-    // Codewhale identity rather than impersonating a Kimi CLI.
+    // Nestlone identity rather than impersonating a Kimi CLI.
     if api_provider == ApiProvider::OpenaiCodex {
         concat!(
-            "codex_cli_rs/0.137.0 (CodeWhale ",
+            "codex_cli_rs/0.137.0 (Nestlone ",
             env!("CARGO_PKG_VERSION"),
             ")"
         )
@@ -2665,7 +2665,7 @@ pub(super) fn parse_models_response(payload: &str) -> Result<Vec<AvailableModel>
 /// Apply provider-owned protocol cutlines to a live `/models` response.
 ///
 /// OpenCode Go mixes OpenAI Chat Completions and Anthropic Messages models in
-/// one roster. Codewhale's `OpencodeGo` route is intentionally Chat-only, so
+/// one roster. Nestlone's `OpencodeGo` route is intentionally Chat-only, so
 /// both `/models` consumers must share this filter before publishing choices.
 fn apply_provider_model_cutline(
     provider: ApiProvider,
@@ -2949,7 +2949,7 @@ pub(super) fn apply_reasoning_effort(
             // or `thinking` as supported parameters. The `thinking` field is
             // only available on the Anthropic Messages API (POST /v1/messages)
             // with a different shape ({"type":"enabled","budget_tokens":N}).
-            // Since CodeWhale routes TelecomJS through the Chat Completions
+            // Since Nestlone routes TelecomJS through the Chat Completions
             // path, we must NOT inject these fields — the gateway may silently
             // ignore them or reject the request, and not every gateway model
             // (qwen-max, deepseek-chat, gpt-4o, claude, etc.) accepts the same

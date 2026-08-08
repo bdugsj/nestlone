@@ -234,8 +234,8 @@ impl SkillsManagerView {
                     return ViewAction::None;
                 };
                 let want_kind = match self.import_scope {
-                    SkillTargetScope::Project => SkillRootKind::CodeWhaleProject,
-                    SkillTargetScope::Global => SkillRootKind::CodeWhaleGlobal,
+                    SkillTargetScope::Project => SkillRootKind::NestloneProject,
+                    SkillTargetScope::Global => SkillRootKind::NestloneGlobal,
                 };
                 // Only treat same-scope owned peers as replace conflicts — the
                 // mutation controller replaces inside `import_scope` alone.
@@ -551,8 +551,8 @@ fn action_label(kind: SkillActionKind) -> &'static str {
 
 fn source_label(kind: SkillSourceKind) -> &'static str {
     match kind {
-        SkillSourceKind::CodeWhaleManaged => "managed",
-        SkillSourceKind::CodeWhaleManual => "manual",
+        SkillSourceKind::NestloneManaged => "managed",
+        SkillSourceKind::NestloneManual => "manual",
         SkillSourceKind::CompatibleExternal => "external",
         SkillSourceKind::BuiltIn => "built-in",
         SkillSourceKind::ReviewedPluginSnapshot => "plugin",

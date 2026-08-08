@@ -64,7 +64,7 @@ const config = {
   ),
   threadMapPath:
     process.env.TELEGRAM_THREAD_MAP_PATH ||
-    "/var/lib/codewhale-telegram-bridge/thread-map.json",
+    "/var/lib/nestlone-telegram-bridge/thread-map.json",
   allowGroups: parseBool(process.env.TELEGRAM_ALLOW_GROUPS, false),
   requirePrefixInGroup: parseBool(process.env.TELEGRAM_REQUIRE_PREFIX_IN_GROUP, true),
   groupPrefix: process.env.TELEGRAM_GROUP_PREFIX || "/cw",
@@ -91,7 +91,7 @@ function requestStop() {
 process.once("SIGINT", requestStop);
 process.once("SIGTERM", requestStop);
 
-console.log("Starting CodeWhale Telegram bridge");
+console.log("Starting Nestlone Telegram bridge");
 console.log(`Runtime: ${config.runtimeUrl}`);
 console.log(`Workspace: ${config.workspace}`);
 if (!config.allowlist.length && !config.allowUnlisted) {
@@ -109,7 +109,7 @@ await pollTelegram();
 async function configureBotCommands() {
   await telegramApi("setMyCommands", {
     commands: [
-      { command: "menu", description: "Open CodeWhale controls" },
+      { command: "menu", description: "Open Nestlone controls" },
       { command: "status", description: "Show runtime and workspace status" },
       { command: "threads", description: "List recent runtime threads" },
       { command: "new", description: "Create a new thread" },
@@ -369,7 +369,7 @@ async function sendMenu(chatId) {
   await sendText(
     chatId,
     [
-      "CodeWhale controls",
+      "Nestlone controls",
       state?.threadId ? `thread=${state.threadId}` : "thread=(new on first prompt)",
       `model=${state?.model || config.model}`
     ].join("\n"),

@@ -363,7 +363,7 @@ impl PluginRegistry {
         }
         if plugin.staged_root.is_none() {
             return Err(format!(
-                "Plugin bundle `{}` has no verified Codewhale runtime snapshot; review and trust it again before enablement",
+                "Plugin bundle `{}` has no verified Nestlone runtime snapshot; review and trust it again before enablement",
                 plugin.name()
             ));
         }
@@ -993,7 +993,7 @@ fn stage_bundle(state_path: &Path, plugin: &LoadedPlugin) -> Result<PathBuf, Str
     if destination.exists() {
         if !staged_bundle_matches(&destination, &plugin.content_hash, &plugin.capability_hash) {
             return Err(
-                "Existing Codewhale plugin runtime snapshot failed content validation; remove the exact .runtime entry and review again"
+                "Existing Nestlone plugin runtime snapshot failed content validation; remove the exact .runtime entry and review again"
                     .to_string(),
             );
         }
@@ -1016,7 +1016,7 @@ fn stage_bundle(state_path: &Path, plugin: &LoadedPlugin) -> Result<PathBuf, Str
         copy_bundle_tree(&plugin.canonical_root, &temporary)?;
         if !staged_bundle_matches(&temporary, &plugin.content_hash, &plugin.capability_hash) {
             return Err(
-                "Plugin bundle changed while Codewhale was staging it; no runtime authority was granted"
+                "Plugin bundle changed while Nestlone was staging it; no runtime authority was granted"
                     .to_string(),
             );
         }
@@ -1884,12 +1884,12 @@ fn preserve_owner_only_file_mode(path: &Path, _source: &fs::Metadata) -> Result<
 }
 
 /// Recheck a persisted plugin receipt, the mutable reviewed source, and the
-/// Codewhale-owned immutable runtime copy. This function performs no writes.
+/// Nestlone-owned immutable runtime copy. This function performs no writes.
 pub fn verify_plugin_authority(authority: &PluginAuthority) -> Result<(), String> {
     verify_plugin_state_authority(authority)?;
     for (label, manifest_path) in [
         ("reviewed source", &authority.source_manifest),
-        ("Codewhale runtime snapshot", &authority.staged_manifest),
+        ("Nestlone runtime snapshot", &authority.staged_manifest),
     ] {
         let current =
             super::manifest::PluginManifest::validate_from_path(manifest_path).map_err(|_| {
@@ -2171,7 +2171,7 @@ mod windows_acl_tests {
         std::fs::create_dir(&target).unwrap();
         set_windows_owner_only_acl(&target).unwrap();
 
-        // Simulate an already-private Codewhale object whose owner is still
+        // Simulate an already-private Nestlone object whose owner is still
         // the current user, but whose DACL intentionally does not grant
         // WRITE_OWNER. Rehardening must restore the full owner-only ACL
         // rather than assuming it may take ownership again.

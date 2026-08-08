@@ -57,7 +57,7 @@ fn store() -> &'static Mutex<Store> {
 
 fn default_path() -> Option<PathBuf> {
     // Unit tests exercise mention selection heavily and must never read from or
-    // append to a developer's real Codewhale home. Integration and release QA
+    // append to a developer's real Nestlone home. Integration and release QA
     // processes use an explicit isolated CODEWHALE_HOME instead.
     #[cfg(test)]
     {

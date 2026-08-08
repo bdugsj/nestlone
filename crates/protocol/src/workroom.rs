@@ -337,7 +337,7 @@ mod tests {
     fn external_thread_ref_serde_roundtrip() {
         let issue = ExternalThreadRef::GitHubIssue {
             owner: "Hmbown".into(),
-            repo: "CodeWhale".into(),
+            repo: "Nestlone".into(),
             number: 3209,
         };
         let json = serde_json::to_string(&issue).unwrap();

@@ -1,13 +1,13 @@
 {
-  "name": "codewhale-vscode",
-  "displayName": "CodeWhale",
-  "description": "Official CodeWhale VS Code integration scaffold for local runtime attach and terminal launch.",
+  "name": "nestlone-vscode",
+  "displayName": "Nestlone",
+  "description": "Official Nestlone VS Code integration scaffold for local runtime attach and terminal launch.",
   "version": "0.8.53",
-  "publisher": "codewhale",
+  "publisher": "nestlone",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Hmbown/CodeWhale.git",
+    "url": "https://github.com/bdugsj/nestlone.git",
     "directory": "extensions/vscode"
   },
   "engines": {
@@ -17,13 +17,13 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:codewhale.openTerminal",
-    "onCommand:codewhale.startRuntime",
-    "onCommand:codewhale.checkRuntime",
-    "onCommand:codewhale.refreshAgentView",
-    "onCommand:codewhale.refreshSnapshots",
-    "onCommand:codewhale.openRuntimeDocs",
-    "onView:codewhale.runtimeStatus"
+    "onCommand:nestlone.openTerminal",
+    "onCommand:nestlone.startRuntime",
+    "onCommand:nestlone.checkRuntime",
+    "onCommand:nestlone.refreshAgentView",
+    "onCommand:nestlone.refreshSnapshots",
+    "onCommand:nestlone.openRuntimeDocs",
+    "onView:nestlone.runtimeStatus"
   ],
   "main": "./out/extension.js",
   "files": [
@@ -35,56 +35,56 @@
   "contributes": {
     "commands": [
       {
-        "command": "codewhale.openTerminal",
-        "title": "CodeWhale: Open Terminal"
+        "command": "nestlone.openTerminal",
+        "title": "Nestlone: Open Terminal"
       },
       {
-        "command": "codewhale.startRuntime",
-        "title": "CodeWhale: Start Local Runtime"
+        "command": "nestlone.startRuntime",
+        "title": "Nestlone: Start Local Runtime"
       },
       {
-        "command": "codewhale.checkRuntime",
-        "title": "CodeWhale: Check Runtime"
+        "command": "nestlone.checkRuntime",
+        "title": "Nestlone: Check Runtime"
       },
       {
-        "command": "codewhale.refreshAgentView",
-        "title": "CodeWhale: Refresh Agent View"
+        "command": "nestlone.refreshAgentView",
+        "title": "Nestlone: Refresh Agent View"
       },
       {
-        "command": "codewhale.refreshSnapshots",
-        "title": "CodeWhale: Refresh Restore Points"
+        "command": "nestlone.refreshSnapshots",
+        "title": "Nestlone: Refresh Restore Points"
       },
       {
-        "command": "codewhale.openRuntimeDocs",
-        "title": "CodeWhale: Open Runtime API Docs"
+        "command": "nestlone.openRuntimeDocs",
+        "title": "Nestlone: Open Runtime API Docs"
       }
     ],
     "configuration": {
-      "title": "CodeWhale",
+      "title": "Nestlone",
       "properties": {
-        "codewhale.commandPath": {
+        "nestlone.commandPath": {
           "type": "string",
-          "default": "codewhale",
-          "description": "Command or absolute path used to launch CodeWhale."
+          "default": "nestlone",
+          "description": "Command or absolute path used to launch Nestlone."
         },
-        "codewhale.runtimeHost": {
+        "nestlone.runtimeHost": {
           "type": "string",
           "default": "127.0.0.1",
-          "description": "Local host used for CodeWhale runtime attach checks."
+          "description": "Local host used for Nestlone runtime attach checks."
         },
-        "codewhale.runtimePort": {
+        "nestlone.runtimePort": {
           "type": "number",
           "default": 7878,
           "minimum": 1,
           "maximum": 65535,
-          "description": "Local port used for CodeWhale runtime attach checks."
+          "description": "Local port used for Nestlone runtime attach checks."
         },
-        "codewhale.runtimeToken": {
+        "nestlone.runtimeToken": {
           "type": "string",
           "default": "",
           "description": "Optional bearer token for authenticated runtime endpoints."
         },
-        "codewhale.agentViewRefreshIntervalSeconds": {
+        "nestlone.agentViewRefreshIntervalSeconds": {
           "type": "number",
           "default": 15,
           "minimum": 0,
@@ -96,17 +96,17 @@
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "codewhale",
-          "title": "CodeWhale",
-          "icon": "media/codewhale.svg"
+          "id": "nestlone",
+          "title": "Nestlone",
+          "icon": "media/nestlone.svg"
         }
       ]
     },
     "views": {
-      "codewhale": [
+      "nestlone": [
         {
           "type": "webview",
-          "id": "codewhale.runtimeStatus",
+          "id": "nestlone.runtimeStatus",
           "name": "Agent View"
         }
       ]

@@ -370,7 +370,7 @@ fn capability_matrix_honors_the_advertised_color_tier() -> Result<()> {
     Ok(())
 }
 
-/// `CODEWHALE_ASCII_SAFE=1` must narrow every CodeWhale-authored decorative
+/// `CODEWHALE_ASCII_SAFE=1` must narrow every Nestlone-authored decorative
 /// glyph, and the default tier must actually differ — otherwise the fallback
 /// is untested and the "ASCII terminals are supported" claim is unbacked.
 #[test]

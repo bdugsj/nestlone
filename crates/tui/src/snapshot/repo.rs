@@ -117,7 +117,7 @@ const SIZE_WALK_SKIP_DIRS: &[&str] = &[
 ];
 
 const BUILTIN_EXCLUDES: &str = "\
-# CodeWhale built-in snapshot exclusions
+# Nestlone built-in snapshot exclusions
 node_modules/
 target/
 dist/
