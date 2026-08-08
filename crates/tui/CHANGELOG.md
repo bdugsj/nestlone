@@ -9,8 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.0.2] - 2026-08-02
 
-First Nestlone release. The project was forked from CodeWhale and rebranded
-end to end; release engineering moved fully to GitHub Actions.
+This is the Nestlone v0.0.2 source candidate, published as release `v0.0.2`.
+The project was forked from CodeWhale and rebranded end to end; release
+engineering moved fully to GitHub Actions.
 
 ### Changed
 
@@ -37,6 +38,19 @@ end to end; release engineering moved fully to GitHub Actions.
 
 - **State crate home-override parsing** broke after the data-directory rename
   and is restored.
+
+### Contributors
+
+The 0.0.2 release rebranded the fork end to end. Merged and harvested PR
+credit, plus issue helpers, recorded in the release credits.
+
+**Merged / harvested contributors:** @greyfreedom, @nightt5879,
+@XhesicaFrost, @cyq1017, @snail-vs, @SparkofSpike, @GTC2080, @h3c-hexin,
+@atmosuwiryo, @M-Maciej, @raphamorim, @LI-Jialu, @kobihikri,
+@EvanProgramming, @adity982, @vibecoding-skills
+
+**Issue helpers:** @fleitz, @LmeSzinc, @antarikshraya, @eugenicum, @whp233,
+@redjade75723, @hardy922, @JayBeest, @elijahchan2019, @cy2311, @wywsoor
 
 ## [0.9.2] - 2026-07-29
 
