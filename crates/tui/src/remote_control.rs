@@ -839,9 +839,7 @@ async fn enroll_device(
         .get("interval")
         .and_then(Value::as_u64)
         .filter(|value| (1..=30).contains(value))
-        .ok_or_else(|| {
-            "Nestlone returned an invalid device authorization interval.".to_string()
-        })?;
+        .ok_or_else(|| "Nestlone returned an invalid device authorization interval.".to_string())?;
     let expires_in = value
         .get("expiresIn")
         .and_then(Value::as_u64)

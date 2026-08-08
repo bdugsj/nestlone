@@ -1382,10 +1382,7 @@ mod tests {
         .unwrap();
 
         let snap = scan(&workspace, Some(&home), SkillAuditMode::OwnedOnly, None);
-        assert_eq!(
-            snap.skills[0].source_kind,
-            SkillSourceKind::NestloneManaged
-        );
+        assert_eq!(snap.skills[0].source_kind, SkillSourceKind::NestloneManaged);
         assert!(
             snap.skills[0]
                 .available_actions

@@ -3104,8 +3104,7 @@ fn xai_auth_status_lines_for_provider(
         XaiOAuthGenerationPointer::Valid
             if diagnostics.route == XaiAuthDiagnosticRoute::OwnedOAuth =>
         {
-            "xAI OAuth generation: configured Nestlone-owned pointer (storage unprobed)"
-                .to_string()
+            "xAI OAuth generation: configured Nestlone-owned pointer (storage unprobed)".to_string()
         }
         XaiOAuthGenerationPointer::Valid => {
             "xAI OAuth generation: valid but inactive for this route".to_string()
